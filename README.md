@@ -1,8 +1,8 @@
 # NiimBlue
 
-Niimbot printers webui. Design and print labels directly from your browser.
+Niimbot printers webui. Design and print labels right from your browser.
 
-Bluetooth connection is working fine, serial needs some work.
+Bluetooth connection works fine, serial needs some work.
 
 There is no code yet. It will be pushed when I finish a library and ui. It is very raw.
 
@@ -13,7 +13,7 @@ Tested printers:
 
 ## Demo
 
-Public preview available here: https://dev.mmote.ru/niimblue/ (updated often).
+The public preview is available here: https://dev.mmote.ru/niimblue/ (updated often).
 
 ## Browser support
 
