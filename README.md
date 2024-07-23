@@ -15,13 +15,19 @@ Tested printers:
 
 ## Demo
 
-The public preview is available here: https://dev.mmote.ru/niimblue/ (updated often).
+The public preview is available [here](https://dev.mmote.ru/niimblue/) (updated often).
 
 ## Browser support
 
 Your browser must support Web Bluetooth API: [supported browsers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API#browser_compatibility).
 
 For serial communication: [supported browsers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility).
+
+## Feedback needed!
+
+I only have D110 and B1 printers. If you own other models, please open an issue, confirm you model working or not with this project.
+
+Bluetooth dumps are MUCH appreciated (search how to enable **Bluetooth HCI Snoop Log** for your device, print any label with **Niimbot** app then run `adb bugreport filename`, you should find **btsnoop_hci.log** in the archive).
 
 ## Images
 
