@@ -1,10 +1,16 @@
 # NiimBlue
 
+> ⚠ **draft** branch
+>
+> This branch contains current code of both projects:
+>
+> - **niimblue** - frontend
+> - **niimbluelib** - printer interface
+>
+> Do not create references to this branch, it will be split into the different repos
+> and/or squash-merged to the main branch on the first release. Then this branch will most likely be removed.
+
 Niimbot printers webui. Design and print labels right from your browser.
-
-There is no code yet. It will be pushed when I finish a library and ui. It is very raw.
-
-If you really want to see how it made, you can browse source code [here](https://gitee.mmote.ru/MultiMote/niimblue-nightly) (you will see auto-generated daily commits, after first release repository will be deleted).
 
 Tested printers:
 
@@ -17,7 +23,7 @@ You can see implemented and planned feature list [in this issue](https://github.
 
 ## Demo
 
-The public preview is available [here](https://dev.mmote.ru/niimblue/) (updated often).
+The public preview is available [here](https://niim.mmote.ru).
 
 ## Browser support
 
@@ -33,6 +39,8 @@ Bluetooth dumps are MUCH appreciated (search how to enable **Bluetooth HCI Snoop
 
 ## Images
 
+Images may be outdated, interface is changing constantly.
+
 ![ui](about/ui.png)
 
 ![labels](about/labels.png)
@@ -44,3 +52,43 @@ Bluetooth dumps are MUCH appreciated (search how to enable **Bluetooth HCI Snoop
 ![printed_b1](about/printed_b1.jpg)
 
 ![printed_d110](about/printed_d110.jpg)
+
+## Launching development server
+
+Skip steps you have done.
+
+1. Install [git](https://git-scm.com)
+
+2. Install [nodejs](https://nodejs.org)
+
+3. Install [yarn](https://yarnpkg.com)
+
+4. Clone repository
+
+    ```bash
+    git clone -b draft https://github.com/MultiMote/niimblue.git
+    ```
+
+5. Install dependencies
+
+    ```bash
+    cd niimblue
+    yarn --cwd niimbluelib
+    yarn --cwd niimblue
+    ```
+
+6. Run dev server
+
+    ```bash
+    yarn --cwd niimblue dev-locallib
+    ```
+
+    or
+
+    ```bash
+    cd niimblue
+    yarn dev-locallib
+    ```
+
+    This command will install local niimbluelib to the niimblue project and run the server.
+    If niimbluelib is modified you must re-run this command.

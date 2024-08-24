@@ -1,0 +1,32 @@
+{
+  "name": "@mmote/niimbluelib",
+  "version": "0.0.1",
+  "description": "Library for communicating with niimbot printers",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "author": "MultiMote",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "clean-build": "yarn clean && yarn build",
+    "build": "tsc --build",
+    "test": "yarn build && node utils/test.mjs",
+    "parse-dump": "yarn build && node utils/parse-dump.mjs",
+    "clean": "node clean-dist.mjs",
+    "gen-printer-models": "node utils/gen-printer-models.js > src/printer_models.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "@types/w3c-web-serial": "^1.0.6",
+    "@types/web-bluetooth": "^0.0.20",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "async-mutex": "^0.5.0",
+    "typescript-event-target": "^1.1.1"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+}
