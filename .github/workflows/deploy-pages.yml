@@ -57,7 +57,7 @@ jobs:
       - name: Build niimblue
         run: yarn --cwd niimblue vite build --base="${{ steps.pages.outputs.base_path || '/' }}"
         env:
-          COMMIT_HASH: ${GITHUB_SHA}
+          COMMIT_HASH: ${{github.sha}}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
