@@ -34,24 +34,32 @@ jobs:
         with:
           node-version: "20"
           cache: yarn
-          cache-dependency-path: ./yarn.lock
 
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
 
-      - name: Install dependencies
-        run: yarn install
+      - name: Install niimbluelib dependencies
+        run: yarn --cwd niimbluelib
 
-      - name: Build
-        run: yarn vite build --base="${{ steps.pages.outputs.base_path || '/' }}"
+      - name: Build niimbluelib
+        run: yarn --cwd niimbluelib build
+
+      - name: Install niimblue dependencies
+        run: yarn --cwd niimblue
+
+      - name: Check niimblue code
+        run: yarn --cwd niimblue sv-check
+
+      - name: Build niimblue
+        run: yarn --cwd niimblue vite build --base="${{ steps.pages.outputs.base_path || '/' }}"
         env:
           COMMIT_HASH: ${GITHUB_SHA}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ./niimblue/dist
 
   deploy:
     environment:
