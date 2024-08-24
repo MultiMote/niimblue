@@ -2,9 +2,7 @@
 
 Niimbot printers webui. Design and print labels right from your browser.
 
-There is no code yet. It will be pushed when I finish a library and ui. It is very raw.
-
-If you really want to see how it made, you can browse source code [here](https://gitee.mmote.ru/MultiMote/niimblue-nightly) (you will see auto-generated daily commits, after first release repository will be deleted).
+There is no code in the main branch yet. You can browse source code at the [draft](https://github.com/MultiMote/niimblue/tree/draft) branch.
 
 Tested printers:
 
@@ -17,7 +15,7 @@ You can see implemented and planned feature list [in this issue](https://github.
 
 ## Demo
 
-The public preview is available [here](https://dev.mmote.ru/niimblue/) (updated often).
+The public preview is available [here](https://niim.mmote.ru) (updated often).
 
 ## Browser support
 
