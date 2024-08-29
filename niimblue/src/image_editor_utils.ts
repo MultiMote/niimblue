@@ -1,4 +1,5 @@
 import { fabric } from "fabric";
+import { QRCode } from './fabric-object/qrcode.class';
 
 export class ImageEditorUtils {
   static readonly SIZE_DEFAULT: number = 64;
@@ -124,5 +125,13 @@ export class ImageEditorUtils {
     });
     canvas.add(obj);
     obj.centerV();
+  }
+
+  public static addQrCode(canvas: fabric.Canvas): void {
+    const qr = new QRCode({
+      text: 'NiimBlue',
+      size: ImageEditorUtils.SIZE_DEFAULT,
+    });
+    canvas.add(qr);
   }
 }
