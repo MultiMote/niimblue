@@ -11,7 +11,7 @@ export interface QRCodeType extends fabric.Object {
 
 // @ts-ignore
 export const QRCode = fabric.util.createClass(fabric.Object, {
-  type: 'qrcode',
+  type: 'QRCode',
   stateProperties: PRESERVE_PROPERTIES.concat(...(fabric.Object.prototype.stateProperties ?? [])),
   cacheProperties: PRESERVE_PROPERTIES.concat(...(fabric.Object.prototype.cacheProperties ?? [])),
   paths: [],
@@ -130,7 +130,7 @@ QRCode.fromElement = () => { };
 
 // @ts-ignore
 QRCode.fromObject = (object: any, callback: any) => {
-  fabric.Object._fromObject('qrcode', object, callback);
+  return fabric.Object._fromObject('QRCode', object, callback);
 };
 
 // @ts-ignore
