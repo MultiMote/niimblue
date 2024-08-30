@@ -119,13 +119,8 @@ export const QRCode = fabric.util.createClass(fabric.Object, {
   },
 })
 
-// @ts-ignore
 QRCode.ATTRIBUTE_NAMES = [];
-
-// @ts-ignore
 QRCode.fromElement = () => { };
-
-// @ts-ignore
 QRCode.fromObject = (object: any, callback: any) => {
   return fabric.Object._fromObject('QRCode', object, callback);
 };
