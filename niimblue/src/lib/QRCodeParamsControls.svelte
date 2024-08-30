@@ -39,14 +39,14 @@
     <span class="input-group-text" title="Error Correction Level"
       ><FaIcon icon="pen-to-square" /></span
     >
-    <select class="from-select" value={ecl} on:change={eclChange}>
+    <select class="form-select" value={ecl} on:change={eclChange}>
       <option value="L">Level L</option>
       <option value="M">Level M</option>
       <option value="Q">Level Q</option>
       <option value="H">Level H</option>
     </select>
   </div>
-  <textarea class="qrcode-content" value={text} on:change={textChange} />
+  <textarea class="qrcode-content form-control" value={text} on:change={textChange} />
 {/if}
 
 <style>
@@ -55,7 +55,6 @@
   }
 
   .qrcode-content {
-    width: 100%;
     height: 100px;
   }
 </style>
