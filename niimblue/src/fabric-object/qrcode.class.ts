@@ -9,7 +9,6 @@ export interface QRCodeType extends fabric.Object {
   ecl: 'L' | 'M' | 'Q' | 'H'
 }
 
-// @ts-ignore
 export const QRCode = fabric.util.createClass(fabric.Object, {
   type: 'QRCode',
   stateProperties: PRESERVE_PROPERTIES.concat(...(fabric.Object.prototype.stateProperties ?? [])),
@@ -71,7 +70,6 @@ export const QRCode = fabric.util.createClass(fabric.Object, {
     const svg = qr.svg();
     const match = svg.match(/<path[^>]*?d=(["\'])?((?:.(?!\1|>))*.?)\1?/);
     const path_str = match ? match[2] : '';
-    //@ts-ignore
     this.paths = fabric.util.makePathSimpler(fabric.util.parsePath(path_str))
     return this
   },
@@ -106,7 +104,6 @@ export const QRCode = fabric.util.createClass(fabric.Object, {
   _toSVG() {
     const x = - (this.width / 2);
     const y = - (this.height / 2);
-    // @ts-ignore
     const path = fabric.util.joinPath(this.paths);
 
     return [
