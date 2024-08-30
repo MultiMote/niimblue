@@ -151,12 +151,10 @@
       ImageEditorUtils.addRect(fabricCanvas);
     } else if (name === "image") {
       ImageEditorUtils.addImageWithFilePicker(fabricCanvas);
+    } else if (name === "qrcode") {
+      ImageEditorUtils.addQrCode(fabricCanvas);
     }
   };
-
-  const onAddQrCode = () => {
-    ImageEditorUtils.addQrCode(fabricCanvas);
-  }
 
   const onIconPicked = (i: IconName) => {
     const lookup = faParse.icon(i);
@@ -282,11 +280,6 @@
             <button class="btn btn-secondary btn-sm" on:click={onImportClicked}>Import JSON</button>
           </div>
         </div>
-
-        <button class="btn btn-sm btn-secondary" on:click={onAddQrCode}>
-          <FaIcon icon="qrcode" />
-          <FaIcon icon="plus"/>
-        </button>
 
         <IconPicker onSubmit={onIconPicked} />
         <ObjectPicker onSubmit={onObjectPicked} />

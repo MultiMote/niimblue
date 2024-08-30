@@ -30,6 +30,9 @@
       <button class="btn me-1" on:click={() => onSubmit("image")}>
         <FaIcon icon="image" /> Image
       </button>
+      <button class="btn me-1" on:click={() => onSubmit('qrcode')}>
+        <FaIcon icon="qrcode" /> QR Code
+      </button>
     </div>
   </div>
 </div>
