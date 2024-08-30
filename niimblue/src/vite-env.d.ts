@@ -13,3 +13,38 @@ declare type FontData = {
 };
 
 declare function queryLocalFonts(): Promise<ReadonlyArray<FontData>>;
+
+// Extend types and functions that are not exported in @types/fabric
+declare namespace fabric {
+  type MoveCommand = ['M' | 'm', number, number];
+  type LineCommand = 
+    | ['L' | 'l', number, number] 
+    | ['H' | 'h' | 'V' | 'v', number];
+  type CurveCommand = 
+    | ['C' | 'c', number, number, number, number, number, number] 
+    | ['S' | 's', number, number, number, number];
+  type QuadraticCommand =
+    | ['Q' | 'q', number, number, number, number]
+    | ['T' | 't', number, number];
+  type EllipseCommand = ['A' | 'a', number, number, number, number, number, number, number];
+  type CloseCommand = ['Z' | 'z'];
+  type PathCommand = MoveCommand | LineCommand | CurveCommand | QuadraticCommand | EllipseCommand | CloseCommand;
+
+  interface IUtil {
+    /**
+     * Parse SVG path string into array of path commands
+     * @param pathString SVG path string
+     */
+    parsePath(pathString: string): PathCommand[];
+    /**
+     * Simplify path commands
+     * @param path Array of path commands
+     */
+    makePathSimpler(path: PathCommand[]): PathCommand[];
+    /**
+     * Join path commands into a single path string
+     * @param pathData Array of path commands
+     */
+    joinPath(pathData: PathCommand[]): string;
+  }
+}
