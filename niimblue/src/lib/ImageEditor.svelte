@@ -11,6 +11,8 @@
   import TextParamsPanel from "./TextParamsControls.svelte";
   import GenericObjectParamsControls from "./GenericObjectParamsControls.svelte";
   import { ImageEditorUtils } from "../image_editor_utils";
+  import { QRCode } from '../fabric-object/qrcode.class';
+  import QrCodeParamsPanel from "./QRCodeParamsControls.svelte";
 
   let htmlCanvas: HTMLCanvasElement;
   let fabricCanvas: fabric.Canvas;
@@ -149,6 +151,8 @@
       ImageEditorUtils.addRect(fabricCanvas);
     } else if (name === "image") {
       ImageEditorUtils.addImageWithFilePicker(fabricCanvas);
+    } else if (name === "qrcode") {
+      ImageEditorUtils.addQrCode(fabricCanvas);
     }
   };
 
@@ -299,6 +303,9 @@
 
         {#if selectedObject instanceof fabric.IText}
           <TextParamsPanel {selectedObject} valueUpdated={() => fabricCanvas.requestRenderAll()} />
+        {/if}
+        {#if selectedObject instanceof QRCode}
+          <QrCodeParamsPanel {selectedObject} valueUpdated={() => fabricCanvas.requestRenderAll()} />
         {/if}
       </div>
     </div>

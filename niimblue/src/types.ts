@@ -15,4 +15,4 @@ export type LabelPreset = {
   printDirection: PrintDirection;
 };
 
-export type OjectType = "text" | "rectangle" | "line" | "circle" | "image"
+export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qrcode"
