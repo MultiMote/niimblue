@@ -3,10 +3,12 @@ import { fabric } from 'fabric'
 
 const PRESERVE_PROPERTIES = ['text', 'size', 'ecl']
 
+export type ErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
+
 export interface QRCodeType extends fabric.Object {
   text: string
   size: number
-  ecl: 'L' | 'M' | 'Q' | 'H'
+  ecl: ErrorCorrectionLevel
 }
 
 export const QRCode = fabric.util.createClass(fabric.Object, {
@@ -24,7 +26,7 @@ export const QRCode = fabric.util.createClass(fabric.Object, {
    * Error Correction Level
    * @var {'L' | 'M' | 'Q' | 'H'}
    */
-  ecl: 'M',
+  ecl: 'M' as ErrorCorrectionLevel,
   /**
    * QRCode size
    * @var {number}
@@ -68,7 +70,7 @@ export const QRCode = fabric.util.createClass(fabric.Object, {
       join: true
     });
     const svg = qr.svg();
-    const match = svg.match(/<path[^>]*?d=(["\'])?((?:.(?!\1|>))*.?)\1?/);
+    const match = /<path[^>]*?d=(["'])?((?:.(?!\1|>))*.?)\1?/.exec(svg);
     const path_str = match ? match[2] : '';
     this.paths = fabric.util.makePathSimpler(fabric.util.parsePath(path_str))
     return this
