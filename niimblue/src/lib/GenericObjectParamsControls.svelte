@@ -6,7 +6,6 @@
   export let valueUpdated: () => void;
 
   const putToCenterV = () => {
-    selectedObject.canvas?.centerObjectH(selectedObject);
     selectedObject.centerV();
     valueUpdated();
   };
