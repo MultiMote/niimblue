@@ -11,7 +11,7 @@
   import TextParamsPanel from "./TextParamsControls.svelte";
   import GenericObjectParamsControls from "./GenericObjectParamsControls.svelte";
   import { ImageEditorUtils } from "../image_editor_utils";
-  import { QRCode } from '../fabric-object/qrcode.class';
+  import { QRCode } from "../fabric-object/qrcode.class";
   import QrCodeParamsPanel from "./QRCodeParamsControls.svelte";
 
   let htmlCanvas: HTMLCanvasElement;

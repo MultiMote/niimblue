@@ -16,18 +16,14 @@ declare function queryLocalFonts(): Promise<ReadonlyArray<FontData>>;
 
 // Extend types and functions that are not exported in @types/fabric
 declare namespace fabric {
-  type MoveCommand = ['M' | 'm', number, number];
-  type LineCommand = 
-    | ['L' | 'l', number, number] 
-    | ['H' | 'h' | 'V' | 'v', number];
-  type CurveCommand = 
-    | ['C' | 'c', number, number, number, number, number, number] 
-    | ['S' | 's', number, number, number, number];
-  type QuadraticCommand =
-    | ['Q' | 'q', number, number, number, number]
-    | ['T' | 't', number, number];
-  type EllipseCommand = ['A' | 'a', number, number, number, number, number, number, number];
-  type CloseCommand = ['Z' | 'z'];
+  type MoveCommand = ["M" | "m", number, number];
+  type LineCommand = ["L" | "l", number, number] | ["H" | "h" | "V" | "v", number];
+  type CurveCommand =
+    | ["C" | "c", number, number, number, number, number, number]
+    | ["S" | "s", number, number, number, number];
+  type QuadraticCommand = ["Q" | "q", number, number, number, number] | ["T" | "t", number, number];
+  type EllipseCommand = ["A" | "a", number, number, number, number, number, number, number];
+  type CloseCommand = ["Z" | "z"];
   type PathCommand = MoveCommand | LineCommand | CurveCommand | QuadraticCommand | EllipseCommand | CloseCommand;
 
   interface IUtil {

@@ -1,18 +1,18 @@
-import QRCodeSVG from 'qrcode-svg'
-import { fabric } from 'fabric'
+import QRCodeSVG from "qrcode-svg";
+import { fabric } from "fabric";
 
-const PRESERVE_PROPERTIES = ['text', 'size', 'ecl']
+const PRESERVE_PROPERTIES = ["text", "size", "ecl"];
 
-export type ErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
+export type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
 
 export interface QRCodeType extends fabric.Object {
-  text: string
-  size: number
-  ecl: ErrorCorrectionLevel
+  text: string;
+  size: number;
+  ecl: ErrorCorrectionLevel;
 }
 
 export const QRCode = fabric.util.createClass(fabric.Object, {
-  type: 'QRCode',
+  type: "QRCode",
   stateProperties: PRESERVE_PROPERTIES.concat(...(fabric.Object.prototype.stateProperties ?? [])),
   cacheProperties: PRESERVE_PROPERTIES.concat(...(fabric.Object.prototype.cacheProperties ?? [])),
   paths: [],
@@ -21,12 +21,12 @@ export const QRCode = fabric.util.createClass(fabric.Object, {
    * QRCode text
    * @var {string}
    */
-  text: '',
+  text: "",
   /**
    * Error Correction Level
-   * @var {'L' | 'M' | 'Q' | 'H'}
+   * @var {"L" | "M" | "Q" | "H"}
    */
-  ecl: 'M' as ErrorCorrectionLevel,
+  ecl: "M" as ErrorCorrectionLevel,
   /**
    * QRCode size
    * @var {number}
@@ -34,64 +34,65 @@ export const QRCode = fabric.util.createClass(fabric.Object, {
   size: 80,
 
   initialize(options = {}) {
-    this.callSuper('initialize', options);
+    this.callSuper("initialize", options);
     this._createPathData();
   },
 
   _set(key: any, value: any) {
-    this.callSuper('_set', key, value);
+    this.callSuper("_set", key, value);
     switch (key) {
-      case 'text':
-      case 'qrPadding':
-      case 'ecl':
+      case "text":
+      case "qrPadding":
+      case "ecl":
         this._createPathData();
         break;
-      case 'size':
+      case "size":
         this._createPathData();
         this.set({
           width: value,
-          height: value
+          height: value,
         });
-        break
+        break;
     }
 
-    return this
+    return this;
   },
 
   _createPathData() {
     const qr = new QRCodeSVG({
-      content: this.text || '',
+      content: this.text || "",
       padding: 0,
       width: this.size,
       height: this.size,
       color: this.stroke,
       background: this.fill,
       ecl: this.ecl,
-      join: true
+      join: true,
     });
     const svg = qr.svg();
     const match = /<path[^>]*?d=(["'])?((?:.(?!\1|>))*.?)\1?/.exec(svg);
-    const path_str = match ? match[2] : '';
-    this.paths = fabric.util.makePathSimpler(fabric.util.parsePath(path_str))
-    return this
+    const path_str = match ? match[2] : "";
+    this.paths = fabric.util.makePathSimpler(fabric.util.parsePath(path_str));
+    return this;
   },
 
   _render(ctx: CanvasRenderingContext2D) {
-    const w2 = this.width / 2, h2 = this.height / 2
+    const w2 = this.width / 2,
+      h2 = this.height / 2;
 
-    ctx.beginPath()
+    ctx.beginPath();
     for (const path of this.paths) {
-      const action = path[0]
-      const x = path[1]
-      const y = path[2]
-      if (action === 'M') ctx.moveTo(x - w2, y - h2)
-      else if (action === 'L') ctx.lineTo(x - w2, y - h2)
-      else if (action === 'C') {
-        ctx.closePath()
-        ctx.beginPath()
+      const action = path[0];
+      const x = path[1];
+      const y = path[2];
+      if (action === "M") ctx.moveTo(x - w2, y - h2);
+      else if (action === "L") ctx.lineTo(x - w2, y - h2);
+      else if (action === "C") {
+        ctx.closePath();
+        ctx.beginPath();
       }
     }
-    ctx.closePath()
+    ctx.closePath();
 
     ctx.save();
     ctx.fillStyle = this.stroke;
@@ -100,34 +101,50 @@ export const QRCode = fabric.util.createClass(fabric.Object, {
   },
 
   toObject(propertiesToInclude = []) {
-    return this.callSuper('toObject', PRESERVE_PROPERTIES.concat(...propertiesToInclude));
+    return this.callSuper("toObject", PRESERVE_PROPERTIES.concat(...propertiesToInclude));
   },
 
   _toSVG() {
-    const x = - (this.width / 2);
-    const y = - (this.height / 2);
+    const x = -(this.width / 2);
+    const y = -(this.height / 2);
     const path = fabric.util.joinPath(this.paths);
 
     return [
-      '<rect style="fill:', this.fill, ';" ',
-      'x="', x, '" y="', y,
-      '" width="', this.width, '" height="', this.height,
+      '<rect style="fill:',
+      this.fill,
+      ';" ',
+      'x="',
+      x,
+      '" y="',
+      y,
+      '" width="',
+      this.width,
+      '" height="',
+      this.height,
       '" />\n',
-      '<path style="fill:', this.stroke, ';" ',
-      'transform="translate(', x, ', ', y, ')" ',
-      'd="', path, '"',
-      ' />\n',
+      '<path style="fill:',
+      this.stroke,
+      ';" ',
+      'transform="translate(',
+      x,
+      ", ",
+      y,
+      ')" ',
+      'd="',
+      path,
+      '"',
+      " />\n",
     ];
   },
-})
+});
 
 QRCode.ATTRIBUTE_NAMES = [];
-QRCode.fromElement = () => { };
+QRCode.fromElement = () => {};
 QRCode.fromObject = (object: any, callback: any) => {
-  return fabric.Object._fromObject('QRCode', object, callback);
+  return fabric.Object._fromObject("QRCode", object, callback);
 };
 
 // @ts-ignore
-fabric.QRCode = QRCode
+fabric.QRCode = QRCode;
 
-export default QRCode
+export default QRCode;
