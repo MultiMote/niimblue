@@ -86,19 +86,17 @@ export const Barcode = fabric.util.createClass(fabric.Object, {
     if (this.printText) {
       if (this.encoding === 'EAN13') {
         dp = 2 * fontWidth
-        dh = this.height - fontHeight * 0.5
-      } else {
-        dh = this.height - fontHeight
       }
+      dh = this.height - fontHeight * 1.2
       dw = (this.width - dp * 2) / this.bandcode.length
     }
     for (let i = 0; i < this.bandcode.length; i++) {
       const d = this.bandcode[i]
       if (d === '1') {
-        if (this.encoding !== 'EAN13' || EAN13_LONG_IDX.includes(i))
-          ctx.fillRect(realX(dp + i * dw), realY(0), dw, dh)
+        if (this.encoding === 'EAN13' && EAN13_LONG_IDX.includes(i))
+          ctx.fillRect(realX(dp + i * dw), realY(0), dw, dh + fontHeight * 0.7)
         else
-          ctx.fillRect(realX(dp + i * dw), realY(0), dw, dh - fontHeight * 0.7)
+          ctx.fillRect(realX(dp + i * dw), realY(0), dw, dh)
       }
     }
 
