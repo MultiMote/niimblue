@@ -1,5 +1,6 @@
 import { fabric } from 'fabric'
 import { code128b, ean13 } from '../utils/barcode'
+import { equalSpacingFillText } from '../utils/canvas'
 
 const PRESERVE_PROPERTIES = ['text', 'encoding', 'printText']
 const EAN13_LONG_IDX: number[] = [0, 1, 2, 45, 46, 47, 48, 49, 92, 93, 94]
@@ -104,34 +105,13 @@ export const Barcode = fabric.util.createClass(fabric.Object, {
     if (this.printText) {
       const fastY = realY(this.height - fontHeight)
       if (this.encoding === 'EAN13') {
-        let partW = 42 * dw
-        const textSpace = (partW - fontWidth * 6 - dw * 1) / 5
-
-        // first digit
-        ctx.fillText(this.text[0], realX(fontWidth * 0.5), fastY)
-        // part 1
-        {
-          const pl = fontWidth * 2 + dw * 4
-          for (let i = 1; i < 7; i++) {
-            const partI = i - 1
-            ctx.fillText(this.text[i], realX(pl + fontWidth * partI + textSpace * partI), fastY)
-          }
-        }
-        // part 2
-        {
-          const pl = fontWidth * 2 + dw * 8 + partW
-          for (let i = 7; i < 13; i++) {
-            const partI = i - 7
-            ctx.fillText(this.text[i], realX(pl + fontWidth * partI + textSpace * partI), fastY)
-          }
-        }
-        // last digit
-        ctx.fillText('>', realX(this.width - fontWidth * 1.5), fastY)
+        let partW = 41 * dw
+        ctx.fillText(this.text[0], realX(fontWidth * 0.5), fastY) // first digit
+        equalSpacingFillText(ctx, this.text.slice(1, 7), realX(fontWidth * 2 + dw * 4), fastY, partW) // part 1
+        equalSpacingFillText(ctx, this.text.slice(7, 13), realX(fontWidth * 2 + dw * 9 + partW), fastY, partW) // part 2
+        ctx.fillText('>', realX(this.width - fontWidth * 1.5), fastY) // last digit
       } else {
-        const textSpace = (this.width - fontWidth * this.text.length) / (this.text.length - 1)
-        for (let i = 0; i < this.text.length; i++) {
-          ctx.fillText(this.text[i], realX(fontWidth * i + textSpace * i), fastY)
-        }
+        equalSpacingFillText(ctx, this.text, realX(0), fastY, this.width)
       }
     }
 
