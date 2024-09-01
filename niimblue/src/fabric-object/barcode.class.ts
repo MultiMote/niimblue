@@ -73,8 +73,8 @@ export const Barcode = fabric.util.createClass(fabric.Object, {
     ctx.save();
 
     ctx.fillStyle = this.fill;
-    const fontHeight = Math.round(Math.max(Math.min(this.height / 10, this.width / this.text.length * 1.5), 10))
-    ctx.font = `${fontHeight}px Courier New`
+    const fontHeight = Math.round(Math.max(Math.min(this.height / 10, this.width / this.text.length * 1.5), 12))
+    ctx.font = `bold ${fontHeight}px Courier New`
     ctx.textBaseline = 'top'
     const fontWidth = ctx.measureText('0').width
     const w2 = this.width / 2, h2 = this.height / 2
