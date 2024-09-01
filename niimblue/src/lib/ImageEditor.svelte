@@ -13,6 +13,8 @@
   import { ImageEditorUtils } from "../image_editor_utils";
   import { QRCode } from "../fabric-object/qrcode.class";
   import QrCodeParamsPanel from "./QRCodeParamsControls.svelte";
+  import { Barcode } from "../fabric-object/barcode.class";
+  import BarcodeParamsPanel from './BarcodeParamsControls.svelte';
 
   let htmlCanvas: HTMLCanvasElement;
   let fabricCanvas: fabric.Canvas;
@@ -153,6 +155,8 @@
       ImageEditorUtils.addImageWithFilePicker(fabricCanvas);
     } else if (name === "qrcode") {
       ImageEditorUtils.addQrCode(fabricCanvas);
+    } else if (name === 'barcode') {
+      ImageEditorUtils.addBarcode(fabricCanvas);
     }
   };
 
@@ -241,6 +245,18 @@
         });
       }
     });
+
+    fabricCanvas.on('object:scaling', (e) => {
+      const grid = 5;
+      if (e.target && e.target instanceof Barcode && e.target.width !== undefined && e.target.height !== undefined) {
+        e.target.set({
+          width: Math.round(e.target.width * (e.target.scaleX ?? 1)),
+          height: Math.round(e.target.height * (e.target.scaleY ?? 1)),
+          scaleX: 1,
+          scaleY: 1,
+        });
+      }
+    })
   });
 
   onDestroy(() => {
@@ -306,6 +322,9 @@
         {/if}
         {#if selectedObject instanceof QRCode}
           <QrCodeParamsPanel {selectedObject} valueUpdated={() => fabricCanvas.requestRenderAll()} />
+        {/if}
+        {#if selectedObject instanceof Barcode}
+          <BarcodeParamsPanel {selectedObject} valueUpdated={() => fabricCanvas.requestRenderAll()} />
         {/if}
       </div>
     </div>
