@@ -15,6 +15,7 @@
   import QrCodeParamsPanel from "./QRCodeParamsControls.svelte";
   import { Barcode } from "../fabric-object/barcode.class";
   import BarcodeParamsPanel from "./BarcodeParamsControls.svelte";
+  import Dropdown from "bootstrap/js/dist/dropdown";
 
   let htmlCanvas: HTMLCanvasElement;
   let fabricCanvas: fabric.Canvas;
@@ -205,7 +206,13 @@
 
     ImageEditorUtils.addText(fabricCanvas);
 
-    fabricCanvas.on("object:moving", (e: fabric.IEvent<MouseEvent>) => {
+    // force close dropdowns on touch devices
+    fabricCanvas.on("mouse:down", (e: fabric.IEvent<MouseEvent>): void => {
+      const dropdowns = document.querySelectorAll("[data-bs-toggle='dropdown']");
+      dropdowns.forEach((el) => new Dropdown(el).hide());
+    });
+
+    fabricCanvas.on("object:moving", (e: fabric.IEvent<MouseEvent>): void => {
       const grid = 5;
       if (e.target && e.target.left !== undefined && e.target.top !== undefined) {
         e.target.set({
@@ -241,8 +248,7 @@
       }
     });
 
-    fabricCanvas.on("object:scaling", (e) => {
-      const grid = 5;
+    fabricCanvas.on("object:scaling", (e: fabric.IEvent<MouseEvent>): void => {
       if (e.target && e.target instanceof Barcode && e.target.width !== undefined && e.target.height !== undefined) {
         e.target.set({
           width: Math.round(e.target.width * (e.target.scaleX ?? 1)),

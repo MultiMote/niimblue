@@ -142,7 +142,7 @@ export class ImageEditorUtils {
       width: ImageEditorUtils.SIZE_DEFAULT * 2,
       height: ImageEditorUtils.SIZE_DEFAULT,
       encoding: "EAN13",
-    });
+    })
     canvas.add(barcode);
   }
 }
