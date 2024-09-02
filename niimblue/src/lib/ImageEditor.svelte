@@ -14,7 +14,7 @@
   import { QRCode } from "../fabric-object/qrcode.class";
   import QrCodeParamsPanel from "./QRCodeParamsControls.svelte";
   import { Barcode } from "../fabric-object/barcode.class";
-  import BarcodeParamsPanel from './BarcodeParamsControls.svelte';
+  import BarcodeParamsPanel from "./BarcodeParamsControls.svelte";
 
   let htmlCanvas: HTMLCanvasElement;
   let fabricCanvas: fabric.Canvas;
@@ -155,7 +155,7 @@
       ImageEditorUtils.addImageWithFilePicker(fabricCanvas);
     } else if (name === "qrcode") {
       ImageEditorUtils.addQrCode(fabricCanvas);
-    } else if (name === 'barcode') {
+    } else if (name === "barcode") {
       ImageEditorUtils.addBarcode(fabricCanvas);
     }
   };
@@ -189,12 +189,7 @@
     if (savedLabelPropsStr != null) {
       try {
         const obj = JSON.parse(savedLabelPropsStr);
-        if (
-          "size" in obj &&
-          "width" in obj.size &&
-          "height" in obj.size &&
-          ["top", "left"].includes(obj.printDirection)
-        ) {
+        if ("size" in obj && "width" in obj.size && "height" in obj.size && ["top", "left"].includes(obj.printDirection)) {
           labelProps = obj as LabelProps;
         }
       } catch (e) {
@@ -246,7 +241,7 @@
       }
     });
 
-    fabricCanvas.on('object:scaling', (e) => {
+    fabricCanvas.on("object:scaling", (e) => {
       const grid = 5;
       if (e.target && e.target instanceof Barcode && e.target.width !== undefined && e.target.height !== undefined) {
         e.target.set({
@@ -256,7 +251,7 @@
           scaleY: 1,
         });
       }
-    })
+    });
   });
 
   onDestroy(() => {

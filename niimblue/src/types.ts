@@ -4,8 +4,8 @@ export type ConnectionState = "connecting" | "connected" | "disconnected";
 export type ConnectionType = "bluetooth" | "serial";
 
 export interface LabelProps {
-  printDirection: PrintDirection
-  size: { width: number; height: number }
+  printDirection: PrintDirection;
+  size: { width: number; height: number };
 }
 export type LabelPreset = {
   width: number;
@@ -15,4 +15,4 @@ export type LabelPreset = {
   printDirection: PrintDirection;
 };
 
-export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qrcode" | "barcode"
+export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qrcode" | "barcode";
