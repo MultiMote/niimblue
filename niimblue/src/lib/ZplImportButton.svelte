@@ -19,7 +19,7 @@
 
     try {
       const response = await fetch(
-        `http://api.labelary.com/v1/printers/${dpmm}dpmm/labels/${widthInches}x${heightInches}/0/`,
+        `https://api.labelary.com/v1/printers/${dpmm}dpmm/labels/${widthInches}x${heightInches}/0/`,
         {
           method: "POST",
           headers: {
