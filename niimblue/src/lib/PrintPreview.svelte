@@ -3,7 +3,7 @@
   import { derived } from "svelte/store";
   import Modal from "bootstrap/js/dist/modal";
   import { connectionState, printerClient, printerMeta } from "../stores";
-  import { copyImageData, threshold, atkinson } from "../post_process";
+  import { copyImageData, threshold, atkinson } from "../utils/post_process";
   import { type EncodedImage, ImageEncoder, LabelType, PacketGenerator, ProtocolVersion } from "@mmote/niimbluelib";
   import type { LabelProps } from "../types";
   import FaIcon from "./FaIcon.svelte";

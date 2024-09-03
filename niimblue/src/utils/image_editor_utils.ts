@@ -1,6 +1,7 @@
 import { fabric } from "fabric";
-import { QRCode } from "./fabric-object/qrcode.class";
-import Barcode from "./fabric-object/barcode.class";
+import { QRCode } from "../fabric-object/qrcode.class";
+import Barcode from "../fabric-object/barcode.class";
+import type { OjectType } from "../types";
 
 export class ImageEditorUtils {
   static readonly SIZE_DEFAULT: number = 64;
@@ -142,7 +143,25 @@ export class ImageEditorUtils {
       width: ImageEditorUtils.SIZE_DEFAULT * 2,
       height: ImageEditorUtils.SIZE_DEFAULT,
       encoding: "EAN13",
-    })
+    });
     canvas.add(barcode);
+  }
+
+  public static addObject(canvas: fabric.Canvas, objType: OjectType): void {
+    if (objType === "text") {
+      this.addText(canvas);
+    } else if (objType === "line") {
+      this.addHLine(canvas);
+    } else if (objType === "circle") {
+      this.addCircle(canvas);
+    } else if (objType === "rectangle") {
+      this.addRect(canvas);
+    } else if (objType === "image") {
+      this.addImageWithFilePicker(canvas);
+    } else if (objType === "qrcode") {
+      this.addQrCode(canvas);
+    } else if (objType === "barcode") {
+      this.addBarcode(canvas);
+    }
   }
 }

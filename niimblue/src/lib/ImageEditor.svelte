@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { fabric } from "fabric";
-  import { type LabelProps, type OjectType } from "../types";
+  import { type LabelProps, type OjectType, type ExportedLabelTemplate } from "../types";
   import LabelPropsEditor from "./LabelPropsEditor.svelte";
   import IconPicker from "./IconPicker.svelte";
   import { type IconName, icon as faIcon, parse as faParse } from "@fortawesome/fontawesome-svg-core";
@@ -10,12 +10,13 @@
   import PrintPreview from "./PrintPreview.svelte";
   import TextParamsPanel from "./TextParamsControls.svelte";
   import GenericObjectParamsControls from "./GenericObjectParamsControls.svelte";
-  import { ImageEditorUtils } from "../image_editor_utils";
+  import { ImageEditorUtils } from "../utils/image_editor_utils";
   import { QRCode } from "../fabric-object/qrcode.class";
   import QrCodeParamsPanel from "./QRCodeParamsControls.svelte";
   import { Barcode } from "../fabric-object/barcode.class";
   import BarcodeParamsPanel from "./BarcodeParamsControls.svelte";
   import Dropdown from "bootstrap/js/dist/dropdown";
+  import { FileUtils } from "../utils/file_utils";
 
   let htmlCanvas: HTMLCanvasElement;
   let fabricCanvas: fabric.Canvas;
@@ -66,60 +67,26 @@
   };
 
   const onExportClicked = () => {
-    const json: string = JSON.stringify({
-      canvas: fabricCanvas.toJSON(),
-      label: labelProps,
-    });
-    const link = document.createElement("a");
-    const file: Blob = new Blob([json], { type: "text/json" });
-    link.href = URL.createObjectURL(file);
-    link.download = "canvas.json";
-    link.click();
-    URL.revokeObjectURL(link.href);
+    FileUtils.saveLabelAsJson(fabricCanvas, labelProps);
   };
 
-  const onImportClicked = () => {
-    const input: HTMLInputElement = document.createElement("input");
-    const reader = new FileReader();
+  const onImportClicked = async () => {
+    const contents = await FileUtils.pickAndReadTextFile("json");
+    const data = JSON.parse(contents);
 
-    input.type = "file";
+    // todo: validation and merge with  onLoadClicked
+    labelProps = data.label;
+    onUpdateLabelProps();
 
-    input.onchange = (e: Event) => {
-      let target = e.target as HTMLInputElement;
-      if (target.files !== null) {
-        let file: File = target.files[0];
-
-        if (file.type === "application/json") {
-          reader.readAsText(file, "UTF-8");
-          reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
-            if (readerEvt?.target?.result) {
-              const json = readerEvt.target.result as string;
-              const data = JSON.parse(json);
-
-              // todo: validation and merge with  onLoadClicked
-              labelProps = data.label;
-              onUpdateLabelProps();
-
-              fabricCanvas.loadFromJSON(
-                data.canvas,
-                () => {
-                  fabricCanvas.requestRenderAll();
-                },
-                (src: object, obj: fabric.Object, error: any) => {
-                  obj.set({ snapAngle: 10 });
-                  // console.log(error);
-                }
-              );
-            }
-          };
-          reader.onerror = (readerEvt: ProgressEvent<FileReader>) => {
-            console.error(readerEvt);
-          };
-        }
+    fabricCanvas.loadFromJSON(
+      data.canvas,
+      () => {
+        fabricCanvas.requestRenderAll();
+      },
+      (src: object, obj: fabric.Object, error: any) => {
+        obj.set({ snapAngle: 10 });
       }
-    };
-
-    input.click();
+    );
   };
 
   const onLoadClicked = () => {
@@ -143,22 +110,8 @@
     );
   };
 
-  const onObjectPicked = (name: OjectType) => {
-    if (name === "text") {
-      ImageEditorUtils.addText(fabricCanvas);
-    } else if (name === "line") {
-      ImageEditorUtils.addHLine(fabricCanvas);
-    } else if (name === "circle") {
-      ImageEditorUtils.addCircle(fabricCanvas);
-    } else if (name === "rectangle") {
-      ImageEditorUtils.addRect(fabricCanvas);
-    } else if (name === "image") {
-      ImageEditorUtils.addImageWithFilePicker(fabricCanvas);
-    } else if (name === "qrcode") {
-      ImageEditorUtils.addQrCode(fabricCanvas);
-    } else if (name === "barcode") {
-      ImageEditorUtils.addBarcode(fabricCanvas);
-    }
+  const onObjectPicked = (objectType: OjectType) => {
+    ImageEditorUtils.addObject(fabricCanvas, objectType);
   };
 
   const onIconPicked = (i: IconName) => {

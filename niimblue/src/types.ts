@@ -16,3 +16,8 @@ export type LabelPreset = {
 };
 
 export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qrcode" | "barcode";
+
+export interface ExportedLabelTemplate {
+  canvas: { version: string; objects: Object[] };
+  label: LabelProps;
+};
