@@ -18,7 +18,12 @@ export class FileUtils {
     URL.revokeObjectURL(link.href);
   }
 
-  /** Open file picker and return file contents */
+  /**
+   * Open file picker and return file contents
+   *
+   * fixme: never ends if dialog closed
+   *
+   * */
   public static async pickAndReadTextFile(acceptExtension: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const input: HTMLInputElement = document.createElement("input");

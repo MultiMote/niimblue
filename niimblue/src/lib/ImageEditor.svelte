@@ -17,6 +17,7 @@
   import BarcodeParamsPanel from "./BarcodeParamsControls.svelte";
   import Dropdown from "bootstrap/js/dist/dropdown";
   import { FileUtils } from "../utils/file_utils";
+  import ZplImportButton from "./ZplImportButton.svelte";
 
   let htmlCanvas: HTMLCanvasElement;
   let fabricCanvas: fabric.Canvas;
@@ -108,6 +109,25 @@
         // console.log(error);
       }
     );
+  };
+
+  const zplImageReady = (img: Blob) => {
+    const reader = new FileReader();
+
+    reader.readAsDataURL(img);
+    reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
+      if (readerEvt?.target?.result) {
+        fabric.Image.fromURL(readerEvt.target.result as string, (img: fabric.Image) => {
+          img.set({ left: 0, top: 0, snapAngle: 10 });
+          img.scaleToHeight(labelProps.size.width - 1).scaleToHeight(labelProps.size.height - 1);
+          fabricCanvas.add(img);
+        });
+      }
+    };
+    
+    reader.onerror = (readerEvt: ProgressEvent<FileReader>) => {
+      console.error(readerEvt);
+    };
   };
 
   const onObjectPicked = (objectType: OjectType) => {
@@ -245,9 +265,13 @@
 
         <div class="btn-group btn-group-sm" role="group">
           <button class="btn btn-secondary btn-sm" on:click={onLoadClicked}><FaIcon icon="folder-open" /></button>
-          <button class="btn btn-secondary dropdown-toggle px-1" data-bs-toggle="dropdown"> </button>
+          <button class="btn btn-secondary dropdown-toggle px-1" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+          </button>
           <div class="dropdown-menu px-2">
-            <button class="btn btn-secondary btn-sm" on:click={onImportClicked}>Import JSON</button>
+            <div class="d-flex gap-1 flex-wrap">
+              <button class="btn btn-secondary btn-sm" on:click={onImportClicked}>Import JSON</button>
+              <ZplImportButton {labelProps} onImageReady={zplImageReady} />
+            </div>
           </div>
         </div>
 
