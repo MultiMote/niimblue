@@ -119,12 +119,11 @@
       if (readerEvt?.target?.result) {
         fabric.Image.fromURL(readerEvt.target.result as string, (img: fabric.Image) => {
           img.set({ left: 0, top: 0, snapAngle: 10 });
-          img.scaleToHeight(labelProps.size.width - 1).scaleToHeight(labelProps.size.height - 1);
           fabricCanvas.add(img);
         });
       }
     };
-    
+
     reader.onerror = (readerEvt: ProgressEvent<FileReader>) => {
       console.error(readerEvt);
     };
