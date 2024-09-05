@@ -69,7 +69,7 @@ jobs:
             </url>
           </urlset>" > ./niimblue/dist/sitemap.xml
         env:
-          PAGE_URL: ${{ steps.pages.outputs.base_path }}
+          PAGE_URL: ${{ steps.pages.outputs.origin }}
           LAST_MODIFIED: ${{ github.event.repository.updated_at }}
 
       - name: Upload artifact
