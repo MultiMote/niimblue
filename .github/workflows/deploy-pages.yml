@@ -59,6 +59,19 @@ jobs:
         env:
           COMMIT_HASH: ${{github.sha}}
 
+      - name: Generate Sitemap
+        run: |
+          echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+          <urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">
+            <url>
+              <loc>$PAGE_URL</loc>
+              <lastmod>$LAST_MODIFIED</lastmod>
+            </url>
+          </urlset>" > ./niimblue/dist/sitemap.xml
+        env:
+          PAGE_URL: ${{ steps.pages.outputs.base_path }}
+          LAST_MODIFIED: ${{ github.event.repository.updated_at }}
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
