@@ -32,6 +32,7 @@ export abstract class NiimbotAbstractClient extends TypedEventTarget<ClientEvent
   public readonly abstraction: Abstraction;
   protected info: PrinterInfo = {};
   private heartbeatTimer?: NodeJS.Timeout;
+  /** https://github.com/MultiMote/niimblue/issues/5 */
   protected packetIntervalMs: number = 10;
 
   constructor() {

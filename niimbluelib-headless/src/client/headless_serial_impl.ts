@@ -1,53 +1,47 @@
 import { Mutex } from "async-mutex";
-import { ConnectionInfo, NiimbotAbstractClient } from ".";
-import { ConnectResult, NiimbotPacket, ResponseCommandId } from "../packets";
-import { Utils } from "../utils";
+import { SerialPort } from "serialport";
 import {
+  ConnectionInfo,
+  NiimbotAbstractClient,
+  ConnectResult,
+  NiimbotPacket,
+  ResponseCommandId,
+  Utils,
   ConnectEvent,
   DisconnectEvent,
   PacketReceivedEvent,
   RawPacketReceivedEvent,
   RawPacketSentEvent,
-} from "./events";
+} from "@mmote/niimbluelib";
 
-/** WIP. Uses serial communication, Works worse than NiimbotBluetoothClient at the moment, events are not firing */
-export class NiimbotSerialClient extends NiimbotAbstractClient {
+/** WIP. Uses serial communication (serialport lib) */
+export class NiimbotHeadlessSerialClient extends NiimbotAbstractClient {
   private port?: SerialPort = undefined;
-  private writer?: WritableStreamDefaultWriter<Uint8Array> = undefined;
-  private reader?: ReadableStreamDefaultReader<Uint8Array> = undefined;
   private mutex: Mutex = new Mutex();
+  private path: string;
+  private isOpen: boolean = false;
+
+  constructor(path: string) {
+    super();
+    this.path = path;
+  }
 
   public async connect(): Promise<ConnectionInfo> {
     await this.disconnect();
 
-    const _port: SerialPort = await navigator.serial.requestPort();
+    const _port: SerialPort = new SerialPort({ path: this.path, baudRate: 115200, endOnClose: true });
+    this.isOpen = true;
 
-    _port.addEventListener("disconnect", () => {
-      this.port = undefined;
-      console.log("serial disconnect event");
+    _port.on("close", () => {
+      this.isOpen = false;
       this.dispatchTypedEvent("disconnect", new DisconnectEvent());
     });
 
-    await _port.open({ baudRate: 115200 });
-
-    if (_port.readable === null) {
-      throw new Error("Port is not readable");
-    }
-
-    if (_port.writable === null) {
-      throw new Error("Port is not writable");
-    }
+    _port.on("readable", () => {
+      this.dataReady();
+    });
 
     this.port = _port;
-    const info = _port.getInfo();
-    this.writer = _port.writable.getWriter();
-    this.reader = _port.readable.getReader();
-
-    setTimeout(() => {
-      void (async () => {
-        await this.waitSerialData();
-      })();
-    }, 1); // todo: maybe some other way exists
 
     try {
       await this.initialNegotiate();
@@ -58,7 +52,7 @@ export class NiimbotSerialClient extends NiimbotAbstractClient {
     }
 
     const result: ConnectionInfo = {
-      deviceName: `Serial (VID:${info.usbVendorId?.toString(16)} PID:${info.usbProductId?.toString(16)})`,
+      deviceName: `Serial (${this.path})`,
       result: this.info.connectResult ?? ConnectResult.FirmwareErrors,
     };
 
@@ -66,26 +60,22 @@ export class NiimbotSerialClient extends NiimbotAbstractClient {
     return result;
   }
 
-  private async waitSerialData() {
+  private dataReady() {
     let buf = new Uint8Array();
 
+    // todo: test, maybe not needed
     while (true) {
-      try {
-        const result = await this.reader!.read();
-        if (result.value) {
-          // console.info(`<< serial chunk ${Utils.bufToHex(result.value)}`);
+      const result: Buffer | null = this.port!.read();
+      if (result !== null) {
+        const chunk = Uint8Array.from(result);
+        console.info(`<< serial chunk ${Utils.bufToHex(chunk)}`);
 
-          const newBuf = new Uint8Array(buf.length + result.value.length);
-          newBuf.set(buf, 0);
-          newBuf.set(result.value, buf.length);
-          buf = newBuf;
-        }
-
-        if (result.done) {
-          console.log("done");
-          break;
-        }
-      } catch (e) {
+        const newBuf = new Uint8Array(buf.length + chunk.length);
+        newBuf.set(buf, 0);
+        newBuf.set(chunk, buf.length);
+        buf = newBuf;
+      } else {
+        // console.log("done");
         break;
       }
 
@@ -102,36 +92,22 @@ export class NiimbotSerialClient extends NiimbotAbstractClient {
           buf = new Uint8Array();
         }
       } catch (e) {
-        // console.info(`Incomplete packet, ignoring:${Utils.bufToHex(buf)}`);
+        console.info(`Incomplete packet, ignoring:${Utils.bufToHex(buf)}`);
       }
     }
   }
 
   public async disconnect() {
-    if (this.writer !== undefined) {
-      this.writer.releaseLock();
-    }
-
-    if (this.reader !== undefined) {
-      this.reader.releaseLock();
-    }
-
-    if (this.port !== undefined) {
-      await this.port.close();
-      this.dispatchTypedEvent("disconnect", new DisconnectEvent());
-    }
-
-    this.port = undefined;
-    this.writer = undefined;
+    this.port?.close();
   }
 
   public isConnected(): boolean {
-    return this.port !== undefined && this.writer !== undefined;
+    return this.isOpen;
   }
 
   public async sendPacketWaitResponse(packet: NiimbotPacket, timeoutMs: number = 1000): Promise<NiimbotPacket> {
-    if (!this.port?.readable || !this.port?.writable) {
-      throw new Error("Port is not readable/writable");
+    if (!this.isConnected()) {
+      throw new Error("Not connected");
     }
 
     return this.mutex.runExclusive(async () => {
@@ -167,11 +143,11 @@ export class NiimbotSerialClient extends NiimbotAbstractClient {
 
   public async sendRaw(data: Uint8Array, force?: boolean) {
     const send = async () => {
-      if (this.writer === undefined) {
-        throw new Error("Port is not writable");
+      if (!this.isConnected()) {
+        throw new Error("Not connected");
       }
       await Utils.sleep(this.packetIntervalMs);
-      await this.writer.write(data);
+      this.port!.write(Buffer.from(data));
       this.dispatchTypedEvent("rawpacketsent", new RawPacketSentEvent(data));
     };
 
