@@ -108,6 +108,8 @@ export class NiimbotSerialClient extends NiimbotAbstractClient {
   }
 
   public async disconnect() {
+    this.stopHeartbeat();
+
     if (this.writer !== undefined) {
       this.writer.releaseLock();
     }

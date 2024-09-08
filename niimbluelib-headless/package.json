@@ -1,7 +1,7 @@
 {
   "name": "@mmote/niimbluelib-headless",
   "version": "0.0.1",
-  "description": "Hedless clients for niimbluelib",
+  "description": "Headless clients for niimbluelib",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -13,7 +13,8 @@
   "scripts": {
     "clean-build": "yarn clean && yarn build",
     "build": "tsc --build",
-    "test": "yarn build && node utils/test.mjs"
+    "test-bluetooth": "yarn build && node utils/test-bluetooth.mjs",
+    "test-serial": "yarn build && node utils/test-serial.mjs"
   },
   "devDependencies": {
     "@types/node": "^20.14.2",
@@ -22,8 +23,11 @@
   "dependencies": {
     "@mmote/niimbluelib": "file:../niimbluelib",
     "async-mutex": "^0.5.0",
-    "serialport": "^12.0.0",
     "canvas": "^2.8.0"
+  },
+  "optionalDependencies": {
+    "serialport": "^12.0.0",
+    "bluetooth-serial-port": "^3.0.2"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

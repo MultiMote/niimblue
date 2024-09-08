@@ -98,6 +98,7 @@ export class NiimbotHeadlessSerialClient extends NiimbotAbstractClient {
   }
 
   public async disconnect() {
+    this.stopHeartbeat();
     this.port?.close();
   }
 
