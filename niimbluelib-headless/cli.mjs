@@ -37,44 +37,43 @@ const initClient = (transport, address, debug) => {
 };
 
 const printImage = async (path, options) => {
-  loadImage(path).then(async (image) => {
-    const canvas = createCanvas(image.width, image.height);
-    const ctx = canvas.getContext("2d");
+  const image = await loadImage(path);
+  const canvas = createCanvas(image.width, image.height);
+  const ctx = canvas.getContext("2d");
 
-    ctx.fillStyle = "white";
-    ctx.lineWidth = 3;
+  ctx.fillStyle = "white";
+  ctx.lineWidth = 3;
 
-    // fill background
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+  // fill background
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-    const encoded = ImageEncoder.encodeCanvas(canvas, options.direction);
+  const encoded = ImageEncoder.encodeCanvas(canvas, options.direction);
 
-    const client = initClient(options.transport, options.address, options.debug);
-    await client.connect();
-    await client.abstraction.print(client.getPrintTaskVersion(), encoded);
+  const client = initClient(options.transport, options.address, options.debug);
+  await client.connect();
+  await client.abstraction.print(client.getPrintTaskVersion(), encoded);
 
-    let statusTimer = setInterval(async () => {
-      try {
-        const status = await client.abstraction.getPrintStatus();
+  let statusTimer = setInterval(async () => {
+    try {
+      const status = await client.abstraction.getPrintStatus();
 
-        console.log(
-          `Page ${status.page}/${options.quantity}, Page print ${status.pagePrintProgress}%, Page feed ${status.pageFeedProgress}%`
-        );
+      console.log(
+        `Page ${status.page}/${options.quantity}, Page print ${status.pagePrintProgress}%, Page feed ${status.pageFeedProgress}%`
+      );
 
-        if (status.page === options.quantity && status.pagePrintProgress === 100 && status.pageFeedProgress === 100) {
-          clearInterval(statusTimer);
-          await client.abstraction.printEnd();
-          await client.disconnect();
-        }
-      } catch (e) {
-        console.error(e);
+      if (status.page === options.quantity && status.pagePrintProgress === 100 && status.pageFeedProgress === 100) {
         clearInterval(statusTimer);
         await client.abstraction.printEnd();
         await client.disconnect();
       }
-    }, 300);
-  });
+    } catch (e) {
+      console.error(e);
+      clearInterval(statusTimer);
+      await client.abstraction.printEnd();
+      await client.disconnect();
+    }
+  }, 300);
 };
 
 program
