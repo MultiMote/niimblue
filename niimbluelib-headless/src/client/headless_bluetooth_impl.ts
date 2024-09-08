@@ -31,10 +31,7 @@ export class NiimbotHeadlessBluetoothClient extends NiimbotAbstractClient {
       const rawPacketReceivedWrapped = this.rawPacketReceived.bind(this);
 
       const onConnect = async () => {
-        console.log("connected ble");
-
         this.port.on("data", rawPacketReceivedWrapped);
-
         resolve();
       };
 

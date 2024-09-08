@@ -20,6 +20,8 @@ export class NiimbotHeadlessSerialClient extends NiimbotAbstractClient {
   private mutex: Mutex = new Mutex();
   private path: string;
   private isOpen: boolean = false;
+  /** Buffer for fragmented data accumulation */
+  private packetBuf: Uint8Array = new Uint8Array();
 
   constructor(path: string) {
     super();
@@ -61,38 +63,36 @@ export class NiimbotHeadlessSerialClient extends NiimbotAbstractClient {
   }
 
   private dataReady() {
-    let buf = new Uint8Array();
 
-    // todo: test, maybe not needed
     while (true) {
       const result: Buffer | null = this.port!.read();
       if (result !== null) {
         const chunk = Uint8Array.from(result);
-        console.info(`<< serial chunk ${Utils.bufToHex(chunk)}`);
+        // console.info(`<< serial chunk ${Utils.bufToHex(chunk)}`);
 
-        const newBuf = new Uint8Array(buf.length + chunk.length);
-        newBuf.set(buf, 0);
-        newBuf.set(chunk, buf.length);
-        buf = newBuf;
+        const newBuf = new Uint8Array(this.packetBuf.length + chunk.length);
+        newBuf.set(this.packetBuf, 0);
+        newBuf.set(chunk, this.packetBuf.length);
+        this.packetBuf = newBuf;
       } else {
         // console.log("done");
         break;
       }
 
       try {
-        const packets: NiimbotPacket[] = NiimbotPacket.fromBytesMultiPacket(buf);
+        const packets: NiimbotPacket[] = NiimbotPacket.fromBytesMultiPacket(this.packetBuf);
 
         if (packets.length > 0) {
-          this.dispatchTypedEvent("rawpacketreceived", new RawPacketReceivedEvent(buf));
+          this.dispatchTypedEvent("rawpacketreceived", new RawPacketReceivedEvent(this.packetBuf));
 
           packets.forEach((p) => {
             this.dispatchTypedEvent("packetreceived", new PacketReceivedEvent(p));
           });
 
-          buf = new Uint8Array();
+          this.packetBuf = new Uint8Array();
         }
       } catch (e) {
-        console.info(`Incomplete packet, ignoring:${Utils.bufToHex(buf)}`);
+        console.info(`Incomplete packet, ignoring:${Utils.bufToHex(this.packetBuf)}`);
       }
     }
   }

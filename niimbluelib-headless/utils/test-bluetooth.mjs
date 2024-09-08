@@ -2,7 +2,7 @@ import { NiimbotHeadlessBluetoothClient, ImageEncoder } from "../dist/index.js";
 import { Utils, RequestCommandId, ResponseCommandId } from "@mmote/niimbluelib";
 import { createCanvas } from "canvas";
 
-// found device: B1-G327071185 with address 07:27:03:17:6E:82)
+// found device: B1-G327071185 with address 07:27:03:17:6E:82
 // found device: D110-G326030306 with address 03:26:03:C3:F9:11
 
 const client = new NiimbotHeadlessBluetoothClient("03:26:03:C3:F9:11"); // D110
@@ -31,6 +31,7 @@ const props = {
   height: 96,
   printDirection: "left",
 };
+const quantity = 1;
 
 const canvas = createCanvas(props.width, props.height);
 const ctx = canvas.getContext("2d");
@@ -52,4 +53,23 @@ const image = ImageEncoder.encodeCanvas(canvas, props.printDirection);
 
 await client.abstraction.print(client.getPrintTaskVersion(), image);
 
-await client.disconnect();
+let statusTimer = setInterval(async () => {
+  try {
+    const status = await client.abstraction.getPrintStatus();
+
+    console.log(
+      `Page ${status.page}/${quantity}, Page print ${status.pagePrintProgress}%, Page feed ${status.pageFeedProgress}%`
+    );
+
+    if (status.page === quantity && status.pagePrintProgress === 100 && status.pageFeedProgress === 100) {
+      clearInterval(statusTimer);
+      await client.abstraction.printEnd();
+      await client.disconnect();
+    }
+  } catch (e) {
+    console.error(e);
+    clearInterval(statusTimer);
+    await client.abstraction.printEnd();
+    await client.disconnect();
+  }
+}, 300);

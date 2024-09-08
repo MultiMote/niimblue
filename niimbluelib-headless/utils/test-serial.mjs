@@ -28,6 +28,7 @@ const props = {
   height: 96,
   printDirection: "top",
 };
+const quantity = 1;
 
 const canvas = createCanvas(props.width, props.height);
 const ctx = canvas.getContext("2d");
@@ -49,4 +50,23 @@ const image = ImageEncoder.encodeCanvas(canvas, props.printDirection);
 
 await client.abstraction.print(client.getPrintTaskVersion(), image);
 
-await client.disconnect();
+let statusTimer = setInterval(async () => {
+  try {
+    const status = await client.abstraction.getPrintStatus();
+
+    console.log(
+      `Page ${status.page}/${quantity}, Page print ${status.pagePrintProgress}%, Page feed ${status.pageFeedProgress}%`
+    );
+
+    if (status.page === quantity && status.pagePrintProgress === 100 && status.pageFeedProgress === 100) {
+      clearInterval(statusTimer);
+      await client.abstraction.printEnd();
+      await client.disconnect();
+    }
+  } catch (e) {
+    console.error(e);
+    clearInterval(statusTimer);
+    await client.abstraction.printEnd();
+    await client.disconnect();
+  }
+}, 300);
