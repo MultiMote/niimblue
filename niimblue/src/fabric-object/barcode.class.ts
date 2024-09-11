@@ -75,7 +75,7 @@ export const Barcode = fabric.util.createClass(fabric.Object, {
 
     ctx.fillStyle = this.fill;
     const fontHeight = Math.round(Math.max(Math.min(this.height / 10, (this.width / this.text.length) * 1.5), 12));
-    ctx.font = `bold ${fontHeight}px Courier New`;
+    ctx.font = `bold ${fontHeight}px Noto Sans Variable`;
     ctx.textBaseline = "top";
     const fontWidth = ctx.measureText("0").width;
     const w2 = this.width / 2,
@@ -94,12 +94,37 @@ export const Barcode = fabric.util.createClass(fabric.Object, {
       dh = this.height - fontHeight * 1.2;
       dw = (this.width - dp * 2) / this.bandcode.length;
     }
+
+    let blackStartPosition = -1;
+    let blackCount = 0;
+    let long = false;
+
+    // render barcode
+    // todo: snap barcode elements to the pixel grid (to make rendering sharp)
     for (let i = 0; i < this.bandcode.length; i++) {
-      const d = this.bandcode[i];
-      if (d === "1") {
-        if (this.encoding === "EAN13" && EAN13_LONG_IDX.includes(i))
-          ctx.fillRect(realX(dp + i * dw), realY(0), dw, dh + fontHeight * 0.7);
-        else ctx.fillRect(realX(dp + i * dw), realY(0), dw, dh);
+      const isBlack = this.bandcode[i] === "1";
+      const xPos = realX(dp + i * dw);
+
+      if (isBlack) {
+        blackCount++;
+
+        if (blackStartPosition == -1) {
+          blackStartPosition = xPos;
+        }
+
+        if (!long && this.encoding === "EAN13" && EAN13_LONG_IDX.includes(i)) {
+          long = true;
+        }
+
+        if (blackStartPosition!= -1 && i === this.bandcode.length - 1) {
+          ctx.fillRect(blackStartPosition, realY(0), dw * blackCount, long ? dh + fontHeight * 0.7 : dh);
+        }
+      } else {
+        ctx.fillRect(blackStartPosition, realY(0), dw * blackCount, long ? dh + fontHeight * 0.7 : dh);
+
+        blackStartPosition = -1;
+        blackCount = 0;
+        long = false;
       }
     }
 

@@ -140,7 +140,7 @@ export class ImageEditorUtils {
   public static addBarcode(canvas: fabric.Canvas): void {
     const barcode = new Barcode({
       text: "1234567890128",
-      width: ImageEditorUtils.SIZE_DEFAULT * 2,
+      width: (canvas.width ?? ImageEditorUtils.SIZE_DEFAULT) - ImageEditorUtils.OBJECT_DEFAULTS.left,
       height: ImageEditorUtils.SIZE_DEFAULT,
       encoding: "EAN13",
     });
