@@ -76,7 +76,7 @@ export class ImageEditorUtils {
   public static addText(canvas: fabric.Canvas, text?: string): void {
     const obj = new fabric.IText(text ?? "Text", {
       ...this.OBJECT_DEFAULTS,
-      fontFamily: "Arial",
+      fontFamily: "Noto Sans Variable",
       textAlign: "center",
       originX: "center", //added
       originY: "center",

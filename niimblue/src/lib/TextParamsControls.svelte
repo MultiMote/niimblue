@@ -4,8 +4,11 @@
 
   export let selectedObject: fabric.Object;
   export let valueUpdated: () => void;
+
+  const DEFAULT_FONT = "Noto Sans Variable";
+
   let selectedText: fabric.IText | undefined;
-  let fontFamilies: string[] = ["Arial"];
+  let fontFamilies: string[] = [DEFAULT_FONT];
 
   const toggleBold = () => {
     if (selectedText!.fontWeight === "bold") {
@@ -34,7 +37,7 @@
   const getFonts = async () => {
     try {
       const fonts = await queryLocalFonts();
-      fontFamilies = [...new Set(fonts.map((f: FontData) => f.family))].sort();
+      fontFamilies = [DEFAULT_FONT, ...new Set(fonts.map((f: FontData) => f.family))].sort();
       console.log(fontFamilies);
     } catch (e) {
       alert(e);
@@ -139,6 +142,6 @@
     width: 10em;
   }
   .font-family {
-    width: 12em;
+    width: 16em;
   }
 </style>

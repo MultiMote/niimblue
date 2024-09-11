@@ -11,14 +11,10 @@
 @import "bootstrap/scss/close";
 @import "bootstrap/scss/progress";
 @import "bootstrap/scss/alert";
+@import "font";
 
 // @import "@fortawesome/fontawesome-svg-core/styles";
 
-// h1.title {
-//   .niim {
-//     color: #ff5349;
-//   }
-//   .blue {
-//     color: #0b7eff;
-//   }
-// }
+body {
+  font-family: "Noto Sans", sans-serif;
+}
