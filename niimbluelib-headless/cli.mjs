@@ -15,6 +15,10 @@ const initClient = (transport, address, debug) => {
     throw new Error("Invalid transport");
   }
 
+  client.addEventListener("printprogress", (e) => {
+    console.log(`Page ${e.page}/${e.pagesTotal}, Page print ${e.pagePrintProgress}%, Page feed ${e.pageFeedProgress}%`);
+  });
+
   if (debug) {
     client.addEventListener("packetsent", (e) => {
       console.log(`>> ${Utils.bufToHex(e.packet.toBytes())} (${RequestCommandId[e.packet.command]})`);
@@ -52,28 +56,15 @@ const printImage = async (path, options) => {
 
   const client = initClient(options.transport, options.address, options.debug);
   await client.connect();
-  await client.abstraction.print(client.getPrintTaskVersion(), encoded);
+  await client.abstraction.print(client.getPrintTaskVersion(), encoded, {quantity: options.quantity});
 
-  let statusTimer = setInterval(async () => {
-    try {
-      const status = await client.abstraction.getPrintStatus();
-
-      console.log(
-        `Page ${status.page}/${options.quantity}, Page print ${status.pagePrintProgress}%, Page feed ${status.pageFeedProgress}%`
-      );
-
-      if (status.page === options.quantity && status.pagePrintProgress === 100 && status.pageFeedProgress === 100) {
-        clearInterval(statusTimer);
-        await client.abstraction.printEnd();
-        await client.disconnect();
-      }
-    } catch (e) {
-      console.error(e);
-      clearInterval(statusTimer);
-      await client.abstraction.printEnd();
-      await client.disconnect();
-    }
-  }, 300);
+  try {
+    await client.abstraction.waitUntilPrintFinished(options.quantity);
+  } catch (e) {
+    console.error(e);
+  }
+  await client.abstraction.printEnd();
+  await client.disconnect();
 };
 
 program

@@ -4,7 +4,7 @@
   import Modal from "bootstrap/js/dist/modal";
   import { connectionState, printerClient, printerMeta } from "../stores";
   import { copyImageData, threshold, atkinson } from "../utils/post_process";
-  import { type EncodedImage, ImageEncoder, LabelType, PacketGenerator, ProtocolVersion } from "@mmote/niimbluelib";
+  import { type EncodedImage, ImageEncoder, LabelType, PacketGenerator, ProtocolVersion, type PrintProgressEvent } from "@mmote/niimbluelib";
   import type { LabelProps } from "../types";
   import FaIcon from "./FaIcon.svelte";
 
@@ -58,20 +58,21 @@
 
     printState = "printing";
 
-    statusTimer = setInterval(async () => {
-      try {
-        const status = await $printerClient.abstraction.getPrintStatus();
-        printProgress = status.pagePrintProgress;
+    const listener = (e: PrintProgressEvent) => {
+      printProgress = e.pagePrintProgress;
+    }
 
-        if (status.page === quantity && status.pagePrintProgress === 100 && status.pageFeedProgress === 100) {
-          await endPrint();
-        }
-      } catch (e) {
-        error = `${e}`;
-        console.error(e);
-        await endPrint();
-      }
-    }, 100);
+    $printerClient.addEventListener("printprogress", listener);
+
+    try {
+      await $printerClient.abstraction.waitUntilPrintFinished(quantity, 100);
+    } catch (e) {
+      error = `${e}`;
+      console.error(e);
+    }
+
+    $printerClient.removeEventListener("printprogress", listener);
+    await endPrint();
 
     printState = "idle";
   };

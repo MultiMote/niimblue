@@ -20,6 +20,10 @@ client.addEventListener("disconnect", () => {
   console.log("disconnected");
 });
 
+client.addEventListener("printprogress", (e) => {
+  console.log(`Page ${e.page}/${e.pagesTotal}, Page print ${e.pagePrintProgress}%, Page feed ${e.pageFeedProgress}%`);
+});
+
 await client.connect();
 
 // label props
@@ -48,25 +52,13 @@ ctx.strokeRect(0.5, 0.5, canvas.width - 1, canvas.height - 1);
 
 const image = ImageEncoder.encodeCanvas(canvas, props.printDirection);
 
-await client.abstraction.print(client.getPrintTaskVersion(), image);
+await client.abstraction.print(client.getPrintTaskVersion(), image, { quantity });
 
-let statusTimer = setInterval(async () => {
-  try {
-    const status = await client.abstraction.getPrintStatus();
+try {
+  await client.abstraction.waitUntilPrintFinished(quantity);
+} catch (e) {
+  console.error(e);
+}
 
-    console.log(
-      `Page ${status.page}/${quantity}, Page print ${status.pagePrintProgress}%, Page feed ${status.pageFeedProgress}%`
-    );
-
-    if (status.page === quantity && status.pagePrintProgress === 100 && status.pageFeedProgress === 100) {
-      clearInterval(statusTimer);
-      await client.abstraction.printEnd();
-      await client.disconnect();
-    }
-  } catch (e) {
-    console.error(e);
-    clearInterval(statusTimer);
-    await client.abstraction.printEnd();
-    await client.disconnect();
-  }
-}, 300);
+await client.abstraction.printEnd();
+await client.disconnect();

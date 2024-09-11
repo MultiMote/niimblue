@@ -16,6 +16,7 @@ import {
   Utils,
   Validators,
   ProtocolVersion,
+  PrintProgressEvent,
 } from "..";
 import { SequentialDataReader } from "./data_reader";
 
@@ -71,6 +72,7 @@ export class Abstraction {
   private readonly DEFAULT_TIMEOUT: number = 1_000;
   private client: NiimbotAbstractClient;
   private timeout: number = this.DEFAULT_TIMEOUT;
+  private statusPollTimer: NodeJS.Timeout | undefined;
 
   constructor(client: NiimbotAbstractClient) {
     this.client = client;
@@ -301,6 +303,36 @@ export class Abstraction {
     } finally {
       this.setDefaultTimeout();
     }
+  }
+
+  /**
+   * Poll printer every {@link pollIntervalMs} and resolve when printer pages equals {@link pagesToPrint}, pagePrintProgress=100, pageFeedProgress=100.
+   *
+   * printprogress event is firing during this process.
+   *
+   * @param pagesToPrint Total pages to print.
+   * @param pollIntervalMs Poll interval in milliseconds.
+   */
+  public async waitUntilPrintFinished(pagesToPrint: number, pollIntervalMs: number = 300): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.statusPollTimer = setInterval(() => {
+        this.getPrintStatus()
+          .then((status: PrintStatus) => {
+            this.client.dispatchTypedEvent(
+              "printprogress",
+              new PrintProgressEvent(status.page, pagesToPrint, status.pagePrintProgress, status.pageFeedProgress)
+            );
+
+            if (status.page === pagesToPrint && status.pagePrintProgress === 100 && status.pageFeedProgress === 100) {
+              clearInterval(this.statusPollTimer);
+              resolve();
+            }
+          })
+          .catch((e: unknown) => {
+            reject(e as Error);
+          });
+      }, pollIntervalMs);
+    });
   }
 
   public async printEnd(): Promise<void> {
