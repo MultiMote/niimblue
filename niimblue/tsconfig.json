@@ -9,7 +9,7 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "strict": true,                                      /* Enable all strict type-checking options. */
-
+    "noImplicitOverride": true
   },
   "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte"]
 }

@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { ChangeEventHandler } from "svelte/elements";
-  import { QRCode, type QRCodeType, type ErrorCorrectionLevel } from "../fabric-object/qrcode.class";
+  import { QRCode, type ErrorCorrectionLevel } from "../fabric-object/qrcode.class";
   import FaIcon from "./FaIcon.svelte";
 
   export let selectedObject: fabric.Object | undefined;
   export let valueUpdated: () => void;
-  let selectedQRCode: QRCodeType | undefined;
+  let selectedQRCode: QRCode | undefined;
   let text: string | undefined;
   let ecl: string | undefined;
 
@@ -29,7 +29,7 @@
   };
 
   $: {
-    selectedQRCode = selectedObject instanceof QRCode ? (selectedObject as QRCodeType) : undefined;
+    selectedQRCode = selectedObject instanceof QRCode ? (selectedObject as QRCode) : undefined;
     init();
   }
 </script>

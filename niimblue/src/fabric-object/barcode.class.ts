@@ -4,88 +4,80 @@ import { equalSpacingFillText } from "../utils/canvas_utils";
 
 const PRESERVE_PROPERTIES = ["text", "encoding", "printText"];
 const EAN13_LONG_IDX: number[] = [0, 1, 2, 45, 46, 47, 48, 49, 92, 93, 94];
+
 export type BarcodeCoding = "EAN13" | "CODE128B";
+
 export interface IBarcodeOptions extends fabric.IObjectOptions {
-  text?: string;
+  text: string;
   encoding?: BarcodeCoding;
   printText?: boolean;
 }
 
-export interface Barcode extends fabric.Object {
+export class Barcode extends fabric.Object {
   text: string;
   encoding: BarcodeCoding;
   printText: boolean;
-  constructor(options?: IBarcodeOptions): void;
-  initialize(options?: IBarcodeOptions): Barcode;
-}
 
-export const Barcode = fabric.util.createClass(fabric.Object, {
-  type: "Barcode",
-  stateProperties: PRESERVE_PROPERTIES.concat(...(fabric.Object.prototype.stateProperties ?? [])),
-  cacheProperties: PRESERVE_PROPERTIES.concat(...(fabric.Object.prototype.cacheProperties ?? [])),
-  bandcode: "",
+  bandcode: string = "";
+  displayText: string = "";
 
-  /**
-   * Barcode text
-   * @var {string}
-   */
-  text: "",
-  /**
-   * Encoding
-   * @type {BarcodeCoding}
-   */
-  encoding: "EAN13",
-  /**
-   * Print text
-   * @type {boolean}
-   */
-  printText: true,
+  constructor(options?: IBarcodeOptions) {
+    super(options);
+    this.type = "Barcode";
+    this.stateProperties = PRESERVE_PROPERTIES.concat(...(fabric.Object.prototype.stateProperties ?? []));
+    this.cacheProperties = PRESERVE_PROPERTIES.concat(...(fabric.Object.prototype.cacheProperties ?? []));
 
-  initialize(options = {}) {
-    this.callSuper("initialize", options);
+    this.text = options?.text ?? "";
+    this.encoding = options?.encoding ?? "EAN13";
+    this.printText = options?.printText ?? true;
     this._createBandCode();
-  },
+  }
 
-  _set(key: any, value: any) {
-    this.callSuper("_set", key, value);
-    switch (key) {
-      case "text":
-      case "encoding":
-        this._createBandCode();
-        break;
+  override _set(key: string, value: any): this {
+    super._set(key, value);
+    if (key === "text" || key == "encoding") {
+      this._createBandCode();
     }
     return this;
-  },
+  }
 
-  _createBandCode() {
+  _createBandCode(): fabric.Object {
     if (this.encoding === "EAN13") {
       const { text, bandcode } = ean13(this.text);
-      this.text = text;
+      this.displayText = text;
       this.bandcode = bandcode;
     } else {
+      this.displayText = this.text;
       this.bandcode = code128b(this.text);
     }
     return this;
-  },
+  }
 
-  _render(ctx: CanvasRenderingContext2D) {
-    if (this.bandcode === "") return;
+  //todo: remove magic numbers
+  override _render(ctx: CanvasRenderingContext2D) {
+    super._render(ctx);
+
+    if (this.bandcode === "" || this.height === undefined || this.width === undefined) {
+      return;
+    }
 
     ctx.save();
 
-    ctx.fillStyle = this.fill;
-    const fontHeight = Math.round(Math.max(Math.min(this.height / 10, (this.width / this.text.length) * 1.5), 12));
+    const fontHeight = Math.round(
+      Math.max(Math.min(this.height / 10, (this.width / this.displayText.length) * 1.5), 12)
+    );
+
     ctx.font = `bold ${fontHeight}px Noto Sans Variable`;
     ctx.textBaseline = "top";
     const fontWidth = ctx.measureText("0").width;
-    const w2 = this.width / 2,
-      h2 = this.height / 2;
+    const w2 = this.width / 2;
+    const h2 = this.height / 2;
     const realX = (x: number) => x - w2;
     const realY = (y: number) => y - h2;
 
-    // render bandcode
-    let dh = this.height,
-      dp = 0;
+    let dh = this.height;
+    let dp = 0;
+
     if (this.printText) {
       if (this.encoding === "EAN13") {
         dp = 2 * fontWidth;
@@ -94,11 +86,12 @@ export const Barcode = fabric.util.createClass(fabric.Object, {
     } else if (this.encoding === "EAN13") {
       dh = this.height * 0.9;
     }
+
     const dw = (this.width - dp * 2) / this.bandcode.length;
 
     let blackStartPosition = -1;
     let blackCount = 0;
-    let long = false;
+    let isLongBar = false;
 
     // render barcode
     // todo: snap barcode elements to the pixel grid (to make rendering sharp)
@@ -113,37 +106,21 @@ export const Barcode = fabric.util.createClass(fabric.Object, {
           blackStartPosition = xPos;
         }
 
-        if (!long && this.encoding === "EAN13" && EAN13_LONG_IDX.includes(i)) {
-          long = true;
+        if (!isLongBar && this.encoding === "EAN13" && EAN13_LONG_IDX.includes(i)) {
+          isLongBar = true;
         }
 
-        if (blackStartPosition!= -1 && i === this.bandcode.length - 1) {
-          ctx.fillRect(
-            blackStartPosition, 
-            realY(0), 
-            dw * blackCount, 
-            long 
-              ? this.printText
-                ? dh + fontHeight * 0.7
-                : dh + this.height * 0.1
-              : dh
-          );
+        if (blackStartPosition != -1 && i === this.bandcode.length - 1) { // last index
+          const longBarHeight = this.printText ? dh + fontHeight * 0.7 : dh + this.height * 0.1;
+          ctx.fillRect(blackStartPosition, realY(0), dw * blackCount, isLongBar ? longBarHeight : dh);
         }
       } else {
-        ctx.fillRect(
-          blackStartPosition, 
-          realY(0), 
-          dw * blackCount, 
-          long 
-          ? this.printText
-            ? dh + fontHeight * 0.7
-            : dh + this.height * 0.1
-          : dh
-        );
+        const longBarHeight = this.printText ? dh + fontHeight * 0.7 : dh + this.height * 0.1;
+        ctx.fillRect(blackStartPosition, realY(0), dw * blackCount, isLongBar ? longBarHeight : dh);
 
         blackStartPosition = -1;
         blackCount = 0;
-        long = false;
+        isLongBar = false;
       }
     }
 
@@ -152,27 +129,26 @@ export const Barcode = fabric.util.createClass(fabric.Object, {
       const fastY = realY(this.height - fontHeight);
       if (this.encoding === "EAN13") {
         let partW = 41 * dw;
-        ctx.fillText(this.text[0], realX(fontWidth * 0.5), fastY); // first digit
-        equalSpacingFillText(ctx, this.text.slice(1, 7), realX(fontWidth * 2 + dw * 4), fastY, partW); // part 1
-        equalSpacingFillText(ctx, this.text.slice(7, 13), realX(fontWidth * 2 + dw * 9 + partW), fastY, partW); // part 2
+        ctx.fillText(this.displayText[0], realX(fontWidth * 0.5), fastY); // first digit
+        equalSpacingFillText(ctx, this.displayText.slice(1, 7), realX(fontWidth * 2 + dw * 4), fastY, partW); // part 1
+        equalSpacingFillText(ctx, this.displayText.slice(7, 13), realX(fontWidth * 2 + dw * 9 + partW), fastY, partW); // part 2
         ctx.fillText(">", realX(this.width - fontWidth * 1.5), fastY); // last digit
       } else {
-        equalSpacingFillText(ctx, this.text, realX(0), fastY, this.width);
+        equalSpacingFillText(ctx, this.displayText, realX(0), fastY, this.width);
       }
     }
 
     ctx.restore();
-  },
+  }
 
-  toObject(propertiesToInclude = []) {
-    return this.callSuper("toObject", PRESERVE_PROPERTIES.concat(...propertiesToInclude));
-  },
-});
-Barcode.ATTRIBUTE_NAMES = [];
-Barcode.fromElement = () => {};
-Barcode.fromObject = (object: any, callback: any) => {
-  return fabric.Object._fromObject("Barcode", object, callback);
-};
+  override toObject(propertiesToInclude: string[] = []) {
+    return super.toObject(PRESERVE_PROPERTIES.concat(...propertiesToInclude));
+  }
+
+  static fromObject(object: any, callback: Function): fabric.Object {
+    return fabric.Object._fromObject("Barcode", object, callback);
+  }
+}
 
 // @ts-ignore
 fabric.Barcode = Barcode;

@@ -33,7 +33,7 @@ const ean13_table_switch_mask = {
  * @param data string of 12 or 13 digits
  * @returns string of EAN13 barcode, it is an array of 95 characters, each character is either 0 or 1, representing a white or black stripe, respectively.
  */
-export function ean13(data: string) {
+export function ean13(data: string): { text: string; bandcode: string } {
   if (data.length > 13) throw new Error("Data too long for EAN13");
   if (data.length < 12) data = data.padEnd(12, "0");
   if (/^\d+$/.test(data) === false) throw new Error("Invalid character in EAN13");
@@ -199,7 +199,7 @@ const code128_ascii_to_id = code128_bp.reduce((acc, { ascii }, idx) => {
  * @param data string to convert
  * @returns string of Code128B barcode, it is a sequence of 0 and 1, representing a white or black stripe, respectively.
  */
-export function code128b(data: string) {
+export function code128b(data: string): string {
   // Code128 allows only 232 characters, but we need to add start, stop, and checksum, so there are 229 characters left.
   if (data.length > 229) throw new Error("Data too long for Code128B");
 

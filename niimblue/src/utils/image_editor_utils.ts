@@ -132,16 +132,23 @@ export class ImageEditorUtils {
   public static addQrCode(canvas: fabric.Canvas): void {
     const qr = new QRCode({
       text: "NiimBlue",
-      size: ImageEditorUtils.SIZE_DEFAULT,
+      top: this.OBJECT_DEFAULTS.top,
+      left: this.OBJECT_DEFAULTS.left,
+      width: this.SIZE_DEFAULT,
+      height: this.SIZE_DEFAULT,
+      snapAngle: this.OBJECT_DEFAULTS.snapAngle,
     });
     canvas.add(qr);
   }
 
   public static addBarcode(canvas: fabric.Canvas): void {
     const barcode = new Barcode({
-      text: "1234567890128",
-      width: (canvas.width ?? ImageEditorUtils.SIZE_DEFAULT) - ImageEditorUtils.OBJECT_DEFAULTS.left,
-      height: ImageEditorUtils.SIZE_DEFAULT,
+      top: this.OBJECT_DEFAULTS.top,
+      left: this.OBJECT_DEFAULTS.left,
+      text: "123456789012",
+      width: (canvas.width ?? this.SIZE_DEFAULT) - this.OBJECT_DEFAULTS.left * 2,
+      height: this.SIZE_DEFAULT,
+      snapAngle: this.OBJECT_DEFAULTS.snapAngle,
       encoding: "EAN13",
     });
     canvas.add(barcode);
