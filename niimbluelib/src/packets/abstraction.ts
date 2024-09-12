@@ -329,6 +329,7 @@ export class Abstraction {
             }
           })
           .catch((e: unknown) => {
+            clearInterval(this.statusPollTimer);
             reject(e as Error);
           });
       }, pollIntervalMs);
