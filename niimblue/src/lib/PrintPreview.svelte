@@ -18,6 +18,7 @@
   export let onClosed: () => void;
   export let labelProps: LabelProps;
   export let imageCallback: () => string;
+  export let printNow: boolean = false;
 
   let modalElement: HTMLElement;
   let previewCanvas: HTMLCanvasElement;
@@ -91,6 +92,10 @@
     await endPrint();
 
     printState = "idle";
+
+    if (printNow && !error) {
+      modal.hide();
+    }
   };
 
   const updatePreview = () => {
@@ -113,7 +118,7 @@
 
   const updateSavedProp = (key: string, value: any, refreshPreview: boolean = false) => {
     const keyObj = key as keyof typeof savedProps;
-    
+
     if (savedProps[keyObj] !== undefined) {
       savedProps[keyObj] = savedProps[keyObj] = value;
       localStorage.setItem("saved_preview_props", JSON.stringify(savedProps));
@@ -139,18 +144,6 @@
   };
 
   onMount(() => {
-    // create image from fabric canvas to work with
-    const img = new Image();
-    img.onload = () => {
-      previewCanvas.width = img.width;
-      previewCanvas.height = img.height;
-      imgContext = previewCanvas.getContext("2d")!;
-      imgContext.drawImage(img, 0, 0, img.width, img.height);
-      imgData = imgContext.getImageData(0, 0, img.width, img.height);
-      updatePreview();
-    };
-    img.src = imageCallback();
-
     modal = new Modal(modalElement);
     modal.show();
     modalElement.addEventListener("hidden.bs.modal", async () => {
@@ -164,6 +157,22 @@
     }
 
     loadProps();
+
+    // create image from fabric canvas to work with
+    const img = new Image();
+    img.onload = () => {
+      previewCanvas.width = img.width;
+      previewCanvas.height = img.height;
+      imgContext = previewCanvas.getContext("2d")!;
+      imgContext.drawImage(img, 0, 0, img.width, img.height);
+      imgData = imgContext.getImageData(0, 0, img.width, img.height);
+      updatePreview();
+
+      if (printNow && !$disconnected && printState === "idle") {
+        onPrint();
+      }
+    };
+    img.src = imageCallback();
   });
 
   onDestroy(() => {

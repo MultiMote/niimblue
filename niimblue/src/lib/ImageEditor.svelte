@@ -18,6 +18,7 @@
   import Dropdown from "bootstrap/js/dist/dropdown";
   import { FileUtils } from "../utils/file_utils";
   import ZplImportButton from "./ZplImportButton.svelte";
+  import { connectionState } from "../stores";
 
   let htmlCanvas: HTMLCanvasElement;
   let fabricCanvas: fabric.Canvas;
@@ -25,6 +26,7 @@
   let previewOpened: boolean = false;
   let selectedObject: fabric.Object | undefined = undefined;
   let selectedCount: number = 0;
+  let printNow: boolean = false;
 
   const deleteSelected = () => {
     fabricCanvas.getActiveObjects().forEach((obj) => {
@@ -86,7 +88,7 @@
       },
       (src: object, obj: fabric.Object, error: any) => {
         obj.set({ snapAngle: 10 });
-      }
+      },
     );
   };
 
@@ -107,7 +109,7 @@
       (src: object, obj: fabric.Object, error: any) => {
         obj.set({ snapAngle: 10 });
         // console.log(error);
-      }
+      },
     );
   };
 
@@ -145,10 +147,17 @@
   };
 
   const onPreviewClosed = () => {
+    printNow = false;
     previewOpened = false;
   };
 
   const openPreview = () => {
+    printNow = false;
+    previewOpened = true;
+  };
+
+  const openPreviewAndPrint = () => {
+    printNow = true;
     previewOpened = true;
   };
 
@@ -277,7 +286,13 @@
         <IconPicker onSubmit={onIconPicked} />
         <ObjectPicker onSubmit={onObjectPicked} />
 
-        <button class="btn btn-sm btn-primary ms-1" on:click={openPreview}><FaIcon icon="print" /> Preview</button>
+        <button class="btn btn-sm btn-primary ms-1" on:click={openPreview}><FaIcon icon="eye" /> Preview</button>
+        <button
+          title="Print with default or saved parameters"
+          class="btn btn-sm btn-primary ms-1"
+          on:click={openPreviewAndPrint}
+          disabled={$connectionState !== "connected"}><FaIcon icon="print" /> Print</button
+        >
       </div>
     </div>
   </div>
@@ -308,7 +323,7 @@
   </div>
 
   {#if previewOpened}
-    <PrintPreview onClosed={onPreviewClosed} imageCallback={getImageForPreview} {labelProps} />
+    <PrintPreview onClosed={onPreviewClosed} imageCallback={getImageForPreview} {labelProps} {printNow} />
   {/if}
 </div>
 
