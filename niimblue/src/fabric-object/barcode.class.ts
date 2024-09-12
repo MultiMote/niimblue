@@ -26,7 +26,7 @@ export const Barcode = fabric.util.createClass(fabric.Object, {
   bandcode: "",
 
   /**
-   * QRCode text
+   * Barcode text
    * @var {string}
    */
   text: "",
@@ -85,15 +85,16 @@ export const Barcode = fabric.util.createClass(fabric.Object, {
 
     // render bandcode
     let dh = this.height,
-      dp = 0,
-      dw = this.width / this.bandcode.length;
+      dp = 0;
     if (this.printText) {
       if (this.encoding === "EAN13") {
         dp = 2 * fontWidth;
       }
       dh = this.height - fontHeight * 1.2;
-      dw = (this.width - dp * 2) / this.bandcode.length;
+    } else if (this.encoding === "EAN13") {
+      dh = this.height * 0.9;
     }
+    const dw = (this.width - dp * 2) / this.bandcode.length;
 
     let blackStartPosition = -1;
     let blackCount = 0;
@@ -117,10 +118,28 @@ export const Barcode = fabric.util.createClass(fabric.Object, {
         }
 
         if (blackStartPosition!= -1 && i === this.bandcode.length - 1) {
-          ctx.fillRect(blackStartPosition, realY(0), dw * blackCount, long ? dh + fontHeight * 0.7 : dh);
+          ctx.fillRect(
+            blackStartPosition, 
+            realY(0), 
+            dw * blackCount, 
+            long 
+              ? this.printText
+                ? dh + fontHeight * 0.7
+                : dh + this.height * 0.1
+              : dh
+          );
         }
       } else {
-        ctx.fillRect(blackStartPosition, realY(0), dw * blackCount, long ? dh + fontHeight * 0.7 : dh);
+        ctx.fillRect(
+          blackStartPosition, 
+          realY(0), 
+          dw * blackCount, 
+          long 
+          ? this.printText
+            ? dh + fontHeight * 0.7
+            : dh + this.height * 0.1
+          : dh
+        );
 
         blackStartPosition = -1;
         blackCount = 0;
