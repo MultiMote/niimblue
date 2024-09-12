@@ -4,9 +4,16 @@
   import Modal from "bootstrap/js/dist/modal";
   import { connectionState, printerClient, printerMeta } from "../stores";
   import { copyImageData, threshold, atkinson } from "../utils/post_process";
-  import { type EncodedImage, ImageEncoder, LabelType, PacketGenerator, ProtocolVersion, type PrintProgressEvent } from "@mmote/niimbluelib";
-  import type { LabelProps } from "../types";
+  import {
+    type EncodedImage,
+    ImageEncoder,
+    LabelType,
+    ProtocolVersion,
+    type PrintProgressEvent,
+  } from "@mmote/niimbluelib";
+  import type { LabelProps, PostProcessType } from "../types";
   import FaIcon from "./FaIcon.svelte";
+  import ParamLockButton from "./ParamLockButton.svelte";
 
   export let onClosed: () => void;
   export let labelProps: LabelProps;
@@ -19,7 +26,7 @@
   let printProgress: number = 0; // todo: more progress data
   let density: number = 3;
   let quantity: number = 1;
-  let postProcessType: "threshold" | "dither";
+  let postProcessType: PostProcessType;
   let thresholdValue: number = 140;
   let imgData: ImageData;
   let imgContext: CanvasRenderingContext2D;
@@ -28,6 +35,15 @@
   let statusTimer: NodeJS.Timeout | undefined = undefined;
   let error: string = "";
   let taskVer = $printerClient?.getPrintTaskVersion();
+
+  let savedProps = {} as {
+    postProcess?: PostProcessType;
+    threshold?: number;
+    quantity?: number;
+    density?: number;
+    labelType?: LabelType;
+    printTaskVersion?: ProtocolVersion;
+  };
 
   const disconnected = derived(connectionState, ($connectionState) => $connectionState !== "connected");
 
@@ -60,7 +76,7 @@
 
     const listener = (e: PrintProgressEvent) => {
       printProgress = e.pagePrintProgress;
-    }
+    };
 
     $printerClient.addEventListener("printprogress", listener);
 
@@ -89,6 +105,39 @@
     imgContext.putImageData(iData, 0, 0);
   };
 
+  const toggleSavedProp = (key: string, value: any) => {
+    const keyObj = key as keyof typeof savedProps;
+    savedProps[keyObj] = savedProps[keyObj] === undefined ? value : undefined;
+    localStorage.setItem("saved_preview_props", JSON.stringify(savedProps));
+  };
+
+  const updateSavedProp = (key: string, value: any, refreshPreview: boolean = false) => {
+    const keyObj = key as keyof typeof savedProps;
+    
+    if (savedProps[keyObj] !== undefined) {
+      savedProps[keyObj] = savedProps[keyObj] = value;
+      localStorage.setItem("saved_preview_props", JSON.stringify(savedProps));
+    }
+
+    if (refreshPreview) {
+      updatePreview();
+    }
+  };
+
+  const loadProps = () => {
+    try {
+      savedProps = JSON.parse(localStorage.getItem("saved_preview_props") ?? "{}");
+      if (savedProps.postProcess) postProcessType = savedProps.postProcess;
+      if (savedProps.threshold) thresholdValue = savedProps.threshold;
+      if (savedProps.quantity) quantity = savedProps.quantity;
+      if (savedProps.density) density = savedProps.density;
+      if (savedProps.labelType) labelType = savedProps.labelType;
+      if (savedProps.printTaskVersion) printTaskVersion = savedProps.printTaskVersion;
+    } catch (e) {
+      console.error("Props load error", e);
+    }
+  };
+
   onMount(() => {
     // create image from fabric canvas to work with
     const img = new Image();
@@ -109,12 +158,12 @@
       onClosed();
     });
 
-
-
     if (taskVer !== undefined) {
       console.log(`Detected print task version: ${ProtocolVersion[taskVer]}`);
       printTaskVersion = taskVer;
     }
+
+    loadProps();
   });
 
   onDestroy(() => {
@@ -164,10 +213,25 @@
         <div class="input-group input-group-sm">
           <span class="input-group-text">Post-process</span>
 
-          <select class="form-select" bind:value={postProcessType} on:change={updatePreview}>
+          <select
+            class="form-select"
+            bind:value={postProcessType}
+            on:change={() => updateSavedProp("postProcess", postProcessType, true)}
+          >
             <option value="threshold">Threshold</option>
             <option value="dither">Dither (Atkinson)</option>
           </select>
+
+          <ParamLockButton
+            propName="postProcess"
+            value={postProcessType}
+            savedValue={savedProps.postProcess}
+            onClick={toggleSavedProp}
+          />
+        </div>
+
+        <div class="input-group input-group-sm">
+          <span class="input-group-text">Threshold</span>
 
           <input
             type="range"
@@ -176,23 +240,51 @@
             min="1"
             max="255"
             bind:value={thresholdValue}
-            on:change={updatePreview}
+            on:change={() => updateSavedProp("threshold", thresholdValue, true)}
+          />
+          <span class="input-group-text">{thresholdValue}</span>
+
+          <ParamLockButton
+            propName="threshold"
+            value={thresholdValue}
+            savedValue={savedProps.threshold}
+            onClick={toggleSavedProp}
           />
         </div>
 
         <div class="input-group flex-nowrap input-group-sm">
           <span class="input-group-text">Copies</span>
-          <input class="form-control" type="number" min="1" bind:value={quantity} />
+          <input
+            class="form-control"
+            type="number"
+            min="1"
+            bind:value={quantity}
+            on:change={() => updateSavedProp("quantity", quantity)}
+          />
+          <ParamLockButton
+            propName="quantity"
+            value={quantity}
+            savedValue={savedProps.quantity}
+            onClick={toggleSavedProp}
+          />
         </div>
 
         <div class="input-group flex-nowrap input-group-sm">
           <span class="input-group-text">Density</span>
-          <input class="form-control" type="number" min="1" max="6" bind:value={density} />
+          <input
+            class="form-control"
+            type="number"
+            min="1"
+            max="6"
+            bind:value={density}
+            on:change={() => updateSavedProp("density", density)}
+          />
+          <ParamLockButton propName="density" value={density} savedValue={savedProps.density} onClick={toggleSavedProp} />
         </div>
 
         <div class="input-group input-group-sm">
           <span class="input-group-text">Label type</span>
-          <select class="form-select" bind:value={labelType}>
+          <select class="form-select" bind:value={labelType} on:change={() => updateSavedProp("labelType", labelType)}>
             {#each Object.values(LabelType) as lt}
               {#if typeof lt !== "string"}
                 <option value={lt}>
@@ -202,17 +294,45 @@
               {/if}
             {/each}
           </select>
+
+          <ParamLockButton
+            propName="labelType"
+            value={labelType}
+            savedValue={savedProps.labelType}
+            onClick={toggleSavedProp}
+          />
         </div>
 
         <div class="input-group input-group-sm">
           <span class="input-group-text">Print task version</span>
-          <select class="form-select" bind:value={printTaskVersion}>
-            <option value={ProtocolVersion.V1} disabled>{#if taskVer === ProtocolVersion.V1}✔{/if} V1 - NOT IMPLEMENTED</option>
-            <option value={ProtocolVersion.V2} disabled>{#if taskVer === ProtocolVersion.V2}✔{/if} V2 - NOT IMPLEMENTED</option>
-            <option value={ProtocolVersion.V3}>{#if taskVer === ProtocolVersion.V3}✔{/if} V3 - D110</option>
-            <option value={ProtocolVersion.V4}>{#if taskVer === ProtocolVersion.V4}✔{/if} V4 - B1</option>
-            <option value={ProtocolVersion.V5} disabled>{#if taskVer === ProtocolVersion.V5}✔{/if} V5 - NOT IMPLEMENTED</option>
+          <select
+            class="form-select"
+            bind:value={printTaskVersion}
+            on:change={() => updateSavedProp("printTaskVersion", printTaskVersion)}
+          >
+            <option value={ProtocolVersion.V1} disabled
+              >{#if taskVer === ProtocolVersion.V1}✔{/if} V1 - NOT IMPLEMENTED</option
+            >
+            <option value={ProtocolVersion.V2} disabled
+              >{#if taskVer === ProtocolVersion.V2}✔{/if} V2 - NOT IMPLEMENTED</option
+            >
+            <option value={ProtocolVersion.V3}
+              >{#if taskVer === ProtocolVersion.V3}✔{/if} V3 - D110</option
+            >
+            <option value={ProtocolVersion.V4}
+              >{#if taskVer === ProtocolVersion.V4}✔{/if} V4 - B1</option
+            >
+            <option value={ProtocolVersion.V5} disabled
+              >{#if taskVer === ProtocolVersion.V5}✔{/if} V5 - NOT IMPLEMENTED</option
+            >
           </select>
+
+          <ParamLockButton
+            propName="printTaskVersion"
+            value={printTaskVersion}
+            savedValue={savedProps.printTaskVersion}
+            onClick={toggleSavedProp}
+          />
         </div>
 
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -223,12 +343,7 @@
           </button>
         {/if}
 
-        <button
-          type="button"
-          class="btn btn-primary"
-          disabled={$disconnected || printState !== "idle"}
-          on:click={onPrint}
-        >
+        <button type="button" class="btn btn-primary" disabled={$disconnected || printState !== "idle"} on:click={onPrint}>
           {#if $disconnected}
             Printer is not connected
           {:else}
@@ -252,5 +367,11 @@
   }
   .progress-bar {
     transition: none;
+  }
+  .input-group .form-range {
+    flex-grow: 1;
+    width: 1%;
+    height: unset;
+    padding: 0 1rem;
   }
 </style>

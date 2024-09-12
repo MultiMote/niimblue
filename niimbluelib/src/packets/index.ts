@@ -147,7 +147,7 @@ export enum ConnectResult {
 
 export enum ProtocolVersion {
   /** Used in D11 */
-  V1,
+  V1 = 1,
   /** Used in B21, D110new */
   V2,
   /** Used in B16 */

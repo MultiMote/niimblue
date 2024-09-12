@@ -21,3 +21,5 @@ export interface ExportedLabelTemplate {
   canvas: { version: string; objects: Object[] };
   label: LabelProps;
 };
+
+export type PostProcessType ="threshold" | "dither";
