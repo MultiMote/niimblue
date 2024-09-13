@@ -30,7 +30,13 @@
   let printNow: boolean = false;
 
   const deleteSelected = () => {
-    fabricCanvas.getActiveObjects().forEach((obj) => {
+    const selected: fabric.Object[] = fabricCanvas.getActiveObjects();
+    for (const obj of selected) {
+      if (obj instanceof fabric.IText && obj.isEditing) {
+        return;
+      }
+    }
+    selected.forEach((obj) => {
       fabricCanvas.remove(obj);
     });
     selectedObject = undefined;
@@ -53,7 +59,6 @@
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.repeat) return;
     if (e.key === "Delete") {
-      // todo: fix del in text editing
       deleteSelected();
     }
   };
@@ -268,7 +273,9 @@
 
           <button class="btn btn-secondary dropdown-toggle px-1" data-bs-toggle="dropdown"> </button>
           <div class="dropdown-menu px-2">
-            <button class="btn btn-secondary btn-sm" on:click={onExportClicked}>{$tr("editor.export.json", "Export JSON")}</button>
+            <button class="btn btn-secondary btn-sm" on:click={onExportClicked}
+              >{$tr("editor.export.json", "Export JSON")}</button
+            >
           </div>
         </div>
 
@@ -278,7 +285,9 @@
           </button>
           <div class="dropdown-menu px-2">
             <div class="d-flex gap-1 flex-wrap">
-              <button class="btn btn-secondary btn-sm" on:click={onImportClicked}>{$tr("editor.import.json", "Import JSON")}</button>
+              <button class="btn btn-secondary btn-sm" on:click={onImportClicked}
+                >{$tr("editor.import.json", "Import JSON")}</button
+              >
               <ZplImportButton {labelProps} onImageReady={zplImageReady} text={$tr("editor.import.zpl", "Import ZPL")} />
             </div>
           </div>
@@ -287,7 +296,9 @@
         <IconPicker onSubmit={onIconPicked} />
         <ObjectPicker onSubmit={onObjectPicked} />
 
-        <button class="btn btn-sm btn-primary ms-1" on:click={openPreview}><FaIcon icon="eye" /> {$tr("editor.preview", "Preview")}</button>
+        <button class="btn btn-sm btn-primary ms-1" on:click={openPreview}
+          ><FaIcon icon="eye" /> {$tr("editor.preview", "Preview")}</button
+        >
         <button
           title="Print with default or saved parameters"
           class="btn btn-sm btn-primary ms-1"
@@ -302,11 +313,15 @@
     <div class="col d-flex justify-content-center">
       <div class="toolbar d-flex flex-wrap gap-1 justify-content-center align-items-center">
         {#if selectedCount > 0}
-          <button class="btn btn-sm btn-danger me-1" on:click={deleteSelected} title={$tr("editor.delete", "Print")}><FaIcon icon="trash" /></button>
+          <button class="btn btn-sm btn-danger me-1" on:click={deleteSelected} title={$tr("editor.delete", "Print")}
+            ><FaIcon icon="trash" /></button
+          >
         {/if}
 
         {#if selectedObject && selectedCount === 1}
-          <button class="btn btn-sm btn-secondary me-1" on:click={cloneSelected} title={$tr("editor.clone", "Clone")}><FaIcon icon="clone" /></button>
+          <button class="btn btn-sm btn-secondary me-1" on:click={cloneSelected} title={$tr("editor.clone", "Clone")}
+            ><FaIcon icon="clone" /></button
+          >
           <GenericObjectParamsControls {selectedObject} valueUpdated={() => fabricCanvas.requestRenderAll()} />
         {/if}
 
