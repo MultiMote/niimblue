@@ -25,7 +25,7 @@
   let printState: "idle" | "sending" | "printing" = "idle";
   let modal: Modal;
   let printProgress: number = 0; // todo: more progress data
-  let density: number = 3;
+  let density: number = $printerMeta?.densityDefault ?? 3;
   let quantity: number = 1;
   let postProcessType: PostProcessType;
   let thresholdValue: number = 140;
@@ -283,8 +283,8 @@
           <input
             class="form-control"
             type="number"
-            min="1"
-            max="6"
+            min="{$printerMeta?.densityMin ?? 1}"
+            max="{$printerMeta?.densityMax ?? 20}"
             bind:value={density}
             on:change={() => updateSavedProp("density", density)}
           />
