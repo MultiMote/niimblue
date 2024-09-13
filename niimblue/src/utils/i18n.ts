@@ -4,8 +4,8 @@ import { languagesMaps, langPack } from "../lang_pack";
 
 export type {translationKeys, supportedLanguages} from '../lang_pack'
 
-function browserLanguage2supportedLanguage(brewserLanguage: string): supportedLanguages {
-  switch(brewserLanguage) {
+function browserLanguage2supportedLanguage(browserLanguage: string): supportedLanguages {
+  switch(browserLanguage) {
     case "ru":
     case "ru-RU":
       return "ru"

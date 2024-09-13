@@ -107,6 +107,7 @@ export const langPack: Record<supportedLanguages, Partial<Record<translationKeys
     "preview.print_task_version": "Версия задачи печати",
     "preview.not_implemented": "НЕ РЕАЛИЗОВАНО",
     "preview.close": "Закрыть",
+    "preview.print": "Печать",
     "preview.not_connected": "Принтер не подключен",
     "preview.label_type": "Тип этикетки",
     "preview.label_type.Invalid": "Некорректный",
