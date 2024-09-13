@@ -33,8 +33,8 @@
 <div class="version text-end text-secondary">
   <div>
     <select class="form-select form-select-sm d-inline-block w-auto" bind:value={$locale}>
-      {#each locales as l}
-        <option value={l}>{l}</option>
+      {#each Object.entries(locales) as [key, name]}
+        <option value={key}>{name}</option>
       {/each}
     </select>
   </div>
