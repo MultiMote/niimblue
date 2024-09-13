@@ -6,7 +6,7 @@
   export let onClick: (key: string, value: any) => void;
 </script>
 
-<button class="btn btn-sm btn-outline-secondary" on:click={() => onClick(propName, value)}>
+<button class="btn btn-sm btn-outline-secondary param-lock-btn" on:click={() => onClick(propName, value)}>
   {#if savedValue }
     <FaIcon icon="lock" params={{classes: "text-warning"}} />
   {:else}
@@ -14,3 +14,8 @@
   {/if}
 </button>
 
+<style>
+  .param-lock-btn {
+    width: 35px;
+  }
+</style>
