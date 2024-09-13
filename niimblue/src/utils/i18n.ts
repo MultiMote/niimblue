@@ -2,7 +2,9 @@ import { derived, writable } from "svelte/store";
 import type { translationKeys, supportedLanguages } from "../lang_pack"
 import { languagesMaps, langPack } from "../lang_pack";
 
-function brewserLanguage2supportedLanguagesKeys(brewserLanguage: string): supportedLanguages {
+export type {translationKeys, supportedLanguages} from '../lang_pack'
+
+function browserLanguage2supportedLanguage(brewserLanguage: string): supportedLanguages {
   switch(brewserLanguage) {
     case "ru":
     case "ru-RU":
@@ -19,7 +21,7 @@ function brewserLanguage2supportedLanguagesKeys(brewserLanguage: string): suppor
 export const locales = languagesMaps;
 
 export const locale = writable<supportedLanguages>(
-  localStorage.getItem("locale") as supportedLanguages ?? brewserLanguage2supportedLanguagesKeys(navigator.language)
+  localStorage.getItem("locale") as supportedLanguages ?? browserLanguage2supportedLanguage(navigator.language)
 );
 locale.subscribe((value: supportedLanguages) => localStorage.setItem("locale", value));
 

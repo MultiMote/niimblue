@@ -14,7 +14,7 @@
   import type { LabelProps, PostProcessType } from "../types";
   import FaIcon from "./FaIcon.svelte";
   import ParamLockButton from "./ParamLockButton.svelte";
-  import { tr } from "../utils/i18n";
+  import { tr, type translationKeys } from "../utils/i18n";
 
   export let onClosed: () => void;
   export let labelProps: LabelProps;
@@ -48,6 +48,8 @@
   };
 
   const disconnected = derived(connectionState, ($connectionState) => $connectionState !== "connected");
+
+  const labelType2translationKeys = (labelType: string): translationKeys => `preview.label_type.${labelType}` as translationKeys
 
   const endPrint = async () => {
     clearInterval(statusTimer);
@@ -299,7 +301,7 @@
               {#if typeof lt !== "string"}
                 <option value={lt}>
                   {#if $printerMeta?.paperTypes.includes(lt)}✔{/if}
-                  {$tr(`preview.label_type.${LabelType[lt]}`, LabelType[lt])}
+                  {$tr(labelType2translationKeys(LabelType[lt]), LabelType[lt])}
                 </option>
               {/if}
             {/each}

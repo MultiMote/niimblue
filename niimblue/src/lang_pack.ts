@@ -66,6 +66,7 @@ export type translationKeys =
   | "preview.postprocess.threshold"
   | "preview.postprocess"
   | "preview.print_task_version"
+  | "preview.print"
   | "preview.threshold"
   | "preview.title"
 
@@ -192,6 +193,7 @@ export const langPack: Record<supportedLanguages, Partial<Record<translationKeys
     "preview.not_implemented": "暂不支持",
     "preview.close": "关闭",
     "preview.not_connected": "打印机未连接",
+    "preview.print": "打印",
     "preview.label_type": "标签类型",
     "preview.label_type.Invalid": "无效纸张",
     "preview.label_type.WithGaps": "间隙纸",
