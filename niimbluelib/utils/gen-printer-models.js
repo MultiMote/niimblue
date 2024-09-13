@@ -3,6 +3,8 @@
 fetch("https://oss-print.niimbot.com/public_resources/static_resources/devices.json")
   .then((resp) => resp.json())
   .then((items) => {
+    items.sort((a, b) => a.name.localeCompare(b.name));
+
     const dir_d = {
       270: "left",
       180: "top",
@@ -47,6 +49,9 @@ export interface PrinterModelMeta {
   printDirection: PrintDirection;
   printheadPixels: number;
   paperTypes: number[];
+  densityMin: number;
+  densityMax: number;
+  densityDefault: number;
 }
 `);
 
@@ -68,6 +73,9 @@ export interface PrinterModelMeta {
       console.log(`    printDirection: "${dir}",`);
       console.log(`    printheadPixels: ${Math.ceil(item.widthSetEnd * ppmm)},`);
       console.log(`    paperTypes: [${paperTypes}],`);
+      console.log(`    densityMin: ${item.solubilitySetStart},`);
+      console.log(`    densityMax: ${item.solubilitySetEnd},`);
+      console.log(`    densityDefault: ${item.solubilitySetDefault},`);
       console.log("  },");
     }
 
