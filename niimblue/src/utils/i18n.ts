@@ -1,21 +1,35 @@
 import { derived, writable } from "svelte/store";
-import type {translationKeys, supportedLanguagesKeys} from "../lang_pack"
-import { supportedLanguages ,langPack } from "../lang_pack";
+import type { translationKeys, supportedLanguages } from "../lang_pack"
+import { languagesMaps, langPack } from "../lang_pack";
 
-export const locales = supportedLanguages;
+function brewserLanguage2supportedLanguagesKeys(brewserLanguage: string): supportedLanguages {
+  switch(brewserLanguage) {
+    case "ru":
+    case "ru-RU":
+      return "ru"
+    case "zh":
+    case "zh-Hans":
+    case "zh-CN":
+      return "zh_cn";
+    default:
+      return "en"
+  }
+}
 
-export const locale = writable<supportedLanguagesKeys>(
-  localStorage.getItem("locale") as supportedLanguagesKeys ?? "en"
+export const locales = languagesMaps;
+
+export const locale = writable<supportedLanguages>(
+  localStorage.getItem("locale") as supportedLanguages ?? brewserLanguage2supportedLanguagesKeys(navigator.language)
 );
-locale.subscribe((value: string) => localStorage.setItem("locale", value));
+locale.subscribe((value: supportedLanguages) => localStorage.setItem("locale", value));
 
 export const tr = derived(locale, ($locale) => (key: translationKeys, fallback: string) => {
   const result = langPack[$locale] ? langPack[$locale][key] : undefined;
-  if (!result) {
+  if (result === undefined) {
     if ($locale !== "en") {
       console.warn(`${key} of ${$locale} locale is not translated`);
     }
     return fallback;
   }
-  return langPack[$locale][key];
+  return result;
 });

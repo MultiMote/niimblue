@@ -69,9 +69,9 @@ export type translationKeys =
   | "preview.threshold"
   | "preview.title"
 
-export type supportedLanguagesKeys = "en" | "ru" | "zh_cn"
+export type supportedLanguages = "en" | "ru" | "zh_cn"
 
-export const langPack: Record<supportedLanguagesKeys, Partial<Record<translationKeys, string>>> = {
+export const langPack: Record<supportedLanguages, Partial<Record<translationKeys, string>>> = {
   /** Do not add anything in "en" translation, fallback values used */
   en: {},
 
@@ -246,7 +246,7 @@ export const langPack: Record<supportedLanguagesKeys, Partial<Record<translation
   }
 };
 
-export const supportedLanguages: Record<supportedLanguagesKeys, string> = {
+export const languagesMaps: Record<supportedLanguages, string> = {
   en: "English",
   ru: "Русский",
   zh_cn: "简体中文",
