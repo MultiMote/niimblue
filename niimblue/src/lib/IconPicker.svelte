@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import FaIcon from "./FaIcon.svelte";
   import { type IconName } from "@fortawesome/fontawesome-svg-core";
+  import { tr } from "../utils/i18n";
 
   export let onSubmit: (i: IconName) => void;
 
@@ -24,9 +25,9 @@
   </button>
 
   <div class="dropdown-menu">
-    <h6 class="dropdown-header">Add icon</h6>
+    <h6 class="dropdown-header">{$tr("editor.iconpicker.title", "Add icon")}</h6>
     <div class="p-3">
-      <input type="text" class="form-control" placeholder="Search" bind:value={search} />
+      <input type="text" class="form-control" placeholder={$tr("editor.iconpicker.search", "Search")} bind:value={search} />
       <div class="icons">
         {#each iconNames as name}
           {#if !search || name.includes(search.toLowerCase())}

@@ -14,6 +14,7 @@
   import type { LabelProps, PostProcessType } from "../types";
   import FaIcon from "./FaIcon.svelte";
   import ParamLockButton from "./ParamLockButton.svelte";
+  import { tr } from "../utils/i18n";
 
   export let onClosed: () => void;
   export let labelProps: LabelProps;
@@ -194,7 +195,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Print preview</h1>
+        <h1 class="modal-title fs-5" id="exampleModalLabel">{$tr("preview.title", "Print preview")}</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
@@ -220,15 +221,15 @@
 
       <div class="modal-footer">
         <div class="input-group input-group-sm">
-          <span class="input-group-text">Post-process</span>
+          <span class="input-group-text">{$tr("preview.postprocess", "Post-process")}</span>
 
           <select
             class="form-select"
             bind:value={postProcessType}
             on:change={() => updateSavedProp("postProcess", postProcessType, true)}
           >
-            <option value="threshold">Threshold</option>
-            <option value="dither">Dither (Atkinson)</option>
+            <option value="threshold">{$tr("preview.postprocess.threshold", "Threshold")}</option>
+            <option value="dither">{$tr("preview.postprocess.atkinson", "Dither (Atkinson)")}</option>
           </select>
 
           <ParamLockButton
@@ -240,7 +241,7 @@
         </div>
 
         <div class="input-group input-group-sm">
-          <span class="input-group-text">Threshold</span>
+          <span class="input-group-text">{$tr("preview.threshold", "Threshold")}</span>
 
           <input
             type="range"
@@ -262,7 +263,7 @@
         </div>
 
         <div class="input-group flex-nowrap input-group-sm">
-          <span class="input-group-text">Copies</span>
+          <span class="input-group-text">{$tr("preview.copies", "Copies")}</span>
           <input
             class="form-control"
             type="number"
@@ -279,7 +280,7 @@
         </div>
 
         <div class="input-group flex-nowrap input-group-sm">
-          <span class="input-group-text">Density</span>
+          <span class="input-group-text">{$tr("preview.density", "Density")}</span>
           <input
             class="form-control"
             type="number"
@@ -292,13 +293,13 @@
         </div>
 
         <div class="input-group input-group-sm">
-          <span class="input-group-text">Label type</span>
+          <span class="input-group-text">{$tr("preview.label_type", "Label type")}</span>
           <select class="form-select" bind:value={labelType} on:change={() => updateSavedProp("labelType", labelType)}>
             {#each Object.values(LabelType) as lt}
               {#if typeof lt !== "string"}
                 <option value={lt}>
                   {#if $printerMeta?.paperTypes.includes(lt)}✔{/if}
-                  {LabelType[lt]}
+                  {$tr(`preview.label_type.${LabelType[lt]}`, LabelType[lt])}
                 </option>
               {/if}
             {/each}
@@ -313,17 +314,17 @@
         </div>
 
         <div class="input-group input-group-sm">
-          <span class="input-group-text">Print task version</span>
+          <span class="input-group-text">{$tr("preview.print_task_version", "Print task version")}</span>
           <select
             class="form-select"
             bind:value={printTaskVersion}
             on:change={() => updateSavedProp("printTaskVersion", printTaskVersion)}
           >
             <option value={ProtocolVersion.V1} disabled
-              >{#if taskVer === ProtocolVersion.V1}✔{/if} V1 - NOT IMPLEMENTED</option
+              >{#if taskVer === ProtocolVersion.V1}✔{/if} V1 - {$tr("preview.not_implemented", "NOT IMPLEMENTED")}</option
             >
             <option value={ProtocolVersion.V2} disabled
-              >{#if taskVer === ProtocolVersion.V2}✔{/if} V2 - NOT IMPLEMENTED</option
+              >{#if taskVer === ProtocolVersion.V2}✔{/if} V2 - {$tr("preview.not_implemented", "NOT IMPLEMENTED")}</option
             >
             <option value={ProtocolVersion.V3}
               >{#if taskVer === ProtocolVersion.V3}✔{/if} V3 - D110</option
@@ -332,7 +333,7 @@
               >{#if taskVer === ProtocolVersion.V4}✔{/if} V4 - B1</option
             >
             <option value={ProtocolVersion.V5} disabled
-              >{#if taskVer === ProtocolVersion.V5}✔{/if} V5 - NOT IMPLEMENTED</option
+              >{#if taskVer === ProtocolVersion.V5}✔{/if} V5 - {$tr("preview.not_implemented", "NOT IMPLEMENTED")}</option
             >
           </select>
 
@@ -344,7 +345,7 @@
           />
         </div>
 
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{$tr("preview.close", "Close")}</button>
 
         {#if printState !== "idle"}
           <button type="button" class="btn btn-primary" disabled={$disconnected} on:click={endPrint}>
@@ -354,9 +355,10 @@
 
         <button type="button" class="btn btn-primary" disabled={$disconnected || printState !== "idle"} on:click={onPrint}>
           {#if $disconnected}
-            Printer is not connected
+            {$tr("preview.not_connected", "Printer is not connected")}
+
           {:else}
-            <FaIcon icon="print" /> Print
+            <FaIcon icon="print" /> {$tr("preview.print", "Print")}
           {/if}
         </button>
       </div>

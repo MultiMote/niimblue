@@ -2,6 +2,7 @@
   import BrowserWarning from "./lib/BrowserWarning.svelte";
   import ImageEditor from "./lib/ImageEditor.svelte";
   import PrinterConnector from "./lib/PrinterConnector.svelte";
+  import { locale, locales, tr } from "./utils/i18n";
 </script>
 
 <div class="container my-2">
@@ -31,6 +32,13 @@
 <!-- svelte-ignore missing-declaration -->
 <div class="version text-end text-secondary">
   <div>
+    <select class="form-select form-select-sm d-inline-block w-auto" bind:value={$locale}>
+      {#each locales as l}
+        <option value={l}>{l}</option>
+      {/each}
+    </select>
+  </div>
+  <div>
     {#if __APP_COMMIT__}
       <a class="text-secondary" href="https://github.com/MultiMote/niimblue/commit/{__APP_COMMIT__}"
         >{__APP_COMMIT__.slice(0, 6)}</a
@@ -38,10 +46,11 @@
     {:else}
       v{__APP_VERSION__}
     {/if}
-    built at {__BUILD_DATE__}
+    {$tr("main.built", "built at")}
+    {__BUILD_DATE__}
   </div>
   <div>
-    <a class="text-secondary" href="https://github.com/MultiMote/niimblue">code</a>
+    <a class="text-secondary" href="https://github.com/MultiMote/niimblue">{$tr("main.code", "Code")}</a>
   </div>
 </div>
 

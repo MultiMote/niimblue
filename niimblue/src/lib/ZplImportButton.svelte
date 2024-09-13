@@ -3,6 +3,7 @@
   import { FileUtils } from "../utils/file_utils";
   import FaIcon from "./FaIcon.svelte";
 
+  export let text: string;
   export let labelProps: LabelProps;
   export let onImageReady: (img: Blob) => void;
   let state: "idle" | "processing" | "error" = "idle";
@@ -45,7 +46,7 @@
 </script>
 
 <button class="btn btn-secondary btn-sm" on:click={onImportClicked}
-  >Import ZPL
+  >{text}
   {#if state === "processing"}
     <FaIcon icon="sync" params={{ classes: ["fa-spin"] }}></FaIcon>
   {:else if state === "error"}

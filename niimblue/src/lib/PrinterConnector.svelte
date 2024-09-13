@@ -3,6 +3,7 @@
   import { printerClient, connectedPrinterName, connectionState, initClient, heartbeatData, printerInfo, printerMeta } from "../stores";
   import type { ConnectionType } from "../types";
   import FaIcon from "./FaIcon.svelte";
+  import { tr } from "../utils/i18n";
 
   let connectionType: ConnectionType = "bluetooth";
   let rfidInfo: RfidInfo|undefined = undefined;
@@ -93,8 +94,8 @@
     <span class="input-group-text">{$printerMeta?.model ?? $connectedPrinterName}</span>
   {:else}
     <select class="form-select" disabled={$connectionState === "connecting"} bind:value={connectionType}>
-      <option value="bluetooth">Bluetooth</option>
-      <option value="serial">Serial</option>
+      <option value="bluetooth">{$tr("connector.bluetooth", "Bluetooth")}</option>
+      <option value="serial">{$tr("connector.serial", "Serial (USB)")}</option>
     </select>
   {/if}
 

@@ -3,17 +3,6 @@
 
   export let onItemSelected: (preset: LabelPreset) => void;
 
-  // <option value=""></option>
-  // <option value="L:1:240x96">D# 30x15mm | 8dpmm (203dpi) | Left</option>
-  // <option value="L:1:320x96">D# 40x15mm | 8dpmm (203dpi) | Left</option>
-  // <option value="T:1:96x320">D# 40x15mm | 8dpmm (203dpi) | Top</option>
-  // <option value="T:8:30x20">B# 30x20mm | 8dpmm (203dpi) | Top</option>
-  // <option value="T:8:40x30">B# 40x30mm | 8dpmm (203dpi) | Top</option>
-  // <option value="T:8:40x70">B# 40x70mm | 8dpmm (203dpi) | Top</option>
-  // <option value="T:8:43x25">B# 43x25mm | 8dpmm (203dpi) | Top</option>
-  // <option value="T:8:50x30">B# 50x30mm | 8dpmm (203dpi) | Top</option>
-  // <option value="T:8:50x40">B# 50x40mm | 8dpmm (203dpi) | Top</option>
-
   const presets: LabelPreset[] = [
     { width: 30, height: 12, unit: "mm", dpmm: 8, printDirection: "left" },
     { width: 40, height: 12, unit: "mm", dpmm: 8, printDirection: "left" },

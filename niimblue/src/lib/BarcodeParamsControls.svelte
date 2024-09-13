@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Barcode, type BarcodeCoding } from "../fabric-object/barcode.class";
+  import { tr } from "../utils/i18n";
   import FaIcon from "./FaIcon.svelte";
 
   export let selectedObject: fabric.Object | undefined;
@@ -39,7 +40,7 @@
 
 {#if selectedBarcode}
   <div class="input-group input-group-sm flex-nowrap">
-    <span class="input-group-text" title="Encoding"><FaIcon icon="code" /></span>
+    <span class="input-group-text" title={$tr("params.barcode.encoding", "Encoding")}><FaIcon icon="code" /></span>
     <select class="form-select" bind:value={encoding} on:change={encodingChange}>
       <option value="EAN13">EAN13</option>
       <option value="CODE128B">Code128 B</option>
@@ -51,7 +52,7 @@
 
   {#if encoding === "EAN13"}
     <div class="input-group input-group-sm flex-nowrap">
-      <span class="input-group-text" title="Content"><FaIcon icon="barcode" /></span>
+      <span class="input-group-text" title={$tr("params.barcode.content", "Content")}><FaIcon icon="barcode" /></span>
       <input class="barcode-content form-control" maxlength="12" bind:value={text} on:input={textChange} />
     </div>
   {:else}

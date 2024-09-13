@@ -4,6 +4,7 @@
   import LabelPresetsBrowser from "./LabelPresetsBrowser.svelte";
   import { icon } from "@fortawesome/fontawesome-svg-core";
   import { printerMeta } from "../stores";
+  import { tr } from "../utils/i18n";
 
   export let labelProps: LabelProps;
   export let onChange: () => void;
@@ -52,23 +53,23 @@
     <FaIcon icon="gear" />
   </button>
   <div class="dropdown-menu">
-    <h6 class="dropdown-header">Label properties</h6>
+    <h6 class="dropdown-header">{$tr("params.label.title", "Label properties")}</h6>
     <div class="p-3">
       <LabelPresetsBrowser class="mb-1" onItemSelected={onLabelPresetSelected} />
 
       <div class="input-group flex-nowrap input-group-sm mb-3">
-        <span class="input-group-text">Size</span>
+        <span class="input-group-text">{$tr("params.label.size", "Size")}</span>
         <input class="form-control" type="number" min="0" bind:value={sizeMm.width} on:change={onChangePre} />
         <span class="input-group-text">x</span>
         <input class="form-control" type="number" min="0" bind:value={sizeMm.height} on:change={onChangePre} />
-        <span class="input-group-text">mm</span>
+        <span class="input-group-text">{$tr("params.label.mm", "mm")}</span>
         <input class="form-control" type="number" min="0" bind:value={sizeMm.dpmm} on:change={onChangePre} />
-        <span class="input-group-text">dpmm</span>
-        <button class="btn btn-sm btn-primary" on:click={onCalcSize}>Calc</button>
+        <span class="input-group-text">{$tr("params.label.dpmm", "dpmm")}</span>
+        <button class="btn btn-sm btn-primary" on:click={onCalcSize}>{$tr("params.label.calc", "Calc")}</button>
       </div>
 
       <div class="input-group flex-nowrap input-group-sm mb-3">
-        <span class="input-group-text">Size</span>
+        <span class="input-group-text">{$tr("params.label.size", "Size")}</span>
         <input
           class="form-control"
           type="number"
@@ -86,7 +87,7 @@
           bind:value={labelProps.size.height}
           on:change={onChangePre}
         />
-        <span class="input-group-text">px</span>
+        <span class="input-group-text">{$tr("params.label.px", "px")}</span>
 
         {#if $printerMeta !== undefined}
           {@const headSide = labelProps.printDirection == "left" ? labelProps.size.height : labelProps.size.width}
@@ -99,13 +100,13 @@
       </div>
 
       <div class="input-group flex-nowrap input-group-sm mb-3">
-        <span class="input-group-text">Print from</span>
+        <span class="input-group-text">{$tr("params.label.direction", "Print from")}</span>
         <select class="form-select" bind:value={labelProps.printDirection} on:change={onChangePre}>
           <option value="left"
-            >{#if $printerMeta?.printDirection === "left"}✔{/if} Left</option
+            >{#if $printerMeta?.printDirection === "left"}✔{/if} {$tr("params.label.direction.left", "Left")}</option
           >
           <option value="top"
-            >{#if $printerMeta?.printDirection === "top"}✔{/if} Top</option
+            >{#if $printerMeta?.printDirection === "top"}✔{/if} {$tr("params.label.direction.top", "Top")}</option
           >
         </select>
         {#if $printerMeta !== undefined && $printerMeta.printDirection !== labelProps.printDirection}
@@ -124,6 +125,6 @@
 
 <style>
   .dropdown-menu {
-    min-width: 400px;
+    min-width: 450px;
   }
 </style>
