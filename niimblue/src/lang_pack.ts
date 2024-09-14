@@ -47,6 +47,7 @@ export type translationKeys =
   | "params.text.font_size.up"
   | "params.text.font_size"
   | "params.text.line_height"
+  | "params.text.invert_colors"
   | "preview.close"
   | "preview.copies"
   | "preview.density"
@@ -238,6 +239,7 @@ export const langPack: Record<supportedLanguages, Partial<Record<translationKeys
     "params.text.font_size.down": "缩小",
     "params.text.line_height": "行距",
     "params.text.font_family": "字体",
+    "params.text.invert_colors": "反转颜色",
     /* GenericObjectParamsControls */
     "params.generic.center.vertical": "竖向居中",
     "params.generic.center.horizontal": "横向居中",
