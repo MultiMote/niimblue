@@ -191,7 +191,7 @@
       backgroundColor: "#fff",
     });
 
-    ImageEditorUtils.addText(fabricCanvas, $tr("editor.default_text", "Print"));
+    ImageEditorUtils.addText(fabricCanvas, $tr("editor.default_text", "Text"));
 
     // force close dropdowns on touch devices
     fabricCanvas.on("mouse:down", (e: fabric.IEvent<MouseEvent>): void => {
