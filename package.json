@@ -1,0 +1,41 @@
+{
+	"name": "niimblue",
+	"private": true,
+	"type": "module",
+	"version": "0.0.1",
+	"scripts": {
+		"dev-locallib": "yarn install-locallib && yarn sv-check && yarn dev-open",
+		"dev": "vite --force",
+		"dev-open": "vite --force --open",
+		"build": "vite build",
+		"build-rel": "vite build --base=./",
+		"preview": "vite preview",
+		"install-locallib": "yarn --cwd ../niimbluelib && yarn --cwd ../niimbluelib clean-build && yarn add file:../niimbluelib",
+		"sv-check": "svelte-check --tsconfig ./tsconfig.json"
+	},
+	"dependencies": {
+		"@fontsource-variable/noto-sans": "^5.0.5",
+		"@fortawesome/fontawesome-svg-core": "^6.5.2",
+		"@fortawesome/free-solid-svg-icons": "^6.5.2",
+		"@mmote/niimbluelib": "0.0.1-alpha.0",
+		"@popperjs/core": "^2.11.8",
+		"bootstrap": "5.3.3",
+		"fabric": "^5.3.0",
+		"qrcode-svg": "^1.1.0"
+	},
+	"devDependencies": {
+		"@sveltejs/vite-plugin-svelte": "^3.1.1",
+		"@tsconfig/svelte": "^5.0.4",
+		"@types/bootstrap": "^5.2.10",
+		"@types/fabric": "^5.3.7",
+		"@types/node": "^20.14.8",
+		"@types/qrcode-svg": "^1.1.5",
+		"sass": "^1.77.5",
+		"svelte": "^4.2.18",
+		"svelte-check": "^3.8.4",
+		"tslib": "^2.6.3",
+		"typescript": "^5.2.2",
+		"vite": "^5.3.1"
+	},
+	"packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+}

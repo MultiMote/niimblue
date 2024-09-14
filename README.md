@@ -2,8 +2,6 @@
 
 Niimbot printers webui. Design and print labels right from your browser.
 
-There is no code in the main branch yet. You can browse source code at the [draft](https://github.com/MultiMote/niimblue/tree/draft) branch.
-
 Tested printers:
 
 - Niimbot D110
@@ -15,7 +13,7 @@ You can see implemented and planned feature list [in this issue](https://github.
 
 ## Demo
 
-The public preview is available [here](https://niim.mmote.ru) (updated often).
+The public preview is available [here](https://niim.mmote.ru).
 
 ## Browser support
 
@@ -31,6 +29,8 @@ Bluetooth dumps are MUCH appreciated (search how to enable **Bluetooth HCI Snoop
 
 ## Images
 
+Images may be outdated, interface is changing constantly.
+
 ![ui](about/ui.png)
 
 ![labels](about/labels.png)
@@ -42,3 +42,39 @@ Bluetooth dumps are MUCH appreciated (search how to enable **Bluetooth HCI Snoop
 ![printed_b1](about/printed_b1.jpg)
 
 ![printed_d110](about/printed_d110.jpg)
+
+## Launching development server
+
+Skip steps you have done.
+
+1. Install [git](https://git-scm.com)
+
+2. Install [nodejs](https://nodejs.org)
+
+3. Install [yarn](https://yarnpkg.com)
+
+4. Clone repository
+
+    ```bash
+    git clone https://github.com/MultiMote/niimblue.git
+    ```
+
+5. Install dependencies
+
+    ```bash
+    yarn install
+    ```
+
+6. Run dev server
+
+    Check code and open browser:
+
+    ```bash
+    yarn dev-check
+    ```
+
+    Or just run:
+
+    ```bash
+    yarn dev
+    ```

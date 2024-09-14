@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="%VITE_PAGE_DESCRIPTION%"/>
+    <meta property="og:site_name" content="%VITE_PAGE_TITLE%" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="%VITE_PAGE_TITLE%">
+    <meta property="og:description" content="%VITE_PAGE_DESCRIPTION%">
+    <meta property="og:image" content="%VITE_DEPLOY_BASE_URL%/og-image.svg">
+    <link rel="canonical" href="%VITE_DEPLOY_BASE_URL%/">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+
+    <!-- Preload fonts to make canvas.js happy -->
+    <link rel="preload" as="font" type="font/woff2" crossorigin="anonymous"
+          href="node_modules/@fontsource-variable/noto-sans/files/noto-sans-latin-wght-normal.woff2"/>
+    <link rel="preload" as="font" type="font/woff2" crossorigin="anonymous"
+          href="node_modules/@fontsource-variable/noto-sans/files/noto-sans-cyrillic-wght-normal.woff2"/>
+
+    <title>%VITE_PAGE_TITLE%</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/index.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+@import "bootstrap/scss/bootstrap-utilities";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/containers";
+@import "bootstrap/scss/grid";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/button-group";
+@import "bootstrap/scss/forms";
+@import "bootstrap/scss/dropdown";
+@import "bootstrap/scss/modal";
+@import "bootstrap/scss/close";
+@import "bootstrap/scss/progress";
+@import "bootstrap/scss/alert";
+@import "font";
+
+// @import "@fortawesome/fontawesome-svg-core/styles";
+
+body {
+  font-family: "Noto Sans Variable", sans-serif;
+}
