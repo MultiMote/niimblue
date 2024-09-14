@@ -15,7 +15,7 @@ import {
   NiimbotAbstractClient,
   Utils,
   Validators,
-  ProtocolVersion,
+  PrintTaskVersion,
   PrintProgressEvent,
 } from "..";
 import { SequentialDataReader } from "./data_reader";
@@ -289,13 +289,13 @@ export class Abstraction {
   }
 
   public async print(
-    protoVersion: ProtocolVersion,
+    taskVersion: PrintTaskVersion,
     image: EncodedImage,
     options?: PrintOptions,
     timeout?: number
   ): Promise<void> {
     this.setTimeout(timeout ?? 10_000);
-    const packets: NiimbotPacket[] = PacketGenerator.generatePrintSequence(protoVersion, image, options);
+    const packets: NiimbotPacket[] = PacketGenerator.generatePrintSequence(taskVersion, image, options);
     try {
       for (const element of packets) {
         await this.send(element);

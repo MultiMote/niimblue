@@ -8,7 +8,7 @@ import {
   ResponseCommandId,
   SoundSettingsItemType,
   SoundSettingsType,
-  ProtocolVersion,
+  PrintTaskVersion,
 } from ".";
 import { EncodedImage, ImageEncoder, ImageRow as ImagePart } from "../image_encoder";
 import { Utils } from "../utils";
@@ -344,8 +344,6 @@ export class PacketGenerator {
     PageEnd           5555 e3 01 01 e3aaaa
     PrintStatus       5555 a3 01 01 a3aaaa (alot)
     PrintEnd          5555 f3 01 01 f3aaaa
-
-
     You should send PrintEnd manually after this sequence (after print finished)
   */
   public static generatePrintSequenceV4(image: EncodedImage, options?: PrintOptions): NiimbotPacket[] {
@@ -361,17 +359,17 @@ export class PacketGenerator {
   }
 
   public static generatePrintSequence(
-    protoVersion: ProtocolVersion,
+    printTaskVersion: PrintTaskVersion,
     image: EncodedImage,
     options?: PrintOptions
   ): NiimbotPacket[] {
-    switch (protoVersion) {
-      case ProtocolVersion.V3:
+    switch (printTaskVersion) {
+      case PrintTaskVersion.V3:
         return PacketGenerator.generatePrintSequenceV3(image, options);
-      case ProtocolVersion.V4:
+      case PrintTaskVersion.V4:
         return PacketGenerator.generatePrintSequenceV4(image, options);
       default:
-        throw new Error(`PrintTaskVersion ${protoVersion} Not implemented`);
+        throw new Error(`PrintTaskVersion ${printTaskVersion} Not implemented`);
     }
   }
 }

@@ -5,7 +5,7 @@ import {
   getPrintTaskVersion,
   LabelType,
   NiimbotPacket,
-  ProtocolVersion,
+  PrintTaskVersion,
 } from "../packets";
 import { TypedEventTarget } from "typescript-event-target";
 import { ClientEventMap, HeartbeatEvent, PacketSentEvent, PrinterInfoFetchedEvent } from "./events";
@@ -128,7 +128,7 @@ export abstract class NiimbotAbstractClient extends TypedEventTarget<ClientEvent
   }
 
   /** Determine print task version if any */
-  public getPrintTaskVersion(): ProtocolVersion | undefined {
+  public getPrintTaskVersion(): PrintTaskVersion | undefined {
     const meta = this.getModelMetadata();
 
     if (meta === undefined) {

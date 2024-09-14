@@ -145,7 +145,7 @@ export enum ConnectResult {
   FirmwareErrors = 90,
 }
 
-export enum ProtocolVersion {
+export enum PrintTaskVersion {
   /** Used in D11 */
   V1 = 1,
   /** Used in B21, D110new */
@@ -162,4 +162,4 @@ export * from "./packet";
 export * from "./packet_generator";
 export * from "./abstraction";
 export * from "./data_reader";
-export * from "./protocol_versions";
+export * from "./print_task_versions";

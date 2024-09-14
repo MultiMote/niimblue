@@ -8,7 +8,7 @@
     type EncodedImage,
     ImageEncoder,
     LabelType,
-    ProtocolVersion,
+    PrintTaskVersion,
     type PrintProgressEvent,
   } from "@mmote/niimbluelib";
   import type { LabelProps, PostProcessType } from "../types";
@@ -32,7 +32,7 @@
   let thresholdValue: number = 140;
   let imgData: ImageData;
   let imgContext: CanvasRenderingContext2D;
-  let printTaskVersion: ProtocolVersion = ProtocolVersion.V3;
+  let printTaskVersion: PrintTaskVersion = PrintTaskVersion.V3;
   let labelType: LabelType = LabelType.WithGaps;
   let statusTimer: NodeJS.Timeout | undefined = undefined;
   let error: string = "";
@@ -44,7 +44,7 @@
     quantity?: number;
     density?: number;
     labelType?: LabelType;
-    printTaskVersion?: ProtocolVersion;
+    printTaskVersion?: PrintTaskVersion;
   };
 
   const disconnected = derived(connectionState, ($connectionState) => $connectionState !== "connected");
@@ -155,7 +155,7 @@
     });
 
     if (taskVer !== undefined) {
-      console.log(`Detected print task version: ${ProtocolVersion[taskVer]}`);
+      console.log(`Detected print task version: ${PrintTaskVersion[taskVer]}`);
       printTaskVersion = taskVer;
     }
 
@@ -322,20 +322,20 @@
             bind:value={printTaskVersion}
             on:change={() => updateSavedProp("printTaskVersion", printTaskVersion)}
           >
-            <option value={ProtocolVersion.V1} disabled
-              >{#if taskVer === ProtocolVersion.V1}✔{/if} V1 - {$tr("preview.not_implemented", "NOT IMPLEMENTED")}</option
+            <option value={PrintTaskVersion.V1} disabled
+              >{#if taskVer === PrintTaskVersion.V1}✔{/if} V1 - {$tr("preview.not_implemented", "NOT IMPLEMENTED")}</option
             >
-            <option value={ProtocolVersion.V2} disabled
-              >{#if taskVer === ProtocolVersion.V2}✔{/if} V2 - {$tr("preview.not_implemented", "NOT IMPLEMENTED")}</option
+            <option value={PrintTaskVersion.V2} disabled
+              >{#if taskVer === PrintTaskVersion.V2}✔{/if} V2 - {$tr("preview.not_implemented", "NOT IMPLEMENTED")}</option
             >
-            <option value={ProtocolVersion.V3}
-              >{#if taskVer === ProtocolVersion.V3}✔{/if} V3 - D110</option
+            <option value={PrintTaskVersion.V3}
+              >{#if taskVer === PrintTaskVersion.V3}✔{/if} V3 - D110</option
             >
-            <option value={ProtocolVersion.V4}
-              >{#if taskVer === ProtocolVersion.V4}✔{/if} V4 - B1</option
+            <option value={PrintTaskVersion.V4}
+              >{#if taskVer === PrintTaskVersion.V4}✔{/if} V4 - B1</option
             >
-            <option value={ProtocolVersion.V5} disabled
-              >{#if taskVer === ProtocolVersion.V5}✔{/if} V5 - {$tr("preview.not_implemented", "NOT IMPLEMENTED")}</option
+            <option value={PrintTaskVersion.V5} disabled
+              >{#if taskVer === PrintTaskVersion.V5}✔{/if} V5 - {$tr("preview.not_implemented", "NOT IMPLEMENTED")}</option
             >
           </select>
 
