@@ -2,10 +2,7 @@
 
 Niimbot printers webui. Design and print labels right from your browser.
 
-Tested printers:
-
-- Niimbot D110
-- Niimbot B1
+Uses [NiimBlueLib](https://github.com/MultiMote/niimbluelib) for communication.
 
 ## Features
 
