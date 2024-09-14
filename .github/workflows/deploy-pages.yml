@@ -4,7 +4,7 @@ on:
   # Runs on pushes targeting the default branch
   push:
     branches:
-      - draft
+      - main
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -34,28 +34,20 @@ jobs:
         with:
           node-version: "20"
           cache: yarn
-          cache-dependency-path: |
-            ./niimbluelib/yarn.lock
-            ./niimblue/yarn.lock
+          cache-dependency-path: ./yarn.lock
 
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
 
-      - name: Install niimbluelib dependencies
-        run: yarn --cwd niimbluelib
+      - name: Install dependencies
+        run: yarn install
 
-      - name: Build niimbluelib
-        run: yarn --cwd niimbluelib build
+      - name: Check code
+        run: yarn sv-check
 
-      - name: Install niimblue dependencies
-        run: yarn --cwd niimblue
-
-      - name: Check niimblue code
-        run: yarn --cwd niimblue sv-check
-
-      - name: Build niimblue
-        run: yarn --cwd niimblue vite build --base="${{ steps.pages.outputs.base_path || '/' }}"
+      - name: Build
+        run: yarn vite build --base="${{ steps.pages.outputs.base_path || '/' }}"
         env:
           COMMIT_HASH: ${{github.sha}}
 
@@ -67,7 +59,7 @@ jobs:
               <loc>$PAGE_URL</loc>
               <lastmod>$LAST_MODIFIED</lastmod>
             </url>
-          </urlset>" > ./niimblue/dist/sitemap.xml
+          </urlset>" > ./dist/sitemap.xml
         env:
           PAGE_URL: ${{ steps.pages.outputs.origin }}
           LAST_MODIFIED: ${{ github.event.repository.updated_at }}
@@ -75,7 +67,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./niimblue/dist
+          path: ./dist
 
   deploy:
     environment:

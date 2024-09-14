@@ -1,15 +1,5 @@
 # NiimBlue
 
-> ⚠ **draft** branch
->
-> This branch contains current code of both projects:
->
-> - **niimblue** - frontend
-> - **niimbluelib** - printer interface
->
-> Do not create references to this branch, it will be split into the different repos
-> and/or squash-merged to the main branch on the first release. Then this branch will most likely be removed.
-
 Niimbot printers webui. Design and print labels right from your browser.
 
 Tested printers:
@@ -66,29 +56,25 @@ Skip steps you have done.
 4. Clone repository
 
     ```bash
-    git clone -b draft https://github.com/MultiMote/niimblue.git
+    git clone https://github.com/MultiMote/niimblue.git
     ```
 
 5. Install dependencies
 
     ```bash
-    cd niimblue
-    yarn --cwd niimbluelib
-    yarn --cwd niimblue
+    yarn install
     ```
 
 6. Run dev server
 
-    ```bash
-    yarn --cwd niimblue dev-locallib
-    ```
-
-    or
+    Check code and open browser:
 
     ```bash
-    cd niimblue
-    yarn dev-locallib
+    yarn dev-check
     ```
 
-    This command will install local niimbluelib to the niimblue project and run the server.
-    If niimbluelib is modified you must re-run this command.
+    Or just run:
+
+    ```bash
+    yarn dev
+    ```

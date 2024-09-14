@@ -17,7 +17,7 @@
 		"@fontsource-variable/noto-sans": "^5.0.5",
 		"@fortawesome/fontawesome-svg-core": "^6.5.2",
 		"@fortawesome/free-solid-svg-icons": "^6.5.2",
-		"@mmote/niimbluelib": "file:../niimbluelib",
+		"@mmote/niimbluelib": "0.0.1-alpha.0",
 		"@popperjs/core": "^2.11.8",
 		"bootstrap": "5.3.3",
 		"fabric": "^5.3.0",
