@@ -4,13 +4,12 @@
 	"type": "module",
 	"version": "0.0.1",
 	"scripts": {
-		"dev-locallib": "yarn install-locallib && yarn sv-check && yarn dev-open",
+		"dev-check": "yarn sv-check && yarn dev-open",
 		"dev": "vite --force",
 		"dev-open": "vite --force --open",
 		"build": "vite build",
 		"build-rel": "vite build --base=./",
 		"preview": "vite preview",
-		"install-locallib": "yarn --cwd ../niimbluelib && yarn --cwd ../niimbluelib clean-build && yarn add file:../niimbluelib",
 		"sv-check": "svelte-check --tsconfig ./tsconfig.json"
 	},
 	"dependencies": {
