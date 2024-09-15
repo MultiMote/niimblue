@@ -99,7 +99,7 @@
     on:click={invertColors}
     title={$tr("params.text.invert_colors", "Invert colors")}
   >
-    <FaIcon icon="fill-drip" />
+    <FaIcon icon="circle-half-stroke" />
   </button>
 
   <div class="input-group flex-nowrap input-group-sm font-size">

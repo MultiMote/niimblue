@@ -153,6 +153,7 @@ export const langPack: Record<supportedLanguages, Partial<Record<translationKeys
     "params.text.font_size.down": "Уменьшить размер шрифта",
     "params.text.line_height": "Межстрочный интервал",
     "params.text.font_family": "Шрифт",
+    "params.text.invert_colors": "Инвертировать цвета",
     /* GenericObjectParamsControls */
     "params.generic.center.vertical": "Выровнять вертикально",
     "params.generic.center.horizontal": "Выровнять горизонтально",
