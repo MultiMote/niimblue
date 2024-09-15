@@ -1,8 +1,8 @@
 import { derived, writable } from "svelte/store";
-import type { translationKeys, supportedLanguages } from "../lang_pack"
-import { languagesMaps, langPack } from "../lang_pack";
+import type { translationKeys, supportedLanguages } from "../locale"
+import { languageNames, langPack } from "../locale";
 
-export type {translationKeys, supportedLanguages} from '../lang_pack'
+export type {translationKeys, supportedLanguages} from '../locale'
 
 function browserLanguage2supportedLanguage(browserLanguage: string): supportedLanguages {
   switch(browserLanguage) {
@@ -18,7 +18,7 @@ function browserLanguage2supportedLanguage(browserLanguage: string): supportedLa
   }
 }
 
-export const locales = languagesMaps;
+export const locales = languageNames;
 
 export const locale = writable<supportedLanguages>(
   localStorage.getItem("locale") as supportedLanguages ?? browserLanguage2supportedLanguage(navigator.language)
