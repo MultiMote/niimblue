@@ -21,6 +21,21 @@
     commit();
   };
 
+  const invertColors = () => {
+    if (selectedText!.backgroundColor === "black") {
+      selectedText!.set({
+        backgroundColor: "transparent",
+        fill: "black",
+      });
+    } else {
+      selectedText!.set({
+        backgroundColor: "black",
+        fill: "white",
+      });
+    }
+    commit();
+  };
+
   const setAlign = (align: "left" | "center" | "right") => {
     selectedText!.textAlign = align;
     commit();
@@ -78,6 +93,13 @@
     title={$tr("params.text.bold", "Bold")}
   >
     <FaIcon icon="bold" />
+  </button>
+  <button
+    class="btn btn-sm {selectedText.backgroundColor === 'black' ? 'btn-secondary' : ''}"
+    on:click={invertColors}
+    title={$tr("params.text.invert_colors", "Invert colors")}
+  >
+    <FaIcon icon="fill-drip" />
   </button>
 
   <div class="input-group flex-nowrap input-group-sm font-size">

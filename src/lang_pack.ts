@@ -41,6 +41,7 @@ export type translationKeys =
   | "params.text.align.left"
   | "params.text.align.right"
   | "params.text.bold"
+  | "params.text.invert_colors"
   | "params.text.fetch_fonts"
   | "params.text.font_family"
   | "params.text.font_size.down"
@@ -174,7 +175,7 @@ export const langPack: Record<supportedLanguages, Partial<Record<translationKeys
     "connector.bluetooth": "蓝牙",
     "connector.serial": "串口（USB）",
     /* ImageEditor */
-    "editor.default_text": "打印",
+    "editor.default_text": "文本",
     "editor.export.json": "导出 JSON 文件",
     "editor.import.json": "导入 JSON 文件",
     "editor.import.zpl": "导入 ZPL 文件",
@@ -233,6 +234,7 @@ export const langPack: Record<supportedLanguages, Partial<Record<translationKeys
     "params.text.align.center": "居中",
     "params.text.align.right": "右对齐",
     "params.text.bold": "加粗",
+    "params.text.invert_colors": "反转颜色",
     "params.text.font_size": "字体大小",
     "params.text.font_size.up": "加大",
     "params.text.font_size.down": "缩小",
