@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { fabric } from "fabric";
-  import { type LabelProps, type OjectType, type ExportedLabelTemplate } from "../types";
+  import { type LabelProps, type OjectType, type MoveDirection } from "../types";
   import LabelPropsEditor from "./LabelPropsEditor.svelte";
   import IconPicker from "./IconPicker.svelte";
   import { type IconName, icon as faIcon, parse as faParse } from "@fortawesome/fontawesome-svg-core";
@@ -20,6 +20,8 @@
   import ZplImportButton from "./ZplImportButton.svelte";
   import { connectionState } from "../stores";
   import { tr } from "../utils/i18n";
+
+  let GRID_SIZE: number = 5;
 
   let htmlCanvas: HTMLCanvasElement;
   let fabricCanvas: fabric.Canvas;
@@ -48,16 +50,49 @@
     if (selectedObject) {
       selectedObject.clone((obj: fabric.Object) => {
         obj.snapAngle = 10;
-        obj.top! += 5;
-        obj.left! += 5;
+        obj.top! += GRID_SIZE;
+        obj.left! += GRID_SIZE;
         fabricCanvas.add(obj);
         fabricCanvas.setActiveObject(obj);
       });
     }
   };
 
+  const moveSelected = (direction: MoveDirection, ctrl?: boolean) => {
+    const selected: fabric.Object[] = fabricCanvas.getActiveObjects();
+    for (const obj of selected) {
+      if (obj instanceof fabric.IText && obj.isEditing) {
+        return;
+      }
+    }
+
+    const amount = ctrl ? 1 : GRID_SIZE;
+
+    selected.forEach((obj) => {
+      if (direction === "Left") {
+        // round to fix inter-pixel positions
+        obj.left = Math.round(obj.left!) - amount;
+      } else if (direction === "Right") {
+        obj.left = Math.round(obj.left!) + amount;
+      } else if (direction === "Up") {
+        obj.top = Math.round(obj.top!) - amount;
+      } else if (direction === "Down") {
+        obj.top = Math.round(obj.top!) + amount;
+      }
+      obj.setCoords();
+    });
+    fabricCanvas.renderAll();
+  };
+
   const onKeyDown = (e: KeyboardEvent) => {
-    if (e.repeat) return;
+    if (e.key.startsWith("Arrow")) {
+      moveSelected(e.key.slice("Arrow".length) as MoveDirection, e.ctrlKey);
+    }
+
+    if (e.repeat) {
+      return;
+    }
+
     if (e.key === "Delete") {
       deleteSelected();
     }
@@ -200,11 +235,10 @@
     });
 
     fabricCanvas.on("object:moving", (e: fabric.IEvent<MouseEvent>): void => {
-      const grid = 5;
       if (e.target && e.target.left !== undefined && e.target.top !== undefined) {
         e.target.set({
-          left: Math.round(e.target.left / grid) * grid,
-          top: Math.round(e.target.top / grid) * grid,
+          left: Math.round(e.target.left / GRID_SIZE) * GRID_SIZE,
+          top: Math.round(e.target.top / GRID_SIZE) * GRID_SIZE,
         });
       }
     });

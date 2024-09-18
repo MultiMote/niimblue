@@ -20,6 +20,8 @@ export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qr
 export interface ExportedLabelTemplate {
   canvas: { version: string; objects: Object[] };
   label: LabelProps;
-};
+}
 
-export type PostProcessType ="threshold" | "dither";
+export type PostProcessType = "threshold" | "dither";
+
+export type MoveDirection = "Up" | "Down" | "Left" | "Right";
