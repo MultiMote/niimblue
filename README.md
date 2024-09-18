@@ -36,6 +36,8 @@ Images may be outdated, interface is changing constantly.
 
 ![dither](about/dither.png)
 
+![templating](about/templating.png)
+
 ![printed_b1](about/printed_b1.jpg)
 
 ![printed_d110](about/printed_d110.jpg)

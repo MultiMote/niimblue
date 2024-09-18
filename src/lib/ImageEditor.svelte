@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { fabric } from "fabric";
-  import { type LabelProps, type OjectType, type MoveDirection } from "../types";
+  import type { LabelProps, OjectType, MoveDirection, FabricJson } from "../types";
   import LabelPropsEditor from "./LabelPropsEditor.svelte";
   import IconPicker from "./IconPicker.svelte";
   import { type IconName, icon as faIcon, parse as faParse } from "@fortawesome/fontawesome-svg-core";
@@ -20,6 +20,7 @@
   import ZplImportButton from "./ZplImportButton.svelte";
   import { connectionState } from "../stores";
   import { tr } from "../utils/i18n";
+  import VariableInsertControl from "./VariableInsertControl.svelte";
 
   let GRID_SIZE: number = 5;
 
@@ -205,8 +206,13 @@
     previewOpened = true;
   };
 
-  const getImageForPreview = (): string => {
-    return fabricCanvas.toDataURL({ format: "png" });
+  const controlValueUpdated = () => {
+    fabricCanvas.requestRenderAll();
+    selectedObject = selectedObject;
+  };
+
+  const getCanvasForPreview = (): FabricJson => {
+    return fabricCanvas.toJSON();
   };
 
   onMount(() => {
@@ -222,6 +228,8 @@
         console.error(e);
       }
     }
+
+    fabric.disableStyleCopyPaste = true;
 
     fabricCanvas = new fabric.Canvas(htmlCanvas, {
       width: labelProps.size.width,
@@ -359,24 +367,27 @@
           <button class="btn btn-sm btn-secondary me-1" on:click={cloneSelected} title={$tr("editor.clone", "Clone")}
             ><FaIcon icon="clone" /></button
           >
-          <GenericObjectParamsControls {selectedObject} valueUpdated={() => fabricCanvas.requestRenderAll()} />
+          <GenericObjectParamsControls {selectedObject} valueUpdated={controlValueUpdated} />
         {/if}
 
         {#if selectedObject instanceof fabric.IText}
-          <TextParamsPanel {selectedObject} valueUpdated={() => fabricCanvas.requestRenderAll()} />
+          <TextParamsPanel {selectedObject} valueUpdated={controlValueUpdated} />
         {/if}
         {#if selectedObject instanceof QRCode}
-          <QrCodeParamsPanel {selectedObject} valueUpdated={() => fabricCanvas.requestRenderAll()} />
+          <QrCodeParamsPanel {selectedObject} valueUpdated={controlValueUpdated} />
         {/if}
         {#if selectedObject instanceof Barcode}
-          <BarcodeParamsPanel {selectedObject} valueUpdated={() => fabricCanvas.requestRenderAll()} />
+          <BarcodeParamsPanel {selectedObject} valueUpdated={controlValueUpdated} />
+        {/if}
+        {#if selectedObject instanceof fabric.IText || selectedObject instanceof QRCode || (selectedObject instanceof Barcode && selectedObject.encoding === "CODE128B")}
+          <VariableInsertControl {selectedObject} valueUpdated={controlValueUpdated} />
         {/if}
       </div>
     </div>
   </div>
 
   {#if previewOpened}
-    <PrintPreview onClosed={onPreviewClosed} imageCallback={getImageForPreview} {labelProps} {printNow} />
+    <PrintPreview onClosed={onPreviewClosed} canvasCallback={getCanvasForPreview} {labelProps} {printNow} />
   {/if}
 </div>
 

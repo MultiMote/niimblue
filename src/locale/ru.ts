@@ -77,6 +77,10 @@ export const translation_ru: Partial<Record<translationKeys, string>> = {
   "params.text.line_height": "Межстрочный интервал",
   "params.text.font_family": "Шрифт",
   "params.text.invert_colors": "Инвертировать цвета",
+  "params.variables.insert": "Вставить переменную",
+  "params.variables.insert.datetime": "Дата и время",
+  "params.variables.insert.date": "Дата",
+  "params.variables.insert.time": "Время",
   /* GenericObjectParamsControls */
   "params.generic.center.vertical": "Выровнять вертикально",
   "params.generic.center.horizontal": "Выровнять горизонтально",

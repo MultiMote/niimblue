@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { fabric } from "fabric";
   import { onDestroy, onMount } from "svelte";
   import { derived } from "svelte/store";
   import Modal from "bootstrap/js/dist/modal";
@@ -11,14 +12,15 @@
     PrintTaskVersion,
     type PrintProgressEvent,
   } from "@mmote/niimbluelib";
-  import type { LabelProps, PostProcessType } from "../types";
+  import type { LabelProps, PostProcessType, FabricJson } from "../types";
   import FaIcon from "./FaIcon.svelte";
   import ParamLockButton from "./ParamLockButton.svelte";
   import { tr, type translationKeys } from "../utils/i18n";
+  import { canvasPreprocess } from "../utils/canvas_preprocess";
 
   export let onClosed: () => void;
   export let labelProps: LabelProps;
-  export let imageCallback: () => string;
+  export let canvasCallback: () => FabricJson;
   export let printNow: boolean = false;
 
   let modalElement: HTMLElement;
@@ -30,8 +32,8 @@
   let quantity: number = 1;
   let postProcessType: PostProcessType;
   let thresholdValue: number = 140;
-  let imgData: ImageData;
-  let imgContext: CanvasRenderingContext2D;
+  let originalImage: ImageData;
+  let previewContext: CanvasRenderingContext2D;
   let printTaskVersion: PrintTaskVersion = PrintTaskVersion.V3;
   let labelType: LabelType = LabelType.WithGaps;
   let statusTimer: NodeJS.Timeout | undefined = undefined;
@@ -49,7 +51,8 @@
 
   const disconnected = derived(connectionState, ($connectionState) => $connectionState !== "connected");
 
-  const labelType2translationKeys = (labelType: string): translationKeys => `preview.label_type.${labelType}` as translationKeys
+  const labelType2translationKeys = (labelType: string): translationKeys =>
+    `preview.label_type.${labelType}` as translationKeys;
 
   const endPrint = async () => {
     clearInterval(statusTimer);
@@ -102,7 +105,7 @@
   };
 
   const updatePreview = () => {
-    let iData: ImageData = copyImageData(imgData);
+    let iData: ImageData = copyImageData(originalImage);
 
     if (postProcessType === "threshold") {
       iData = threshold(iData, thresholdValue);
@@ -110,7 +113,7 @@
       iData = atkinson(iData, thresholdValue);
     }
 
-    imgContext.putImageData(iData, 0, 0);
+    previewContext.putImageData(iData, 0, 0);
   };
 
   const toggleSavedProp = (key: string, value: any) => {
@@ -161,21 +164,26 @@
 
     loadProps();
 
-    // create image from fabric canvas to work with
-    const img = new Image();
-    img.onload = () => {
-      previewCanvas.width = img.width;
-      previewCanvas.height = img.height;
-      imgContext = previewCanvas.getContext("2d")!;
-      imgContext.drawImage(img, 0, 0, img.width, img.height);
-      imgData = imgContext.getImageData(0, 0, img.width, img.height);
+    const fabricTempCanvas = new fabric.Canvas(null, { width: labelProps.size.width, height: labelProps.size.height });
+
+    fabricTempCanvas.loadFromJSON(canvasCallback(), () => {
+      const variables = {"foo": "bar"};
+
+      canvasPreprocess(fabricTempCanvas, variables);
+
+      fabricTempCanvas.requestRenderAll();
+
+      const preRenderedCanvas = fabricTempCanvas.toCanvasElement();
+      const ctx = preRenderedCanvas.getContext("2d")!;
+      previewCanvas.width = preRenderedCanvas.width;
+      previewCanvas.height = preRenderedCanvas.height;
+      previewContext = previewCanvas.getContext("2d")!;
+      originalImage = ctx.getImageData(0, 0, preRenderedCanvas.width, preRenderedCanvas.height);
+
       updatePreview();
 
-      if (printNow && !$disconnected && printState === "idle") {
-        onPrint();
-      }
-    };
-    img.src = imageCallback();
+      fabricTempCanvas.dispose();
+    });
   });
 
   onDestroy(() => {
@@ -286,8 +294,8 @@
           <input
             class="form-control"
             type="number"
-            min="{$printerMeta?.densityMin ?? 1}"
-            max="{$printerMeta?.densityMax ?? 20}"
+            min={$printerMeta?.densityMin ?? 1}
+            max={$printerMeta?.densityMax ?? 20}
             bind:value={density}
             on:change={() => updateSavedProp("density", density)}
           />
@@ -323,10 +331,16 @@
             on:change={() => updateSavedProp("printTaskVersion", printTaskVersion)}
           >
             <option value={PrintTaskVersion.V1} disabled
-              >{#if taskVer === PrintTaskVersion.V1}✔{/if} V1 - {$tr("preview.not_implemented", "NOT IMPLEMENTED")}</option
+              >{#if taskVer === PrintTaskVersion.V1}✔{/if} V1 - {$tr(
+                "preview.not_implemented",
+                "NOT IMPLEMENTED",
+              )}</option
             >
             <option value={PrintTaskVersion.V2} disabled
-              >{#if taskVer === PrintTaskVersion.V2}✔{/if} V2 - {$tr("preview.not_implemented", "NOT IMPLEMENTED")}</option
+              >{#if taskVer === PrintTaskVersion.V2}✔{/if} V2 - {$tr(
+                "preview.not_implemented",
+                "NOT IMPLEMENTED",
+              )}</option
             >
             <option value={PrintTaskVersion.V3}
               >{#if taskVer === PrintTaskVersion.V3}✔{/if} V3 - D110</option
@@ -335,7 +349,10 @@
               >{#if taskVer === PrintTaskVersion.V4}✔{/if} V4 - B1</option
             >
             <option value={PrintTaskVersion.V5} disabled
-              >{#if taskVer === PrintTaskVersion.V5}✔{/if} V5 - {$tr("preview.not_implemented", "NOT IMPLEMENTED")}</option
+              >{#if taskVer === PrintTaskVersion.V5}✔{/if} V5 - {$tr(
+                "preview.not_implemented",
+                "NOT IMPLEMENTED",
+              )}</option
             >
           </select>
 
@@ -358,7 +375,6 @@
         <button type="button" class="btn btn-primary" disabled={$disconnected || printState !== "idle"} on:click={onPrint}>
           {#if $disconnected}
             {$tr("preview.not_connected", "Printer is not connected")}
-
           {:else}
             <FaIcon icon="print" /> {$tr("preview.print", "Print")}
           {/if}

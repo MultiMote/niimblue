@@ -16,6 +16,9 @@ declare function queryLocalFonts(): Promise<ReadonlyArray<FontData>>;
 
 // Extend types and functions that are not exported in @types/fabric
 declare namespace fabric {
+  /** deprecated, by no other ways to stop style copy now */
+  let disableStyleCopyPaste: boolean;
+
   type MoveCommand = ["M" | "m", number, number];
   type LineCommand = ["L" | "l", number, number] | ["H" | "h" | "V" | "v", number];
   type CurveCommand =

@@ -80,7 +80,7 @@ export class ImageEditorUtils {
       textAlign: "center",
       originX: "center",
       originY: "center",
-      lineHeight: 1,
+      lineHeight: 1
     });
     canvas.add(obj);
     obj.center();

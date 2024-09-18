@@ -1,4 +1,5 @@
 import type { PrintDirection } from "@mmote/niimbluelib";
+import { fabric } from "fabric";
 
 export type ConnectionState = "connecting" | "connected" | "disconnected";
 export type ConnectionType = "bluetooth" | "serial";
@@ -17,8 +18,13 @@ export type LabelPreset = {
 
 export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qrcode" | "barcode";
 
+export interface FabricJson {
+  version: string;
+  objects: fabric.Object[];
+}
+
 export interface ExportedLabelTemplate {
-  canvas: { version: string; objects: Object[] };
+  canvas: FabricJson;
   label: LabelProps;
 }
 
