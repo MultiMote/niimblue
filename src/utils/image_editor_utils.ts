@@ -78,7 +78,7 @@ export class ImageEditorUtils {
       ...this.OBJECT_DEFAULTS,
       fontFamily: "Noto Sans Variable",
       textAlign: "center",
-      originX: "center", //added
+      originX: "center",
       originY: "center",
       lineHeight: 1,
     });

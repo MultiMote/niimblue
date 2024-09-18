@@ -38,6 +38,12 @@
 
   const setAlign = (align: "left" | "center" | "right") => {
     selectedText!.textAlign = align;
+
+    // change object origin, but keep position
+    const pos = selectedText!.getPointByOrigin("left", "top");
+    selectedText!.originX = align;
+    selectedText!.setPositionByOrigin(pos, "left", "top")
+
     commit();
   };
 
