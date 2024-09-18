@@ -81,7 +81,7 @@
       }
       obj.setCoords();
     });
-    fabricCanvas.renderAll();
+    fabricCanvas.requestRenderAll();
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
@@ -95,6 +95,9 @@
 
     if (e.key === "Delete") {
       deleteSelected();
+    } else if (e.key === "Escape") {
+      fabricCanvas.discardActiveObject();
+      fabricCanvas.requestRenderAll();
     }
   };
 
