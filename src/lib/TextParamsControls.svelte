@@ -36,13 +36,22 @@
     commit();
   };
 
-  const setAlign = (align: "left" | "center" | "right") => {
+  const setXAlign = (align: "left" | "center" | "right") => {
     selectedText!.textAlign = align;
 
     // change object origin, but keep position
     const pos = selectedText!.getPointByOrigin("left", "top");
     selectedText!.originX = align;
-    selectedText!.setPositionByOrigin(pos, "left", "top")
+    selectedText!.setPositionByOrigin(pos, "left", "top");
+
+    commit();
+  };
+
+  const setYAlign = (align: "top" | "bottom" | "center") => {
+    // change object origin, but keep position
+    const pos = selectedText!.getPointByOrigin("left", "top");
+    selectedText!.originY = align;
+    selectedText!.setPositionByOrigin(pos, "left", "top");
 
     commit();
   };
@@ -81,18 +90,72 @@
   <button
     title={$tr("params.text.align.left", "Align text: Left")}
     class="btn btn-sm {selectedText.textAlign === 'left' ? 'btn-secondary' : ''}"
-    on:click={() => setAlign("left")}><FaIcon icon="align-left" /></button
+    on:click={() => setXAlign("left")}><FaIcon icon="align-left" /></button
   >
   <button
     title={$tr("params.text.align.center", "Align text: Center")}
     class="btn btn-sm {selectedText.textAlign === 'center' ? 'btn-secondary' : ''}"
-    on:click={() => setAlign("center")}><FaIcon icon="align-center" /></button
+    on:click={() => setXAlign("center")}><FaIcon icon="align-center" /></button
   >
   <button
     title={$tr("params.text.align.right", "Align text: Right")}
     class="btn btn-sm {selectedText.textAlign === 'right' ? 'btn-secondary' : ''}"
-    on:click={() => setAlign("right")}><FaIcon icon="align-right" /></button
+    on:click={() => setXAlign("right")}><FaIcon icon="align-right" /></button
   >
+  <div class="dropdown">
+    <button
+      class="btn btn-sm dropdown-toggle"
+      type="button"
+      data-bs-toggle="dropdown"
+      title={$tr("params.text.vorigin", "Vertical Origin")}
+    >
+      <span class="fa-layers">
+        {#if selectedText.originY === 'top'}
+        <FaIcon icon="minus" params={{ transform: { y: -8 } }} />
+        <FaIcon icon="arrow-down" params={{ transform: { y: 2 } }} />
+        {:else if selectedText.originY === 'center'}
+        <FaIcon icon="arrow-up" params={{ transform: { y: -4 } }} />
+        <FaIcon icon="arrow-down" params={{ transform: { y: 4 } }} />
+        {:else if selectedText.originY === 'bottom'}
+        <FaIcon icon="minus" params={{ transform: { y: 10 } }} />
+        <FaIcon icon="arrow-up" />
+        {/if}
+      </span>
+    </button>
+    <div class="dropdown-menu p-2">
+      <button
+        class="btn btn-sm {selectedText.originY === 'top' ? 'btn-secondary' : ''}"
+        on:click={() => setYAlign("top")}
+        title={$tr("params.text.vorigin.top", "Top")}
+      >
+        <span class="fa-layers">
+          <FaIcon icon="minus" params={{ transform: { y: -8 } }} />
+          <FaIcon icon="arrow-down" params={{ transform: { y: 2 } }} />
+        </span>
+      </button>
+      <button
+        class="btn btn-sm {selectedText.originY === 'center' ? 'btn-secondary' : ''}"
+        on:click={() => setYAlign("center")}
+        title={$tr("params.text.vorigin.center", "Center")}
+      >
+        <span class="fa-layers">
+          <FaIcon icon="arrow-up" params={{ transform: { y: -4 } }} />
+          <FaIcon icon="arrow-down" params={{ transform: { y: 4 } }} />
+        </span>
+      </button>
+      <button
+        class="btn btn-sm {selectedText.originY === 'bottom' ? 'btn-secondary' : ''}"
+        on:click={() => setYAlign("bottom")}
+        title={$tr("params.text.vorigin.bottom", "Bottom")}
+      >
+        <span class="fa-layers">
+          <FaIcon icon="minus" params={{ transform: { y: 10 } }} />
+          <FaIcon icon="arrow-up" />
+        </span>
+      </button>
+    </div>
+  </div>
+
   <button
     class="btn btn-sm {selectedText.fontWeight === 'bold' ? 'btn-secondary' : ''}"
     on:click={toggleBold}
@@ -125,7 +188,10 @@
         <FaIcon icon="caret-up" params={{ transform: { x: 10, y: -5, size: 12 } }} />
       </span></button
     >
-    <button class="btn btn-secondary" on:click={fontSizeDown} title={$tr("params.text.font_size.down", "Decrease font size")}
+    <button
+      class="btn btn-secondary"
+      on:click={fontSizeDown}
+      title={$tr("params.text.font_size.down", "Decrease font size")}
       ><span class="fa-layers">
         <FaIcon icon="font" />
         <FaIcon icon="caret-down" params={{ transform: { x: 10, y: -5, size: 12 } }} />

@@ -1,7 +1,7 @@
 import type { translationKeys } from ".";
 
 /** Russian */
-export const translation_ru: Partial<Record<translationKeys, string>> = {
+export const translation_ru: Record<translationKeys, string> = {
   /* Main page */
   "main.code": "Исходный код",
   "main.built": "собрано",
@@ -76,6 +76,10 @@ export const translation_ru: Partial<Record<translationKeys, string>> = {
   "params.text.align.left": "Выравнивание текста: Слева",
   "params.text.align.center": "Выравнивание текста: По центру",
   "params.text.align.right": "Выравнивание текста: Справа",
+  "params.text.vorigin": "Вертикальная привязка",
+  "params.text.vorigin.top": "Сверху",
+  "params.text.vorigin.center": "Снизу",
+  "params.text.vorigin.bottom": "Снизу",
   "params.text.bold": "Полужирный",
   "params.text.font_size": "Размер шрифта",
   "params.text.font_size.up": "Увеличить размер шрифта",
