@@ -73,14 +73,19 @@ export class ImageEditorUtils {
     input.click();
   }
 
-  public static addText(canvas: fabric.Canvas, text?: string): void {
+  public static addText(
+    canvas: fabric.Canvas,
+    text?: string,
+    xAlign?: "left" | "right" | "center",
+    yAlign?: "top" | "bottom" | "center"
+  ): void {
     const obj = new fabric.IText(text ?? "Text", {
       ...this.OBJECT_DEFAULTS,
       fontFamily: "Noto Sans Variable",
-      textAlign: "center",
-      originX: "center",
-      originY: "center",
-      lineHeight: 1
+      textAlign: xAlign ?? "center",
+      originX: xAlign ?? "center",
+      originY: yAlign ?? "center",
+      lineHeight: 1,
     });
     canvas.add(obj);
     obj.center();

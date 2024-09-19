@@ -38,6 +38,8 @@ Images may be outdated, interface is changing constantly.
 
 ![templating](about/templating.png)
 
+![batch](about/batch.png)
+
 ![printed_b1](about/printed_b1.jpg)
 
 ![printed_d110](about/printed_d110.jpg)

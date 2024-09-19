@@ -56,11 +56,17 @@ export const translation_ru: Partial<Record<translationKeys, string>> = {
   "editor.iconpicker.title": "Добавить иконку",
   "editor.iconpicker.search": "Поиск",
   /* LabelPropsEditor */
+  "params.csv.title": "Динамические данные",
+  "params.csv.tip": "Первая строка - заголовок. Он используется для имён переменных. В качестве разделителей используются запятые.",
+  "params.csv.rowsfound": "Найдено строк:",
+  "params.csv.enabled": "Включить",
+  "params.csv.placeholders": "Переменные:",
+  /* LabelPropsEditor */
   "params.label.title": "Настройки этикетки",
   "params.label.size": "Размер",
   "params.label.mm": "мм",
   "params.label.dpmm": "пикс/мм",
-  "params.label.calc": "Рассчёт",
+  "params.label.calc": "Расчёт",
   "params.label.px": "пикс.",
   "params.label.direction": "Печатать",
   "params.label.direction.left": "Слева",

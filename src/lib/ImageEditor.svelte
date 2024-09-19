@@ -21,6 +21,8 @@
   import { connectionState } from "../stores";
   import { tr } from "../utils/i18n";
   import VariableInsertControl from "./VariableInsertControl.svelte";
+  import CsvControl from "./CsvControl.svelte";
+  import { Persistence } from "../utils/persistence";
 
   let GRID_SIZE: number = 5;
 
@@ -31,6 +33,8 @@
   let selectedObject: fabric.Object | undefined = undefined;
   let selectedCount: number = 0;
   let printNow: boolean = false;
+  let csvData: string = "";
+  let csvEnabled: boolean = false;
 
   const deleteSelected = () => {
     const selected: fabric.Object[] = fabricCanvas.getActiveObjects();
@@ -215,7 +219,21 @@
     return fabricCanvas.toJSON();
   };
 
+  const onCsvUpdate = (enabled: boolean, csv: string) => {
+    csvData = csv;
+    csvEnabled = enabled;
+    Persistence.saveCsv(csvEnabled, csvData);
+  };
+
+  const onCsvPlaceholderPicked = (name: string) => {
+    ImageEditorUtils.addText(fabricCanvas, `{${name}}`, "left", "top");
+  };
+
   onMount(() => {
+    const csvSaved = Persistence.loadCsv();
+    csvData = csvSaved.data;
+    csvEnabled = csvSaved.enabled;
+
     const savedLabelPropsStr: string | null = localStorage.getItem("last_label_props");
 
     if (savedLabelPropsStr != null) {
@@ -313,6 +331,8 @@
       <div class="toolbar d-flex flex-wrap gap-1 justify-content-center align-items-center">
         <LabelPropsEditor {labelProps} onChange={onUpdateLabelProps} />
 
+        <CsvControl csv={csvData} enabled={csvEnabled} onUpdate={onCsvUpdate} onPlaceholderPicked={onCsvPlaceholderPicked} />
+
         <div class="btn-group btn-group-sm" role="group">
           <button class="btn btn-secondary btn-sm" on:click={onSaveClicked}><FaIcon icon="floppy-disk" /></button>
 
@@ -387,7 +407,7 @@
   </div>
 
   {#if previewOpened}
-    <PrintPreview onClosed={onPreviewClosed} canvasCallback={getCanvasForPreview} {labelProps} {printNow} />
+    <PrintPreview onClosed={onPreviewClosed} canvasCallback={getCanvasForPreview} {labelProps} {printNow} {csvEnabled} {csvData} />
   {/if}
 </div>
 

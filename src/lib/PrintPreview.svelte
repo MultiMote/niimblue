@@ -10,6 +10,7 @@
     ImageEncoder,
     LabelType,
     PrintTaskVersion,
+    Utils,
     type PrintProgressEvent,
   } from "@mmote/niimbluelib";
   import type { LabelProps, PostProcessType, FabricJson } from "../types";
@@ -17,11 +18,14 @@
   import ParamLockButton from "./ParamLockButton.svelte";
   import { tr, type translationKeys } from "../utils/i18n";
   import { canvasPreprocess } from "../utils/canvas_preprocess";
+  import { type DSVRowArray, csvParse } from "d3-dsv";
 
   export let onClosed: () => void;
   export let labelProps: LabelProps;
   export let canvasCallback: () => FabricJson;
   export let printNow: boolean = false;
+  export let csvData: string;
+  export let csvEnabled: boolean;
 
   let modalElement: HTMLElement;
   let previewCanvas: HTMLCanvasElement;
@@ -39,6 +43,9 @@
   let statusTimer: NodeJS.Timeout | undefined = undefined;
   let error: string = "";
   let taskVer = $printerClient?.getPrintTaskVersion();
+  let csvParsed: DSVRowArray<string>;
+  let page = 0;
+  let pagesTotal = 1;
 
   let savedProps = {} as {
     postProcess?: PostProcessType;
@@ -66,36 +73,43 @@
   };
 
   const onPrint = async () => {
-    const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, labelProps.printDirection);
-
     printState = "sending";
     error = "";
 
-    try {
-      await $printerClient.abstraction.print(printTaskVersion, encoded, { quantity, density, labelType });
-    } catch (e) {
-      error = `${e}`;
-      console.error(e);
-      return;
+    // do it in a stupid way (library not supports multi-page print yet)
+    for (let curPage = 0; curPage < pagesTotal; curPage++) {
+      page = curPage;
+      console.log("Printing page", page);
+
+      await generatePreviewData(page);
+      const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, labelProps.printDirection);
+
+      try {
+        await $printerClient.abstraction.print(printTaskVersion, encoded, { quantity, density, labelType });
+      } catch (e) {
+        error = `${e}`;
+        console.error(e);
+        return;
+      }
+
+      printState = "printing";
+
+      const listener = (e: PrintProgressEvent) => {
+        printProgress = e.pagePrintProgress;
+      };
+
+      $printerClient.addEventListener("printprogress", listener);
+
+      try {
+        await $printerClient.abstraction.waitUntilPrintFinished(quantity, 100);
+      } catch (e) {
+        error = `${e}`;
+        console.error(e);
+      }
+
+      $printerClient.removeEventListener("printprogress", listener);
+      await endPrint();
     }
-
-    printState = "printing";
-
-    const listener = (e: PrintProgressEvent) => {
-      printProgress = e.pagePrintProgress;
-    };
-
-    $printerClient.addEventListener("printprogress", listener);
-
-    try {
-      await $printerClient.abstraction.waitUntilPrintFinished(quantity, 100);
-    } catch (e) {
-      error = `${e}`;
-      console.error(e);
-    }
-
-    $printerClient.removeEventListener("printprogress", listener);
-    await endPrint();
 
     printState = "idle";
 
@@ -149,7 +163,67 @@
     }
   };
 
-  onMount(() => {
+  const pageDown = () => {
+    if (!csvEnabled) {
+      page = 0;
+      return;
+    }
+    page = Math.max(0, Math.min(csvParsed.length - 1, page - 1));
+    generatePreviewData(page);
+  };
+
+  const pageUp = () => {
+    if (!csvEnabled) {
+      page = 0;
+      return;
+    }
+    page = Math.min(csvParsed.length - 1, page + 1);
+    generatePreviewData(page);
+  };
+
+  const generatePreviewData = async (page: number): Promise<void> => {
+    return new Promise((resolve) => {
+      const fabricTempCanvas = new fabric.Canvas(null, { width: labelProps.size.width, height: labelProps.size.height });
+
+      fabricTempCanvas.loadFromJSON(canvasCallback(), () => {
+        let variables = {};
+
+        if (csvEnabled) {
+          if (page >= 0 && page < csvParsed.length) {
+            variables = csvParsed[page];
+          } else {
+            console.warn(`Page ${page} is out of csv bounds (csv length is ${csvParsed.length})`);
+          }
+        }
+
+        console.log("Page variables:", variables);
+
+        canvasPreprocess(fabricTempCanvas, variables);
+
+        fabricTempCanvas.requestRenderAll();
+
+        const preRenderedCanvas = fabricTempCanvas.toCanvasElement();
+        const ctx = preRenderedCanvas.getContext("2d")!;
+        previewCanvas.width = preRenderedCanvas.width;
+        previewCanvas.height = preRenderedCanvas.height;
+        previewContext = previewCanvas.getContext("2d")!;
+        originalImage = ctx.getImageData(0, 0, preRenderedCanvas.width, preRenderedCanvas.height);
+
+        updatePreview();
+
+        fabricTempCanvas.dispose();
+        console.log("resolve")
+        resolve();
+      });
+    });
+  };
+
+  onMount(async () => {
+    if (csvEnabled) {
+      csvParsed = csvParse(csvData);
+      pagesTotal = csvParsed.length;
+    }
+
     modal = new Modal(modalElement);
     modal.show();
     modalElement.addEventListener("hidden.bs.modal", async () => {
@@ -164,26 +238,11 @@
 
     loadProps();
 
-    const fabricTempCanvas = new fabric.Canvas(null, { width: labelProps.size.width, height: labelProps.size.height });
+    await generatePreviewData(page);
 
-    fabricTempCanvas.loadFromJSON(canvasCallback(), () => {
-      const variables = {"foo": "bar"};
-
-      canvasPreprocess(fabricTempCanvas, variables);
-
-      fabricTempCanvas.requestRenderAll();
-
-      const preRenderedCanvas = fabricTempCanvas.toCanvasElement();
-      const ctx = preRenderedCanvas.getContext("2d")!;
-      previewCanvas.width = preRenderedCanvas.width;
-      previewCanvas.height = preRenderedCanvas.height;
-      previewContext = previewCanvas.getContext("2d")!;
-      originalImage = ctx.getImageData(0, 0, preRenderedCanvas.width, preRenderedCanvas.height);
-
-      updatePreview();
-
-      fabricTempCanvas.dispose();
-    });
+    if (printNow && !$disconnected && printState === "idle") {
+      onPrint();
+    }
   });
 
   onDestroy(() => {
@@ -210,7 +269,16 @@
       </div>
 
       <div class="modal-body text-center">
-        <canvas class="print-start-{labelProps.printDirection}" bind:this={previewCanvas}></canvas>
+        <div class="d-flex justify-content-center">
+          {#if pagesTotal > 1}<button disabled={printState !== "idle"} class="btn w-100 fs-1" on:click={pageDown}
+              ><FaIcon icon="angle-left" /></button
+            >{/if}
+          <canvas class="print-start-{labelProps.printDirection}" bind:this={previewCanvas}></canvas>
+          {#if pagesTotal > 1}<button disabled={printState !== "idle"} class="btn w-100 fs-1" on:click={pageUp}
+              ><FaIcon icon="angle-right" /></button
+            >{/if}
+        </div>
+        {#if pagesTotal > 1}<div>Page {page + 1} / {pagesTotal}</div>{/if}
 
         {#if printState === "sending"}
           <div>Sending...</div>
@@ -387,6 +455,7 @@
 <style>
   canvas {
     border: 1px solid #6d6d6d;
+    max-width: 100%;
   }
   canvas.print-start-left {
     border-left: 2px solid #ff4646;
