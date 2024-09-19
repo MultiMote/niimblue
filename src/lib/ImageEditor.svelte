@@ -222,7 +222,7 @@
   const onCsvUpdate = (enabled: boolean, csv: string) => {
     csvData = csv;
     csvEnabled = enabled;
-    Persistence.saveCsv(csvEnabled, csvData);
+    Persistence.saveCsv(csvData);
   };
 
   const onCsvPlaceholderPicked = (name: string) => {
@@ -232,7 +232,6 @@
   onMount(() => {
     const csvSaved = Persistence.loadCsv();
     csvData = csvSaved.data;
-    csvEnabled = csvSaved.enabled;
 
     const savedLabelPropsStr: string | null = localStorage.getItem("last_label_props");
 
