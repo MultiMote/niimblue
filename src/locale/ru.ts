@@ -56,9 +56,9 @@ export const translation_ru: Partial<Record<translationKeys, string>> = {
   "editor.iconpicker.title": "Добавить иконку",
   "editor.iconpicker.search": "Поиск",
   /* LabelPropsEditor */
-  "params.csv.title": "Динамические данные",
+  "params.csv.title": "Динамические данные (CSV)",
   "params.csv.tip": "Первая строка - заголовок. Он используется для имён переменных. В качестве разделителей используются запятые.",
-  "params.csv.rowsfound": "Найдено строк:",
+  "params.csv.rowsfound": "Найдено строк c данными:",
   "params.csv.enabled": "Включить",
   "params.csv.placeholders": "Переменные:",
   /* LabelPropsEditor */

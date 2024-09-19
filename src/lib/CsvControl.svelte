@@ -30,12 +30,12 @@
     class="btn btn-sm btn-secondary"
     data-bs-toggle="dropdown"
     data-bs-auto-close="outside"
-    title={$tr("params.csv.title", "Dynamic label data")}
+    title={$tr("params.csv.title", "Dynamic label data (CSV)")}
   >
     <FaIcon icon="table-list" />
   </button>
   <div class="dropdown-menu">
-    <h6 class="dropdown-header">{$tr("params.csv.title", "Dynamic label data")}</h6>
+    <h6 class="dropdown-header">{$tr("params.csv.title", "Dynamic label data (CSV)")}</h6>
     <div class="p-3 text-body-secondary">
       <div class="form-check form-switch">
         <input
@@ -56,7 +56,7 @@
       <textarea class="dsv form-control my-3" bind:value={csv} on:input={onDataChanged} />
 
       <div class="placeholders pt-1">
-        {$tr("params.csv.rowsfound", "Rows found:")} <strong>{rows}</strong>
+        {$tr("params.csv.rowsfound", "Data rows found:")} <strong>{rows}</strong>
       </div>
       <div class="placeholders pt-1">
         {$tr("params.csv.placeholders", "Variables:")}
