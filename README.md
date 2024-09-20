@@ -8,6 +8,8 @@ Uses [NiimBlueLib](https://github.com/MultiMote/niimbluelib) for communication.
 
 You can see implemented and planned feature list [in this issue](https://github.com/MultiMote/niimblue/issues/3).
 
+List of supported models you can find in [niimluelib](https://github.com/MultiMote/niimbluelib/issues/1) repository.
+
 ## Demo
 
 The public preview is available [here](https://niim.mmote.ru).
@@ -20,7 +22,7 @@ For serial communication: [supported browsers](https://developer.mozilla.org/en-
 
 ## Feedback needed!
 
-I only have D110 and B1 printers. If you own other models, please open an issue, confirm you model working or not with this project.
+I only have D110 and B1 printers. If you own other models, please write a comment [here](https://github.com/MultiMote/niimbluelib/issues/1) describing your model working or not.
 
 Bluetooth dumps are MUCH appreciated (search how to enable **Bluetooth HCI Snoop Log** for your device, print any label with **Niimbot** app then run `adb bugreport filename`, you should find **btsnoop_hci.log** in the archive).
 
