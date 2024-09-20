@@ -109,13 +109,13 @@
   const onUpdateLabelProps = () => {
     labelProps = labelProps; // trigger update
     fabricCanvas.setDimensions(labelProps.size);
-    localStorage.setItem("last_label_props", JSON.stringify(labelProps));
+    Persistence.saveLastLabelProps(labelProps);
   };
 
   const onSaveClicked = () => {
-    const data = fabricCanvas.toJSON();
-    localStorage.setItem("saved_canvas_data", JSON.stringify(data));
-    localStorage.setItem("saved_canvas_props", JSON.stringify(labelProps));
+    if (confirm($tr("editor.warning.save", "Saved data wil be overwritten. Save?"))) {
+      Persistence.saveCanvas(labelProps, fabricCanvas.toJSON());
+    }
   };
 
   const onExportClicked = () => {
@@ -125,6 +125,10 @@
   const onImportClicked = async () => {
     const contents = await FileUtils.pickAndReadTextFile("json");
     const data = JSON.parse(contents);
+
+    if (!confirm($tr("editor.warning.load", "Canvas wil be replaced with saved data"))) {
+      return;
+    }
 
     // todo: validation and merge with  onLoadClicked
     labelProps = data.label;
@@ -142,16 +146,22 @@
   };
 
   const onLoadClicked = () => {
-    const props = localStorage.getItem("saved_canvas_props");
-    if (props) {
-      const parsedProps = JSON.parse(props);
-      labelProps = parsedProps;
-      onUpdateLabelProps();
+    if (!confirm($tr("editor.warning.load", "Canvas wil be replaced with saved data"))) {
+      return;
     }
 
-    const data = localStorage.getItem("saved_canvas_data");
+    const { labelData, canvasData } = Persistence.loadSavedCanvas();
+
+    if (labelData === null || canvasData === null) {
+      alert("No saved label data found, or data is corrupt");
+      return;
+    }
+
+    labelProps = labelData;
+    onUpdateLabelProps();
+
     fabricCanvas.loadFromJSON(
-      data,
+      canvasData,
       () => {
         fabricCanvas.requestRenderAll();
       },
@@ -233,17 +243,9 @@
     const csvSaved = Persistence.loadCsv();
     csvData = csvSaved.data;
 
-    const savedLabelPropsStr: string | null = localStorage.getItem("last_label_props");
-
-    if (savedLabelPropsStr != null) {
-      try {
-        const obj = JSON.parse(savedLabelPropsStr);
-        if ("size" in obj && "width" in obj.size && "height" in obj.size && ["top", "left"].includes(obj.printDirection)) {
-          labelProps = obj as LabelProps;
-        }
-      } catch (e) {
-        console.error(e);
-      }
+    const savedLabelProps = Persistence.loadLastLabelProps();
+    if (savedLabelProps !== null) {
+      labelProps = savedLabelProps;
     }
 
     fabric.disableStyleCopyPaste = true;
@@ -330,7 +332,12 @@
       <div class="toolbar d-flex flex-wrap gap-1 justify-content-center align-items-center">
         <LabelPropsEditor {labelProps} onChange={onUpdateLabelProps} />
 
-        <CsvControl csv={csvData} enabled={csvEnabled} onUpdate={onCsvUpdate} onPlaceholderPicked={onCsvPlaceholderPicked} />
+        <CsvControl
+          csv={csvData}
+          enabled={csvEnabled}
+          onUpdate={onCsvUpdate}
+          onPlaceholderPicked={onCsvPlaceholderPicked}
+        />
 
         <div class="btn-group btn-group-sm" role="group">
           <button class="btn btn-secondary btn-sm" on:click={onSaveClicked}><FaIcon icon="floppy-disk" /></button>
@@ -406,7 +413,14 @@
   </div>
 
   {#if previewOpened}
-    <PrintPreview onClosed={onPreviewClosed} canvasCallback={getCanvasForPreview} {labelProps} {printNow} {csvEnabled} {csvData} />
+    <PrintPreview
+      onClosed={onPreviewClosed}
+      canvasCallback={getCanvasForPreview}
+      {labelProps}
+      {printNow}
+      {csvEnabled}
+      {csvData}
+    />
   {/if}
 </div>
 

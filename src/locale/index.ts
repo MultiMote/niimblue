@@ -24,6 +24,8 @@ export type translationKeys =
   | "editor.objectpicker.title"
   | "editor.preview"
   | "editor.print"
+  | "editor.warning.save"
+  | "editor.warning.load"
   | "main.built"
   | "main.code"
   | "params.csv.title"

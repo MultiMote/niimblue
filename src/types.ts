@@ -1,4 +1,4 @@
-import type { PrintDirection } from "@mmote/niimbluelib";
+import type { LabelType, PrintDirection, PrintTaskVersion } from "@mmote/niimbluelib";
 import { fabric } from "fabric";
 
 export type ConnectionState = "connecting" | "connected" | "disconnected";
@@ -31,3 +31,12 @@ export interface ExportedLabelTemplate {
 export type PostProcessType = "threshold" | "dither";
 
 export type MoveDirection = "Up" | "Down" | "Left" | "Right";
+
+export interface PreviewProps {
+  postProcess?: PostProcessType
+  threshold?: number
+  quantity?: number
+  density?: number
+  labelType?: LabelType
+  printTaskVersion?: PrintTaskVersion
+};

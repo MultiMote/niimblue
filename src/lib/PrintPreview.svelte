@@ -13,12 +13,13 @@
     Utils,
     type PrintProgressEvent,
   } from "@mmote/niimbluelib";
-  import type { LabelProps, PostProcessType, FabricJson } from "../types";
+  import type { LabelProps, PostProcessType, FabricJson, PreviewProps } from "../types";
   import FaIcon from "./FaIcon.svelte";
   import ParamLockButton from "./ParamLockButton.svelte";
   import { tr, type translationKeys } from "../utils/i18n";
   import { canvasPreprocess } from "../utils/canvas_preprocess";
   import { type DSVRowArray, csvParse } from "d3-dsv";
+  import { Persistence } from "../utils/persistence";
 
   export let onClosed: () => void;
   export let labelProps: LabelProps;
@@ -47,14 +48,7 @@
   let page = 0;
   let pagesTotal = 1;
 
-  let savedProps = {} as {
-    postProcess?: PostProcessType;
-    threshold?: number;
-    quantity?: number;
-    density?: number;
-    labelType?: LabelType;
-    printTaskVersion?: PrintTaskVersion;
-  };
+  let savedProps = {} as PreviewProps;
 
   const disconnected = derived(connectionState, ($connectionState) => $connectionState !== "connected");
 
@@ -133,7 +127,7 @@
   const toggleSavedProp = (key: string, value: any) => {
     const keyObj = key as keyof typeof savedProps;
     savedProps[keyObj] = savedProps[keyObj] === undefined ? value : undefined;
-    localStorage.setItem("saved_preview_props", JSON.stringify(savedProps));
+    Persistence.savePreviewProps(savedProps);
   };
 
   const updateSavedProp = (key: string, value: any, refreshPreview: boolean = false) => {
@@ -141,7 +135,7 @@
 
     if (savedProps[keyObj] !== undefined) {
       savedProps[keyObj] = savedProps[keyObj] = value;
-      localStorage.setItem("saved_preview_props", JSON.stringify(savedProps));
+      Persistence.savePreviewProps(savedProps);
     }
 
     if (refreshPreview) {
@@ -150,17 +144,18 @@
   };
 
   const loadProps = () => {
-    try {
-      savedProps = JSON.parse(localStorage.getItem("saved_preview_props") ?? "{}");
-      if (savedProps.postProcess) postProcessType = savedProps.postProcess;
-      if (savedProps.threshold) thresholdValue = savedProps.threshold;
-      if (savedProps.quantity) quantity = savedProps.quantity;
-      if (savedProps.density) density = savedProps.density;
-      if (savedProps.labelType) labelType = savedProps.labelType;
-      if (savedProps.printTaskVersion) printTaskVersion = savedProps.printTaskVersion;
-    } catch (e) {
-      console.error("Props load error", e);
+    const saved = Persistence.loadSavedPreviewProps();
+    if (saved === null) {
+      return;
     }
+
+    savedProps = saved;
+    if (saved.postProcess) postProcessType = saved.postProcess;
+    if (saved.threshold) thresholdValue = saved.threshold;
+    if (saved.quantity) quantity = saved.quantity;
+    if (saved.density) density = saved.density;
+    if (saved.labelType) labelType = saved.labelType;
+    if (saved.printTaskVersion) printTaskVersion = saved.printTaskVersion;
   };
 
   const pageDown = () => {
@@ -212,7 +207,7 @@
         updatePreview();
 
         fabricTempCanvas.dispose();
-        console.log("resolve")
+        console.log("resolve");
         resolve();
       });
     });
