@@ -2,8 +2,8 @@ import { fabric } from "fabric";
 import { code128b, ean13 } from "../utils/barcode";
 import { equalSpacingFillText } from "../utils/canvas_utils";
 
-const PRESERVE_PROPERTIES = ["text", "encoding", "printText"];
-const EAN13_LONG_IDX: number[] = [0, 1, 2, 45, 46, 47, 48, 49, 92, 93, 94];
+const ALL_PROPERTIES = ["text", "encoding", "printText", "scaleFactor", "fontSize", "font", "fontFamily"];
+const EAN13_LONG_BAR_INDEXES: number[] = [0, 1, 2, 45, 46, 47, 48, 49, 92, 93, 94];
 
 export type BarcodeCoding = "EAN13" | "CODE128B";
 
@@ -11,33 +11,65 @@ export interface IBarcodeOptions extends fabric.IObjectOptions {
   text: string;
   encoding?: BarcodeCoding;
   printText?: boolean;
+  scaleFactor?: number;
+  fontSize?: number;
+  fontFamily?: string;
 }
 
 export class Barcode extends fabric.Object {
   text: string;
   encoding: BarcodeCoding;
   printText: boolean;
+  scaleFactor: number;
+  fontSize: number;
+  fontFamily: string;
 
-  bandcode: string = "";
+  barcodeEncoded: string = "";
   displayText: string = "";
 
   constructor(options?: IBarcodeOptions) {
     super(options);
     this.type = "Barcode";
-    this.stateProperties = PRESERVE_PROPERTIES.concat(...(fabric.Object.prototype.stateProperties ?? []));
-    this.cacheProperties = PRESERVE_PROPERTIES.concat(...(fabric.Object.prototype.cacheProperties ?? []));
+    this.stateProperties = ALL_PROPERTIES.concat(...(fabric.Object.prototype.stateProperties ?? []));
+    this.cacheProperties = ALL_PROPERTIES.concat(...(fabric.Object.prototype.cacheProperties ?? []));
+    this.objectCaching = false; // todo: fix cache (blur on scaleFactor change)
+
+    this.setControlsVisibility({
+      tl: false,
+      tr: false,
+      bl: false,
+      br: false,
+      ml: false,
+      mr: false,
+      mtr: false,
+    });
 
     this.text = options?.text ?? "";
     this.encoding = options?.encoding ?? "EAN13";
     this.printText = options?.printText ?? true;
+    this.scaleFactor = options?.scaleFactor ?? 1;
+    this.fontSize = options?.fontSize ?? 12;
+    this.fontFamily = options?.fontFamily ?? "Noto Sans Variable";
     this._createBandCode();
   }
 
   override _set(key: string, value: any): this {
     super._set(key, value);
+
     if (key === "text" || key == "encoding") {
       this._createBandCode();
     }
+
+    if (this.barcodeEncoded && (ALL_PROPERTIES.includes(key) || key == "canvas")) {
+      const letterWidth = this._measureLetterWidth();
+      let barcodeWidth = (this.scaleFactor ?? 1) * this.barcodeEncoded.length;
+
+      if (this.encoding === "EAN13") {
+        barcodeWidth += letterWidth * 2; // side margins
+      }
+      super._set("width", barcodeWidth);
+    }
+
     return this;
   }
 
@@ -45,59 +77,72 @@ export class Barcode extends fabric.Object {
     if (this.encoding === "EAN13") {
       const { text, bandcode } = ean13(this.text);
       this.displayText = text;
-      this.bandcode = bandcode;
+      this.barcodeEncoded = bandcode;
     } else {
       this.displayText = this.text;
-      this.bandcode = code128b(this.text);
+      this.barcodeEncoded = code128b(this.text);
     }
     return this;
   }
 
-  //todo: remove magic numbers
+  _getFont(): string {
+    return `bold ${this.fontSize}px ${this.fontFamily}`;
+  }
+
+  // parent canvas is needed for this operation
+  _measureLetterWidth(): number {
+    const ctx = this.canvas?.getContext();
+    let w = 0;
+
+    if (ctx !== undefined) {
+      ctx.save();
+      ctx.font = this._getFont();
+      w = ctx.measureText("0").width;
+      ctx.restore();
+    }
+    return Math.ceil(w);
+  }
+
   override _render(ctx: CanvasRenderingContext2D) {
     super._render(ctx);
 
-    if (this.bandcode === "" || this.height === undefined || this.width === undefined) {
+    if (
+      this.barcodeEncoded === "" ||
+      this.height === undefined ||
+      this.width === undefined ||
+      this.fontSize === undefined ||
+      this.fontFamily === undefined
+    ) {
       return;
     }
 
+    const letterWidth = this._measureLetterWidth();
+
     ctx.save();
+    ctx.translate(-this.width / 2, -this.height / 2); // make top-left origin
+    ctx.translate(0.5, 0.5); // blurry rendering fix
 
-    const fontHeight = Math.round(
-      Math.max(Math.min(this.height / 10, (this.width / this.displayText.length) * 1.5), 12)
-    );
+    ctx.font = this._getFont();
+    ctx.textBaseline = "bottom";
 
-    ctx.font = `bold ${fontHeight}px Noto Sans Variable`;
-    ctx.textBaseline = "top";
-    const fontWidth = ctx.measureText("0").width;
-    const w2 = this.width / 2;
-    const h2 = this.height / 2;
-    const realX = (x: number) => x - w2;
-    const realY = (y: number) => y - h2;
-
-    let dh = this.height;
-    let dp = 0;
+    let longBarHeight = this.height;
+    let shortBarHeight = this.height;
+    let barcodeStartPos = this.encoding === "EAN13" ? letterWidth : 0;
 
     if (this.printText) {
-      if (this.encoding === "EAN13") {
-        dp = 2 * fontWidth;
-      }
-      dh = this.height - fontHeight * 1.2;
+      shortBarHeight -= this.fontSize * 1.2;
     } else if (this.encoding === "EAN13") {
-      dh = this.height * 0.9;
+      shortBarHeight -= 8;
     }
-
-    const dw = (this.width - dp * 2) / this.bandcode.length;
 
     let blackStartPosition = -1;
     let blackCount = 0;
     let isLongBar = false;
 
     // render barcode
-    // todo: snap barcode elements to the pixel grid (to make rendering sharp)
-    for (let i = 0; i < this.bandcode.length; i++) {
-      const isBlack = this.bandcode[i] === "1";
-      const xPos = realX(dp + i * dw);
+    for (let i = 0; i < this.barcodeEncoded.length; i++) {
+      const isBlack = this.barcodeEncoded[i] === "1";
+      const xPos = barcodeStartPos + i * this.scaleFactor;
 
       if (isBlack) {
         blackCount++;
@@ -106,18 +151,16 @@ export class Barcode extends fabric.Object {
           blackStartPosition = xPos;
         }
 
-        if (!isLongBar && this.encoding === "EAN13" && EAN13_LONG_IDX.includes(i)) {
+        if (this.encoding === "EAN13" && EAN13_LONG_BAR_INDEXES.includes(i)) {
           isLongBar = true;
         }
 
-        if (blackStartPosition != -1 && i === this.bandcode.length - 1) { // last index
-          const longBarHeight = this.printText ? dh + fontHeight * 0.7 : dh + this.height * 0.1;
-          ctx.fillRect(blackStartPosition, realY(0), dw * blackCount, isLongBar ? longBarHeight : dh);
+        if (blackStartPosition != -1 && i === this.barcodeEncoded.length - 1) {
+          // last index
+          ctx.fillRect(blackStartPosition, 0, this.scaleFactor * blackCount, isLongBar ? longBarHeight : shortBarHeight);
         }
       } else {
-        const longBarHeight = this.printText ? dh + fontHeight * 0.7 : dh + this.height * 0.1;
-        ctx.fillRect(blackStartPosition, realY(0), dw * blackCount, isLongBar ? longBarHeight : dh);
-
+        ctx.fillRect(blackStartPosition, 0, this.scaleFactor * blackCount, isLongBar ? longBarHeight : shortBarHeight);
         blackStartPosition = -1;
         blackCount = 0;
         isLongBar = false;
@@ -126,15 +169,33 @@ export class Barcode extends fabric.Object {
 
     // render text
     if (this.printText) {
-      const fastY = realY(this.height - fontHeight);
       if (this.encoding === "EAN13") {
-        let partW = 41 * dw;
-        ctx.fillText(this.displayText[0], realX(fontWidth * 0.5), fastY); // first digit
-        equalSpacingFillText(ctx, this.displayText.slice(1, 7), realX(fontWidth * 2 + dw * 4), fastY, partW); // part 1
-        equalSpacingFillText(ctx, this.displayText.slice(7, 13), realX(fontWidth * 2 + dw * 9 + partW), fastY, partW); // part 2
-        ctx.fillText(">", realX(this.width - fontWidth * 1.5), fastY); // last digit
+        const parts = [this.displayText[0], this.displayText.slice(1, 7), this.displayText.slice(7, 13), ">"];
+        const midPartWidth = 40;
+        const longBars1End = 4;
+        const longBars2End = 50;
+
+        ctx.fillText(parts[0], 0, this.height); // first digit
+
+        equalSpacingFillText(
+          ctx,
+          parts[1],
+          letterWidth + longBars1End * this.scaleFactor,
+          this.height,
+          midPartWidth * this.scaleFactor
+        ); // part 1
+
+        equalSpacingFillText(
+          ctx,
+          parts[2],
+          letterWidth + longBars2End * this.scaleFactor,
+          this.height,
+          midPartWidth * this.scaleFactor
+        ); // part 2
+
+        ctx.fillText(parts[3], this.width - letterWidth, this.height); // last digit
       } else {
-        equalSpacingFillText(ctx, this.displayText, realX(0), fastY, this.width);
+        equalSpacingFillText(ctx, this.displayText, barcodeStartPos, this.height, this.width);
       }
     }
 
@@ -142,7 +203,7 @@ export class Barcode extends fabric.Object {
   }
 
   override toObject(propertiesToInclude: string[] = []) {
-    return super.toObject(PRESERVE_PROPERTIES.concat(...propertiesToInclude));
+    return super.toObject(ALL_PROPERTIES.concat(...propertiesToInclude));
   }
 
   static fromObject(object: any, callback: Function): fabric.Object {

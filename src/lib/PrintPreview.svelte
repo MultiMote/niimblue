@@ -10,7 +10,6 @@
     ImageEncoder,
     LabelType,
     PrintTaskVersion,
-    Utils,
     type PrintProgressEvent,
   } from "@mmote/niimbluelib";
   import type { LabelProps, PostProcessType, FabricJson, PreviewProps } from "../types";
@@ -207,7 +206,6 @@
         updatePreview();
 
         fabricTempCanvas.dispose();
-        console.log("resolve");
         resolve();
       });
     });

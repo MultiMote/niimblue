@@ -101,4 +101,7 @@ export const translation_ru: Record<translationKeys, string> = {
   /** BarcodeParamsControls */
   "params.barcode.encoding": "Тип",
   "params.barcode.content": "Содержимое",
+  "params.barcode.scale": "Масштаб",
+  "params.barcode.font_size": "Размер шрифта",
+  "params.barcode.enable_caption": "Показывать надпись"
 };

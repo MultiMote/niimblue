@@ -8,12 +8,18 @@
   let selectedBarcode: Barcode | undefined;
   let encoding: BarcodeCoding | undefined;
   let text: string | undefined;
+  let scale: number | undefined;
+  let fontSize: number | undefined;
   let printText: boolean | undefined;
 
   const init = () => {
-    text = selectedBarcode?.text;
-    encoding = selectedBarcode?.encoding;
-    printText = selectedBarcode?.printText;
+    if (selectedBarcode !== undefined) {
+      text = selectedBarcode.text;
+      encoding = selectedBarcode.encoding;
+      printText = selectedBarcode.printText;
+      scale = selectedBarcode.scaleFactor;
+      fontSize = selectedBarcode.fontSize;
+    }
   };
 
   const togglePrintText = () => {
@@ -32,6 +38,16 @@
     valueUpdated();
   };
 
+  const scaleChange = () => {
+    selectedBarcode!.set("scaleFactor", Math.max(1, scale ?? 1));
+    valueUpdated();
+  };
+
+  const fontSizeChange = () => {
+    selectedBarcode!.set("fontSize", fontSize ?? 12);
+    valueUpdated();
+  };
+
   $: {
     selectedBarcode = selectedObject instanceof Barcode ? (selectedObject as Barcode) : undefined;
     init();
@@ -46,9 +62,27 @@
       <option value="CODE128B">Code128 B</option>
     </select>
   </div>
-  <button class="btn btn-sm {printText ? 'btn-secondary' : ''}" title="Enable caption" on:click={togglePrintText}>
-    <FaIcon icon="font" />
+
+  <div class="input-group input-group-sm flex-nowrap">
+    <span class="input-group-text" title={$tr("params.barcode.scale", "Scale factor")}>
+      <FaIcon icon="left-right" />
+    </span>
+    <input class="barcode-width form-control" type="number" min="1" bind:value={scale} on:input={scaleChange} />
+  </div>
+
+  <button
+    class="btn btn-sm {printText ? 'btn-secondary' : ''}"
+    title={$tr("params.barcode.enable_caption", "Enable caption")}
+    on:click={togglePrintText}
+  >
+    123
   </button>
+
+  <div class="input-group input-group-sm flex-nowrap">
+    <span class="input-group-text" title={$tr("params.barcode.font_size", "Font size")}><FaIcon icon="text-height" /></span
+    >
+    <input class="barcode-width form-control" type="number" min="1" bind:value={fontSize} on:input={fontSizeChange} />
+  </div>
 
   {#if encoding === "EAN13"}
     <div class="input-group input-group-sm flex-nowrap">
@@ -67,5 +101,9 @@
 
   textarea.barcode-content {
     height: 100px;
+  }
+
+  input.barcode-width {
+    max-width: 64px;
   }
 </style>

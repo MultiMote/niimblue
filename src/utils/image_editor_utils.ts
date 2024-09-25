@@ -154,7 +154,7 @@ export class ImageEditorUtils {
       width: (canvas.width ?? this.SIZE_DEFAULT) - this.OBJECT_DEFAULTS.left * 2,
       height: this.SIZE_DEFAULT,
       snapAngle: this.OBJECT_DEFAULTS.snapAngle,
-      encoding: "EAN13",
+      encoding: "CODE128B"
     });
     canvas.add(barcode);
   }
