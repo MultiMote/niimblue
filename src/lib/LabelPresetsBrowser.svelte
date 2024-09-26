@@ -60,10 +60,15 @@
         </div>
 
         <span class="label p-1">
-          {item.width}x{item.height}{#if item.unit === "mm"}{$tr(
-              "params.label.mm",
-              "mm",
-            )}{:else if item.unit === "px"}{$tr("params.label.px", "px")}{/if}
+          {#if item.title}
+            {item.title}
+          {:else }
+            {item.width}x{item.height}{#if item.unit === "mm"}{$tr(
+                "params.label.mm",
+                "mm",
+              )}{:else if item.unit === "px"}{$tr("params.label.px", "px")}{/if}
+          {/if}
+
         </span>
       </div>
     </button>

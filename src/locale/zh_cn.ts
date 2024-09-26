@@ -56,7 +56,7 @@ export const translation_zh_cn: Partial<Record<translationKeys, string>> = {
   "editor.iconpicker.title": "添加图标",
   "editor.iconpicker.search": "搜索",
   /* LabelPropsEditor */
-  "params.label.title": "标签属性",
+  "params.label.dialog_title": "标签属性",
   "params.label.size": "尺寸",
   "params.label.mm": "毫米",
   "params.label.dpmm": "点/毫米",

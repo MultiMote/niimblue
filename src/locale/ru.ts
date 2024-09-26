@@ -64,7 +64,8 @@ export const translation_ru: Record<translationKeys, string> = {
   "params.csv.enabled": "Включить",
   "params.csv.placeholders": "Переменные:",
   /* LabelPropsEditor */
-  "params.label.title": "Настройки этикетки",
+  "params.label.dialog_title": "Настройки этикетки",
+  "params.label.label_title": "Своё название",
   "params.label.size": "Размер",
   "params.label.mm": "мм",
   "params.label.dpmm": "пикс/мм",

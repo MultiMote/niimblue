@@ -14,6 +14,7 @@
 
   let labelPresets: LabelPreset[] = DEFAULT_LABEL_PRESETS;
 
+  let title: string | undefined = "";
   let prevUnit: LabelUnit = "mm";
   let unit: LabelUnit = "mm";
   let dpmm = 8;
@@ -61,6 +62,7 @@
     printDirection = preset.printDirection;
     width = preset.width;
     height = preset.height;
+    title = preset.title ?? "";
 
     onApply();
   };
@@ -79,6 +81,7 @@
       unit,
       width,
       height,
+      title
     };
     labelPresets = [...labelPresets, newPreset];
     Persistence.saveLabelPresets(labelPresets);
@@ -147,7 +150,7 @@
     <FaIcon icon="gear" />
   </button>
   <div class="dropdown-menu">
-    <h6 class="dropdown-header">{$tr("params.label.title", "Label properties")}</h6>
+    <h6 class="dropdown-header">{$tr("params.label.dialog_title", "Label properties")}</h6>
 
     <div class="p-3">
       <div class="mb-3 {error ? 'cursor-help text-warning' : 'text-secondary'}" title={error}>
@@ -201,6 +204,12 @@
           >
         </select>
       </div>
+
+      <div class="input-group flex-nowrap input-group-sm mb-3">
+        <span class="input-group-text">{$tr("params.label.label_title", "Custom title")}</span>
+        <input class="form-control" type="text" bind:value={title} />
+      </div>
+
       <div class="text-end">
         <button class="btn btn-sm btn-primary" on:click={onApply}>{$tr("params.label.apply", "Apply")}</button>
       </div>
