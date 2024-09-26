@@ -150,7 +150,7 @@
     <h6 class="dropdown-header">{$tr("params.label.title", "Label properties")}</h6>
 
     <div class="p-3">
-      <div class="mb-3 {error ? 'warning text-warning' : 'text-secondary'}" title={error}>
+      <div class="mb-3 {error ? 'cursor-help text-warning' : 'text-secondary'}" title={error}>
         {$tr("params.label.current", "Current parameters:")}
         {labelProps.size.width}x{labelProps.size.height}
         {$tr("params.label.px", "px")}
@@ -181,11 +181,11 @@
       </div>
 
       <div class="input-group flex-nowrap input-group-sm mb-3">
-        <span class="input-group-text" title={$tr("params.label.head_density.help", "Calculation: DPI / 25.4")}
-          >{$tr("params.label.head_density", "Pixel density")}</span
-        >
+        <span class="input-group-text">{$tr("params.label.head_density", "Pixel density")}</span>
         <input class="form-control" type="number" min="1" bind:value={dpmm} />
-        <span class="input-group-text">{$tr("params.label.dpmm", "dpmm")}</span>
+        <span class="input-group-text cursor-help" title={$tr("params.label.head_density.help", "Calculation: DPI / 25.4")}
+          >{$tr("params.label.dpmm", "dpmm")}</span
+        >
       </div>
 
       <div class="input-group flex-nowrap input-group-sm mb-3">
@@ -213,7 +213,7 @@
     min-width: 450px;
   }
 
-  .warning {
+  .cursor-help {
     cursor: help;
   }
 </style>
