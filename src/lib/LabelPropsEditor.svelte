@@ -200,22 +200,6 @@
             {$tr("params.label.direction.top", "Top")}</option
           >
         </select>
-        <!-- {#if $printerMeta !== undefined}
-          {@const headSide = printDirection == "left" ? height : width}
-          {#if headSide > $printerMeta.printheadPixels}
-            <span
-              class="input-group-text text-warning"
-              title="Label size is too big for your printer ({headSide} > {$printerMeta.printheadPixels})"
-            >
-              <FaIcon icon="warning" />
-            </span>
-          {/if}
-        {/if} -->
-        <!-- {#if $printerMeta !== undefined && $printerMeta.printDirection !== printDirection}
-          <span class="input-group-text text-warning" title="Recommended direction for your printer is {printDirection}">
-            <FaIcon icon="warning" />
-          </span>
-        {/if} -->
       </div>
       <div class="text-end">
         <button class="btn btn-sm btn-primary" on:click={onApply}>{$tr("params.label.apply", "Apply")}</button>
