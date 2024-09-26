@@ -1,51 +1,148 @@
 <script lang="ts">
   import FaIcon from "./FaIcon.svelte";
-  import { type LabelPreset, type LabelProps } from "../types";
+  import { type LabelPreset, type LabelProps, type LabelUnit } from "../types";
   import LabelPresetsBrowser from "./LabelPresetsBrowser.svelte";
-  import { icon } from "@fortawesome/fontawesome-svg-core";
   import { printerMeta } from "../stores";
   import { tr } from "../utils/i18n";
+  import { DEFAULT_LABEL_PRESETS } from "../defaults";
+  import { onMount } from "svelte";
+  import { Persistence } from "../utils/persistence";
+  import type { PrintDirection } from "@mmote/niimbluelib";
 
   export let labelProps: LabelProps;
-  export let onChange: () => void;
+  export let onChange: (newProps: LabelProps) => void;
+
+  let labelPresets: LabelPreset[] = DEFAULT_LABEL_PRESETS;
+
+  let title: string | undefined = "";
+  let prevUnit: LabelUnit = "mm";
+  let unit: LabelUnit = "mm";
   let dpmm = 8;
-  let sizeMm: { width?: number; height?: number; dpmm: number } = { width: undefined, height: undefined, dpmm: 8 };
+  let width = 0;
+  let height = 0;
+  let printDirection: PrintDirection = "left";
+  let error: string = "";
 
-  const onChangePre = () => {
-    labelProps.size.width = labelProps.size.width < dpmm ? dpmm : labelProps.size.width;
-    labelProps.size.height = labelProps.size.height < dpmm ? dpmm : labelProps.size.height;
+  const onApply = () => {
+    let newWidth = width;
+    let newHeight = height;
 
-    if (labelProps.printDirection === "left") {
-      labelProps.size.height -= labelProps.size.height % dpmm;
+    // mm to px
+    if (unit === "mm") {
+      newWidth *= dpmm;
+      newHeight *= dpmm;
+    }
+
+    // limit min siz
+    newWidth = newWidth < dpmm ? dpmm : newWidth;
+    newHeight = newHeight < dpmm ? dpmm : newHeight;
+
+    // width must me multiple of dpmm
+    if (printDirection === "left") {
+      newHeight -= newHeight % dpmm;
     } else {
-      labelProps.size.width -= labelProps.size.width % dpmm;
+      newWidth -= newWidth % dpmm;
     }
-    onChange();
+
+    onChange({
+      printDirection: printDirection,
+      size: {
+        width: newWidth,
+        height: newHeight,
+      },
+    });
   };
 
-  const onLabelPresetSelected = (preset: LabelPreset) => {
-    labelProps.printDirection = preset.printDirection;
-    labelProps.size.width = preset.width * preset.dpmm;
-    labelProps.size.height = preset.height * preset.dpmm;
+  const onLabelPresetSelected = (index: number) => {
+    const preset = labelPresets[index];
 
-    onChangePre();
+    dpmm = preset.dpmm;
+    prevUnit = preset.unit;
+    unit = preset.unit;
+    printDirection = preset.printDirection;
+    width = preset.width;
+    height = preset.height;
+    title = preset.title ?? "";
+
+    onApply();
   };
 
-  const onCalcSize = () => {
-    if (sizeMm.height && sizeMm.width) {
-      labelProps.size.width = sizeMm.width * sizeMm.dpmm;
-      labelProps.size.height = sizeMm.height * sizeMm.dpmm;
-    }
-    onChangePre();
+  const onLabelPresetDelete = (idx: number) => {
+    const result = [...labelPresets];
+    result.splice(idx, 1);
+    labelPresets = result;
+    Persistence.saveLabelPresets(labelPresets);
+  };
+
+  const onLabelPresetAdd = () => {
+    const newPreset: LabelPreset = {
+      dpmm,
+      printDirection,
+      unit,
+      width,
+      height,
+      title
+    };
+    labelPresets = [...labelPresets, newPreset];
+    Persistence.saveLabelPresets(labelPresets);
   };
 
   const onFlip = () => {
-    let width = labelProps.size.width;
-    labelProps.size.width = labelProps.size.height;
-    labelProps.size.height = width;
-    labelProps.printDirection = labelProps.printDirection === "top" ? "left" : "top";
-    onChangePre();
+    let widthTmp = width;
+    width = height;
+    height = widthTmp;
+    printDirection = printDirection === "top" ? "left" : "top";
   };
+
+  const onUnitChange = () => {
+    if (prevUnit === "mm" && unit === "px") {
+      width = Math.floor(width * dpmm);
+      height = Math.floor(height * dpmm);
+    } else if (prevUnit === "px" && unit === "mm") {
+      width = Math.floor(width / dpmm);
+      height = Math.floor(height / dpmm);
+    }
+    prevUnit = unit;
+  };
+
+  const checkError = (props: LabelProps) => {
+    error = "";
+
+    if ($printerMeta !== undefined) {
+      const headSide = props.printDirection == "left" ? props.size.height : props.size.width;
+
+      if (headSide > $printerMeta.printheadPixels) {
+        error += $tr("params.label.warning.width", "Label width is too big for your printer:") + " ";
+        error += `(${headSide} > ${$printerMeta.printheadPixels})`;
+        error += "\n";
+      }
+
+      if ($printerMeta.printDirection !== props.printDirection) {
+        error += $tr("params.label.warning.direction", "Recommended direction for your printer:") + " ";
+        if ($printerMeta.printDirection == "left") {
+          error += $tr("params.label.direction.left", "Left");
+        } else {
+          error += $tr("params.label.direction.top", "Top");
+        }
+      }
+    }
+  };
+
+  onMount(() => {
+    const defaultPreset: LabelPreset = DEFAULT_LABEL_PRESETS[0];
+    width = defaultPreset.width;
+    height = defaultPreset.height;
+    prevUnit = defaultPreset.unit;
+    unit = defaultPreset.unit;
+    printDirection = defaultPreset.printDirection;
+
+    const savedPresets: LabelPreset[] = Persistence.loadLabelPresets();
+    if (savedPresets !== null && Array.isArray(savedPresets) && savedPresets.length !== 0) {
+      labelPresets = savedPresets;
+    }
+  });
+
+  $: checkError(labelProps);
 </script>
 
 <div class="dropdown">
@@ -53,72 +150,69 @@
     <FaIcon icon="gear" />
   </button>
   <div class="dropdown-menu">
-    <h6 class="dropdown-header">{$tr("params.label.title", "Label properties")}</h6>
+    <h6 class="dropdown-header">{$tr("params.label.dialog_title", "Label properties")}</h6>
+
     <div class="p-3">
-      <LabelPresetsBrowser class="mb-1" onItemSelected={onLabelPresetSelected} />
+      <div class="mb-3 {error ? 'cursor-help text-warning' : 'text-secondary'}" title={error}>
+        {$tr("params.label.current", "Current parameters:")}
+        {labelProps.size.width}x{labelProps.size.height}
+        {$tr("params.label.px", "px")}
+        {#if labelProps.printDirection === "top"}
+          ({$tr("params.label.direction", "Print from")} {$tr("params.label.direction.top", "Top")})
+        {:else if labelProps.printDirection === "left"}
+          ({$tr("params.label.direction", "Print from")} {$tr("params.label.direction.left", "Left")})
+        {/if}
+      </div>
+
+      <LabelPresetsBrowser
+        class="mb-1"
+        presets={labelPresets}
+        onItemSelected={onLabelPresetSelected}
+        onItemDelete={onLabelPresetDelete}
+        onItemAdd={onLabelPresetAdd}
+      />
 
       <div class="input-group flex-nowrap input-group-sm mb-3">
         <span class="input-group-text">{$tr("params.label.size", "Size")}</span>
-        <input class="form-control" type="number" min="0" bind:value={sizeMm.width} on:change={onChangePre} />
-        <span class="input-group-text">x</span>
-        <input class="form-control" type="number" min="0" bind:value={sizeMm.height} on:change={onChangePre} />
-        <span class="input-group-text">{$tr("params.label.mm", "mm")}</span>
-        <input class="form-control" type="number" min="0" bind:value={sizeMm.dpmm} on:change={onChangePre} />
-        <span class="input-group-text">{$tr("params.label.dpmm", "dpmm")}</span>
-        <button class="btn btn-sm btn-primary" on:click={onCalcSize}>{$tr("params.label.calc", "Calc")}</button>
+        <input class="form-control" type="number" min="0" step={dpmm} bind:value={width} />
+        <button class="btn btn-sm btn-secondary" on:click={onFlip}><FaIcon icon="repeat" /></button>
+        <input class="form-control" type="number" min="0" step={dpmm} bind:value={height} />
+        <select class="form-select" bind:value={unit} on:change={onUnitChange}>
+          <option value="mm"> {$tr("params.label.mm", "mm")}</option>
+          <option value="px"> {$tr("params.label.px", "px")}</option>
+        </select>
       </div>
 
       <div class="input-group flex-nowrap input-group-sm mb-3">
-        <span class="input-group-text">{$tr("params.label.size", "Size")}</span>
-        <input
-          class="form-control"
-          type="number"
-          min="0"
-          step={dpmm}
-          bind:value={labelProps.size.width}
-          on:change={onChangePre}
-        />
-        <button class="btn btn-sm btn-secondary" on:click={onFlip}><FaIcon icon="repeat" /></button>
-        <input
-          class="form-control"
-          type="number"
-          min="0"
-          step={dpmm}
-          bind:value={labelProps.size.height}
-          on:change={onChangePre}
-        />
-        <span class="input-group-text">{$tr("params.label.px", "px")}</span>
-
-        {#if $printerMeta !== undefined}
-          {@const headSide = labelProps.printDirection == "left" ? labelProps.size.height : labelProps.size.width}
-          {#if headSide > $printerMeta.printheadPixels}
-            <span class="input-group-text text-warning" title="Label size is too big for your printer ({headSide} > {$printerMeta.printheadPixels})">
-              <FaIcon icon="warning" />
-            </span>
-          {/if}
-        {/if}
+        <span class="input-group-text">{$tr("params.label.head_density", "Pixel density")}</span>
+        <input class="form-control" type="number" min="1" bind:value={dpmm} />
+        <span class="input-group-text cursor-help" title={$tr("params.label.head_density.help", "Calculation: DPI / 25.4")}
+          >{$tr("params.label.dpmm", "dpmm")}</span
+        >
       </div>
 
       <div class="input-group flex-nowrap input-group-sm mb-3">
         <span class="input-group-text">{$tr("params.label.direction", "Print from")}</span>
-        <select class="form-select" bind:value={labelProps.printDirection} on:change={onChangePre}>
+        <select class="form-select" bind:value={printDirection}>
           <option value="left"
-            >{#if $printerMeta?.printDirection === "left"}✔{/if} {$tr("params.label.direction.left", "Left")}</option
+            >{#if $printerMeta?.printDirection === "left"}✔{/if}
+            {$tr("params.label.direction.left", "Left")}</option
           >
           <option value="top"
-            >{#if $printerMeta?.printDirection === "top"}✔{/if} {$tr("params.label.direction.top", "Top")}</option
+            >{#if $printerMeta?.printDirection === "top"}✔{/if}
+            {$tr("params.label.direction.top", "Top")}</option
           >
         </select>
-        {#if $printerMeta !== undefined && $printerMeta.printDirection !== labelProps.printDirection}
-          <span
-            class="input-group-text text-warning"
-            title="Recommended direction for your printer is {labelProps.printDirection}"
-          >
-            <FaIcon icon="warning" />
-          </span>
-        {/if}
       </div>
-      <!-- <button class="btn btn-sm btn-primary" on:click={onSubmit}>Update</button> -->
+
+      <div class="input-group flex-nowrap input-group-sm mb-3">
+        <span class="input-group-text">{$tr("params.label.label_title", "Custom title")}</span>
+        <input class="form-control" type="text" bind:value={title} />
+      </div>
+
+      <div class="text-end">
+        <button class="btn btn-sm btn-primary" on:click={onApply}>{$tr("params.label.apply", "Apply")}</button>
+      </div>
     </div>
   </div>
 </div>
@@ -126,5 +220,9 @@
 <style>
   .dropdown-menu {
     min-width: 450px;
+  }
+
+  .cursor-help {
+    cursor: help;
   }
 </style>

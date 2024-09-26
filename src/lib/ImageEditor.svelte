@@ -106,8 +106,8 @@
     }
   };
 
-  const onUpdateLabelProps = () => {
-    labelProps = labelProps; // trigger update
+  const onUpdateLabelProps = (newProps: LabelProps) => {
+    labelProps = newProps;
     fabricCanvas.setDimensions(labelProps.size);
     Persistence.saveLastLabelProps(labelProps);
   };
@@ -132,7 +132,7 @@
 
     // todo: validation and merge with  onLoadClicked
     labelProps = data.label;
-    onUpdateLabelProps();
+    onUpdateLabelProps(labelProps);
 
     fabricCanvas.loadFromJSON(
       data.canvas,
@@ -158,7 +158,7 @@
     }
 
     labelProps = labelData;
-    onUpdateLabelProps();
+    onUpdateLabelProps(labelProps);
 
     fabricCanvas.loadFromJSON(
       canvasData,

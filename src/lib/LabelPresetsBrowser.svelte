@@ -1,19 +1,13 @@
 <script lang="ts">
   import type { LabelPreset } from "../types";
+  import { tr } from "../utils/i18n";
+  import FaIcon from "./FaIcon.svelte";
 
-  export let onItemSelected: (preset: LabelPreset) => void;
-
-  const presets: LabelPreset[] = [
-    { width: 30, height: 12, unit: "mm", dpmm: 8, printDirection: "left" },
-    { width: 40, height: 12, unit: "mm", dpmm: 8, printDirection: "left" },
-    { width: 12, height: 40, unit: "mm", dpmm: 8, printDirection: "top" },
-    { width: 30, height: 20, unit: "mm", dpmm: 8, printDirection: "top" },
-    { width: 40, height: 30, unit: "mm", dpmm: 8, printDirection: "top" },
-    { width: 40, height: 70, unit: "mm", dpmm: 8, printDirection: "top" },
-    { width: 43, height: 25, unit: "mm", dpmm: 8, printDirection: "top" },
-    { width: 50, height: 30, unit: "mm", dpmm: 8, printDirection: "top" },
-    { width: 50, height: 40, unit: "mm", dpmm: 8, printDirection: "top" },
-  ];
+  export let onItemSelected: (index: number) => void;
+  export let onItemDelete: (index: number) => void;
+  export let onItemAdd: () => void;
+  export let presets: LabelPreset[];
+  let deleteIndex: number = -1;
 
   const scaleDimensions = (preset: LabelPreset): { width: number; height: number } => {
     const scaleFactor = Math.min(100 / preset.width, 100 / preset.height);
@@ -22,30 +16,77 @@
       height: Math.round(preset.height * scaleFactor),
     };
   };
+
+  const deleteConfirmed = (e: MouseEvent, idx: number) => {
+    e.stopPropagation();
+    deleteIndex = -1;
+    onItemDelete(idx);
+  };
+
+  const deleteRejected = (e: MouseEvent, idx: number) => {
+    e.stopPropagation();
+    deleteIndex = -1;
+  };
+
+  const deleteRequested = (e: MouseEvent, idx: number) => {
+    e.stopPropagation();
+    deleteIndex = idx;
+  };
 </script>
 
 <div class="preset-browser overflow-y-auto border d-flex gap-1 flex-wrap {$$props.class}">
-  {#each presets as item}
+  {#each presets as item, idx}
     <button
       class="btn p-0 card-wrapper d-flex justify-content-center align-items-center"
-      on:click={() => onItemSelected(item)}
+      on:click={() => onItemSelected(idx)}
     >
       <div
         class="card print-start-{item.printDirection} d-flex justify-content-center align-items-center"
         style="width: {scaleDimensions(item).width}%; height: {scaleDimensions(item).height}%;"
       >
+        <div class="remove d-flex">
+          {#if deleteIndex === idx}
+            <button class="remove btn text-danger-emphasis" on:click={(e) => deleteConfirmed(e, idx)}
+              ><FaIcon icon="trash" /></button
+            >
+            <button class="remove btn text-success" on:click={(e) => deleteRejected(e, idx)}
+              ><FaIcon icon="multiply" /></button
+            >
+          {:else}
+            <button class="remove btn text-danger-emphasis" on:click={(e) => deleteRequested(e, idx)}
+              ><FaIcon icon="trash" /></button
+            >
+          {/if}
+        </div>
+
         <span class="label p-1">
-          {item.width}x{item.height}{item.unit}
+          {#if item.title}
+            {item.title}
+          {:else }
+            {item.width}x{item.height}{#if item.unit === "mm"}{$tr(
+                "params.label.mm",
+                "mm",
+              )}{:else if item.unit === "px"}{$tr("params.label.px", "px")}{/if}
+          {/if}
+
         </span>
       </div>
     </button>
   {/each}
+  <button class="btn p-0 card-wrapper d-flex justify-content-center align-items-center" on:click={onItemAdd}>
+      <div class="d-flex justify-content-center align-items-center">
+        <span class="p-1 fs-1" title={$tr("params.label.save_template", "Save template")}>
+          <FaIcon icon="circle-plus"/>
+        </span>
+      </div>
+    </button>
 </div>
 
 <style>
   .preset-browser {
     max-height: 200px;
     max-width: 100%;
+    min-height: 96px;
   }
 
   .card-wrapper {
@@ -55,7 +96,21 @@
 
   .card {
     background-color: white;
+    position: relative;
   }
+
+  .card > .remove {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .card > .remove > button {
+    padding: 0;
+    line-height: 100%;
+    width: 1em;
+  }
+
   .card > .label {
     background-color: rgba(255, 255, 255, 0.8);
     color: black;
