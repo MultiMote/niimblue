@@ -60,7 +60,6 @@ export const translation_zh_cn: Partial<Record<translationKeys, string>> = {
   "params.label.size": "尺寸",
   "params.label.mm": "毫米",
   "params.label.dpmm": "点/毫米",
-  "params.label.calc": "计算",
   "params.label.px": "像素",
   "params.label.direction": "出纸方向",
   "params.label.direction.left": "向左",

@@ -8,10 +8,12 @@ export interface LabelProps {
   printDirection: PrintDirection;
   size: { width: number; height: number };
 }
-export type LabelPreset = {
+export type LabelUnit = "mm" | "px";
+
+export interface LabelPreset {
   width: number;
   height: number;
-  unit: string;
+  unit: LabelUnit
   dpmm: number;
   printDirection: PrintDirection;
 };

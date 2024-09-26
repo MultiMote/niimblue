@@ -1,4 +1,4 @@
-import type { FabricJson, LabelProps, PreviewProps } from "../types";
+import type { FabricJson, LabelPreset, LabelProps, PreviewProps } from "../types";
 
 // todo: validation
 export class Persistence {
@@ -67,5 +67,13 @@ export class Persistence {
 
   static loadSavedPreviewProps(): PreviewProps {
     return this.loadObject("saved_preview_props") as PreviewProps;
+  }
+
+  static saveLabelPresets(presets: LabelPreset[])  {
+    this.saveObject("label_presets", presets);
+  }
+
+  static loadLabelPresets(): LabelPreset[] {
+    return this.loadObject("label_presets") as LabelPreset[];
   }
 }
