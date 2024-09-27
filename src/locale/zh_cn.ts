@@ -1,7 +1,7 @@
 import type { translationKeys } from ".";
 
 /** Simplified Chinese */
-export const translation_zh_cn: Record<translationKeys, string> = {
+export const translation_zh_cn: Partial<Record<translationKeys, string>> = {
   /* BrowserWarning */
   "browser_warning.lines.first": "哦豁，你的浏览器貌似不支持蓝牙和串口通讯",
   "browser_warning.lines.second": "但是你依然可以使用标签编辑功能",
