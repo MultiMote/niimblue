@@ -239,6 +239,36 @@
     ImageEditorUtils.addText(fabricCanvas, `{${name}}`, "left", "top");
   };
 
+  const onPaste = (event: ClipboardEvent) => {
+    const selected: fabric.Object[] = fabricCanvas.getActiveObjects();
+    for (const obj of selected) {
+      if ((obj instanceof fabric.IText && obj.isEditing) || obj instanceof QRCode) {
+        return;
+      }
+    }
+    if (event.clipboardData) {
+      console.debug(event.clipboardData)
+
+      // paste image
+      for (const item of event.clipboardData.items) {
+        if (item.type.indexOf("image") !== -1) {
+          const blob = item.getAsFile();
+          if (blob) {
+            ImageEditorUtils.addImageFile(fabricCanvas, blob);
+          }
+        }
+      }
+
+      // paste text
+      const text = event.clipboardData.getData("text");
+      if (text) {
+        ImageEditorUtils.addText(fabricCanvas, text);
+      }
+
+      event.preventDefault();
+    }
+  };
+
   onMount(() => {
     const csvSaved = Persistence.loadCsv();
     csvData = csvSaved.data;
@@ -316,7 +346,7 @@
   });
 </script>
 
-<svelte:window on:keydown={onKeyDown} />
+<svelte:window on:keydown={onKeyDown} on:paste={onPaste} />
 
 <div class="image-editor">
   <div class="row mb-1">
