@@ -1,9 +1,30 @@
 <script lang="ts">
   import { iconCodepoints, type MaterialIcon } from "../mdi_icons";
   export let icon: MaterialIcon;
-  export let rotate90: boolean = false;
 </script>
 
-<span class="material-icons{rotate90 ? 'r-90' : ''}">
+<span class="mdi">
   {String.fromCodePoint(iconCodepoints[icon])}
 </span>
+
+<style>
+  .mdi {
+    font-family: "Material Icons";
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+    font-size: 1.5em;
+    vertical-align: -0.24em;
+    /*vertical-align: middle;*/
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "liga";
+  }
+</style>
