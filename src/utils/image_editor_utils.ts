@@ -27,6 +27,7 @@ export class ImageEditorUtils {
     });
   }
 
+  // todo: return object
   public static addImageFile(canvas: fabric.Canvas, file: File) {
     const reader = new FileReader();
 
@@ -57,6 +58,7 @@ export class ImageEditorUtils {
     }
   }
 
+  // todo: return object
   static addImageWithFilePicker(fabricCanvas: fabric.Canvas) {
     const input: HTMLInputElement = document.createElement("input");
 
@@ -78,7 +80,7 @@ export class ImageEditorUtils {
     text?: string,
     xAlign?: "left" | "right" | "center",
     yAlign?: "top" | "bottom" | "center"
-  ): void {
+  ): fabric.IText {
     const obj = new fabric.IText(text ?? "Text", {
       ...this.OBJECT_DEFAULTS,
       fontFamily: "Noto Sans Variable",
@@ -89,9 +91,10 @@ export class ImageEditorUtils {
     });
     canvas.add(obj);
     obj.center();
+    return obj;
   }
 
-  public static addHLine(canvas: fabric.Canvas): void {
+  public static addHLine(canvas: fabric.Canvas): fabric.Line {
     const obj = new fabric.Line([10, 10, 10 + this.SIZE_DEFAULT, 10], {
       ...this.OBJECT_DEFAULTS,
       stroke: "#000",
@@ -107,9 +110,10 @@ export class ImageEditorUtils {
     });
     canvas.add(obj);
     obj.centerV();
+    return obj;
   }
 
-  public static addCircle(canvas: fabric.Canvas): void {
+  public static addCircle(canvas: fabric.Canvas): fabric.Circle {
     const obj = new fabric.Circle({
       ...this.OBJECT_DEFAULTS,
       radius: this.SIZE_DEFAULT / 2,
@@ -119,9 +123,10 @@ export class ImageEditorUtils {
     });
     canvas.add(obj);
     obj.centerV();
+    return obj;
   }
 
-  public static addRect(canvas: fabric.Canvas): void {
+  public static addRect(canvas: fabric.Canvas): fabric.Rect {
     const obj = new fabric.Rect({
       ...this.OBJECT_DEFAULTS,
       width: this.SIZE_DEFAULT,
@@ -132,9 +137,10 @@ export class ImageEditorUtils {
     });
     canvas.add(obj);
     obj.centerV();
+    return obj;
   }
 
-  public static addQrCode(canvas: fabric.Canvas): void {
+  public static addQrCode(canvas: fabric.Canvas): QRCode {
     const qr = new QRCode({
       text: "NiimBlue",
       top: this.OBJECT_DEFAULTS.top,
@@ -144,9 +150,10 @@ export class ImageEditorUtils {
       snapAngle: this.OBJECT_DEFAULTS.snapAngle,
     });
     canvas.add(qr);
+    return qr;
   }
 
-  public static addBarcode(canvas: fabric.Canvas): void {
+  public static addBarcode(canvas: fabric.Canvas): Barcode {
     const barcode = new Barcode({
       top: this.OBJECT_DEFAULTS.top,
       left: this.OBJECT_DEFAULTS.left,
@@ -154,26 +161,29 @@ export class ImageEditorUtils {
       width: (canvas.width ?? this.SIZE_DEFAULT) - this.OBJECT_DEFAULTS.left * 2,
       height: this.SIZE_DEFAULT,
       snapAngle: this.OBJECT_DEFAULTS.snapAngle,
-      encoding: "CODE128B"
+      encoding: "CODE128B",
     });
     canvas.add(barcode);
+    return barcode;
   }
 
-  public static addObject(canvas: fabric.Canvas, objType: OjectType): void {
-    if (objType === "text") {
-      this.addText(canvas);
-    } else if (objType === "line") {
-      this.addHLine(canvas);
-    } else if (objType === "circle") {
-      this.addCircle(canvas);
-    } else if (objType === "rectangle") {
-      this.addRect(canvas);
-    } else if (objType === "image") {
-      this.addImageWithFilePicker(canvas);
-    } else if (objType === "qrcode") {
-      this.addQrCode(canvas);
-    } else if (objType === "barcode") {
-      this.addBarcode(canvas);
+  public static addObject(canvas: fabric.Canvas, objType: OjectType): fabric.Object | undefined {
+    switch (objType) {
+      case "text":
+        return this.addText(canvas);
+      case "line":
+        return this.addHLine(canvas);
+      case "circle":
+        return this.addCircle(canvas);
+      case "rectangle":
+        return this.addRect(canvas);
+      case "image":
+        this.addImageWithFilePicker(canvas);
+        return;
+      case "qrcode":
+        return this.addQrCode(canvas);
+      case "barcode":
+        return this.addBarcode(canvas);
     }
   }
 }

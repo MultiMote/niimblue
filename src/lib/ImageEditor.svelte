@@ -191,7 +191,10 @@
   };
 
   const onObjectPicked = (objectType: OjectType) => {
-    ImageEditorUtils.addObject(fabricCanvas, objectType);
+    const obj = ImageEditorUtils.addObject(fabricCanvas, objectType);
+    if (obj !== undefined) {
+      fabricCanvas.setActiveObject(obj);
+    }
   };
 
   const onIconPicked = (i: IconName) => {
@@ -236,7 +239,8 @@
   };
 
   const onCsvPlaceholderPicked = (name: string) => {
-    ImageEditorUtils.addText(fabricCanvas, `{${name}}`, "left", "top");
+    const obj = ImageEditorUtils.addText(fabricCanvas, `{${name}}`, "left", "top");
+    fabricCanvas.setActiveObject(obj);
   };
 
   const onPaste = (event: ClipboardEvent) => {
@@ -260,7 +264,8 @@
       // paste text
       const text = event.clipboardData.getData("text");
       if (text) {
-        ImageEditorUtils.addText(fabricCanvas, text);
+        const obj = ImageEditorUtils.addText(fabricCanvas, text);
+        fabricCanvas.setActiveObject(obj);
       }
 
       event.preventDefault();
