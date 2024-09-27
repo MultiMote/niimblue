@@ -130,6 +130,11 @@
   resolved "https://registry.yarnpkg.com/@fontsource-variable/noto-sans/-/noto-sans-5.0.5.tgz#89e044227de4210bd62b4ab28ec9e688c78f1f03"
   integrity sha512-SVixgckO4DIgvFJ+vTRZEj8vTvjZceuGOhKMgnETItKELl1tHzk+ZFatSTCofPJ1zjhTwqvHrHkFeCbUGiqaRg==
 
+"@fontsource/material-icons@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@fontsource/material-icons/-/material-icons-5.1.0.tgz#84cec5fad3d91a5269d08d4d27a0c572311988fe"
+  integrity sha512-xqTEO5vcVl8saTAi3QBRpGot4pX9WkqR7lOp07NfHwizigIPUTWnCc9UNlotWs3Jt4TWI8GKomDn2HdK2GwOtw==
+
 "@fortawesome/fontawesome-common-types@6.5.2":
   version "6.5.2"
   resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-6.5.2.tgz#eaf2f5699f73cef198454ebc0c414e3688898179"

@@ -352,6 +352,13 @@
 <svelte:window on:keydown={onKeyDown} on:paste={onPaste} />
 
 <div class="image-editor">
+  <span class="material-icons">
+    add_card
+  </span>
+  <span class="material-icons">
+    &#xeb86;
+  </span>
+
   <div class="row mb-1">
     <div class="col d-flex justify-content-center">
       <div class="canvas-wrapper print-start-{labelProps.printDirection}">
