@@ -247,8 +247,6 @@
       }
     }
     if (event.clipboardData) {
-      console.debug(event.clipboardData)
-
       // paste image
       for (const item of event.clipboardData.items) {
         if (item.type.indexOf("image") !== -1) {
