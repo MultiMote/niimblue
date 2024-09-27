@@ -1,25 +1,48 @@
-const response = await fetch(
-  "https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/font/MaterialIcons-Regular.codepoints"
-);
-const iconsText = await response.text();
-const lines = iconsText.split("\n");
+import fs from "fs";
+import readline from "readline";
+const codepoints = {};
+const availableIcons = [];
 
-console.log("type IconListItem = Record<string, string>;");
+let fileStream = fs.createReadStream("node_modules/material-icons/css/_codepoints.scss");
+
+let rl = readline.createInterface({
+  input: fileStream,
+  crlfDelay: Infinity,
+});
+
+for await (const line of rl) {
+  const r = /^\s*"(\w+)": (\w+)/.exec(line);
+  if (r != null) {
+    codepoints[r[1]] = r[2];
+  }
+}
+fileStream.close();
+
+fileStream = fs.createReadStream("node_modules/material-icons/index.d.ts");
+
+rl = readline.createInterface({
+  input: fileStream,
+  crlfDelay: Infinity,
+});
+
+for await (const line of rl) {
+  const r = /^\s*"(\w+)"/.exec(line);
+  if (r != null) {
+    availableIcons.push(r[1]);
+  }
+}
+fileStream.close();
+
+console.log(`import { type MaterialIcon } from "material-icons"`);
+console.log("");
+console.log("type IconListItem = Record<MaterialIcon, number>;");
 console.log("");
 console.log("export const icons: IconListItem = {");
-let lastName = "";
-for (const line of lines) {
-  if (!line) {
-    continue;
+
+for (const icon of availableIcons) {
+  if (icon in codepoints) {
+    console.log(`  "${icon}": 0x${codepoints[icon]},`);
   }
-  const [name, codepoint] = line.split(" ");
-
-  if (name === lastName) {
-    continue;
-  }
-
-  console.log(`  "${name}": "${codepoint}",`);
-
-  lastName = name;
 }
+
 console.log("};");

@@ -23,6 +23,7 @@
   import VariableInsertControl from "./VariableInsertControl.svelte";
   import CsvControl from "./CsvControl.svelte";
   import { Persistence } from "../utils/persistence";
+  import { icons } from "../mdi_icons";
 
   let GRID_SIZE: number = 5;
 
@@ -357,6 +358,9 @@
   </span>
   <span class="material-icons">
     &#xeb86;
+  </span>
+  <span class="material-icons">
+    {String.fromCodePoint(icons["add_card"])}
   </span>
 
   <div class="row mb-1">
