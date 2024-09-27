@@ -3,18 +3,20 @@
   import FaIcon from "./FaIcon.svelte";
   import { type IconName } from "@fortawesome/fontawesome-svg-core";
   import { tr } from "../utils/i18n";
+  import type { MaterialIcon } from "material-icons";
+  import { icons } from "../mdi_icons";
 
   export let onSubmit: (i: IconName) => void;
 
-  let iconNames: IconName[] = [];
+  let iconNames: MaterialIcon[] = [];
   let search: string = "";
 
   onMount(async () => {
-    const { fas } = await import("@fortawesome/free-solid-svg-icons");
+    iconNames = Object.keys(icons) as MaterialIcon [];
 
-    iconNames = Object.values(fas)
-      .map((e) => e.iconName)
-      .filter((value, index, array) => array.indexOf(value) === index);
+    // iconNames = Object.values(fas)
+    //   .map((e) => e.iconName)
+    //   .filter((value, index, array) => array.indexOf(value) === index);
   });
 </script>
 
@@ -31,8 +33,11 @@
       <div class="icons">
         {#each iconNames as name}
           {#if !search || name.includes(search.toLowerCase())}
-            <button class="btn me-1" title={name} on:click={() => onSubmit(name)}>
-              <FaIcon icon={name} />
+            <button class="btn me-1" title={name}>
+              <!-- <FaIcon icon={name} /> -->
+              <span class="material-icons">
+                {String.fromCodePoint(icons[name])}
+              </span>
             </button>
           {/if}
         {/each}
