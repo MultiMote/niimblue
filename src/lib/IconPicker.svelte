@@ -34,7 +34,7 @@
         {/each}
       </div>
       <a href="https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Filled" target="_blank" class="text-secondary">
-        See detailed list here
+        {$tr("editor.iconpicker.mdi_link_title", "See detailed list here")}
       </a>
     </div>
   </div>

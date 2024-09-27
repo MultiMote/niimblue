@@ -57,6 +57,7 @@ export const translation_ru: Record<translationKeys, string> = {
   /* IconPicker */
   "editor.iconpicker.title": "Добавить иконку",
   "editor.iconpicker.search": "Поиск",
+  "editor.iconpicker.mdi_link_title": "Подробный список здесь",
   /* LabelPropsEditor */
   "params.csv.title": "Динамические данные (CSV)",
   "params.csv.tip": "Первая строка - заголовок. Он используется для имён переменных. В качестве разделителей используются запятые.",
