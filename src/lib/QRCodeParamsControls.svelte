@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { ChangeEventHandler } from "svelte/elements";
   import { QRCode, type ErrorCorrectionLevel } from "../fabric-object/qrcode.class";
-  import FaIcon from "./FaIcon.svelte";
   import { tr } from "../utils/i18n";
+  import MdIcon from "./MdIcon.svelte";
 
   export let selectedObject: fabric.Object | undefined;
   export let valueUpdated: () => void;
@@ -37,7 +37,7 @@
 
 {#if selectedQRCode}
   <div class="input-group input-group-sm flex-nowrap">
-    <span class="input-group-text" title={$tr("params.qrcode.ecl", "Error Correction Level")}><FaIcon icon="wand-magic-sparkles" /></span>
+    <span class="input-group-text" title={$tr("params.qrcode.ecl", "Error Correction Level")}><MdIcon icon="auto_fix_high" /></span>
     <select class="form-select" bind:value={ecl} on:change={eclChange}>
       <option value="L">Level L</option>
       <option value="M">Level M</option>

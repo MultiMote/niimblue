@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { LabelPreset } from "../types";
   import { tr } from "../utils/i18n";
-  import FaIcon from "./FaIcon.svelte";
+  import MdIcon from "./MdIcon.svelte";
 
   export let onItemSelected: (index: number) => void;
   export let onItemDelete: (index: number) => void;
@@ -47,14 +47,14 @@
         <div class="remove d-flex">
           {#if deleteIndex === idx}
             <button class="remove btn text-danger-emphasis" on:click={(e) => deleteConfirmed(e, idx)}
-              ><FaIcon icon="trash" /></button
+              ><MdIcon icon="delete"/></button
             >
             <button class="remove btn text-success" on:click={(e) => deleteRejected(e, idx)}
-              ><FaIcon icon="multiply" /></button
+              ><MdIcon icon="close" /></button
             >
           {:else}
             <button class="remove btn text-danger-emphasis" on:click={(e) => deleteRequested(e, idx)}
-              ><FaIcon icon="trash" /></button
+              ><MdIcon icon="delete"/></button
             >
           {/if}
         </div>
@@ -76,7 +76,7 @@
   <button class="btn p-0 card-wrapper d-flex justify-content-center align-items-center" on:click={onItemAdd}>
       <div class="d-flex justify-content-center align-items-center">
         <span class="p-1 fs-1" title={$tr("params.label.save_template", "Save template")}>
-          <FaIcon icon="circle-plus"/>
+          <MdIcon icon="add_circle"/>
         </span>
       </div>
     </button>
@@ -108,7 +108,6 @@
   .card > .remove > button {
     padding: 0;
     line-height: 100%;
-    width: 1em;
   }
 
   .card > .label {

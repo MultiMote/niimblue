@@ -2,6 +2,7 @@ import { fabric } from "fabric";
 import { QRCode } from "../fabric-object/qrcode.class";
 import Barcode from "../fabric-object/barcode.class";
 import type { OjectType } from "../types";
+import type { ITextOptions, TextOptions } from "fabric/fabric-impl";
 
 export class ImageEditorUtils {
   static readonly SIZE_DEFAULT: number = 64;
@@ -78,16 +79,35 @@ export class ImageEditorUtils {
   public static addText(
     canvas: fabric.Canvas,
     text?: string,
-    xAlign?: "left" | "right" | "center",
-    yAlign?: "top" | "bottom" | "center"
+    options?: ITextOptions
   ): fabric.IText {
     const obj = new fabric.IText(text ?? "Text", {
       ...this.OBJECT_DEFAULTS,
       fontFamily: "Noto Sans Variable",
-      textAlign: xAlign ?? "center",
-      originX: xAlign ?? "center",
-      originY: yAlign ?? "center",
+      textAlign: "center",
+      originX: "center",
+      originY: "center",
       lineHeight: 1,
+      ...options
+    });
+    canvas.add(obj);
+    obj.center();
+    return obj;
+  }
+
+  public static addStaticText(
+    canvas: fabric.Canvas,
+    text?: string,
+    options?: TextOptions
+  ): fabric.Text {
+    const obj = new fabric.Text(text ?? "Text", {
+      ...this.OBJECT_DEFAULTS,
+      fontFamily: "Noto Sans Variable",
+      textAlign: "center",
+      originX: "center",
+      originY: "center",
+      lineHeight: 1,
+      ...options
     });
     canvas.add(obj);
     obj.center();

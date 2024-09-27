@@ -22,9 +22,6 @@ export default defineConfig({
           fabric: ["fabric"],
         },
         chunkFileNames: (chunkInfo) => {
-          if (chunkInfo.facadeModuleId?.includes("@fortawesome")) {
-            return "assets/fa-icons.[hash].js";
-          }
           return "assets/[name].[hash].js";
         },
       },

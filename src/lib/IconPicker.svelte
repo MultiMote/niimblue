@@ -1,27 +1,23 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import FaIcon from "./FaIcon.svelte";
-  import { type IconName } from "@fortawesome/fontawesome-svg-core";
   import { tr } from "../utils/i18n";
+  import { iconCodepoints, type MaterialIcon } from "../mdi_icons";
+  import MdIcon from "./MdIcon.svelte";
 
-  export let onSubmit: (i: IconName) => void;
+  export let onSubmit: (i: MaterialIcon) => void;
 
-  let iconNames: IconName[] = [];
+  let iconNames: MaterialIcon[] = [];
   let search: string = "";
 
   onMount(async () => {
-    const { fas } = await import("@fortawesome/free-solid-svg-icons");
-
-    iconNames = Object.values(fas)
-      .map((e) => e.iconName)
-      .filter((value, index, array) => array.indexOf(value) === index);
+    iconNames = Object.keys(iconCodepoints) as MaterialIcon [];
   });
 </script>
 
 <div class="dropdown">
   <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-    <FaIcon icon="face-laugh" />
-    <FaIcon icon="plus" />
+    <MdIcon icon="emoji_emotions"/>
+    <MdIcon icon="add"/>
   </button>
 
   <div class="dropdown-menu">
@@ -32,11 +28,14 @@
         {#each iconNames as name}
           {#if !search || name.includes(search.toLowerCase())}
             <button class="btn me-1" title={name} on:click={() => onSubmit(name)}>
-              <FaIcon icon={name} />
+              <MdIcon icon={name}/>
             </button>
           {/if}
         {/each}
       </div>
+      <a href="https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Filled" target="_blank" class="text-secondary">
+        {$tr("editor.iconpicker.mdi_link_title", "See detailed list here")}
+      </a>
     </div>
   </div>
 </div>

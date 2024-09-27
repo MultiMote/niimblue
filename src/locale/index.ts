@@ -12,6 +12,7 @@ export type translationKeys =
   | "editor.export.json"
   | "editor.iconpicker.search"
   | "editor.iconpicker.title"
+  | "editor.iconpicker.mdi_link_title"
   | "editor.import.json"
   | "editor.import.zpl"
   | "editor.objectpicker.barcode"

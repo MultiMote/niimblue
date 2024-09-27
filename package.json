@@ -10,18 +10,18 @@
 		"build": "vite build",
 		"build-rel": "vite build --base=./",
 		"preview": "vite preview",
-		"sv-check": "svelte-check --tsconfig ./tsconfig.json"
+		"sv-check": "svelte-check --tsconfig ./tsconfig.json",
+		"gen-mdi-list": "node gen-mdi-list.mjs > src/mdi_icons.ts"
 	},
 	"dependencies": {
 		"@fontsource-variable/noto-sans": "^5.0.5",
-		"@fortawesome/fontawesome-svg-core": "^6.5.2",
-		"@fortawesome/free-solid-svg-icons": "^6.5.2",
 		"@mmote/niimbluelib": "0.0.1-alpha.0",
 		"@popperjs/core": "^2.11.8",
 		"bootstrap": "5.3.3",
 		"d3-dsv": "^3.0.1",
 		"dayjs": "^1.11.13",
 		"fabric": "5.4.0-browser",
+		"material-icons": "^1.13.12",
 		"qrcode-svg": "^1.1.0"
 	},
 	"devDependencies": {

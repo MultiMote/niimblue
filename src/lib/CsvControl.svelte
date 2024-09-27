@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { tr } from "../utils/i18n";
-  import FaIcon from "./FaIcon.svelte";
   import { csvParse } from "d3-dsv";
+  import MdIcon from "./MdIcon.svelte";
 
   export let enabled: boolean;
   export let csv: string;
@@ -32,7 +31,7 @@
     data-bs-auto-close="outside"
     title={$tr("params.csv.title", "Dynamic label data (CSV)")}
   >
-    <FaIcon icon="table-list" />
+    <MdIcon icon="dataset" />
   </button>
   <div class="dropdown-menu">
     <h6 class="dropdown-header">{$tr("params.csv.title", "Dynamic label data (CSV)")}</h6>

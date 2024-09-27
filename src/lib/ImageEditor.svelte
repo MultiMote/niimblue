@@ -4,9 +4,7 @@
   import type { LabelProps, OjectType, MoveDirection, FabricJson } from "../types";
   import LabelPropsEditor from "./LabelPropsEditor.svelte";
   import IconPicker from "./IconPicker.svelte";
-  import { type IconName, icon as faIcon, parse as faParse } from "@fortawesome/fontawesome-svg-core";
   import ObjectPicker from "./ObjectPicker.svelte";
-  import FaIcon from "./FaIcon.svelte";
   import PrintPreview from "./PrintPreview.svelte";
   import TextParamsPanel from "./TextParamsControls.svelte";
   import GenericObjectParamsControls from "./GenericObjectParamsControls.svelte";
@@ -23,6 +21,8 @@
   import VariableInsertControl from "./VariableInsertControl.svelte";
   import CsvControl from "./CsvControl.svelte";
   import { Persistence } from "../utils/persistence";
+  import { iconCodepoints, type MaterialIcon } from "../mdi_icons";
+  import MdIcon from "./MdIcon.svelte";
 
   let GRID_SIZE: number = 5;
 
@@ -197,15 +197,12 @@
     }
   };
 
-  const onIconPicked = (i: IconName) => {
-    const lookup = faParse.icon(i);
-    const iconData = faIcon(lookup);
-
-    if (iconData === undefined) {
-      console.error(`Icon ${i} not found`);
-      return;
-    }
-    ImageEditorUtils.addSvg(fabricCanvas, iconData.html.toString());
+  const onIconPicked = (i: MaterialIcon) => {
+    // todo: icon is not vertically centered
+    ImageEditorUtils.addStaticText(fabricCanvas, String.fromCodePoint(iconCodepoints[i]), {
+      fontFamily: "Material Icons",
+      fontSize: 100,
+    });
   };
 
   const onPreviewClosed = () => {
@@ -239,7 +236,11 @@
   };
 
   const onCsvPlaceholderPicked = (name: string) => {
-    const obj = ImageEditorUtils.addText(fabricCanvas, `{${name}}`, "left", "top");
+    const obj = ImageEditorUtils.addText(fabricCanvas, `{${name}}`, {
+      textAlign: "left",
+      originX: "left",
+      originY: "top"
+    });
     fabricCanvas.setActiveObject(obj);
   };
 
@@ -352,6 +353,7 @@
 <svelte:window on:keydown={onKeyDown} on:paste={onPaste} />
 
 <div class="image-editor">
+
   <div class="row mb-1">
     <div class="col d-flex justify-content-center">
       <div class="canvas-wrapper print-start-{labelProps.printDirection}">
@@ -373,7 +375,7 @@
         />
 
         <div class="btn-group btn-group-sm" role="group">
-          <button class="btn btn-secondary btn-sm" on:click={onSaveClicked}><FaIcon icon="floppy-disk" /></button>
+          <button class="btn btn-secondary btn-sm" on:click={onSaveClicked}><MdIcon icon="save"/></button>
 
           <button class="btn btn-secondary dropdown-toggle px-1" data-bs-toggle="dropdown"> </button>
           <div class="dropdown-menu px-2">
@@ -384,7 +386,7 @@
         </div>
 
         <div class="btn-group btn-group-sm" role="group">
-          <button class="btn btn-secondary btn-sm" on:click={onLoadClicked}><FaIcon icon="folder-open" /></button>
+          <button class="btn btn-secondary btn-sm" on:click={onLoadClicked}><MdIcon icon="folder" /></button>
           <button class="btn btn-secondary dropdown-toggle px-1" data-bs-toggle="dropdown" data-bs-auto-close="outside">
           </button>
           <div class="dropdown-menu px-2">
@@ -401,13 +403,13 @@
         <ObjectPicker onSubmit={onObjectPicked} />
 
         <button class="btn btn-sm btn-primary ms-1" on:click={openPreview}
-          ><FaIcon icon="eye" /> {$tr("editor.preview", "Preview")}</button
+          ><MdIcon icon="visibility"/> {$tr("editor.preview", "Preview")}</button
         >
         <button
           title="Print with default or saved parameters"
           class="btn btn-sm btn-primary ms-1"
           on:click={openPreviewAndPrint}
-          disabled={$connectionState !== "connected"}><FaIcon icon="print" /> {$tr("editor.print", "Print")}</button
+          disabled={$connectionState !== "connected"}><MdIcon icon="print" /> {$tr("editor.print", "Print")}</button
         >
       </div>
     </div>
@@ -418,13 +420,13 @@
       <div class="toolbar d-flex flex-wrap gap-1 justify-content-center align-items-center">
         {#if selectedCount > 0}
           <button class="btn btn-sm btn-danger me-1" on:click={deleteSelected} title={$tr("editor.delete", "Delete")}
-            ><FaIcon icon="trash" /></button
+            ><MdIcon icon="delete"/></button
           >
         {/if}
 
         {#if selectedObject && selectedCount === 1}
           <button class="btn btn-sm btn-secondary me-1" on:click={cloneSelected} title={$tr("editor.clone", "Clone")}
-            ><FaIcon icon="clone" /></button
+            ><MdIcon icon="content_copy"/></button
           >
           <GenericObjectParamsControls {selectedObject} valueUpdated={controlValueUpdated} />
         {/if}

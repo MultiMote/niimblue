@@ -13,12 +13,12 @@
     type PrintProgressEvent,
   } from "@mmote/niimbluelib";
   import type { LabelProps, PostProcessType, FabricJson, PreviewProps } from "../types";
-  import FaIcon from "./FaIcon.svelte";
   import ParamLockButton from "./ParamLockButton.svelte";
   import { tr, type translationKeys } from "../utils/i18n";
   import { canvasPreprocess } from "../utils/canvas_preprocess";
   import { type DSVRowArray, csvParse } from "d3-dsv";
   import { Persistence } from "../utils/persistence";
+  import MdIcon from "./MdIcon.svelte";
 
   export let onClosed: () => void;
   export let labelProps: LabelProps;
@@ -264,11 +264,11 @@
       <div class="modal-body text-center">
         <div class="d-flex justify-content-center">
           {#if pagesTotal > 1}<button disabled={printState !== "idle"} class="btn w-100 fs-1" on:click={pageDown}
-              ><FaIcon icon="angle-left" /></button
+              ><MdIcon icon="chevron_left" /></button
             >{/if}
           <canvas class="print-start-{labelProps.printDirection}" bind:this={previewCanvas}></canvas>
           {#if pagesTotal > 1}<button disabled={printState !== "idle"} class="btn w-100 fs-1" on:click={pageUp}
-              ><FaIcon icon="angle-right" /></button
+              ><MdIcon icon="chevron_right" /></button
             >{/if}
         </div>
         {#if pagesTotal > 1}<div>Page {page + 1} / {pagesTotal}</div>{/if}
@@ -437,7 +437,7 @@
           {#if $disconnected}
             {$tr("preview.not_connected", "Printer is not connected")}
           {:else}
-            <FaIcon icon="print" /> {$tr("preview.print", "Print")}
+            <MdIcon icon="print" /> {$tr("preview.print", "Print")}
           {/if}
         </button>
       </div>
