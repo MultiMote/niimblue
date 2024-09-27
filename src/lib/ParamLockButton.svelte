@@ -1,5 +1,5 @@
 <script lang="ts">
-  import FaIcon from "./FaIcon.svelte";
+  import MdIcon from "./MdIcon.svelte";
   export let propName: string;
   export let savedValue: any;
   export let value: any;
@@ -8,14 +8,10 @@
 
 <button class="btn btn-sm btn-outline-secondary param-lock-btn" on:click={() => onClick(propName, value)}>
   {#if savedValue }
-    <FaIcon icon="lock" params={{classes: "text-warning"}} />
+    <span class="text-warning">
+      <MdIcon icon="lock"/>
+    </span>
   {:else}
-    <FaIcon icon="lock-open" />
+    <MdIcon icon="lock_open" />
   {/if}
 </button>
-
-<style>
-  .param-lock-btn {
-    width: 35px;
-  }
-</style>

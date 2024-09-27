@@ -1,5 +1,4 @@
 <script lang="ts">
-  import FaIcon from "./FaIcon.svelte";
   import { type LabelPreset, type LabelProps, type LabelUnit } from "../types";
   import LabelPresetsBrowser from "./LabelPresetsBrowser.svelte";
   import { printerMeta } from "../stores";
@@ -8,6 +7,7 @@
   import { onMount } from "svelte";
   import { Persistence } from "../utils/persistence";
   import type { PrintDirection } from "@mmote/niimbluelib";
+  import MdIcon from "./MdIcon.svelte";
 
   export let labelProps: LabelProps;
   export let onChange: (newProps: LabelProps) => void;
@@ -147,7 +147,7 @@
 
 <div class="dropdown">
   <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-    <FaIcon icon="gear" />
+    <MdIcon icon="settings" />
   </button>
   <div class="dropdown-menu">
     <h6 class="dropdown-header">{$tr("params.label.dialog_title", "Label properties")}</h6>
@@ -175,7 +175,7 @@
       <div class="input-group flex-nowrap input-group-sm mb-3">
         <span class="input-group-text">{$tr("params.label.size", "Size")}</span>
         <input class="form-control" type="number" min="0" step={dpmm} bind:value={width} />
-        <button class="btn btn-sm btn-secondary" on:click={onFlip}><FaIcon icon="repeat" /></button>
+        <button class="btn btn-sm btn-secondary" on:click={onFlip}><MdIcon icon="swap_horiz" /></button>
         <input class="form-control" type="number" min="0" step={dpmm} bind:value={height} />
         <select class="form-select" bind:value={unit} on:change={onUnitChange}>
           <option value="mm"> {$tr("params.label.mm", "mm")}</option>

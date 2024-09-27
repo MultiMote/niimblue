@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { LabelProps } from "../types";
   import { FileUtils } from "../utils/file_utils";
-  import FaIcon from "./FaIcon.svelte";
+  import MdIcon from "./MdIcon.svelte";
 
   export let text: string;
   export let labelProps: LabelProps;
@@ -48,8 +48,10 @@
 <button class="btn btn-secondary btn-sm" on:click={onImportClicked}
   >{text}
   {#if state === "processing"}
-    <FaIcon icon="sync" params={{ classes: ["fa-spin"] }}></FaIcon>
+    <MdIcon icon="hourglass_top"/>
   {:else if state === "error"}
-    <FaIcon icon="warning" params={{ classes: ["text-warning"] }}></FaIcon>
+    <span class="text-warning">
+      <MdIcon icon="warning"/>
+    </span>
   {/if}
 </button>

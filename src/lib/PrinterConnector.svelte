@@ -2,8 +2,8 @@
   import { SoundSettingsItemType, type RfidInfo } from "@mmote/niimbluelib";
   import { printerClient, connectedPrinterName, connectionState, initClient, heartbeatData, printerInfo, printerMeta } from "../stores";
   import type { ConnectionType } from "../types";
-  import FaIcon from "./FaIcon.svelte";
   import { tr } from "../utils/i18n";
+  import MdIcon from "./MdIcon.svelte";
 
   let connectionType: ConnectionType = "bluetooth";
   let rfidInfo: RfidInfo|undefined = undefined;
@@ -55,7 +55,7 @@
 <div class="input-group flex-nowrap justify-content-end">
   {#if $connectionState === "connected"}
     <button class="btn btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside"
-      ><FaIcon icon="gear" />
+      ><MdIcon icon="settings" />
     </button>
     <div class="dropdown-menu p-1">
       <div>
@@ -101,13 +101,13 @@
 
   {#if $connectionState !== "connected"}
     <button class="btn btn-primary" disabled={$connectionState === "connecting"} on:click={onConnectClicked}>
-      <FaIcon icon="plug" />
+      <MdIcon icon="power" />
     </button>
   {/if}
 
   {#if $connectionState === "connected"}
     <button class="btn btn-danger" on:click={onDisconnectClicked}>
-      <FaIcon icon="plug-circle-xmark" />
+      <MdIcon icon="power_off" />
     </button>
   {/if}
 </div>

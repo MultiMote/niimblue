@@ -1,8 +1,8 @@
-import { type MaterialIcon } from "material-icons"
+import { type MaterialIcon } from "material-icons/index.d";
 
 type IconListItem = Record<MaterialIcon, number>;
 
-export const icons: IconListItem = {
+export const iconCodepoints: IconListItem = {
   "123": 0xeb8d,
   "360": 0xe577,
   "10k": 0xe951,
@@ -2126,3 +2126,5 @@ export const icons: IconListItem = {
   "zoom_out": 0xe900,
   "zoom_out_map": 0xe56b,
 };
+
+export { type MaterialIcon } from "material-icons/index.d";

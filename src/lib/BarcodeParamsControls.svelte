@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Barcode, type BarcodeCoding } from "../fabric-object/barcode.class";
   import { tr } from "../utils/i18n";
-  import FaIcon from "./FaIcon.svelte";
+  import MdIcon from "./MdIcon.svelte";
 
   export let selectedObject: fabric.Object | undefined;
   export let valueUpdated: () => void;
@@ -56,7 +56,7 @@
 
 {#if selectedBarcode}
   <div class="input-group input-group-sm flex-nowrap">
-    <span class="input-group-text" title={$tr("params.barcode.encoding", "Encoding")}><FaIcon icon="code" /></span>
+    <span class="input-group-text" title={$tr("params.barcode.encoding", "Encoding")}><MdIcon icon="code" /></span>
     <select class="form-select" bind:value={encoding} on:change={encodingChange}>
       <option value="EAN13">EAN13</option>
       <option value="CODE128B">Code128 B</option>
@@ -65,7 +65,7 @@
 
   <div class="input-group input-group-sm flex-nowrap">
     <span class="input-group-text" title={$tr("params.barcode.scale", "Scale factor")}>
-      <FaIcon icon="left-right" />
+      <MdIcon icon="settings_ethernet" />
     </span>
     <input class="barcode-width form-control" type="number" min="1" bind:value={scale} on:input={scaleChange} />
   </div>
@@ -79,14 +79,14 @@
   </button>
 
   <div class="input-group input-group-sm flex-nowrap">
-    <span class="input-group-text" title={$tr("params.barcode.font_size", "Font size")}><FaIcon icon="text-height" /></span
+    <span class="input-group-text" title={$tr("params.barcode.font_size", "Font size")}><MdIcon icon="format_size" /></span
     >
     <input class="barcode-width form-control" type="number" min="1" bind:value={fontSize} on:input={fontSizeChange} />
   </div>
 
   {#if encoding === "EAN13"}
     <div class="input-group input-group-sm flex-nowrap">
-      <span class="input-group-text" title={$tr("params.barcode.content", "Content")}><FaIcon icon="barcode" /></span>
+      <span class="input-group-text" title={$tr("params.barcode.content", "Content")}><MdIcon icon="view_week" /></span>
       <input class="barcode-content form-control" maxlength="12" bind:value={text} on:input={textChange} />
     </div>
   {:else}

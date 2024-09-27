@@ -1,41 +1,41 @@
 <script lang="ts">
-  import FaIcon from "./FaIcon.svelte";
   import { type OjectType } from "../types";
   import { tr } from "../utils/i18n";
+  import MdIcon from "./MdIcon.svelte";
 
   export let onSubmit: (i: OjectType) => void;
 </script>
 
 <div class="dropdown">
   <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-    <FaIcon icon="vector-square" />
-    <FaIcon icon="plus" />
+    <MdIcon icon="format_shapes"/>
+    <MdIcon icon="add"/>
   </button>
 
   <div class="dropdown-menu">
     <h6 class="dropdown-header">{$tr("editor.objectpicker.title", "Add object")}</h6>
     <div class="p-3">
       <button class="btn me-1" on:click={() => onSubmit("text")}>
-        <FaIcon icon="font" /> {$tr("editor.objectpicker.text", "Text")}
+        <MdIcon icon="title"/> {$tr("editor.objectpicker.text", "Text")}
       </button>
       <button class="btn me-1" on:click={() => onSubmit("line")}>
-        <FaIcon icon="minus" /> {$tr("editor.objectpicker.line", "Line")}
+        <MdIcon icon="remove"/> {$tr("editor.objectpicker.line", "Line")}
       </button>
       <button class="btn me-1" on:click={() => onSubmit("rectangle")}>
-        <FaIcon icon="vector-square" /> {$tr("editor.objectpicker.rectangle", "Rectangle")}
+        <MdIcon icon="crop_square"/> {$tr("editor.objectpicker.rectangle", "Rectangle")}
       </button>
       <button class="btn me-1" on:click={() => onSubmit("circle")}>
-        <FaIcon icon="circle-dot" /> {$tr("editor.objectpicker.circle", "Circle")}
+        <MdIcon icon="radio_button_unchecked"/> {$tr("editor.objectpicker.circle", "Circle")}
       </button>
 
       <button class="btn me-1" on:click={() => onSubmit("image")}>
-        <FaIcon icon="image" /> {$tr("editor.objectpicker.image", "Image")}
+        <MdIcon icon="image" /> {$tr("editor.objectpicker.image", "Image")}
       </button>
       <button class="btn me-1" on:click={() => onSubmit("qrcode")}>
-        <FaIcon icon="qrcode" /> {$tr("editor.objectpicker.qrcode", "QR Code")}
+        <MdIcon icon="qr_code_2" /> {$tr("editor.objectpicker.qrcode", "QR Code")}
       </button>
       <button class="btn me-1" on:click={() => onSubmit("barcode")}>
-        <FaIcon icon="barcode" /> {$tr("editor.objectpicker.barcode", "Barcode")}
+        <MdIcon icon="view_week" /> {$tr("editor.objectpicker.barcode", "Barcode")}
       </button>
     </div>
   </div>

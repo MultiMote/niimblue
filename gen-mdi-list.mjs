@@ -33,11 +33,11 @@ for await (const line of rl) {
 }
 fileStream.close();
 
-console.log(`import { type MaterialIcon } from "material-icons"`);
+console.log(`import { type MaterialIcon } from "material-icons/index.d";`);
 console.log("");
 console.log("type IconListItem = Record<MaterialIcon, number>;");
 console.log("");
-console.log("export const icons: IconListItem = {");
+console.log("export const iconCodepoints: IconListItem = {");
 
 for (const icon of availableIcons) {
   if (icon in codepoints) {
@@ -46,3 +46,5 @@ for (const icon of availableIcons) {
 }
 
 console.log("};");
+console.log("");
+console.log('export { type MaterialIcon } from "material-icons/index.d";');
