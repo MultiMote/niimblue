@@ -1,7 +1,7 @@
 import type { translationKeys } from ".";
 
 /** Simplified Chinese */
-export const translation_zh_cn: Partial<Record<translationKeys, string>> = {
+export const translation_zh_cn: Record<translationKeys, string> = {
   /* BrowserWarning */
   "browser_warning.lines.first": "哦豁，你的浏览器貌似不支持蓝牙和串口通讯",
   "browser_warning.lines.second": "但是你依然可以使用标签编辑功能",
@@ -53,15 +53,22 @@ export const translation_zh_cn: Partial<Record<translationKeys, string>> = {
   "params.generic.center.horizontal": "横向居中",
   "params.generic.center.vertical": "竖向居中",
   /* LabelPropsEditor */
-  "params.label.calc": "计算",
+  "params.label.apply": "应用",
+  "params.label.current": "当前设置：",
+  "params.label.dialog_title": "标签设置",
   "params.label.direction.left": "向左",
   "params.label.direction.top": "向上",
   "params.label.direction": "出纸方向",
   "params.label.dpmm": "点/毫米",
+  "params.label.head_density.help": "计算方法：DPI / 25.4",
+  "params.label.head_density": "像素密度",
+  "params.label.label_title": "自定义名称",
   "params.label.mm": "毫米",
   "params.label.px": "像素",
+  "params.label.save_template": "保存模版",
   "params.label.size": "尺寸",
-  "params.label.title": "标签属性",
+  "params.label.warning.direction": "根据你的打印机推荐使用：",
+  "params.label.warning.width": "标签宽度对于你的打印机来说可能太宽了：",
   /* QRCodeParamsControls */
   "params.qrcode.ecl": "误差校正级别",
   /* TextParamsControls */
