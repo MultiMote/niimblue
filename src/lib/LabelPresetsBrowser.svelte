@@ -5,7 +5,6 @@
 
   export let onItemSelected: (index: number) => void;
   export let onItemDelete: (index: number) => void;
-  export let onItemAdd: () => void;
   export let presets: LabelPreset[];
   let deleteIndex: number = -1;
 
@@ -73,13 +72,6 @@
       </div>
     </button>
   {/each}
-  <button class="btn p-0 card-wrapper d-flex justify-content-center align-items-center" on:click={onItemAdd}>
-      <div class="d-flex justify-content-center align-items-center">
-        <span class="p-1 fs-1" title={$tr("params.label.save_template", "Save template")}>
-          <MdIcon icon="add_circle"/>
-        </span>
-      </div>
-    </button>
 </div>
 
 <style>

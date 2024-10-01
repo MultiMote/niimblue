@@ -76,7 +76,7 @@ export const translation_ru: Record<translationKeys, string> = {
   "params.label.direction.top": "Сверху",
   "params.label.apply": "Применить",
   "params.label.current": "Текущие параметры:",
-  "params.label.save_template": "Сохранить шаблон",
+  "params.label.save_template": "Сохранить как шаблон",
   "params.label.head_density": "Плотность пикселей",
   "params.label.head_density.help": "Вычисление: DPI / 25.4",
   "params.label.warning.width": "Ширина этикетки слишком велика для принтера:",

@@ -210,7 +210,9 @@
         <input class="form-control" type="text" bind:value={title} />
       </div>
 
+
       <div class="text-end">
+        <button class="btn btn-sm btn-secondary" on:click={onLabelPresetAdd}>{$tr("params.label.save_template", "Save as template")}</button>
         <button class="btn btn-sm btn-primary" on:click={onApply}>{$tr("params.label.apply", "Apply")}</button>
       </div>
     </div>
