@@ -246,17 +246,11 @@
   });
 </script>
 
-<div
-  bind:this={modalElement}
-  class="modal fade"
-  id="exampleModal"
-  tabindex="-1"
-  aria-labelledby="exampleModalLabel"
-  aria-hidden="true">
+<div bind:this={modalElement} class="modal fade" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">{$tr("preview.title", "Print preview")}</h1>
+        <h1 class="modal-title fs-5">{$tr("preview.title", "Print preview")}</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
