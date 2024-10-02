@@ -3,7 +3,7 @@
   export let icon: MaterialIcon;
 </script>
 
-<span class="mdi">
+<span class="mdi {$$restProps.class || ''}">
   {String.fromCodePoint(iconCodepoints[icon])}
 </span>
 

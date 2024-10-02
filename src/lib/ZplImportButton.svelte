@@ -50,8 +50,6 @@
   {#if state === "processing"}
     <MdIcon icon="hourglass_top" />
   {:else if state === "error"}
-    <span class="text-warning">
-      <MdIcon icon="warning" />
-    </span>
+    <MdIcon icon="warning" class="text-warning" />
   {/if}
 </button>

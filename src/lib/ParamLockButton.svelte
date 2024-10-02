@@ -8,9 +8,7 @@
 
 <button class="btn btn-sm btn-outline-secondary param-lock-btn" on:click={() => onClick(propName, value)}>
   {#if savedValue}
-    <span class="text-warning">
-      <MdIcon icon="lock" />
-    </span>
+    <MdIcon icon="lock" class="text-warning" />
   {:else}
     <MdIcon icon="lock_open" />
   {/if}
