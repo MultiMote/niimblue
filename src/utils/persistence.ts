@@ -61,7 +61,7 @@ export class Persistence {
     return { labelData, canvasData };
   }
 
-  static savePreviewProps(props: PreviewProps)  {
+  static savePreviewProps(props: PreviewProps) {
     this.saveObject("saved_preview_props", props);
   }
 
@@ -69,7 +69,7 @@ export class Persistence {
     return this.loadObject("saved_preview_props") as PreviewProps;
   }
 
-  static saveLabelPresets(presets: LabelPreset[])  {
+  static saveLabelPresets(presets: LabelPreset[]) {
     this.saveObject("label_presets", presets);
   }
 

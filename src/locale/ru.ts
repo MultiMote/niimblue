@@ -60,7 +60,8 @@ export const translation_ru: Record<translationKeys, string> = {
   "editor.iconpicker.mdi_link_title": "Подробный список здесь",
   /* LabelPropsEditor */
   "params.csv.title": "Динамические данные (CSV)",
-  "params.csv.tip": "Первая строка - заголовок. Он используется для имён переменных. В качестве разделителей используются запятые.",
+  "params.csv.tip":
+    "Первая строка - заголовок. Он используется для имён переменных. В качестве разделителей используются запятые.",
   "params.csv.rowsfound": "Найдено строк c данными:",
   "params.csv.enabled": "Включить",
   "params.csv.placeholders": "Переменные:",
@@ -111,5 +112,5 @@ export const translation_ru: Record<translationKeys, string> = {
   "params.barcode.content": "Содержимое",
   "params.barcode.scale": "Масштаб",
   "params.barcode.font_size": "Размер шрифта",
-  "params.barcode.enable_caption": "Показывать надпись"
+  "params.barcode.enable_caption": "Показывать надпись",
 };

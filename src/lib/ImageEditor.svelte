@@ -239,7 +239,7 @@
     const obj = ImageEditorUtils.addText(fabricCanvas, `{${name}}`, {
       textAlign: "left",
       originX: "left",
-      originY: "top"
+      originY: "top",
     });
     fabricCanvas.setActiveObject(obj);
   };
@@ -353,7 +353,6 @@
 <svelte:window on:keydown={onKeyDown} on:paste={onPaste} />
 
 <div class="image-editor">
-
   <div class="row mb-1">
     <div class="col d-flex justify-content-center">
       <div class="canvas-wrapper print-start-{labelProps.printDirection}">
@@ -371,17 +370,16 @@
           csv={csvData}
           enabled={csvEnabled}
           onUpdate={onCsvUpdate}
-          onPlaceholderPicked={onCsvPlaceholderPicked}
-        />
+          onPlaceholderPicked={onCsvPlaceholderPicked} />
 
         <div class="btn-group btn-group-sm" role="group">
-          <button class="btn btn-secondary btn-sm" on:click={onSaveClicked}><MdIcon icon="save"/></button>
+          <button class="btn btn-secondary btn-sm" on:click={onSaveClicked}><MdIcon icon="save" /></button>
 
           <button class="btn btn-secondary dropdown-toggle px-1" data-bs-toggle="dropdown"> </button>
           <div class="dropdown-menu px-2">
-            <button class="btn btn-secondary btn-sm" on:click={onExportClicked}
-              >{$tr("editor.export.json", "Export JSON")}</button
-            >
+            <button class="btn btn-secondary btn-sm" on:click={onExportClicked}>
+              {$tr("editor.export.json", "Export JSON")}
+            </button>
           </div>
         </div>
 
@@ -391,9 +389,9 @@
           </button>
           <div class="dropdown-menu px-2">
             <div class="d-flex gap-1 flex-wrap">
-              <button class="btn btn-secondary btn-sm" on:click={onImportClicked}
-                >{$tr("editor.import.json", "Import JSON")}</button
-              >
+              <button class="btn btn-secondary btn-sm" on:click={onImportClicked}>
+                {$tr("editor.import.json", "Import JSON")}
+              </button>
               <ZplImportButton {labelProps} onImageReady={zplImageReady} text={$tr("editor.import.zpl", "Import ZPL")} />
             </div>
           </div>
@@ -402,15 +400,14 @@
         <IconPicker onSubmit={onIconPicked} />
         <ObjectPicker onSubmit={onObjectPicked} />
 
-        <button class="btn btn-sm btn-primary ms-1" on:click={openPreview}
-          ><MdIcon icon="visibility"/> {$tr("editor.preview", "Preview")}</button
-        >
+        <button class="btn btn-sm btn-primary ms-1" on:click={openPreview}>
+          <MdIcon icon="visibility" /> {$tr("editor.preview", "Preview")}
+        </button>
         <button
           title="Print with default or saved parameters"
           class="btn btn-sm btn-primary ms-1"
           on:click={openPreviewAndPrint}
-          disabled={$connectionState !== "connected"}><MdIcon icon="print" /> {$tr("editor.print", "Print")}</button
-        >
+          disabled={$connectionState !== "connected"}><MdIcon icon="print" /> {$tr("editor.print", "Print")}</button>
       </div>
     </div>
   </div>
@@ -419,15 +416,15 @@
     <div class="col d-flex justify-content-center">
       <div class="toolbar d-flex flex-wrap gap-1 justify-content-center align-items-center">
         {#if selectedCount > 0}
-          <button class="btn btn-sm btn-danger me-1" on:click={deleteSelected} title={$tr("editor.delete", "Delete")}
-            ><MdIcon icon="delete"/></button
-          >
+          <button class="btn btn-sm btn-danger me-1" on:click={deleteSelected} title={$tr("editor.delete", "Delete")}>
+            <MdIcon icon="delete" />
+          </button>
         {/if}
 
         {#if selectedObject && selectedCount === 1}
-          <button class="btn btn-sm btn-secondary me-1" on:click={cloneSelected} title={$tr("editor.clone", "Clone")}
-            ><MdIcon icon="content_copy"/></button
-          >
+          <button class="btn btn-sm btn-secondary me-1" on:click={cloneSelected} title={$tr("editor.clone", "Clone")}>
+            <MdIcon icon="content_copy" />
+          </button>
           <GenericObjectParamsControls {selectedObject} valueUpdated={controlValueUpdated} />
         {/if}
 
@@ -454,8 +451,7 @@
       {labelProps}
       {printNow}
       {csvEnabled}
-      {csvData}
-    />
+      {csvData} />
   {/if}
 </div>
 

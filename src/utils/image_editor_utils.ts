@@ -76,11 +76,7 @@ export class ImageEditorUtils {
     input.click();
   }
 
-  public static addText(
-    canvas: fabric.Canvas,
-    text?: string,
-    options?: ITextOptions
-  ): fabric.IText {
+  public static addText(canvas: fabric.Canvas, text?: string, options?: ITextOptions): fabric.IText {
     const obj = new fabric.IText(text ?? "Text", {
       ...this.OBJECT_DEFAULTS,
       fontFamily: "Noto Sans Variable",
@@ -88,18 +84,14 @@ export class ImageEditorUtils {
       originX: "center",
       originY: "center",
       lineHeight: 1,
-      ...options
+      ...options,
     });
     canvas.add(obj);
     obj.center();
     return obj;
   }
 
-  public static addStaticText(
-    canvas: fabric.Canvas,
-    text?: string,
-    options?: TextOptions
-  ): fabric.Text {
+  public static addStaticText(canvas: fabric.Canvas, text?: string, options?: TextOptions): fabric.Text {
     const obj = new fabric.Text(text ?? "Text", {
       ...this.OBJECT_DEFAULTS,
       fontFamily: "Noto Sans Variable",
@@ -107,7 +99,7 @@ export class ImageEditorUtils {
       originX: "center",
       originY: "center",
       lineHeight: 1,
-      ...options
+      ...options,
     });
     canvas.add(obj);
     obj.center();

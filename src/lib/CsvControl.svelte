@@ -29,8 +29,7 @@
     class="btn btn-sm btn-{enabled ? 'warning' : 'secondary'}"
     data-bs-toggle="dropdown"
     data-bs-auto-close="outside"
-    title={$tr("params.csv.title", "Dynamic label data (CSV)")}
-  >
+    title={$tr("params.csv.title", "Dynamic label data (CSV)")}>
     <MdIcon icon="dataset" />
   </button>
   <div class="dropdown-menu">
@@ -43,8 +42,7 @@
           role="switch"
           id="enabled"
           bind:checked={enabled}
-          on:change={onDataChanged}
-        />
+          on:change={onDataChanged} />
         <label class="form-check-label" for="enabled">{$tr("params.csv.enabled", "Enabled")}</label>
       </div>
 
@@ -60,8 +58,8 @@
       <div class="placeholders pt-1">
         {$tr("params.csv.placeholders", "Variables:")}
         {#each placeholders as p}
-          <button class="btn btn-sm btn-outline-info px-1 py-0" on:click={() => onPlaceholderPicked(p)}>{`{${p}}`}</button
-          >{" "}
+          <button class="btn btn-sm btn-outline-info px-1 py-0" on:click={() => onPlaceholderPicked(p)}>{`{${p}}`}</button>
+          {" "}
         {/each}
       </div>
     </div>

@@ -98,8 +98,7 @@ export type translationKeys =
   | "preview.print_task_version"
   | "preview.print"
   | "preview.threshold"
-  | "preview.title"
-;
+  | "preview.title";
 
 export type supportedLanguages = "en" | "ru" | "zh_cn";
 

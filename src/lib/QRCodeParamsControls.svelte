@@ -37,7 +37,9 @@
 
 {#if selectedQRCode}
   <div class="input-group input-group-sm flex-nowrap">
-    <span class="input-group-text" title={$tr("params.qrcode.ecl", "Error Correction Level")}><MdIcon icon="auto_fix_high" /></span>
+    <span class="input-group-text" title={$tr("params.qrcode.ecl", "Error Correction Level")}>
+      <MdIcon icon="auto_fix_high" />
+    </span>
     <select class="form-select" bind:value={ecl} on:change={eclChange}>
       <option value="L">Level L</option>
       <option value="M">Level M</option>

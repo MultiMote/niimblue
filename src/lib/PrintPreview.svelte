@@ -252,8 +252,7 @@
   id="exampleModal"
   tabindex="-1"
   aria-labelledby="exampleModalLabel"
-  aria-hidden="true"
->
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -263,13 +262,19 @@
 
       <div class="modal-body text-center">
         <div class="d-flex justify-content-center">
-          {#if pagesTotal > 1}<button disabled={printState !== "idle"} class="btn w-100 fs-1" on:click={pageDown}
-              ><MdIcon icon="chevron_left" /></button
-            >{/if}
+          {#if pagesTotal > 1}
+            <button disabled={printState !== "idle"} class="btn w-100 fs-1" on:click={pageDown}>
+              <MdIcon icon="chevron_left" />
+            </button>
+          {/if}
+
           <canvas class="print-start-{labelProps.printDirection}" bind:this={previewCanvas}></canvas>
-          {#if pagesTotal > 1}<button disabled={printState !== "idle"} class="btn w-100 fs-1" on:click={pageUp}
-              ><MdIcon icon="chevron_right" /></button
-            >{/if}
+
+          {#if pagesTotal > 1}
+            <button disabled={printState !== "idle"} class="btn w-100 fs-1" on:click={pageUp}>
+              <MdIcon icon="chevron_right" />
+            </button>
+          {/if}
         </div>
         {#if pagesTotal > 1}<div>Page {page + 1} / {pagesTotal}</div>{/if}
 
@@ -297,8 +302,7 @@
           <select
             class="form-select"
             bind:value={postProcessType}
-            on:change={() => updateSavedProp("postProcess", postProcessType, true)}
-          >
+            on:change={() => updateSavedProp("postProcess", postProcessType, true)}>
             <option value="threshold">{$tr("preview.postprocess.threshold", "Threshold")}</option>
             <option value="dither">{$tr("preview.postprocess.atkinson", "Dither (Atkinson)")}</option>
           </select>
@@ -307,8 +311,7 @@
             propName="postProcess"
             value={postProcessType}
             savedValue={savedProps.postProcess}
-            onClick={toggleSavedProp}
-          />
+            onClick={toggleSavedProp} />
         </div>
 
         <div class="input-group input-group-sm">
@@ -321,16 +324,14 @@
             min="1"
             max="255"
             bind:value={thresholdValue}
-            on:change={() => updateSavedProp("threshold", thresholdValue, true)}
-          />
+            on:change={() => updateSavedProp("threshold", thresholdValue, true)} />
           <span class="input-group-text">{thresholdValue}</span>
 
           <ParamLockButton
             propName="threshold"
             value={thresholdValue}
             savedValue={savedProps.threshold}
-            onClick={toggleSavedProp}
-          />
+            onClick={toggleSavedProp} />
         </div>
 
         <div class="input-group flex-nowrap input-group-sm">
@@ -340,14 +341,12 @@
             type="number"
             min="1"
             bind:value={quantity}
-            on:change={() => updateSavedProp("quantity", quantity)}
-          />
+            on:change={() => updateSavedProp("quantity", quantity)} />
           <ParamLockButton
             propName="quantity"
             value={quantity}
             savedValue={savedProps.quantity}
-            onClick={toggleSavedProp}
-          />
+            onClick={toggleSavedProp} />
         </div>
 
         <div class="input-group flex-nowrap input-group-sm">
@@ -358,8 +357,7 @@
             min={$printerMeta?.densityMin ?? 1}
             max={$printerMeta?.densityMax ?? 20}
             bind:value={density}
-            on:change={() => updateSavedProp("density", density)}
-          />
+            on:change={() => updateSavedProp("density", density)} />
           <ParamLockButton propName="density" value={density} savedValue={savedProps.density} onClick={toggleSavedProp} />
         </div>
 
@@ -380,8 +378,7 @@
             propName="labelType"
             value={labelType}
             savedValue={savedProps.labelType}
-            onClick={toggleSavedProp}
-          />
+            onClick={toggleSavedProp} />
         </div>
 
         <div class="input-group input-group-sm">
@@ -389,40 +386,31 @@
           <select
             class="form-select"
             bind:value={printTaskVersion}
-            on:change={() => updateSavedProp("printTaskVersion", printTaskVersion)}
-          >
-            <option value={PrintTaskVersion.V1} disabled
-              >{#if taskVer === PrintTaskVersion.V1}✔{/if} V1 - {$tr(
+            on:change={() => updateSavedProp("printTaskVersion", printTaskVersion)}>
+            <option value={PrintTaskVersion.V1} disabled>
+              {#if taskVer === PrintTaskVersion.V1}✔{/if} V1 - {$tr("preview.not_implemented", "NOT IMPLEMENTED")}
+            </option>
+            <option value={PrintTaskVersion.V2} disabled>
+              {#if taskVer === PrintTaskVersion.V2}✔{/if} V2 - {$tr(
                 "preview.not_implemented",
                 "NOT IMPLEMENTED",
-              )}</option
-            >
-            <option value={PrintTaskVersion.V2} disabled
-              >{#if taskVer === PrintTaskVersion.V2}✔{/if} V2 - {$tr(
-                "preview.not_implemented",
-                "NOT IMPLEMENTED",
-              )}</option
-            >
-            <option value={PrintTaskVersion.V3}
-              >{#if taskVer === PrintTaskVersion.V3}✔{/if} V3 - D110</option
-            >
-            <option value={PrintTaskVersion.V4}
-              >{#if taskVer === PrintTaskVersion.V4}✔{/if} V4 - B1</option
-            >
-            <option value={PrintTaskVersion.V5} disabled
-              >{#if taskVer === PrintTaskVersion.V5}✔{/if} V5 - {$tr(
-                "preview.not_implemented",
-                "NOT IMPLEMENTED",
-              )}</option
-            >
+              )}</option>
+            <option value={PrintTaskVersion.V3}>
+              {#if taskVer === PrintTaskVersion.V3}✔{/if} V3 - D110
+            </option>
+            <option value={PrintTaskVersion.V4}>
+              {#if taskVer === PrintTaskVersion.V4}✔{/if} V4 - B1
+            </option>
+            <option value={PrintTaskVersion.V5} disabled>
+              {#if taskVer === PrintTaskVersion.V5}✔{/if} V5 - {$tr("preview.not_implemented", "NOT IMPLEMENTED")}
+            </option>
           </select>
 
           <ParamLockButton
             propName="printTaskVersion"
             value={printTaskVersion}
             savedValue={savedProps.printTaskVersion}
-            onClick={toggleSavedProp}
-          />
+            onClick={toggleSavedProp} />
         </div>
 
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{$tr("preview.close", "Close")}</button>

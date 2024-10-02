@@ -1,12 +1,20 @@
 <script lang="ts">
   import { SoundSettingsItemType, type RfidInfo } from "@mmote/niimbluelib";
-  import { printerClient, connectedPrinterName, connectionState, initClient, heartbeatData, printerInfo, printerMeta } from "../stores";
+  import {
+    printerClient,
+    connectedPrinterName,
+    connectionState,
+    initClient,
+    heartbeatData,
+    printerInfo,
+    printerMeta,
+  } from "../stores";
   import type { ConnectionType } from "../types";
   import { tr } from "../utils/i18n";
   import MdIcon from "./MdIcon.svelte";
 
   let connectionType: ConnectionType = "bluetooth";
-  let rfidInfo: RfidInfo|undefined = undefined;
+  let rfidInfo: RfidInfo | undefined = undefined;
 
   const onConnectClicked = async () => {
     initClient(connectionType);
@@ -44,18 +52,18 @@
   };
 
   const fetchInfo = async () => {
-    await $printerClient.fetchPrinterInfo()
+    await $printerClient.fetchPrinterInfo();
   };
 
   const reset = async () => {
-    await $printerClient.abstraction.printerReset()
+    await $printerClient.abstraction.printerReset();
   };
 </script>
 
 <div class="input-group flex-nowrap justify-content-end">
   {#if $connectionState === "connected"}
-    <button class="btn btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside"
-      ><MdIcon icon="settings" />
+    <button class="btn btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+      <MdIcon icon="settings" />
     </button>
     <div class="dropdown-menu p-1">
       <div>
@@ -78,10 +86,7 @@
         <pre>{JSON.stringify($heartbeatData, null, 1)}</pre>
       </div>
 
-
-      <div>
-        Tests
-      </div>
+      <div>Tests</div>
 
       <button class="btn btn-sm btn-primary" on:click={getRfidInfo}>Rfid</button>
       <button class="btn btn-sm btn-primary" on:click={startHeartbeat}>Heartbeat on</button>

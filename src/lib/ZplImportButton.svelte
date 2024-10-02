@@ -25,11 +25,11 @@
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
-            "Accept": "image/png",
+            Accept: "image/png",
             "X-Quality": "bitonal",
           },
           body: contents,
-        }
+        },
       );
       if (response.ok) {
         const img = await response.blob();
@@ -45,13 +45,13 @@
   };
 </script>
 
-<button class="btn btn-secondary btn-sm" on:click={onImportClicked}
-  >{text}
+<button class="btn btn-secondary btn-sm" on:click={onImportClicked}>
+  {text}
   {#if state === "processing"}
-    <MdIcon icon="hourglass_top"/>
+    <MdIcon icon="hourglass_top" />
   {:else if state === "error"}
     <span class="text-warning">
-      <MdIcon icon="warning"/>
+      <MdIcon icon="warning" />
     </span>
   {/if}
 </button>

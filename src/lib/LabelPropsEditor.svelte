@@ -81,7 +81,7 @@
       unit,
       width,
       height,
-      title
+      title,
     };
     labelPresets = [...labelPresets, newPreset];
     Persistence.saveLabelPresets(labelPresets);
@@ -169,8 +169,7 @@
         presets={labelPresets}
         onItemSelected={onLabelPresetSelected}
         onItemDelete={onLabelPresetDelete}
-        onItemAdd={onLabelPresetAdd}
-      />
+        onItemAdd={onLabelPresetAdd} />
 
       <div class="input-group flex-nowrap input-group-sm mb-3">
         <span class="input-group-text">{$tr("params.label.size", "Size")}</span>
@@ -186,22 +185,22 @@
       <div class="input-group flex-nowrap input-group-sm mb-3">
         <span class="input-group-text">{$tr("params.label.head_density", "Pixel density")}</span>
         <input class="form-control" type="number" min="1" bind:value={dpmm} />
-        <span class="input-group-text cursor-help" title={$tr("params.label.head_density.help", "Calculation: DPI / 25.4")}
-          >{$tr("params.label.dpmm", "dpmm")}</span
-        >
+        <span class="input-group-text cursor-help" title={$tr("params.label.head_density.help", "Calculation: DPI / 25.4")}>
+          {$tr("params.label.dpmm", "dpmm")}
+        </span>
       </div>
 
       <div class="input-group flex-nowrap input-group-sm mb-3">
         <span class="input-group-text">{$tr("params.label.direction", "Print from")}</span>
         <select class="form-select" bind:value={printDirection}>
-          <option value="left"
-            >{#if $printerMeta?.printDirection === "left"}✔{/if}
-            {$tr("params.label.direction.left", "Left")}</option
-          >
-          <option value="top"
-            >{#if $printerMeta?.printDirection === "top"}✔{/if}
-            {$tr("params.label.direction.top", "Top")}</option
-          >
+          <option value="left">
+            {#if $printerMeta?.printDirection === "left"}✔{/if}
+            {$tr("params.label.direction.left", "Left")}
+          </option>
+          <option value="top">
+            {#if $printerMeta?.printDirection === "top"}✔{/if}
+            {$tr("params.label.direction.top", "Top")}
+          </option>
         </select>
       </div>
 
@@ -210,9 +209,10 @@
         <input class="form-control" type="text" bind:value={title} />
       </div>
 
-
       <div class="text-end">
-        <button class="btn btn-sm btn-secondary" on:click={onLabelPresetAdd}>{$tr("params.label.save_template", "Save as template")}</button>
+        <button class="btn btn-sm btn-secondary" on:click={onLabelPresetAdd}>
+          {$tr("params.label.save_template", "Save as template")}
+        </button>
         <button class="btn btn-sm btn-primary" on:click={onApply}>{$tr("params.label.apply", "Apply")}</button>
       </div>
     </div>

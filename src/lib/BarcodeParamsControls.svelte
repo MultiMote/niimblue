@@ -73,14 +73,14 @@
   <button
     class="btn btn-sm {printText ? 'btn-secondary' : ''}"
     title={$tr("params.barcode.enable_caption", "Enable caption")}
-    on:click={togglePrintText}
-  >
+    on:click={togglePrintText}>
     123
   </button>
 
   <div class="input-group input-group-sm flex-nowrap">
-    <span class="input-group-text" title={$tr("params.barcode.font_size", "Font size")}><MdIcon icon="format_size" /></span
-    >
+    <span class="input-group-text" title={$tr("params.barcode.font_size", "Font size")}>
+      <MdIcon icon="format_size" />
+    </span>
     <input class="barcode-width form-control" type="number" min="1" bind:value={fontSize} on:input={fontSizeChange} />
   </div>
 

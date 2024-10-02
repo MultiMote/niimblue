@@ -13,11 +13,11 @@ export type LabelUnit = "mm" | "px";
 export interface LabelPreset {
   width: number;
   height: number;
-  unit: LabelUnit
+  unit: LabelUnit;
   dpmm: number;
   printDirection: PrintDirection;
-  title?: string
-};
+  title?: string;
+}
 
 export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qrcode" | "barcode";
 
@@ -36,10 +36,10 @@ export type PostProcessType = "threshold" | "dither";
 export type MoveDirection = "Up" | "Down" | "Left" | "Right";
 
 export interface PreviewProps {
-  postProcess?: PostProcessType
-  threshold?: number
-  quantity?: number
-  density?: number
-  labelType?: LabelType
-  printTaskVersion?: PrintTaskVersion
-};
+  postProcess?: PostProcessType;
+  threshold?: number;
+  quantity?: number;
+  density?: number;
+  labelType?: LabelType;
+  printTaskVersion?: PrintTaskVersion;
+}

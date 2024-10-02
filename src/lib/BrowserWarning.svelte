@@ -10,7 +10,7 @@
   <div class="alert alert-danger" role="alert">
     <div>
       {$tr("browser_warning.lines.first", "Oh no, your browser does not support bluetooth and serial communications")}
-      <MdIcon icon="sentiment_very_dissatisfied"/>
+      <MdIcon icon="sentiment_very_dissatisfied" />
     </div>
     <div>
       {$tr("browser_warning.lines.second", "Anyway, you still can draw labels.")}

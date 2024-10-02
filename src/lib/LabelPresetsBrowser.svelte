@@ -37,37 +37,34 @@
   {#each presets as item, idx}
     <button
       class="btn p-0 card-wrapper d-flex justify-content-center align-items-center"
-      on:click={() => onItemSelected(idx)}
-    >
+      on:click={() => onItemSelected(idx)}>
       <div
         class="card print-start-{item.printDirection} d-flex justify-content-center align-items-center"
-        style="width: {scaleDimensions(item).width}%; height: {scaleDimensions(item).height}%;"
-      >
+        style="width: {scaleDimensions(item).width}%; height: {scaleDimensions(item).height}%;">
         <div class="remove d-flex">
           {#if deleteIndex === idx}
-            <button class="remove btn text-danger-emphasis" on:click={(e) => deleteConfirmed(e, idx)}
-              ><MdIcon icon="delete"/></button
-            >
-            <button class="remove btn text-success" on:click={(e) => deleteRejected(e, idx)}
-              ><MdIcon icon="close" /></button
-            >
+            <button class="remove btn text-danger-emphasis" on:click={(e) => deleteConfirmed(e, idx)}>
+              <MdIcon icon="delete" />
+            </button>
+            <button class="remove btn text-success" on:click={(e) => deleteRejected(e, idx)}>
+              <MdIcon icon="close" />
+            </button>
           {:else}
-            <button class="remove btn text-danger-emphasis" on:click={(e) => deleteRequested(e, idx)}
-              ><MdIcon icon="delete"/></button
-            >
+            <button class="remove btn text-danger-emphasis" on:click={(e) => deleteRequested(e, idx)}>
+              <MdIcon icon="delete" />
+            </button>
           {/if}
         </div>
 
         <span class="label p-1">
           {#if item.title}
             {item.title}
-          {:else }
+          {:else}
             {item.width}x{item.height}{#if item.unit === "mm"}{$tr(
                 "params.label.mm",
                 "mm",
               )}{:else if item.unit === "px"}{$tr("params.label.px", "px")}{/if}
           {/if}
-
         </span>
       </div>
     </button>

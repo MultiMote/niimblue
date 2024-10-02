@@ -22,7 +22,7 @@ export const connectedPrinterName = writable<string>("");
 export const printerClient = writable<NiimbotAbstractClient>();
 export const heartbeatData = writable<HeartbeatData>();
 export const printerInfo = writable<PrinterInfo>();
-export const printerMeta = writable<PrinterModelMeta|undefined>();
+export const printerMeta = writable<PrinterModelMeta | undefined>();
 
 export const initClient = (connectionType: ConnectionType) => {
   printerClient.update((prevClient: NiimbotAbstractClient) => {
@@ -51,7 +51,6 @@ export const initClient = (connectionType: ConnectionType) => {
       newClient.addEventListener("packetsent", (e: PacketSentEvent) => {
         console.log(`>> ${Utils.bufToHex(e.packet.toBytes())} (${RequestCommandId[e.packet.command]})`);
       });
-
 
       // newClient.addEventListener("rawpacketreceived", (e: RawPacketReceivedEvent) => {
       //   console.log(`<< ${Utils.bufToHex(e.data)}`);

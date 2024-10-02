@@ -34,15 +34,18 @@
 
   <div class="dropdown-menu px-2">
     <div class="d-flex gap-1 flex-wrap">
-      <button class="btn btn-secondary btn-sm" on:click={() => insertDateTime()}
-        ><MdIcon icon="calendar_today" /> {$tr("params.variables.insert.datetime", "Datetime")}</button
-      >
-      <button class="btn btn-secondary btn-sm" on:click={() => insertDateTime("YYYY-MM-DD")}
-        ><MdIcon icon="calendar_today" /> {$tr("params.variables.insert.date", "Date")}</button
-      >
-      <button class="btn btn-secondary btn-sm" on:click={() => insertDateTime("HH:mm:ss")}
-        ><MdIcon icon="schedule" /> {$tr("params.variables.insert.time", "Time")}</button
-      >
+      <button class="btn btn-secondary btn-sm" on:click={() => insertDateTime()}>
+        <MdIcon icon="calendar_today" />
+        {$tr("params.variables.insert.datetime", "Datetime")}
+      </button>
+      <button class="btn btn-secondary btn-sm" on:click={() => insertDateTime("YYYY-MM-DD")}>
+        <MdIcon icon="calendar_today" />
+        {$tr("params.variables.insert.date", "Date")}
+      </button>
+      <button class="btn btn-secondary btn-sm" on:click={() => insertDateTime("HH:mm:ss")}>
+        <MdIcon icon="schedule" />
+        {$tr("params.variables.insert.time", "Time")}
+      </button>
     </div>
   </div>
 </div>

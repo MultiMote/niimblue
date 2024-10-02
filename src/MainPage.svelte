@@ -40,9 +40,9 @@
   </div>
   <div>
     {#if __APP_COMMIT__}
-      <a class="text-secondary" href="https://github.com/MultiMote/niimblue/commit/{__APP_COMMIT__}"
-        >{__APP_COMMIT__.slice(0, 6)}</a
-      >
+      <a class="text-secondary" href="https://github.com/MultiMote/niimblue/commit/{__APP_COMMIT__}">
+        {__APP_COMMIT__.slice(0, 6)}
+      </a>
     {:else}
       v{__APP_VERSION__}
     {/if}
