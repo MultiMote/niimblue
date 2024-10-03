@@ -407,24 +407,36 @@
           onPlaceholderPicked={onCsvPlaceholderPicked} />
 
         <div class="btn-group btn-group-sm" role="group">
-          <button class="btn btn-secondary btn-sm" on:click={onSaveClicked}><MdIcon icon="save" /></button>
-
-          <button class="btn btn-secondary dropdown-toggle px-1" data-bs-toggle="dropdown"> </button>
+          <button class="btn btn-secondary dropdown-toggle px-1" data-bs-toggle="dropdown">
+            <MdIcon icon="save" />
+          </button>
           <div class="dropdown-menu px-2">
-            <button class="btn btn-secondary btn-sm" on:click={onExportClicked}>
-              {$tr("editor.export.json", "Export JSON")}
-            </button>
+            <div class="d-flex gap-1 flex-wrap">
+              <button class="btn btn-secondary btn-sm" on:click={onSaveClicked}>
+                <MdIcon icon="open_in_browser" />
+                {$tr("editor.save.browser", "Save (browser)")}
+              </button>
+              <button class="btn btn-secondary btn-sm" on:click={onExportClicked}>
+                <MdIcon icon="data_object" />
+                {$tr("editor.save.json", "Save (JSON)")}
+              </button>
+            </div>
           </div>
         </div>
 
         <div class="btn-group btn-group-sm" role="group">
-          <button class="btn btn-secondary btn-sm" on:click={onLoadClicked}><MdIcon icon="folder" /></button>
           <button class="btn btn-secondary dropdown-toggle px-1" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+            <MdIcon icon="folder" />
           </button>
           <div class="dropdown-menu px-2">
             <div class="d-flex gap-1 flex-wrap">
+              <button class="btn btn-secondary btn-sm" on:click={onLoadClicked}>
+                <MdIcon icon="open_in_browser" />
+                {$tr("editor.load.browser", "Load (browser)")}
+              </button>
               <button class="btn btn-secondary btn-sm" on:click={onImportClicked}>
-                {$tr("editor.import.json", "Import JSON")}
+                <MdIcon icon="data_object" />
+                {$tr("editor.load.json", "Load (JSON)")}
               </button>
               <ZplImportButton {labelProps} onImageReady={zplImageReady} text={$tr("editor.import.zpl", "Import ZPL")} />
             </div>

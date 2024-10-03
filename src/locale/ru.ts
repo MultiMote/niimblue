@@ -13,8 +13,10 @@ export const translation_ru: Record<translationKeys, string> = {
   "connector.serial": "Посл. порт (USB)",
   /* ImageEditor */
   "editor.default_text": "Текст",
-  "editor.export.json": "Экспорт JSON",
-  "editor.import.json": "Импорт JSON",
+  "editor.save.json": "Сохранить (JSON)",
+  "editor.save.browser": "Сохранить (браузер)",
+  "editor.load.json": "Загрузить (JSON)",
+  "editor.load.browser": "Загрузить (браузер)",
   "editor.import.zpl": "Импорт ZPL",
   "editor.preview": "Предпросмотр",
   "editor.print": "Печать",

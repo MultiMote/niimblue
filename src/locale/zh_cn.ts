@@ -13,12 +13,12 @@ export const translation_zh_cn: Partial<Record<translationKeys, string>> = {
   "editor.default_text": "文本",
   "editor.delete": "删除",
   /* ImageEditor Export */
-  "editor.export.json": "导出 JSON 文件",
+  "editor.save.json": "导出 JSON 文件",
   /* IconPicker */
   "editor.iconpicker.search": "搜索",
   "editor.iconpicker.title": "添加图标",
   /* ImageEditor Import */
-  "editor.import.json": "导入 JSON 文件",
+  "editor.load.json": "导入 JSON 文件",
   "editor.import.zpl": "导入 ZPL 文件",
   /* ObjectPicker */
   "editor.objectpicker.barcode": "条码",

@@ -46,6 +46,7 @@
 </script>
 
 <button class="btn btn-secondary btn-sm" on:click={onImportClicked}>
+  <MdIcon icon="receipt_long" />
   {text}
   {#if state === "processing"}
     <MdIcon icon="hourglass_top" />
