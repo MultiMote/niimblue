@@ -281,6 +281,12 @@
         return;
       }
     }
+
+    const openedDropdowns = document.querySelectorAll(".dropdown-menu.show");
+    if (openedDropdowns.length > 0) {
+      return;
+    }
+
     if (event.clipboardData) {
       // paste image
       for (const item of event.clipboardData.items) {
