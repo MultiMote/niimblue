@@ -2,6 +2,7 @@
   import { fabric } from "fabric";
   import { tr } from "../utils/i18n";
   import MdIcon from "./MdIcon.svelte";
+  import { Toasts } from "../utils/toasts";
 
   export let selectedObject: fabric.Object;
   export let valueUpdated: () => void;
@@ -71,7 +72,7 @@
       fontFamilies = [DEFAULT_FONT, ...new Set(fonts.map((f: FontData) => f.family))].sort();
       console.log(fontFamilies);
     } catch (e) {
-      alert(e);
+      Toasts.error(e);
     }
   };
 

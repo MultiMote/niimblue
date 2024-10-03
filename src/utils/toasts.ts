@@ -2,9 +2,9 @@ import Toastify from "toastify-js";
 import { z } from "zod";
 
 export class Toasts {
-  public static error(text: string) {
+  public static error(e: any) {
     Toastify({
-      text,
+      text: `${e}`,
       gravity: "bottom",
       duration: 5000,
       className: "toast-danger",

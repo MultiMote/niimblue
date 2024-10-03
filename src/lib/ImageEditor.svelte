@@ -179,7 +179,7 @@
       const { labelData, canvasData } = LocalStoragePersistence.loadSavedCanvas();
 
       if (labelData === null || canvasData === null) {
-        alert("No saved label data found, or data is corrupt");
+        Toasts.error("No saved label data found, or data is corrupt");
         return;
       }
 

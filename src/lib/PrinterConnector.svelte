@@ -12,6 +12,7 @@
   import type { ConnectionType } from "../types";
   import { tr } from "../utils/i18n";
   import MdIcon from "./MdIcon.svelte";
+  import { Toasts } from "../utils/toasts";
 
   let connectionType: ConnectionType = "bluetooth";
   let rfidInfo: RfidInfo | undefined = undefined;
@@ -24,7 +25,7 @@
       await $printerClient.connect();
     } catch (e) {
       connectionState.set("disconnected");
-      alert(e);
+      Toasts.error(e);
     }
   };
   const onDisconnectClicked = () => {
