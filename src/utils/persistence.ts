@@ -1,8 +1,12 @@
-import type { FabricJson, LabelPreset, LabelProps, PreviewProps } from "../types";
+import { FabricJsonSchema, LabelPresetSchema, LabelPropsSchema, PreviewPropsSchema, type FabricJson, type LabelPreset, type LabelProps, type PreviewProps } from "../types";
+import { z } from "zod";
 
-// todo: validation
-export class Persistence {
+export class LocalStoragePersistence {
   static saveObject(key: string, data: any) {
+    if (data == null || data == undefined) {
+      localStorage.removeItem(key);
+      return;
+    }
     localStorage.setItem(key, JSON.stringify(data));
   }
   static loadObject(key: string): any {
@@ -15,6 +19,29 @@ export class Persistence {
       }
     }
     return null;
+  }
+
+  /**
+   * @throws {z.ZodError}
+   */
+  static loadAndValidateObject<T>(key: string, schema: z.ZodType<T>) {
+    const data = this.loadObject(key);
+
+    if (data === null) {
+      return null;
+    }
+
+    return schema.parse(data);
+  }
+
+  static validateAndSaveObject<T>(key: string, data: any, schema: z.ZodType<T>): void {
+    if (data === null || data === undefined) {
+      this.saveObject(key, data);
+      return;
+    }
+
+    const obj = schema.parse(data);
+    this.saveObject(key, obj);
   }
 
   static saveCsv(data: string) {
@@ -35,45 +62,63 @@ export class Persistence {
     };
   }
 
+  /**
+   * @throws {z.ZodError}
+   */
   static loadLastLabelProps(): LabelProps | null {
-    const obj = this.loadObject("last_label_props");
-
-    if (obj != null) {
-      if ("size" in obj && "width" in obj.size && "height" in obj.size && ["top", "left"].includes(obj.printDirection)) {
-        return obj as LabelProps;
-      }
-    }
-    return null;
+    return this.loadAndValidateObject("last_label_props", LabelPropsSchema);
   }
 
+  /**
+   * @throws {z.ZodError}
+   */
   static saveLastLabelProps(labelData: LabelProps) {
-    this.saveObject("last_label_props", labelData);
+    this.validateAndSaveObject("last_label_props", labelData, LabelPropsSchema);
   }
 
+  /**
+   * @throws {z.ZodError}
+   */
   static saveCanvas(labelData: LabelProps, canvasData: FabricJson) {
-    this.saveObject("saved_canvas_props", labelData);
-    this.saveObject("saved_canvas_data", canvasData);
+    this.validateAndSaveObject("saved_canvas_props", labelData, LabelPropsSchema);
+    this.validateAndSaveObject("saved_canvas_data", canvasData, FabricJsonSchema);
   }
 
+  /**
+   * @throws {z.ZodError}
+   */
   static loadSavedCanvas(): { labelData: LabelProps | null; canvasData: FabricJson | null } {
-    const labelData = this.loadObject("saved_canvas_props");
-    const canvasData = this.loadObject("saved_canvas_data");
+    const labelData = this.loadAndValidateObject("saved_canvas_props", LabelPropsSchema);
+    const canvasData = this.loadAndValidateObject("saved_canvas_data", FabricJsonSchema);
     return { labelData, canvasData };
   }
 
+  /**
+   * @throws {z.ZodError}
+   */
   static savePreviewProps(props: PreviewProps) {
-    this.saveObject("saved_preview_props", props);
+    this.validateAndSaveObject("saved_preview_props", props, PreviewPropsSchema);
   }
 
-  static loadSavedPreviewProps(): PreviewProps {
-    return this.loadObject("saved_preview_props") as PreviewProps;
+  /**
+   * @throws {z.ZodError}
+   */
+  static loadSavedPreviewProps(): PreviewProps | null {
+    return this.loadAndValidateObject("saved_preview_props", PreviewPropsSchema);
   }
 
+  /**
+   * @throws {z.ZodError}
+   */
   static saveLabelPresets(presets: LabelPreset[]) {
-    this.saveObject("label_presets", presets);
+    this.validateAndSaveObject("label_presets", presets, z.array(LabelPresetSchema));
   }
 
-  static loadLabelPresets(): LabelPreset[] {
-    return this.loadObject("label_presets") as LabelPreset[];
+  /**
+   * @throws {z.ZodError}
+   */
+  static loadLabelPresets(): LabelPreset[] | null {
+    const presets = this.loadAndValidateObject("label_presets", z.array(LabelPresetSchema));
+    return presets === null || presets.length === 0 ? null : presets;
   }
 }

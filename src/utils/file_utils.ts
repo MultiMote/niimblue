@@ -1,14 +1,17 @@
 import type { fabric } from "fabric";
-import type { ExportedLabelTemplate, LabelProps } from "../types";
+import { ExportedLabelTemplateSchema, type ExportedLabelTemplate, type LabelProps } from "../types";
 
 export class FileUtils {
   /** Convert label template to JSON and download it */
   public static saveLabelAsJson(canvas: fabric.Canvas, labelProps: LabelProps) {
     const timestamp = Math.floor(Date.now() / 1000);
-    const label: ExportedLabelTemplate = {
+
+    const labelRaw: ExportedLabelTemplate = {
       canvas: canvas.toJSON(),
       label: labelProps,
     };
+    
+    const label = ExportedLabelTemplateSchema.parse(labelRaw);
     const json: string = JSON.stringify(label);
     const link = document.createElement("a");
     const file: Blob = new Blob([json], { type: "text/json" });

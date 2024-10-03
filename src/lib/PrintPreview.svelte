@@ -17,8 +17,9 @@
   import { tr, type translationKeys } from "../utils/i18n";
   import { canvasPreprocess } from "../utils/canvas_preprocess";
   import { type DSVRowArray, csvParse } from "d3-dsv";
-  import { Persistence } from "../utils/persistence";
+  import { LocalStoragePersistence } from "../utils/persistence";
   import MdIcon from "./MdIcon.svelte";
+  import { Toasts } from "../utils/toasts";
 
   export let onClosed: () => void;
   export let labelProps: LabelProps;
@@ -126,7 +127,11 @@
   const toggleSavedProp = (key: string, value: any) => {
     const keyObj = key as keyof typeof savedProps;
     savedProps[keyObj] = savedProps[keyObj] === undefined ? value : undefined;
-    Persistence.savePreviewProps(savedProps);
+    try {
+      LocalStoragePersistence.savePreviewProps(savedProps);
+    } catch (e) {
+      Toasts.zodErrors(e, "Preview parameters save error:");
+    }
   };
 
   const updateSavedProp = (key: string, value: any, refreshPreview: boolean = false) => {
@@ -134,7 +139,11 @@
 
     if (savedProps[keyObj] !== undefined) {
       savedProps[keyObj] = savedProps[keyObj] = value;
-      Persistence.savePreviewProps(savedProps);
+      try {
+        LocalStoragePersistence.savePreviewProps(savedProps);
+      } catch (e) {
+        Toasts.zodErrors(e, "Preview parameters save error:");
+      }
     }
 
     if (refreshPreview) {
@@ -143,18 +152,21 @@
   };
 
   const loadProps = () => {
-    const saved = Persistence.loadSavedPreviewProps();
-    if (saved === null) {
-      return;
+    try {
+      const saved = LocalStoragePersistence.loadSavedPreviewProps();
+      if (saved === null) {
+        return;
+      }
+      savedProps = saved;
+      if (saved.postProcess) postProcessType = saved.postProcess;
+      if (saved.threshold) thresholdValue = saved.threshold;
+      if (saved.quantity) quantity = saved.quantity;
+      if (saved.density) density = saved.density;
+      if (saved.labelType) labelType = saved.labelType;
+      if (saved.printTaskVersion) printTaskVersion = saved.printTaskVersion;
+    } catch (e) {
+      Toasts.zodErrors(e, "Preview parameters load error:");
     }
-
-    savedProps = saved;
-    if (saved.postProcess) postProcessType = saved.postProcess;
-    if (saved.threshold) thresholdValue = saved.threshold;
-    if (saved.quantity) quantity = saved.quantity;
-    if (saved.density) density = saved.density;
-    if (saved.labelType) labelType = saved.labelType;
-    if (saved.printTaskVersion) printTaskVersion = saved.printTaskVersion;
   };
 
   const pageDown = () => {

@@ -16,3 +16,9 @@
 body {
   font-family: "Noto Sans Variable", sans-serif;
 }
+
+.toastify.toast-danger {
+  background: var(--bs-danger-bg-subtle);
+  border: 1px solid var(--bs-danger-border-subtle);
+  color: var(--bs-danger-text-emphasis);
+}

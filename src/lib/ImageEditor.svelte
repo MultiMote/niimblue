@@ -1,7 +1,13 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { fabric } from "fabric";
-  import type { LabelProps, OjectType, MoveDirection, FabricJson } from "../types";
+  import {
+    type LabelProps,
+    type OjectType,
+    type MoveDirection,
+    type FabricJson,
+    ExportedLabelTemplateSchema,
+  } from "../types";
   import LabelPropsEditor from "./LabelPropsEditor.svelte";
   import IconPicker from "./IconPicker.svelte";
   import ObjectPicker from "./ObjectPicker.svelte";
@@ -20,9 +26,10 @@
   import { tr } from "../utils/i18n";
   import VariableInsertControl from "./VariableInsertControl.svelte";
   import CsvControl from "./CsvControl.svelte";
-  import { Persistence } from "../utils/persistence";
+  import { LocalStoragePersistence } from "../utils/persistence";
   import { iconCodepoints, type MaterialIcon } from "../mdi_icons";
   import MdIcon from "./MdIcon.svelte";
+  import { Toasts } from "../utils/toasts";
 
   let GRID_SIZE: number = 5;
 
@@ -109,40 +116,58 @@
   const onUpdateLabelProps = (newProps: LabelProps) => {
     labelProps = newProps;
     fabricCanvas.setDimensions(labelProps.size);
-    Persistence.saveLastLabelProps(labelProps);
+    try {
+      LocalStoragePersistence.saveLastLabelProps(labelProps);
+    } catch (e) {
+      Toasts.zodErrors(e, "Label parameters save error:");
+    }
   };
 
   const onSaveClicked = () => {
     if (confirm($tr("editor.warning.save", "Saved data wil be overwritten. Save?"))) {
-      Persistence.saveCanvas(labelProps, fabricCanvas.toJSON());
+      try {
+        LocalStoragePersistence.saveCanvas(labelProps, fabricCanvas.toJSON());
+      } catch (e) {
+        Toasts.zodErrors(e, "Canvas save error:");
+      }
     }
   };
 
   const onExportClicked = () => {
-    FileUtils.saveLabelAsJson(fabricCanvas, labelProps);
+    try {
+      FileUtils.saveLabelAsJson(fabricCanvas, labelProps);
+    } catch (e) {
+      Toasts.zodErrors(e, "Canvas save error:");
+    }
   };
 
   const onImportClicked = async () => {
     const contents = await FileUtils.pickAndReadTextFile("json");
-    const data = JSON.parse(contents);
+    const rawData = JSON.parse(contents);
 
     if (!confirm($tr("editor.warning.load", "Canvas wil be replaced with saved data"))) {
       return;
     }
 
-    // todo: validation and merge with  onLoadClicked
-    labelProps = data.label;
-    onUpdateLabelProps(labelProps);
+    try {
+      const data = ExportedLabelTemplateSchema.parse(rawData);
 
-    fabricCanvas.loadFromJSON(
-      data.canvas,
-      () => {
-        fabricCanvas.requestRenderAll();
-      },
-      (src: object, obj: fabric.Object, error: any) => {
-        obj.set({ snapAngle: 10 });
-      },
-    );
+      labelProps = data.label;
+      onUpdateLabelProps(labelProps);
+
+      fabricCanvas.loadFromJSON(
+        data.canvas,
+        () => {
+          fabricCanvas.backgroundColor = "#fff";
+          fabricCanvas.requestRenderAll();
+        },
+        (src: object, obj: fabric.Object, error: any) => {
+          obj.set({ snapAngle: 10 });
+        },
+      );
+    } catch (e) {
+      Toasts.zodErrors(e, "Canvas load error:");
+    }
   };
 
   const onLoadClicked = () => {
@@ -150,26 +175,31 @@
       return;
     }
 
-    const { labelData, canvasData } = Persistence.loadSavedCanvas();
+    try {
+      const { labelData, canvasData } = LocalStoragePersistence.loadSavedCanvas();
 
-    if (labelData === null || canvasData === null) {
-      alert("No saved label data found, or data is corrupt");
-      return;
+      if (labelData === null || canvasData === null) {
+        alert("No saved label data found, or data is corrupt");
+        return;
+      }
+
+      labelProps = labelData;
+      onUpdateLabelProps(labelProps);
+
+      fabricCanvas.loadFromJSON(
+        canvasData,
+        () => {
+          fabricCanvas.backgroundColor = "#fff";
+          fabricCanvas.requestRenderAll();
+        },
+        (src: object, obj: fabric.Object, error: any) => {
+          obj.set({ snapAngle: 10 });
+          // console.log(error);
+        },
+      );
+    } catch (e) {
+      Toasts.zodErrors(e, "Canvas load error:");
     }
-
-    labelProps = labelData;
-    onUpdateLabelProps(labelProps);
-
-    fabricCanvas.loadFromJSON(
-      canvasData,
-      () => {
-        fabricCanvas.requestRenderAll();
-      },
-      (src: object, obj: fabric.Object, error: any) => {
-        obj.set({ snapAngle: 10 });
-        // console.log(error);
-      },
-    );
   };
 
   const zplImageReady = (img: Blob) => {
@@ -232,7 +262,7 @@
   const onCsvUpdate = (enabled: boolean, csv: string) => {
     csvData = csv;
     csvEnabled = enabled;
-    Persistence.saveCsv(csvData);
+    LocalStoragePersistence.saveCsv(csvData);
   };
 
   const onCsvPlaceholderPicked = (name: string) => {
@@ -274,12 +304,16 @@
   };
 
   onMount(() => {
-    const csvSaved = Persistence.loadCsv();
+    const csvSaved = LocalStoragePersistence.loadCsv();
     csvData = csvSaved.data;
 
-    const savedLabelProps = Persistence.loadLastLabelProps();
-    if (savedLabelProps !== null) {
-      labelProps = savedLabelProps;
+    try {
+      const savedLabelProps = LocalStoragePersistence.loadLastLabelProps();
+      if (savedLabelProps !== null) {
+        labelProps = savedLabelProps;
+      }
+    } catch (e) {
+      Toasts.zodErrors(e, "Label parameters load error:");
     }
 
     fabric.disableStyleCopyPaste = true;
@@ -401,7 +435,8 @@
         <ObjectPicker onSubmit={onObjectPicked} />
 
         <button class="btn btn-sm btn-primary ms-1" on:click={openPreview}>
-          <MdIcon icon="visibility" /> {$tr("editor.preview", "Preview")}
+          <MdIcon icon="visibility" />
+          {$tr("editor.preview", "Preview")}
         </button>
         <button
           title="Print with default or saved parameters"

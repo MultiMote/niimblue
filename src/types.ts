@@ -1,45 +1,57 @@
-import type { LabelType, PrintDirection, PrintTaskVersion } from "@mmote/niimbluelib";
+import { LabelType, PrintTaskVersion } from "@mmote/niimbluelib";
 import { fabric } from "fabric";
+import { z } from "zod";
 
 export type ConnectionState = "connecting" | "connected" | "disconnected";
 export type ConnectionType = "bluetooth" | "serial";
-
-export interface LabelProps {
-  printDirection: PrintDirection;
-  size: { width: number; height: number };
-}
 export type LabelUnit = "mm" | "px";
-
-export interface LabelPreset {
-  width: number;
-  height: number;
-  unit: LabelUnit;
-  dpmm: number;
-  printDirection: PrintDirection;
-  title?: string;
-}
-
 export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qrcode" | "barcode";
-
-export interface FabricJson {
-  version: string;
-  objects: fabric.Object[];
-}
-
-export interface ExportedLabelTemplate {
-  canvas: FabricJson;
-  label: LabelProps;
-}
-
 export type PostProcessType = "threshold" | "dither";
-
 export type MoveDirection = "Up" | "Down" | "Left" | "Right";
 
-export interface PreviewProps {
-  postProcess?: PostProcessType;
-  threshold?: number;
-  quantity?: number;
-  density?: number;
-  labelType?: LabelType;
-  printTaskVersion?: PrintTaskVersion;
-}
+/** Not validated */
+export const FabricObjectSchema = z.custom<fabric.Object>((val: any): boolean => {
+  return typeof val === "object";
+});
+
+export const LabelPropsSchema = z.object({
+  printDirection: z.enum(["left", "top"]),
+  size: z.object({
+    width: z.number().positive(),
+    height: z.number().positive(),
+  }),
+});
+
+export const LabelPresetSchema = z.object({
+  width: z.number().positive(),
+  height: z.number().positive(),
+  unit: z.enum(["mm", "px"]),
+  dpmm: z.number().positive(),
+  printDirection: z.enum(["left", "top"]),
+  title: z.string().optional(),
+});
+
+export const FabricJsonSchema = z.object({
+  version: z.string(),
+  objects: z.array(FabricObjectSchema),
+});
+
+export const ExportedLabelTemplateSchema = z.object({
+  canvas: FabricJsonSchema,
+  label: LabelPropsSchema,
+});
+
+export const PreviewPropsSchema = z.object({
+  postProcess: z.enum(["threshold", "dither"]).optional(),
+  threshold: z.number().gte(1).lte(255).optional(),
+  quantity: z.number().gte(1).optional(),
+  density: z.number().gte(1).optional(),
+  labelType: z.nativeEnum(LabelType).optional(),
+  printTaskVersion: z.nativeEnum(PrintTaskVersion).optional(),
+});
+
+export type LabelProps = z.infer<typeof LabelPropsSchema>;
+export type LabelPreset = z.infer<typeof LabelPresetSchema>;
+export type FabricJson = z.infer<typeof FabricJsonSchema>;
+export type ExportedLabelTemplate = z.infer<typeof ExportedLabelTemplateSchema>;
+export type PreviewProps = z.infer<typeof PreviewPropsSchema>;

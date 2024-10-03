@@ -5,9 +5,10 @@
   import { tr } from "../utils/i18n";
   import { DEFAULT_LABEL_PRESETS } from "../defaults";
   import { onMount } from "svelte";
-  import { Persistence } from "../utils/persistence";
+  import { LocalStoragePersistence } from "../utils/persistence";
   import type { PrintDirection } from "@mmote/niimbluelib";
   import MdIcon from "./MdIcon.svelte";
+  import { Toasts } from "../utils/toasts";
 
   export let labelProps: LabelProps;
   export let onChange: (newProps: LabelProps) => void;
@@ -71,7 +72,7 @@
     const result = [...labelPresets];
     result.splice(idx, 1);
     labelPresets = result;
-    Persistence.saveLabelPresets(labelPresets);
+    LocalStoragePersistence.saveLabelPresets(labelPresets);
   };
 
   const onLabelPresetAdd = () => {
@@ -83,8 +84,13 @@
       height,
       title,
     };
-    labelPresets = [...labelPresets, newPreset];
-    Persistence.saveLabelPresets(labelPresets);
+    const newPresets = [...labelPresets, newPreset];
+    try {
+      LocalStoragePersistence.saveLabelPresets(newPresets);
+      labelPresets = newPresets;
+    } catch (e) {
+      Toasts.zodErrors(e, "Presets save error:");
+    }
   };
 
   const onFlip = () => {
@@ -136,9 +142,13 @@
     unit = defaultPreset.unit;
     printDirection = defaultPreset.printDirection;
 
-    const savedPresets: LabelPreset[] = Persistence.loadLabelPresets();
-    if (savedPresets !== null && Array.isArray(savedPresets) && savedPresets.length !== 0) {
-      labelPresets = savedPresets;
+    try {
+      const savedPresets: LabelPreset[] | null = LocalStoragePersistence.loadLabelPresets();
+      if (savedPresets !== null) {
+        labelPresets = savedPresets;
+      }
+    } catch (e) {
+      Toasts.zodErrors(e, "Presets load error:");
     }
   });
 
@@ -173,9 +183,9 @@
 
       <div class="input-group flex-nowrap input-group-sm mb-3">
         <span class="input-group-text">{$tr("params.label.size", "Size")}</span>
-        <input class="form-control" type="number" min="0" step={dpmm} bind:value={width} />
+        <input class="form-control" type="number" min="1" step={dpmm} bind:value={width} />
         <button class="btn btn-sm btn-secondary" on:click={onFlip}><MdIcon icon="swap_horiz" /></button>
-        <input class="form-control" type="number" min="0" step={dpmm} bind:value={height} />
+        <input class="form-control" type="number" min="1" step={dpmm} bind:value={height} />
         <select class="form-select" bind:value={unit} on:change={onUnitChange}>
           <option value="mm"> {$tr("params.label.mm", "mm")}</option>
           <option value="px"> {$tr("params.label.px", "px")}</option>
@@ -185,7 +195,9 @@
       <div class="input-group flex-nowrap input-group-sm mb-3">
         <span class="input-group-text">{$tr("params.label.head_density", "Pixel density")}</span>
         <input class="form-control" type="number" min="1" bind:value={dpmm} />
-        <span class="input-group-text cursor-help" title={$tr("params.label.head_density.help", "Calculation: DPI / 25.4")}>
+        <span
+          class="input-group-text cursor-help"
+          title={$tr("params.label.head_density.help", "Calculation: DPI / 25.4")}>
           {$tr("params.label.dpmm", "dpmm")}
         </span>
       </div>
