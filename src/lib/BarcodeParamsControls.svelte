@@ -56,7 +56,7 @@
 
 {#if selectedBarcode}
   <div class="input-group input-group-sm flex-nowrap">
-    <span class="input-group-text" title={$tr("params.barcode.encoding", "Encoding")}><MdIcon icon="code" /></span>
+    <span class="input-group-text" title={$tr("params.barcode.encoding")}><MdIcon icon="code" /></span>
     <select class="form-select" bind:value={encoding} on:change={encodingChange}>
       <option value="EAN13">EAN13</option>
       <option value="CODE128B">Code128 B</option>
@@ -64,7 +64,7 @@
   </div>
 
   <div class="input-group input-group-sm flex-nowrap">
-    <span class="input-group-text" title={$tr("params.barcode.scale", "Scale factor")}>
+    <span class="input-group-text" title={$tr("params.barcode.scale")}>
       <MdIcon icon="settings_ethernet" />
     </span>
     <input class="barcode-width form-control" type="number" min="1" bind:value={scale} on:input={scaleChange} />
@@ -72,13 +72,13 @@
 
   <button
     class="btn btn-sm {printText ? 'btn-secondary' : ''}"
-    title={$tr("params.barcode.enable_caption", "Enable caption")}
+    title={$tr("params.barcode.enable_caption")}
     on:click={togglePrintText}>
     123
   </button>
 
   <div class="input-group input-group-sm flex-nowrap">
-    <span class="input-group-text" title={$tr("params.barcode.font_size", "Font size")}>
+    <span class="input-group-text" title={$tr("params.barcode.font_size")}>
       <MdIcon icon="format_size" />
     </span>
     <input class="barcode-width form-control" type="number" min="1" bind:value={fontSize} on:input={fontSizeChange} />
@@ -86,7 +86,7 @@
 
   {#if encoding === "EAN13"}
     <div class="input-group input-group-sm flex-nowrap">
-      <span class="input-group-text" title={$tr("params.barcode.content", "Content")}><MdIcon icon="view_week" /></span>
+      <span class="input-group-text" title={$tr("params.barcode.content")}><MdIcon icon="view_week" /></span>
       <input class="barcode-content form-control" maxlength="12" bind:value={text} on:input={textChange} />
     </div>
   {:else}

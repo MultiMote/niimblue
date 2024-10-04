@@ -13,36 +13,36 @@
   </button>
 
   <div class="dropdown-menu">
-    <h6 class="dropdown-header">{$tr("editor.objectpicker.title", "Add object")}</h6>
+    <h6 class="dropdown-header">{$tr("editor.objectpicker.title")}</h6>
     <div class="p-3">
       <button class="btn me-1" on:click={() => onSubmit("text")}>
         <MdIcon icon="title" />
-        {$tr("editor.objectpicker.text", "Text")}
+        {$tr("editor.objectpicker.text")}
       </button>
       <button class="btn me-1" on:click={() => onSubmit("line")}>
         <MdIcon icon="remove" />
-        {$tr("editor.objectpicker.line", "Line")}
+        {$tr("editor.objectpicker.line")}
       </button>
       <button class="btn me-1" on:click={() => onSubmit("rectangle")}>
         <MdIcon icon="crop_square" />
-        {$tr("editor.objectpicker.rectangle", "Rectangle")}
+        {$tr("editor.objectpicker.rectangle")}
       </button>
       <button class="btn me-1" on:click={() => onSubmit("circle")}>
         <MdIcon icon="radio_button_unchecked" />
-        {$tr("editor.objectpicker.circle", "Circle")}
+        {$tr("editor.objectpicker.circle")}
       </button>
 
       <button class="btn me-1" on:click={() => onSubmit("image")}>
         <MdIcon icon="image" />
-        {$tr("editor.objectpicker.image", "Image")}
+        {$tr("editor.objectpicker.image")}
       </button>
       <button class="btn me-1" on:click={() => onSubmit("qrcode")}>
         <MdIcon icon="qr_code_2" />
-        {$tr("editor.objectpicker.qrcode", "QR Code")}
+        {$tr("editor.objectpicker.qrcode")}
       </button>
       <button class="btn me-1" on:click={() => onSubmit("barcode")}>
         <MdIcon icon="view_week" />
-        {$tr("editor.objectpicker.barcode", "Barcode")}
+        {$tr("editor.objectpicker.barcode")}
       </button>
     </div>
   </div>

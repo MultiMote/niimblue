@@ -29,11 +29,11 @@
     class="btn btn-sm btn-{enabled ? 'warning' : 'secondary'}"
     data-bs-toggle="dropdown"
     data-bs-auto-close="outside"
-    title={$tr("params.csv.title", "Dynamic label data (CSV)")}>
+    title={$tr("params.csv.title")}>
     <MdIcon icon="dataset" />
   </button>
   <div class="dropdown-menu">
-    <h6 class="dropdown-header">{$tr("params.csv.title", "Dynamic label data (CSV)")}</h6>
+    <h6 class="dropdown-header">{$tr("params.csv.title")}</h6>
     <div class="p-3 text-body-secondary">
       <div class="form-check form-switch">
         <input
@@ -43,20 +43,20 @@
           id="enabled"
           bind:checked={enabled}
           on:change={onDataChanged} />
-        <label class="form-check-label" for="enabled">{$tr("params.csv.enabled", "Enabled")}</label>
+        <label class="form-check-label" for="enabled">{$tr("params.csv.enabled")}</label>
       </div>
 
       <div class="mt-3">
-        {$tr("params.csv.tip", "First row is a header. It used as variable names. Commas are used as separators.")}
+        {$tr("params.csv.tip")}
       </div>
 
       <textarea class="dsv form-control my-3" bind:value={csv} on:input={onDataChanged} />
 
       <div class="placeholders pt-1">
-        {$tr("params.csv.rowsfound", "Data rows found:")} <strong>{rows}</strong>
+        {$tr("params.csv.rowsfound")} <strong>{rows}</strong>
       </div>
       <div class="placeholders pt-1">
-        {$tr("params.csv.placeholders", "Variables:")}
+        {$tr("params.csv.placeholders")}
         {#each placeholders as p}
           <button class="btn btn-sm btn-outline-info px-1 py-0" on:click={() => onPlaceholderPicked(p)}>{`{${p}}`}</button>
           {" "}

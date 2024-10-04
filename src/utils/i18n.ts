@@ -1,11 +1,11 @@
 import { derived, writable } from "svelte/store";
-import type { translationKeys, supportedLanguages } from "../locale";
+import type { TranslationKey, SupportedLanguage } from "../locale";
 import { languageNames, langPack } from "../locale";
 
-export type { translationKeys, supportedLanguages } from "../locale";
-
-function browserLanguage2supportedLanguage(browserLanguage: string): supportedLanguages {
-  switch (browserLanguage) {
+/** Check browser language and return supported language code.
+ *  If language is not supported, "en" is returned. */
+const guessBrowserLanguage = (): SupportedLanguage => {
+  switch (navigator.language) {
     case "ru":
     case "ru-RU":
       return "ru";
@@ -16,22 +16,24 @@ function browserLanguage2supportedLanguage(browserLanguage: string): supportedLa
     default:
       return "en";
   }
-}
+};
 
-export const locales = languageNames;
-
-export const locale = writable<supportedLanguages>(
-  (localStorage.getItem("locale") as supportedLanguages) ?? browserLanguage2supportedLanguage(navigator.language)
+export const locale = writable<SupportedLanguage>(
+  (localStorage.getItem("locale") as SupportedLanguage) ?? guessBrowserLanguage()
 );
-locale.subscribe((value: supportedLanguages) => localStorage.setItem("locale", value));
 
-export const tr = derived(locale, ($locale) => (key: translationKeys, fallback: string) => {
+locale.subscribe((value: SupportedLanguage) => localStorage.setItem("locale", value));
+
+export const tr = derived(locale, ($locale) => (key: TranslationKey) => {
   const result = langPack[$locale] ? langPack[$locale][key] : undefined;
   if (result === undefined) {
     if ($locale !== "en") {
       console.warn(`${key} of ${$locale} locale is not translated`);
     }
-    return fallback;
+    return langPack.en[key];
   }
   return result;
 });
+
+export const locales = languageNames;
+export type { TranslationKey, SupportedLanguage } from "../locale";

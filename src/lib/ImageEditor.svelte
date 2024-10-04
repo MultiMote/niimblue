@@ -124,7 +124,7 @@
   };
 
   const onSaveClicked = () => {
-    if (confirm($tr("editor.warning.save", "Saved data wil be overwritten. Save?"))) {
+    if (confirm($tr("editor.warning.save"))) {
       try {
         LocalStoragePersistence.saveCanvas(labelProps, fabricCanvas.toJSON());
       } catch (e) {
@@ -145,7 +145,7 @@
     const contents = await FileUtils.pickAndReadTextFile("json");
     const rawData = JSON.parse(contents);
 
-    if (!confirm($tr("editor.warning.load", "Canvas wil be replaced with saved data"))) {
+    if (!confirm($tr("editor.warning.load"))) {
       return;
     }
 
@@ -171,7 +171,7 @@
   };
 
   const onLoadClicked = () => {
-    if (!confirm($tr("editor.warning.load", "Canvas wil be replaced with saved data"))) {
+    if (!confirm($tr("editor.warning.load"))) {
       return;
     }
 
@@ -330,7 +330,7 @@
       backgroundColor: "#fff",
     });
 
-    ImageEditorUtils.addText(fabricCanvas, $tr("editor.default_text", "Text"));
+    ImageEditorUtils.addText(fabricCanvas, $tr("editor.default_text"));
 
     // force close dropdowns on touch devices
     fabricCanvas.on("mouse:down", (e: fabric.IEvent<MouseEvent>): void => {
@@ -420,11 +420,11 @@
             <div class="d-flex gap-1 flex-wrap">
               <button class="btn btn-secondary btn-sm" on:click={onSaveClicked}>
                 <MdIcon icon="open_in_browser" />
-                {$tr("editor.save.browser", "Save (browser)")}
+                {$tr("editor.save.browser")}
               </button>
               <button class="btn btn-secondary btn-sm" on:click={onExportClicked}>
                 <MdIcon icon="data_object" />
-                {$tr("editor.save.json", "Save (JSON)")}
+                {$tr("editor.save.json")}
               </button>
             </div>
           </div>
@@ -438,13 +438,13 @@
             <div class="d-flex gap-1 flex-wrap">
               <button class="btn btn-secondary btn-sm" on:click={onLoadClicked}>
                 <MdIcon icon="open_in_browser" />
-                {$tr("editor.load.browser", "Load (browser)")}
+                {$tr("editor.load.browser")}
               </button>
               <button class="btn btn-secondary btn-sm" on:click={onImportClicked}>
                 <MdIcon icon="data_object" />
-                {$tr("editor.load.json", "Load (JSON)")}
+                {$tr("editor.load.json")}
               </button>
-              <ZplImportButton {labelProps} onImageReady={zplImageReady} text={$tr("editor.import.zpl", "Import ZPL")} />
+              <ZplImportButton {labelProps} onImageReady={zplImageReady} text={$tr("editor.import.zpl")} />
             </div>
           </div>
         </div>
@@ -454,13 +454,13 @@
 
         <button class="btn btn-sm btn-primary ms-1" on:click={openPreview}>
           <MdIcon icon="visibility" />
-          {$tr("editor.preview", "Preview")}
+          {$tr("editor.preview")}
         </button>
         <button
           title="Print with default or saved parameters"
           class="btn btn-sm btn-primary ms-1"
           on:click={openPreviewAndPrint}
-          disabled={$connectionState !== "connected"}><MdIcon icon="print" /> {$tr("editor.print", "Print")}</button>
+          disabled={$connectionState !== "connected"}><MdIcon icon="print" /> {$tr("editor.print")}</button>
       </div>
     </div>
   </div>
@@ -469,13 +469,13 @@
     <div class="col d-flex justify-content-center">
       <div class="toolbar d-flex flex-wrap gap-1 justify-content-center align-items-center">
         {#if selectedCount > 0}
-          <button class="btn btn-sm btn-danger me-1" on:click={deleteSelected} title={$tr("editor.delete", "Delete")}>
+          <button class="btn btn-sm btn-danger me-1" on:click={deleteSelected} title={$tr("editor.delete")}>
             <MdIcon icon="delete" />
           </button>
         {/if}
 
         {#if selectedObject && selectedCount === 1}
-          <button class="btn btn-sm btn-secondary me-1" on:click={cloneSelected} title={$tr("editor.clone", "Clone")}>
+          <button class="btn btn-sm btn-secondary me-1" on:click={cloneSelected} title={$tr("editor.clone")}>
             <MdIcon icon="content_copy" />
           </button>
           <GenericObjectParamsControls {selectedObject} valueUpdated={controlValueUpdated} />

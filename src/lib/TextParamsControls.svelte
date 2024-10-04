@@ -89,15 +89,15 @@
 {#if selectedText}
   <!-- <div class="d-flex flex-wrap gap-1"> -->
   <button
-    title={$tr("params.text.align.left", "Align text: Left")}
+    title={$tr("params.text.align.left")}
     class="btn btn-sm {selectedText.textAlign === 'left' ? 'btn-secondary' : ''}"
     on:click={() => setXAlign("left")}><MdIcon icon="format_align_left" /></button>
   <button
-    title={$tr("params.text.align.center", "Align text: Center")}
+    title={$tr("params.text.align.center")}
     class="btn btn-sm {selectedText.textAlign === 'center' ? 'btn-secondary' : ''}"
     on:click={() => setXAlign("center")}><MdIcon icon="format_align_center" /></button>
   <button
-    title={$tr("params.text.align.right", "Align text: Right")}
+    title={$tr("params.text.align.right")}
     class="btn btn-sm {selectedText.textAlign === 'right' ? 'btn-secondary' : ''}"
     on:click={() => setXAlign("right")}><MdIcon icon="format_align_right" /></button>
   <div class="dropdown">
@@ -105,7 +105,7 @@
       class="btn btn-sm dropdown-toggle"
       type="button"
       data-bs-toggle="dropdown"
-      title={$tr("params.text.vorigin", "Vertical Origin")}>
+      title={$tr("params.text.vorigin")}>
       {#if selectedText.originY === "top"}
         <MdIcon icon="vertical_align_top" />
       {:else if selectedText.originY === "center"}
@@ -118,19 +118,19 @@
       <button
         class="btn btn-sm {selectedText.originY === 'top' ? 'btn-secondary' : ''}"
         on:click={() => setYAlign("top")}
-        title={$tr("params.text.vorigin.top", "Top")}>
+        title={$tr("params.text.vorigin.top")}>
         <MdIcon icon="vertical_align_top" />
       </button>
       <button
         class="btn btn-sm {selectedText.originY === 'center' ? 'btn-secondary' : ''}"
         on:click={() => setYAlign("center")}
-        title={$tr("params.text.vorigin.center", "Center")}>
+        title={$tr("params.text.vorigin.center")}>
         <MdIcon icon="vertical_align_center" />
       </button>
       <button
         class="btn btn-sm {selectedText.originY === 'bottom' ? 'btn-secondary' : ''}"
         on:click={() => setYAlign("bottom")}
-        title={$tr("params.text.vorigin.bottom", "Bottom")}>
+        title={$tr("params.text.vorigin.bottom")}>
         <MdIcon icon="vertical_align_bottom" />
       </button>
     </div>
@@ -139,18 +139,18 @@
   <button
     class="btn btn-sm {selectedText.fontWeight === 'bold' ? 'btn-secondary' : ''}"
     on:click={toggleBold}
-    title={$tr("params.text.bold", "Bold")}>
+    title={$tr("params.text.bold")}>
     <MdIcon icon="format_bold" />
   </button>
   <button
     class="btn btn-sm {selectedText.backgroundColor === 'black' ? 'btn-secondary' : ''}"
     on:click={invertColors}
-    title={$tr("params.text.invert_colors", "Invert colors")}>
+    title={$tr("params.text.invert_colors")}>
     <MdIcon icon="invert_colors" />
   </button>
 
   <div class="input-group flex-nowrap input-group-sm font-size">
-    <span class="input-group-text" title={$tr("params.text.font_size", "Font size")}><MdIcon icon="format_size" /></span>
+    <span class="input-group-text" title={$tr("params.text.font_size")}><MdIcon icon="format_size" /></span>
     <input
       type="number"
       min="1"
@@ -162,14 +162,14 @@
     <button
       class="btn btn-secondary"
       on:click={fontSizeDown}
-      title={$tr("params.text.font_size.down", "Decrease font size")}><MdIcon icon="text_decrease" /></button>
-    <button class="btn btn-secondary" on:click={fontSizeUp} title={$tr("params.text.font_size.up", "Increase font size")}>
+      title={$tr("params.text.font_size.down")}><MdIcon icon="text_decrease" /></button>
+    <button class="btn btn-secondary" on:click={fontSizeUp} title={$tr("params.text.font_size.up")}>
       <MdIcon icon="text_increase" />
     </button>
   </div>
 
   <div class="input-group flex-nowrap input-group-sm">
-    <span class="input-group-text" title={$tr("params.text.line_height", "Line height")}>
+    <span class="input-group-text" title={$tr("params.text.line_height")}>
       <MdIcon icon="density_medium" />
     </span>
     <input
@@ -183,7 +183,7 @@
   </div>
 
   <div class="input-group flex-nowrap input-group-sm font-family">
-    <span class="input-group-text" title={$tr("params.text.font_family", "Font family")}>
+    <span class="input-group-text" title={$tr("params.text.font_family")}>
       <MdIcon icon="text_format" />
     </span>
     <!-- svelte-ignore missing-declaration -->
@@ -193,7 +193,7 @@
           <option value={font}>{font}</option>
         {/each}
       </select>
-      <button class="btn btn-secondary" on:click={getFonts} title={$tr("params.text.fetch_fonts", "Fetch fonts")}>
+      <button class="btn btn-secondary" on:click={getFonts} title={$tr("params.text.fetch_fonts")}>
         <MdIcon icon="refresh" />
       </button>
     {:else}

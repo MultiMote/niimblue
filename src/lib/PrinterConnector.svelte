@@ -100,8 +100,8 @@
     <span class="input-group-text">{$printerMeta?.model ?? $connectedPrinterName}</span>
   {:else}
     <select class="form-select" disabled={$connectionState === "connecting"} bind:value={connectionType}>
-      <option value="bluetooth">{$tr("connector.bluetooth", "Bluetooth")}</option>
-      <option value="serial">{$tr("connector.serial", "Serial (USB)")}</option>
+      <option value="bluetooth">{$tr("connector.bluetooth")}</option>
+      <option value="serial">{$tr("connector.serial")}</option>
     </select>
   {/if}
 

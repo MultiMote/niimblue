@@ -14,7 +14,7 @@
   } from "@mmote/niimbluelib";
   import type { LabelProps, PostProcessType, FabricJson, PreviewProps } from "../types";
   import ParamLockButton from "./ParamLockButton.svelte";
-  import { tr, type translationKeys } from "../utils/i18n";
+  import { tr, type TranslationKey } from "../utils/i18n";
   import { canvasPreprocess } from "../utils/canvas_preprocess";
   import { type DSVRowArray, csvParse } from "d3-dsv";
   import { LocalStoragePersistence } from "../utils/persistence";
@@ -52,8 +52,8 @@
 
   const disconnected = derived(connectionState, ($connectionState) => $connectionState !== "connected");
 
-  const labelType2translationKeys = (labelType: string): translationKeys =>
-    `preview.label_type.${labelType}` as translationKeys;
+  const labelTypeTranslationKey = (labelType: string): TranslationKey =>
+    `preview.label_type.${labelType}` as TranslationKey;
 
   const endPrint = async () => {
     clearInterval(statusTimer);
@@ -262,7 +262,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5">{$tr("preview.title", "Print preview")}</h1>
+        <h1 class="modal-title fs-5">{$tr("preview.title")}</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
@@ -303,14 +303,14 @@
 
       <div class="modal-footer">
         <div class="input-group input-group-sm">
-          <span class="input-group-text">{$tr("preview.postprocess", "Post-process")}</span>
+          <span class="input-group-text">{$tr("preview.postprocess")}</span>
 
           <select
             class="form-select"
             bind:value={postProcessType}
             on:change={() => updateSavedProp("postProcess", postProcessType, true)}>
-            <option value="threshold">{$tr("preview.postprocess.threshold", "Threshold")}</option>
-            <option value="dither">{$tr("preview.postprocess.atkinson", "Dither (Atkinson)")}</option>
+            <option value="threshold">{$tr("preview.postprocess.threshold")}</option>
+            <option value="dither">{$tr("preview.postprocess.atkinson")}</option>
           </select>
 
           <ParamLockButton
@@ -321,7 +321,7 @@
         </div>
 
         <div class="input-group input-group-sm">
-          <span class="input-group-text">{$tr("preview.threshold", "Threshold")}</span>
+          <span class="input-group-text">{$tr("preview.threshold")}</span>
 
           <input
             type="range"
@@ -341,7 +341,7 @@
         </div>
 
         <div class="input-group flex-nowrap input-group-sm">
-          <span class="input-group-text">{$tr("preview.copies", "Copies")}</span>
+          <span class="input-group-text">{$tr("preview.copies")}</span>
           <input
             class="form-control"
             type="number"
@@ -356,7 +356,7 @@
         </div>
 
         <div class="input-group flex-nowrap input-group-sm">
-          <span class="input-group-text">{$tr("preview.density", "Density")}</span>
+          <span class="input-group-text">{$tr("preview.density")}</span>
           <input
             class="form-control"
             type="number"
@@ -368,13 +368,13 @@
         </div>
 
         <div class="input-group input-group-sm">
-          <span class="input-group-text">{$tr("preview.label_type", "Label type")}</span>
+          <span class="input-group-text">{$tr("preview.label_type")}</span>
           <select class="form-select" bind:value={labelType} on:change={() => updateSavedProp("labelType", labelType)}>
             {#each Object.values(LabelType) as lt}
               {#if typeof lt !== "string"}
                 <option value={lt}>
                   {#if $printerMeta?.paperTypes.includes(lt)}✔{/if}
-                  {$tr(labelType2translationKeys(LabelType[lt]), LabelType[lt])}
+                  {$tr(labelTypeTranslationKey(LabelType[lt]))}
                 </option>
               {/if}
             {/each}
@@ -388,19 +388,16 @@
         </div>
 
         <div class="input-group input-group-sm">
-          <span class="input-group-text">{$tr("preview.print_task_version", "Print task version")}</span>
+          <span class="input-group-text">{$tr("preview.print_task_version")}</span>
           <select
             class="form-select"
             bind:value={printTaskVersion}
             on:change={() => updateSavedProp("printTaskVersion", printTaskVersion)}>
             <option value={PrintTaskVersion.V1} disabled>
-              {#if taskVer === PrintTaskVersion.V1}✔{/if} V1 - {$tr("preview.not_implemented", "NOT IMPLEMENTED")}
+              {#if taskVer === PrintTaskVersion.V1}✔{/if} V1 - {$tr("preview.not_implemented")}
             </option>
             <option value={PrintTaskVersion.V2} disabled>
-              {#if taskVer === PrintTaskVersion.V2}✔{/if} V2 - {$tr(
-                "preview.not_implemented",
-                "NOT IMPLEMENTED",
-              )}</option>
+              {#if taskVer === PrintTaskVersion.V2}✔{/if} V2 - {$tr("preview.not_implemented")}</option>
             <option value={PrintTaskVersion.V3}>
               {#if taskVer === PrintTaskVersion.V3}✔{/if} V3 - D110
             </option>
@@ -408,7 +405,7 @@
               {#if taskVer === PrintTaskVersion.V4}✔{/if} V4 - B1
             </option>
             <option value={PrintTaskVersion.V5} disabled>
-              {#if taskVer === PrintTaskVersion.V5}✔{/if} V5 - {$tr("preview.not_implemented", "NOT IMPLEMENTED")}
+              {#if taskVer === PrintTaskVersion.V5}✔{/if} V5 - {$tr("preview.not_implemented")}
             </option>
           </select>
 
@@ -419,7 +416,7 @@
             onClick={toggleSavedProp} />
         </div>
 
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{$tr("preview.close", "Close")}</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{$tr("preview.close")}</button>
 
         {#if printState !== "idle"}
           <button type="button" class="btn btn-primary" disabled={$disconnected} on:click={endPrint}>
@@ -429,9 +426,9 @@
 
         <button type="button" class="btn btn-primary" disabled={$disconnected || printState !== "idle"} on:click={onPrint}>
           {#if $disconnected}
-            {$tr("preview.not_connected", "Printer is not connected")}
+            {$tr("preview.not_connected")}
           {:else}
-            <MdIcon icon="print" /> {$tr("preview.print", "Print")}
+            <MdIcon icon="print" /> {$tr("preview.print")}
           {/if}
         </button>
       </div>

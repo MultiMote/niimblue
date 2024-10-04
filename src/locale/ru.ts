@@ -1,7 +1,7 @@
-import type { translationKeys } from ".";
+import type { TranslationKey } from ".";
 
 /** Russian */
-export const translation_ru: Record<translationKeys, string> = {
+export const translation_ru: Record<TranslationKey, string> = {
   /* Main page */
   "main.code": "Исходный код",
   "main.built": "собрано",

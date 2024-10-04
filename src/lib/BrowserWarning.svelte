@@ -9,11 +9,11 @@
 {#if !bluetooth && !serial}
   <div class="alert alert-danger" role="alert">
     <div>
-      {$tr("browser_warning.lines.first", "Oh no, your browser does not support bluetooth and serial communications")}
+      {$tr("browser_warning.lines.first")}
       <MdIcon icon="sentiment_very_dissatisfied" />
     </div>
     <div>
-      {$tr("browser_warning.lines.second", "Anyway, you still can draw labels.")}
+      {$tr("browser_warning.lines.second")}
     </div>
   </div>
 {/if}

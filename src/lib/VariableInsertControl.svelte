@@ -27,7 +27,7 @@
   };
 </script>
 
-<div class="btn-group btn-group-sm" role="group" title={$tr("params.variables.insert", "Insert variable")}>
+<div class="btn-group btn-group-sm" role="group" title={$tr("params.variables.insert")}>
   <button class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside">
     <MdIcon icon="data_object" />
   </button>
@@ -36,15 +36,15 @@
     <div class="d-flex gap-1 flex-wrap">
       <button class="btn btn-secondary btn-sm" on:click={() => insertDateTime()}>
         <MdIcon icon="calendar_today" />
-        {$tr("params.variables.insert.datetime", "Datetime")}
+        {$tr("params.variables.insert.datetime")}
       </button>
       <button class="btn btn-secondary btn-sm" on:click={() => insertDateTime("YYYY-MM-DD")}>
         <MdIcon icon="calendar_today" />
-        {$tr("params.variables.insert.date", "Date")}
+        {$tr("params.variables.insert.date")}
       </button>
       <button class="btn btn-secondary btn-sm" on:click={() => insertDateTime("HH:mm:ss")}>
         <MdIcon icon="schedule" />
-        {$tr("params.variables.insert.time", "Time")}
+        {$tr("params.variables.insert.time")}
       </button>
     </div>
   </div>

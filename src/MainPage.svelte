@@ -46,11 +46,11 @@
     {:else}
       v{__APP_VERSION__}
     {/if}
-    {$tr("main.built", "built at")}
+    {$tr("main.built")}
     {__BUILD_DATE__}
   </div>
   <div>
-    <a class="text-secondary" href="https://github.com/MultiMote/niimblue">{$tr("main.code", "Code")}</a>
+    <a class="text-secondary" href="https://github.com/MultiMote/niimblue">{$tr("main.code")}</a>
   </div>
 </div>
 

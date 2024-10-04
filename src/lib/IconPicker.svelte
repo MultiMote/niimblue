@@ -21,12 +21,12 @@
   </button>
 
   <div class="dropdown-menu">
-    <h6 class="dropdown-header">{$tr("editor.iconpicker.title", "Add icon")}</h6>
+    <h6 class="dropdown-header">{$tr("editor.iconpicker.title")}</h6>
     <div class="p-3">
       <input
         type="text"
         class="form-control"
-        placeholder={$tr("editor.iconpicker.search", "Search")}
+        placeholder={$tr("editor.iconpicker.search")}
         bind:value={search} />
       <div class="icons">
         {#each iconNames as name}
@@ -41,7 +41,7 @@
         href="https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Filled"
         target="_blank"
         class="text-secondary">
-        {$tr("editor.iconpicker.mdi_link_title", "See detailed list here")}
+        {$tr("editor.iconpicker.mdi_link_title")}
       </a>
     </div>
   </div>
