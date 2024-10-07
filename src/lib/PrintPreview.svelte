@@ -393,19 +393,20 @@
             class="form-select"
             bind:value={printTaskVersion}
             on:change={() => updateSavedProp("printTaskVersion", printTaskVersion)}>
-            <option value={PrintTaskVersion.V1} disabled>
-              {#if taskVer === PrintTaskVersion.V1}✔{/if} V1 - {$tr("preview.not_implemented")}
+            <option value={PrintTaskVersion.V1}>
+              {#if taskVer === PrintTaskVersion.V1}✔{/if} V1 - D11/B21
             </option>
-            <option value={PrintTaskVersion.V2} disabled>
-              {#if taskVer === PrintTaskVersion.V2}✔{/if} V2 - {$tr("preview.not_implemented")}</option>
+            <option value={PrintTaskVersion.V2}>
+              {#if taskVer === PrintTaskVersion.V2}✔{/if} V2
+            </option>
             <option value={PrintTaskVersion.V3}>
               {#if taskVer === PrintTaskVersion.V3}✔{/if} V3 - D110
             </option>
             <option value={PrintTaskVersion.V4}>
               {#if taskVer === PrintTaskVersion.V4}✔{/if} V4 - B1
             </option>
-            <option value={PrintTaskVersion.V5} disabled>
-              {#if taskVer === PrintTaskVersion.V5}✔{/if} V5 - {$tr("preview.not_implemented")}
+            <option value={PrintTaskVersion.V5}>
+              {#if taskVer === PrintTaskVersion.V5}✔{/if} V5
             </option>
           </select>
 
