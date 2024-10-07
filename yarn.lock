@@ -162,10 +162,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@mmote/niimbluelib@0.0.1-alpha.1":
-  version "0.0.1-alpha.1"
-  resolved "https://registry.yarnpkg.com/@mmote/niimbluelib/-/niimbluelib-0.0.1-alpha.1.tgz#85df86762dae6e7512ee365abc91551083f8215d"
-  integrity sha512-hyJRw8WgvCjGAcrc3X4Y/eaSIIFHUYxTY/1VZETJS/mlb1KWQZZcwajQnfn3bRvg7x3v9gujHzkKkAiTUU7MLA==
+"@mmote/niimbluelib@0.0.1-alpha.2":
+  version "0.0.1-alpha.2"
+  resolved "https://registry.yarnpkg.com/@mmote/niimbluelib/-/niimbluelib-0.0.1-alpha.2.tgz#ac69dc197f2de6c33183d46d4584d38bdbaca3df"
+  integrity sha512-dISYZzbW+ClQuY7rRKVRluP9eGwpST0iHre+HpM0nNyiJnX3+bWEhswBgg+XEKqXgtqsik0eFlWPj7/clWTjRQ==
   dependencies:
     async-mutex "^0.5.0"
     typescript-event-target "^1.1.1"
