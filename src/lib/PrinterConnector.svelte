@@ -67,25 +67,49 @@
       <MdIcon icon="settings" />
     </button>
     <div class="dropdown-menu p-1">
-      <div>
-        Model metadata:
-        <pre>{JSON.stringify($printerMeta, null, 1)}</pre>
-      </div>
+      {#if $printerInfo}
+        <div>
+          Printer info:
+          <ul>
+            {#each Object.entries($printerInfo) as [k, v]}
+              <li>{k}: <strong>{v || "-"}</strong></li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
 
-      <div>
-        Printer info:
-        <pre>{JSON.stringify($printerInfo, null, 1)}</pre>
-      </div>
+      {#if $printerMeta}
+        <div>
+          Model metadata:
+          <ul>
+            {#each Object.entries($printerMeta) as [k, v]}
+              <li>{k}: <strong>{v || "-"}</strong></li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
 
-      <div>
-        Rfid info:
-        <pre>{JSON.stringify(rfidInfo || {}, null, 1)}</pre>
-      </div>
+      {#if rfidInfo}
+        <div>
+          Rfid info:
+          <ul>
+            {#each Object.entries(rfidInfo) as [k, v]}
+              <li>{k}: <strong>{v || "-"}</strong></li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
 
-      <div>
-        Heartbeat data:
-        <pre>{JSON.stringify($heartbeatData, null, 1)}</pre>
-      </div>
+      {#if $heartbeatData}
+        <div>
+          Heartbeat data:
+          <ul>
+            {#each Object.entries($heartbeatData) as [k, v]}
+              <li>{k}: <strong>{v || "-"}</strong></li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
 
       <div>Tests</div>
 

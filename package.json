@@ -15,7 +15,7 @@
 	},
 	"dependencies": {
 		"@fontsource-variable/noto-sans": "^5.0.5",
-		"@mmote/niimbluelib": "0.0.1-alpha.3",
+		"@mmote/niimbluelib": "0.0.1-alpha.4",
 		"@popperjs/core": "^2.11.8",
 		"bootstrap": "5.3.3",
 		"d3-dsv": "^3.0.1",
