@@ -92,16 +92,19 @@
         printProgress = e.pagePrintProgress;
       };
 
-      $printerClient.addEventListener("printprogress", listener);
+      if (printTaskVersion !== PrintTaskVersion.V1) {
+        $printerClient.addEventListener("printprogress", listener);
 
-      try {
-        await $printerClient.abstraction.waitUntilPrintFinished(quantity, 100);
-      } catch (e) {
-        error = `${e}`;
-        console.error(e);
+        try {
+          await $printerClient.abstraction.waitUntilPrintFinished(quantity, 100);
+        } catch (e) {
+          error = `${e}`;
+          console.error(e);
+        }
+
+        $printerClient.removeEventListener("printprogress", listener);
       }
 
-      $printerClient.removeEventListener("printprogress", listener);
       await endPrint();
     }
 
