@@ -12,15 +12,12 @@ export const translation_zh_cn: Partial<Record<TranslationKey, string>> = {
   "editor.clone": "复制",
   "editor.default_text": "文本",
   "editor.delete": "删除",
-  /* ImageEditor Export */
-  "editor.save.json": "导出 JSON 文件",
-  /* IconPicker */
+  "editor.iconpicker.mdi_link_title": "在这里查看详细列表",
   "editor.iconpicker.search": "搜索",
   "editor.iconpicker.title": "添加图标",
-  /* ImageEditor Import */
-  "editor.load.json": "导入 JSON 文件",
   "editor.import.zpl": "导入 ZPL 文件",
-  /* ObjectPicker */
+  "editor.load.browser": "从浏览器导入",
+  "editor.load.json": "导入 JSON 文件",
   "editor.objectpicker.barcode": "条码",
   "editor.objectpicker.circle": "圆形",
   "editor.objectpicker.image": "图片",
@@ -29,9 +26,10 @@ export const translation_zh_cn: Partial<Record<TranslationKey, string>> = {
   "editor.objectpicker.rectangle": "矩形",
   "editor.objectpicker.text": "文字",
   "editor.objectpicker.title": "添加元素",
-  /* ImageEditor */
   "editor.preview": "预览",
   "editor.print": "打印",
+  "editor.save.browser": "保存到浏览器",
+  "editor.save.json": "导出 JSON 文件",
   "editor.warning.load": "画布将被替换为保存的数据，需要继续吗？",
   "editor.warning.save": "保存的数据将会被覆盖，需要继续吗？",
   /* Main page */
