@@ -73,6 +73,8 @@ export const translation_en = {
   "params.text.vorigin.center": "Center",
   "params.text.vorigin.top": "Top",
   "params.text.vorigin": "Vertical Origin",
+  "params.text.edit": "Edit in popup",
+  "params.text.edit.title": "Editing text",
   "params.variables.insert.date": "Date",
   "params.variables.insert.datetime": "Datetime",
   "params.variables.insert.time": "Time",

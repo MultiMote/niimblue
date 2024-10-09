@@ -100,6 +100,8 @@ export const translation_ru: Record<TranslationKey, string> = {
   "params.text.line_height": "Межстрочный интервал",
   "params.text.font_family": "Шрифт",
   "params.text.invert_colors": "Инвертировать цвета",
+  "params.text.edit": "Редактировать во всплывающем диалоге",
+  "params.text.edit.title": "Редактирование текста",
   "params.variables.insert": "Вставить переменную",
   "params.variables.insert.datetime": "Дата и время",
   "params.variables.insert.date": "Дата",

@@ -66,6 +66,14 @@
     commit();
   };
 
+  const editInPopup = () => {
+    const text = prompt($tr("params.text.edit.title"), selectedText!.text);
+    if (text !== null) {
+      selectedText!.set({ text });
+      commit();
+    }
+  };
+
   const getFonts = async () => {
     try {
       const fonts = await queryLocalFonts();
@@ -101,11 +109,7 @@
     class="btn btn-sm {selectedText.textAlign === 'right' ? 'btn-secondary' : ''}"
     on:click={() => setXAlign("right")}><MdIcon icon="format_align_right" /></button>
   <div class="dropdown">
-    <button
-      class="btn btn-sm dropdown-toggle"
-      type="button"
-      data-bs-toggle="dropdown"
-      title={$tr("params.text.vorigin")}>
+    <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" title={$tr("params.text.vorigin")}>
       {#if selectedText.originY === "top"}
         <MdIcon icon="vertical_align_top" />
       {:else if selectedText.originY === "center"}
@@ -159,13 +163,11 @@
       class="form-control"
       bind:value={selectedText.fontSize}
       on:input={commit} />
-    <button
-      class="btn btn-secondary"
-      on:click={fontSizeDown}
-      title={$tr("params.text.font_size.down")}><MdIcon icon="text_decrease" /></button>
     <button class="btn btn-secondary" on:click={fontSizeUp} title={$tr("params.text.font_size.up")}>
       <MdIcon icon="text_increase" />
     </button>
+    <button class="btn btn-secondary" on:click={fontSizeDown} title={$tr("params.text.font_size.down")}
+      ><MdIcon icon="text_decrease" /></button>
   </div>
 
   <div class="input-group flex-nowrap input-group-sm">
@@ -200,7 +202,10 @@
       <input type="text" class="form-control" bind:value={selectedText.fontFamily} on:input={commit} />
     {/if}
   </div>
-  <!-- </div> -->
+
+  <button class="btn btn-sm btn-secondary" on:click={editInPopup} title={$tr("params.text.edit")}>
+    <MdIcon icon="edit" />
+  </button>
 {/if}
 
 <style>
