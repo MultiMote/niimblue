@@ -89,21 +89,21 @@
       printState = "printing";
 
       const listener = (e: PrintProgressEvent) => {
-        printProgress = e.pagePrintProgress;
+        printProgress = Math.floor((e.page / quantity) * ((e.pagePrintProgress + e.pageFeedProgress) / 2));
       };
 
-      if (printTaskVersion !== PrintTaskVersion.V1) {
-        $printerClient.addEventListener("printprogress", listener);
+      $printerClient.addEventListener("printprogress", listener);
 
-        try {
-          await $printerClient.abstraction.waitUntilPrintFinished(quantity, 100);
-        } catch (e) {
-          error = `${e}`;
-          console.error(e);
-        }
-
-        $printerClient.removeEventListener("printprogress", listener);
+      try {
+        await $printerClient.abstraction.waitUntilPrintFinished(printTaskVersion, quantity, {
+          pollIntervalMs: 100, timeoutMs: 8_000
+        });
+      } catch (e) {
+        error = `${e}`;
+        console.error(e);
       }
+
+      $printerClient.removeEventListener("printprogress", listener);
 
       await endPrint();
     }
@@ -290,7 +290,7 @@
         {#if printState === "sending"}
           <div>Sending...</div>
         {/if}
-        {#if printProgress != 0 && printProgress != 100}
+        {#if printState === "printing" }
           <div>
             Printing...
             <div class="progress" role="progressbar">
