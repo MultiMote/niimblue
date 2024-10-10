@@ -11,6 +11,7 @@ export const translation_ru: Record<TranslationKey, string> = {
   /* PrinterConnector */
   "connector.bluetooth": "Bluetooth",
   "connector.serial": "Посл. порт (USB)",
+  "connector.disconnect.heartbeat": "Отключено (принтер не отвечает)",
   /* ImageEditor */
   "editor.default_text": "Текст",
   "editor.save.json": "Сохранить (JSON)",

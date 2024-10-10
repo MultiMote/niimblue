@@ -8,6 +8,7 @@
     heartbeatData,
     printerInfo,
     printerMeta,
+    heartbeatFails
   } from "../stores";
   import type { ConnectionType } from "../types";
   import { tr } from "../utils/i18n";
@@ -121,7 +122,9 @@
       <button class="btn btn-sm btn-primary" on:click={fetchInfo}>Fetch info again</button>
       <button class="btn btn-sm btn-primary" on:click={reset}>Reset</button>
     </div>
-    <span class="input-group-text">{$printerMeta?.model ?? $connectedPrinterName}</span>
+    <span class="input-group-text {$heartbeatFails > 0 ? 'text-warning': ''}">
+      {$printerMeta?.model ?? $connectedPrinterName}
+    </span>
   {:else}
     <select class="form-select" disabled={$connectionState === "connecting"} bind:value={connectionType}>
       <option value="bluetooth">{$tr("connector.bluetooth")}</option>

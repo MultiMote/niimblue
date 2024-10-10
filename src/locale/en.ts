@@ -4,6 +4,7 @@ export const translation_en = {
   "browser_warning.lines.second": "Anyway, you still can draw labels.",
   "connector.bluetooth": "Bluetooth",
   "connector.serial": "Serial (USB)",
+  "connector.disconnect.heartbeat": "Disconnected (printer does not respond)",
   "editor.clone": "Clone",
   "editor.default_text": "Text",
   "editor.delete": "Delete",

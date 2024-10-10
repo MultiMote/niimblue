@@ -64,11 +64,13 @@
 
     printState = "idle";
     printProgress = 0;
+    $printerClient.startHeartbeat();
   };
 
   const onPrint = async () => {
     printState = "sending";
     error = "";
+    $printerClient.stopHeartbeat();
 
     // do it in a stupid way (library not supports multi-page print yet)
     for (let curPage = 0; curPage < pagesTotal; curPage++) {
@@ -109,6 +111,7 @@
     }
 
     printState = "idle";
+    $printerClient.startHeartbeat();
 
     if (printNow && !error) {
       modal.hide();

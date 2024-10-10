@@ -1,8 +1,9 @@
-import { writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 import type { ConnectionState, ConnectionType } from "./types";
 import {
   ConnectEvent,
   HeartbeatEvent,
+  HeartbeatFailedEvent,
   NiimbotBluetoothClient,
   NiimbotSerialClient,
   PacketReceivedEvent,
@@ -16,6 +17,8 @@ import {
   type PrinterInfo,
   type PrinterModelMeta,
 } from "@mmote/niimbluelib";
+import { Toasts } from "./utils/toasts";
+import { tr } from "./utils/i18n";
 
 export const connectionState = writable<ConnectionState>("disconnected");
 export const connectedPrinterName = writable<string>("");
@@ -23,6 +26,7 @@ export const printerClient = writable<NiimbotAbstractClient>();
 export const heartbeatData = writable<HeartbeatData>();
 export const printerInfo = writable<PrinterInfo>();
 export const printerMeta = writable<PrinterModelMeta | undefined>();
+export const heartbeatFails = writable<number>(0);
 
 export const initClient = (connectionType: ConnectionType) => {
   printerClient.update((prevClient: NiimbotAbstractClient) => {
@@ -44,17 +48,9 @@ export const initClient = (connectionType: ConnectionType) => {
         newClient = new NiimbotSerialClient();
       }
 
-      // newClient.addEventListener("rawpacketsent", (e: RawPacketSentEvent) => {
-      //   console.log(`>> ${Utils.bufToHex(e.data)}`);
-      // });
-
       newClient.addEventListener("packetsent", (e: PacketSentEvent) => {
         console.log(`>> ${Utils.bufToHex(e.packet.toBytes())} (${RequestCommandId[e.packet.command]})`);
       });
-
-      // newClient.addEventListener("rawpacketreceived", (e: RawPacketReceivedEvent) => {
-      //   console.log(`<< ${Utils.bufToHex(e.data)}`);
-      // });
 
       newClient.addEventListener("packetreceived", (e: PacketReceivedEvent) => {
         console.log(`<< ${Utils.bufToHex(e.packet.toBytes())} (${ResponseCommandId[e.packet.command]})`);
@@ -62,6 +58,7 @@ export const initClient = (connectionType: ConnectionType) => {
 
       newClient.addEventListener("connect", (e: ConnectEvent) => {
         console.log("onConnect");
+        heartbeatFails.set(0);
         connectionState.set("connected");
         connectedPrinterName.set(e.info.deviceName ?? "unknown");
       });
@@ -81,7 +78,19 @@ export const initClient = (connectionType: ConnectionType) => {
       });
 
       newClient.addEventListener("heartbeat", (e: HeartbeatEvent) => {
+        heartbeatFails.set(0);
         heartbeatData.set(e.data);
+      });
+
+      newClient.addEventListener("heartbeatfailed", (e: HeartbeatFailedEvent) => {
+        const maxFails = 5;
+        heartbeatFails.set(e.failedAttempts);
+
+        console.warn(`Heartbeat failed ${e.failedAttempts}/${maxFails}`)
+        if (e.failedAttempts >= maxFails) {
+          Toasts.error(get(tr)("connector.disconnect.heartbeat"));
+          newClient.disconnect();
+        }
       });
     }
 
