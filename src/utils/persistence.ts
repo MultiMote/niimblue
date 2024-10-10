@@ -1,4 +1,14 @@
-import { FabricJsonSchema, LabelPresetSchema, LabelPropsSchema, PreviewPropsSchema, type FabricJson, type LabelPreset, type LabelProps, type PreviewProps } from "../types";
+import {
+  FabricJsonSchema,
+  LabelPresetSchema,
+  LabelPropsSchema,
+  PreviewPropsSchema,
+  type ConnectionType,
+  type FabricJson,
+  type LabelPreset,
+  type LabelProps,
+  type PreviewProps,
+} from "../types";
 import { z } from "zod";
 
 export class LocalStoragePersistence {
@@ -120,5 +130,17 @@ export class LocalStoragePersistence {
   static loadLabelPresets(): LabelPreset[] | null {
     const presets = this.loadAndValidateObject("label_presets", z.array(LabelPresetSchema));
     return presets === null || presets.length === 0 ? null : presets;
+  }
+
+  static loadLastConnectionType(): ConnectionType | null {
+    const value = localStorage.getItem("connection_type");
+    if (value === null || !["bluetooth", "serial"].includes(value)) {
+      return null;
+    }
+    return value as ConnectionType;
+  }
+
+  static saveLastConnectionType(value: ConnectionType) {
+    localStorage.setItem("connection_type", value);
   }
 }

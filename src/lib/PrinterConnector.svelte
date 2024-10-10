@@ -8,12 +8,14 @@
     heartbeatData,
     printerInfo,
     printerMeta,
-    heartbeatFails
+    heartbeatFails,
   } from "../stores";
   import type { ConnectionType } from "../types";
   import { tr } from "../utils/i18n";
   import MdIcon from "./MdIcon.svelte";
   import { Toasts } from "../utils/toasts";
+  import { onMount } from "svelte";
+  import { LocalStoragePersistence } from "../utils/persistence";
 
   let connectionType: ConnectionType = "bluetooth";
   let rfidInfo: RfidInfo | undefined = undefined;
@@ -60,9 +62,18 @@
   const reset = async () => {
     await $printerClient.abstraction.printerReset();
   };
+
+  const switchConnectionType = (c: ConnectionType) => {
+    LocalStoragePersistence.saveLastConnectionType(c);
+    connectionType = c;
+  };
+
+  onMount(() => {
+    connectionType = LocalStoragePersistence.loadLastConnectionType() ?? "bluetooth";
+  });
 </script>
 
-<div class="input-group flex-nowrap justify-content-end">
+<div class="input-group input-group-sm flex-nowrap justify-content-end">
   {#if $connectionState === "connected"}
     <button class="btn btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
       <MdIcon icon="settings" />
@@ -122,14 +133,22 @@
       <button class="btn btn-sm btn-primary" on:click={fetchInfo}>Fetch info again</button>
       <button class="btn btn-sm btn-primary" on:click={reset}>Reset</button>
     </div>
-    <span class="input-group-text {$heartbeatFails > 0 ? 'text-warning': ''}">
+    <span class="input-group-text {$heartbeatFails > 0 ? 'text-warning' : ''}">
       {$printerMeta?.model ?? $connectedPrinterName}
     </span>
   {:else}
-    <select class="form-select" disabled={$connectionState === "connecting"} bind:value={connectionType}>
-      <option value="bluetooth">{$tr("connector.bluetooth")}</option>
-      <option value="serial">{$tr("connector.serial")}</option>
-    </select>
+    <button
+      class="btn text-nowrap {connectionType === 'bluetooth' ? 'btn-light' : 'btn-outline-secondary'}"
+      on:click={() => switchConnectionType("bluetooth")}>
+      <MdIcon icon="bluetooth" />
+      {$tr("connector.bluetooth")}
+    </button>
+    <button
+      class="btn text-nowrap {connectionType === 'serial' ? 'btn-light' : 'btn-outline-secondary'}"
+      on:click={() => switchConnectionType((connectionType = "serial"))}>
+      <MdIcon icon="usb" />
+      {$tr("connector.serial")}
+    </button>
   {/if}
 
   {#if $connectionState !== "connected"}

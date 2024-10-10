@@ -6,7 +6,7 @@
 </script>
 
 <div class="container my-2">
-  <div class="row mb-2">
+  <div class="row align-items-center mb-2">
     <div class="col">
       <h1 class="title">
         <span class="niim">Niim</span><span class="blue">Blue</span>
