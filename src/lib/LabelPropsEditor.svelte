@@ -48,8 +48,8 @@
     onChange({
       printDirection: printDirection,
       size: {
-        width: newWidth,
-        height: newHeight,
+        width: Math.floor(newWidth),
+        height: Math.floor(newHeight),
       },
     });
   };
