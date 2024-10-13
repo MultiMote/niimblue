@@ -9,7 +9,7 @@ assignees: ''
 
 * Transport:
 - [ ] Bluetooth (what adapter are you using?)
-- [ ] Serial
+- [ ] Serial (USB)
 
 * Browser console logs (press F12 and copy "Console" tab contents):
 
@@ -20,5 +20,7 @@ assignees: ''
   *paste logs here*
   ```
   </details>
+
+* Label JSON: *export your label to JSON and attach it here*
 
 *describe your issue here*
