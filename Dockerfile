@@ -41,7 +41,7 @@ WORKDIR /dist
 
 
 # Expose the port the app runs on
-EXPOSE 3000
+EXPOSE 7600
 
 # Command to run the app
 CMD ["serve", "-s", "/dist", "-l", "7600", "--ssl-cert", "/dist/dev-cert/cert.pem", "--ssl-key", "/dist/dev-cert/key.pem"]
