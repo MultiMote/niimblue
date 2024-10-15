@@ -7,7 +7,7 @@ Uses [NiimBlueLib](https://github.com/MultiMote/niimbluelib) for communication.
 > [!NOTE]  
 > If you have printing problems, try different print task versions in print preview dialog. Make if default by pressing "Lock" button.
 > 
-> If you found version suitable for yor model, please write [here](https://github.com/MultiMote/niimbluelib/issues/1).
+> If you found version suitable for your model, please write [here](https://github.com/MultiMote/niimbluelib/issues/1).
 
 ## Features
 
