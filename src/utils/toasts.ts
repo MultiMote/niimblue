@@ -2,7 +2,7 @@ import Toastify from "toastify-js";
 import { z } from "zod";
 
 export class Toasts {
-  public static error(e: any) {
+  static error(e: any) {
     Toastify({
       text: `${e}`,
       gravity: "bottom",
@@ -11,7 +11,7 @@ export class Toasts {
     }).showToast();
   }
 
-  public static zodErrors(e: any, prefix: string) {
+  static zodErrors(e: any, prefix: string) {
     if (e instanceof z.ZodError) {
       console.error(e);
       e.issues.forEach((i) => {

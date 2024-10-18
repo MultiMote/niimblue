@@ -16,7 +16,7 @@ export class ImageEditorUtils {
     // noScaleCache: true,
   };
 
-  public static addSvg(canvas: fabric.Canvas, svgCode: string): void {
+  static addSvg(canvas: fabric.Canvas, svgCode: string): void {
     fabric.loadSVGFromString(svgCode, (objects, options) => {
       const obj = fabric.util.groupSVGElements(objects, options);
 
@@ -29,7 +29,7 @@ export class ImageEditorUtils {
   }
 
   // todo: return object
-  public static addImageFile(canvas: fabric.Canvas, file: File) {
+  static addImageFile(canvas: fabric.Canvas, file: File) {
     const reader = new FileReader();
 
     if (file.type.startsWith("image/svg")) {
@@ -76,7 +76,7 @@ export class ImageEditorUtils {
     input.click();
   }
 
-  public static addText(canvas: fabric.Canvas, text?: string, options?: ITextOptions): fabric.IText {
+  static addText(canvas: fabric.Canvas, text?: string, options?: ITextOptions): fabric.IText {
     const obj = new fabric.IText(text ?? "Text", {
       ...this.OBJECT_DEFAULTS,
       fontFamily: "Noto Sans Variable",
@@ -91,7 +91,7 @@ export class ImageEditorUtils {
     return obj;
   }
 
-  public static addStaticText(canvas: fabric.Canvas, text?: string, options?: TextOptions): fabric.Text {
+  static addStaticText(canvas: fabric.Canvas, text?: string, options?: TextOptions): fabric.Text {
     const obj = new fabric.Text(text ?? "Text", {
       ...this.OBJECT_DEFAULTS,
       fontFamily: "Noto Sans Variable",
@@ -106,7 +106,7 @@ export class ImageEditorUtils {
     return obj;
   }
 
-  public static addHLine(canvas: fabric.Canvas): fabric.Line {
+  static addHLine(canvas: fabric.Canvas): fabric.Line {
     const obj = new fabric.Line([10, 10, 10 + this.SIZE_DEFAULT, 10], {
       ...this.OBJECT_DEFAULTS,
       stroke: "#000",
@@ -125,7 +125,7 @@ export class ImageEditorUtils {
     return obj;
   }
 
-  public static addCircle(canvas: fabric.Canvas): fabric.Circle {
+  static addCircle(canvas: fabric.Canvas): fabric.Circle {
     const obj = new fabric.Circle({
       ...this.OBJECT_DEFAULTS,
       radius: this.SIZE_DEFAULT / 2,
@@ -138,7 +138,7 @@ export class ImageEditorUtils {
     return obj;
   }
 
-  public static addRect(canvas: fabric.Canvas): fabric.Rect {
+  static addRect(canvas: fabric.Canvas): fabric.Rect {
     const obj = new fabric.Rect({
       ...this.OBJECT_DEFAULTS,
       width: this.SIZE_DEFAULT,
@@ -152,7 +152,7 @@ export class ImageEditorUtils {
     return obj;
   }
 
-  public static addQrCode(canvas: fabric.Canvas): QRCode {
+  static addQrCode(canvas: fabric.Canvas): QRCode {
     const qr = new QRCode({
       text: "NiimBlue",
       top: this.OBJECT_DEFAULTS.top,
@@ -165,7 +165,7 @@ export class ImageEditorUtils {
     return qr;
   }
 
-  public static addBarcode(canvas: fabric.Canvas): Barcode {
+  static addBarcode(canvas: fabric.Canvas): Barcode {
     const barcode = new Barcode({
       top: this.OBJECT_DEFAULTS.top,
       left: this.OBJECT_DEFAULTS.left,
@@ -179,7 +179,7 @@ export class ImageEditorUtils {
     return barcode;
   }
 
-  public static addObject(canvas: fabric.Canvas, objType: OjectType): fabric.Object | undefined {
+  static addObject(canvas: fabric.Canvas, objType: OjectType): fabric.Object | undefined {
     switch (objType) {
       case "text":
         return this.addText(canvas);

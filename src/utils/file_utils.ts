@@ -3,14 +3,14 @@ import { ExportedLabelTemplateSchema, type ExportedLabelTemplate, type LabelProp
 
 export class FileUtils {
   /** Convert label template to JSON and download it */
-  public static saveLabelAsJson(canvas: fabric.Canvas, labelProps: LabelProps) {
+  static saveLabelAsJson(canvas: fabric.Canvas, labelProps: LabelProps) {
     const timestamp = Math.floor(Date.now() / 1000);
 
     const labelRaw: ExportedLabelTemplate = {
       canvas: canvas.toJSON(),
       label: labelProps,
     };
-    
+
     const label = ExportedLabelTemplateSchema.parse(labelRaw);
     const json: string = JSON.stringify(label);
     const link = document.createElement("a");
@@ -27,7 +27,7 @@ export class FileUtils {
    * fixme: never ends if dialog closed
    *
    * */
-  public static async pickAndReadTextFile(acceptExtension: string): Promise<string> {
+  static async pickAndReadTextFile(acceptExtension: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const input: HTMLInputElement = document.createElement("input");
       const reader = new FileReader();
