@@ -109,7 +109,7 @@ export const translation_zh_cn: Partial<Record<TranslationKey, string>> = {
   "preview.postprocess.atkinson": "抖动（Atkinson）",
   "preview.postprocess.threshold": "阈值化",
   "preview.postprocess": "前置处理器",
-  "preview.print_task_version": "打印接口版本",
+  "preview.print_task": "打印接口",
   "preview.print": "打印",
   "preview.threshold": "阈值",
   "preview.title": "打印预览",

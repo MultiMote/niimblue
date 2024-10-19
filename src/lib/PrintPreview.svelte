@@ -9,8 +9,9 @@
     type EncodedImage,
     ImageEncoder,
     LabelType,
-    PrintTaskVersion,
+    printTaskNames,
     type PrintProgressEvent,
+    type PrintTaskName,
   } from "@mmote/niimbluelib";
   import type { LabelProps, PostProcessType, FabricJson, PreviewProps } from "../types";
   import ParamLockButton from "./ParamLockButton.svelte";
@@ -39,11 +40,11 @@
   let thresholdValue: number = 140;
   let originalImage: ImageData;
   let previewContext: CanvasRenderingContext2D;
-  let printTaskVersion: PrintTaskVersion = PrintTaskVersion.V3;
+  let printTaskName: PrintTaskName = "D110";
   let labelType: LabelType = LabelType.WithGaps;
   let statusTimer: NodeJS.Timeout | undefined = undefined;
   let error: string = "";
-  let taskVer = $printerClient?.getPrintTaskVersion();
+  let detectedPrintTaskName: PrintTaskName | undefined = $printerClient?.getPrintTaskType();
   let csvParsed: DSVRowArray<string>;
   let page = 0;
   let pagesTotal = 1;
@@ -72,8 +73,16 @@
     error = "";
     $printerClient.stopHeartbeat();
 
-    // do it in a stupid way (library not supports multi-page print yet)
+    // do it in a stupid way (multi-page print not finished yet)
     for (let curPage = 0; curPage < pagesTotal; curPage++) {
+      const printTask = $printerClient.abstraction.newPrintTask(printTaskName, {
+        totalPages: quantity,
+        density,
+        labelType,
+        statusPollIntervalMs: 100,
+        statusTimeoutMs: 8_000
+      })
+
       page = curPage;
       console.log("Printing page", page);
 
@@ -81,7 +90,8 @@
       const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, labelProps.printDirection);
 
       try {
-        await $printerClient.abstraction.print(printTaskVersion, encoded, { quantity, density, labelType });
+        await printTask.printInit();
+        await printTask.printPage(encoded, quantity);
       } catch (e) {
         error = `${e}`;
         console.error(e);
@@ -97,9 +107,7 @@
       $printerClient.addEventListener("printprogress", listener);
 
       try {
-        await $printerClient.abstraction.waitUntilPrintFinished(printTaskVersion, quantity, {
-          pollIntervalMs: 100, timeoutMs: 8_000
-        });
+        await printTask.waitForFinished();
       } catch (e) {
         error = `${e}`;
         console.error(e);
@@ -109,6 +117,7 @@
 
       await endPrint();
     }
+
 
     printState = "idle";
     $printerClient.startHeartbeat();
@@ -169,7 +178,7 @@
       if (saved.quantity) quantity = saved.quantity;
       if (saved.density) density = saved.density;
       if (saved.labelType) labelType = saved.labelType;
-      if (saved.printTaskVersion) printTaskVersion = saved.printTaskVersion;
+      if (saved.printTaskName) printTaskName = saved.printTaskName;
     } catch (e) {
       Toasts.zodErrors(e, "Preview parameters load error:");
     }
@@ -242,9 +251,9 @@
       onClosed();
     });
 
-    if (taskVer !== undefined) {
-      console.log(`Detected print task version: ${PrintTaskVersion[taskVer]}`);
-      printTaskVersion = taskVer;
+    if (detectedPrintTaskName !== undefined) {
+      console.log(`Detected print task version: ${detectedPrintTaskName}`);
+      printTaskName = detectedPrintTaskName;
     }
 
     loadProps();
@@ -394,32 +403,22 @@
         </div>
 
         <div class="input-group input-group-sm">
-          <span class="input-group-text">{$tr("preview.print_task_version")}</span>
+          <span class="input-group-text">{$tr("preview.print_task")}</span>
           <select
             class="form-select"
-            bind:value={printTaskVersion}
-            on:change={() => updateSavedProp("printTaskVersion", printTaskVersion)}>
-            <option value={PrintTaskVersion.V1}>
-              {#if taskVer === PrintTaskVersion.V1}✔{/if} V1 - D11/B21
-            </option>
-            <option value={PrintTaskVersion.V2}>
-              {#if taskVer === PrintTaskVersion.V2}✔{/if} V2
-            </option>
-            <option value={PrintTaskVersion.V3}>
-              {#if taskVer === PrintTaskVersion.V3}✔{/if} V3 - D110
-            </option>
-            <option value={PrintTaskVersion.V4}>
-              {#if taskVer === PrintTaskVersion.V4}✔{/if} V4 - B1
-            </option>
-            <option value={PrintTaskVersion.V5}>
-              {#if taskVer === PrintTaskVersion.V5}✔{/if} V5
-            </option>
+            bind:value={printTaskName}
+            on:change={() => updateSavedProp("printTaskName", printTaskName)}>
+            {#each printTaskNames as name}
+              <option value={name}>
+                {#if detectedPrintTaskName === name}✔{/if} {name}
+              </option>
+            {/each}
           </select>
 
           <ParamLockButton
-            propName="printTaskVersion"
-            value={printTaskVersion}
-            savedValue={savedProps.printTaskVersion}
+            propName="printTaskName"
+            value={printTaskName}
+            savedValue={savedProps.printTaskName}
             onClick={toggleSavedProp} />
         </div>
 

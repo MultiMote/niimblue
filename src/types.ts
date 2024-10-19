@@ -1,4 +1,4 @@
-import { LabelType, PrintTaskVersion } from "@mmote/niimbluelib";
+import { LabelType, printTaskNames } from "@mmote/niimbluelib";
 import { fabric } from "fabric";
 import { z } from "zod";
 
@@ -41,13 +41,15 @@ export const ExportedLabelTemplateSchema = z.object({
   label: LabelPropsSchema,
 });
 
+const [firstTask, ...otherTasks] = printTaskNames;
+
 export const PreviewPropsSchema = z.object({
   postProcess: z.enum(["threshold", "dither"]).optional(),
   threshold: z.number().gte(1).lte(255).optional(),
   quantity: z.number().gte(1).optional(),
   density: z.number().gte(1).optional(),
   labelType: z.nativeEnum(LabelType).optional(),
-  printTaskVersion: z.nativeEnum(PrintTaskVersion).optional(),
+  printTaskName: z.enum([firstTask, ...otherTasks]).optional(),
 });
 
 export type LabelProps = z.infer<typeof LabelPropsSchema>;

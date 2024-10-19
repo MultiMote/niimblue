@@ -98,7 +98,7 @@ export const translation_en = {
   "preview.postprocess.atkinson": "Dither (Atkinson)",
   "preview.postprocess.threshold": "Threshold",
   "preview.postprocess": "Post-process",
-  "preview.print_task_version": "Print task version",
+  "preview.print_task": "Print task",
   "preview.print": "Print",
   "preview.threshold": "Threshold",
   "preview.title": "Print preview",

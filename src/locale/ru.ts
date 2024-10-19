@@ -33,7 +33,7 @@ export const translation_ru: Record<TranslationKey, string> = {
   "preview.threshold": "Порог",
   "preview.copies": "Копии",
   "preview.density": "Плотность",
-  "preview.print_task_version": "Версия задачи печати",
+  "preview.print_task": "Задача печати",
   "preview.not_implemented": "НЕ РЕАЛИЗОВАНО",
   "preview.close": "Закрыть",
   "preview.print": "Печать",
