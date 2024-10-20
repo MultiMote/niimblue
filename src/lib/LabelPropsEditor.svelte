@@ -134,6 +134,13 @@
     }
   };
 
+  const fillWithCurrentParams = () => {
+    unit = "px";
+    width = labelProps.size.width;
+    height = labelProps.size.height;
+    printDirection = labelProps.printDirection;
+  };
+
   onMount(() => {
     const defaultPreset: LabelPreset = DEFAULT_LABEL_PRESETS[0];
     width = defaultPreset.width;
@@ -172,6 +179,7 @@
         {:else if labelProps.printDirection === "left"}
           ({$tr("params.label.direction")} {$tr("params.label.direction.left")})
         {/if}
+        <button class="btn btn-sm" on:click={fillWithCurrentParams}><MdIcon icon="arrow_downward" /></button>
       </div>
 
       <LabelPresetsBrowser
@@ -195,9 +203,7 @@
       <div class="input-group flex-nowrap input-group-sm mb-3">
         <span class="input-group-text">{$tr("params.label.head_density")}</span>
         <input class="form-control" type="number" min="1" bind:value={dpmm} />
-        <span
-          class="input-group-text cursor-help"
-          title={$tr("params.label.head_density.help")}>
+        <span class="input-group-text cursor-help" title={$tr("params.label.head_density.help")}>
           {$tr("params.label.dpmm")}
         </span>
       </div>
