@@ -61,11 +61,11 @@
 
     if (!$disconnected && printState !== "idle") {
       await $printerClient.abstraction.printEnd();
+      $printerClient.startHeartbeat();
     }
 
     printState = "idle";
     printProgress = 0;
-    $printerClient.startHeartbeat();
   };
 
   const onPrint = async () => {
