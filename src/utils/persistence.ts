@@ -1,9 +1,11 @@
 import {
+  ExportedLabelTemplateSchema,
   FabricJsonSchema,
   LabelPresetSchema,
   LabelPropsSchema,
   PreviewPropsSchema,
   type ConnectionType,
+  type ExportedLabelTemplate,
   type FabricJson,
   type LabelPreset,
   type LabelProps,
@@ -89,18 +91,26 @@ export class LocalStoragePersistence {
   /**
    * @throws {z.ZodError}
    */
-  static saveCanvas(labelData: LabelProps, canvasData: FabricJson) {
-    this.validateAndSaveObject("saved_canvas_props", labelData, LabelPropsSchema);
-    this.validateAndSaveObject("saved_canvas_data", canvasData, FabricJsonSchema);
+  static saveLabel(labelData: LabelProps, canvasData: FabricJson) {
+    const obj = { label: labelData, canvas: canvasData };
+    this.validateAndSaveObject("saved_label", obj, ExportedLabelTemplateSchema);
   }
 
   /**
    * @throws {z.ZodError}
    */
-  static loadSavedCanvas(): { labelData: LabelProps | null; canvasData: FabricJson | null } {
-    const labelData = this.loadAndValidateObject("saved_canvas_props", LabelPropsSchema);
-    const canvasData = this.loadAndValidateObject("saved_canvas_data", FabricJsonSchema);
-    return { labelData, canvasData };
+  static loadLabel(): ExportedLabelTemplate | null {
+    let label = this.loadAndValidateObject("saved_canvas_props", LabelPropsSchema);
+    let canvas = this.loadAndValidateObject("saved_canvas_data", FabricJsonSchema);
+
+    if (label !== null && canvas !== null) {
+      this.saveLabel(label, canvas);
+      localStorage.removeItem("saved_canvas_props");
+      localStorage.removeItem("saved_canvas_data");
+      return { label, canvas };
+    }
+
+    return this.loadAndValidateObject("saved_label", ExportedLabelTemplateSchema);
   }
 
   /**

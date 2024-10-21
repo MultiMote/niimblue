@@ -126,7 +126,7 @@
   const onSaveClicked = () => {
     if (confirm($tr("editor.warning.save"))) {
       try {
-        LocalStoragePersistence.saveCanvas(labelProps, fabricCanvas.toJSON());
+        LocalStoragePersistence.saveLabel(labelProps, fabricCanvas.toJSON());
       } catch (e) {
         Toasts.zodErrors(e, "Canvas save error:");
       }
@@ -176,18 +176,18 @@
     }
 
     try {
-      const { labelData, canvasData } = LocalStoragePersistence.loadSavedCanvas();
+      const labelData = LocalStoragePersistence.loadLabel();
 
-      if (labelData === null || canvasData === null) {
+      if (labelData === null) {
         Toasts.error("No saved label data found, or data is corrupt");
         return;
       }
 
-      labelProps = labelData;
+      labelProps = labelData.label;
       onUpdateLabelProps(labelProps);
 
       fabricCanvas.loadFromJSON(
-        canvasData,
+        labelData.canvas,
         () => {
           fabricCanvas.backgroundColor = "#fff";
           fabricCanvas.requestRenderAll();
