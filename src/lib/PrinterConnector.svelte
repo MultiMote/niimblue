@@ -84,7 +84,7 @@
           Printer info:
           <ul>
             {#each Object.entries($printerInfo) as [k, v]}
-              <li>{k}: <strong>{v || "-"}</strong></li>
+              <li>{k}: <strong>{v ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
@@ -95,7 +95,7 @@
           Model metadata:
           <ul>
             {#each Object.entries($printerMeta) as [k, v]}
-              <li>{k}: <strong>{v || "-"}</strong></li>
+              <li>{k}: <strong>{v ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
@@ -106,7 +106,7 @@
           Rfid info:
           <ul>
             {#each Object.entries(rfidInfo) as [k, v]}
-              <li>{k}: <strong>{v || "-"}</strong></li>
+              <li>{k}: <strong>{v ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
@@ -117,7 +117,7 @@
           Heartbeat data:
           <ul>
             {#each Object.entries($heartbeatData) as [k, v]}
-              <li>{k}: <strong>{v || "-"}</strong></li>
+              <li>{k}: <strong>{v ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
