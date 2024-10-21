@@ -7,6 +7,7 @@
     type MoveDirection,
     type FabricJson,
     ExportedLabelTemplateSchema,
+    type ExportedLabelTemplate,
   } from "../types";
   import LabelPropsEditor from "./LabelPropsEditor.svelte";
   import IconPicker from "./IconPicker.svelte";
@@ -30,8 +31,9 @@
   import { iconCodepoints, type MaterialIcon } from "../mdi_icons";
   import MdIcon from "./MdIcon.svelte";
   import { Toasts } from "../utils/toasts";
+  import { UndoRedo, type UndoState } from "../utils/undo_redo";
 
-  let GRID_SIZE: number = 5;
+  const GRID_SIZE: number = 5;
 
   let htmlCanvas: HTMLCanvasElement;
   let fabricCanvas: fabric.Canvas;
@@ -42,6 +44,21 @@
   let printNow: boolean = false;
   let csvData: string = "";
   let csvEnabled: boolean = false;
+
+  const undo = new UndoRedo();
+  let undoState: UndoState = { undoDisabled: false, redoDisabled: false };
+
+  const loadLabelData = async (data: ExportedLabelTemplate) => {
+    undo.paused = true;
+    onUpdateLabelProps(data.label);
+    await FileUtils.loadCanvasState(fabricCanvas, data.canvas);
+    undo.paused = false;
+  };
+
+  undo.onLabelUpdate = loadLabelData;
+  undo.onStateUpdate = (state: UndoState) => {
+    undoState = state;
+  };
 
   const deleteSelected = () => {
     const selected: fabric.Object[] = fabricCanvas.getActiveObjects();
@@ -66,6 +83,7 @@
         obj.left! += GRID_SIZE;
         fabricCanvas.add(obj);
         fabricCanvas.setActiveObject(obj);
+        undo.push(fabricCanvas, labelProps);
       });
     }
   };
@@ -118,6 +136,7 @@
     fabricCanvas.setDimensions(labelProps.size);
     try {
       LocalStoragePersistence.saveLastLabelProps(labelProps);
+      undo.push(fabricCanvas, labelProps);
     } catch (e) {
       Toasts.zodErrors(e, "Label parameters save error:");
     }
@@ -151,26 +170,14 @@
 
     try {
       const data = ExportedLabelTemplateSchema.parse(rawData);
-
-      labelProps = data.label;
-      onUpdateLabelProps(labelProps);
-
-      fabricCanvas.loadFromJSON(
-        data.canvas,
-        () => {
-          fabricCanvas.backgroundColor = "#fff";
-          fabricCanvas.requestRenderAll();
-        },
-        (src: object, obj: fabric.Object, error: any) => {
-          obj.set({ snapAngle: 10 });
-        },
-      );
+      await loadLabelData(data);
+      undo.push(fabricCanvas, labelProps);
     } catch (e) {
       Toasts.zodErrors(e, "Canvas load error:");
     }
   };
 
-  const onLoadClicked = () => {
+  const onLoadClicked = async () => {
     if (!confirm($tr("editor.warning.load"))) {
       return;
     }
@@ -183,20 +190,8 @@
         return;
       }
 
-      labelProps = labelData.label;
-      onUpdateLabelProps(labelProps);
-
-      fabricCanvas.loadFromJSON(
-        labelData.canvas,
-        () => {
-          fabricCanvas.backgroundColor = "#fff";
-          fabricCanvas.requestRenderAll();
-        },
-        (src: object, obj: fabric.Object, error: any) => {
-          obj.set({ snapAngle: 10 });
-          // console.log(error);
-        },
-      );
+      await loadLabelData(labelData);
+      undo.push(fabricCanvas, labelProps);
     } catch (e) {
       Toasts.zodErrors(e, "Canvas load error:");
     }
@@ -211,6 +206,7 @@
         fabric.Image.fromURL(readerEvt.target.result as string, (img: fabric.Image) => {
           img.set({ left: 0, top: 0, snapAngle: 10 });
           fabricCanvas.add(img);
+          undo.push(fabricCanvas, labelProps);
         });
       }
     };
@@ -224,6 +220,7 @@
     const obj = ImageEditorUtils.addObject(fabricCanvas, objectType);
     if (obj !== undefined) {
       fabricCanvas.setActiveObject(obj);
+      undo.push(fabricCanvas, labelProps);
     }
   };
 
@@ -233,6 +230,7 @@
       fontFamily: "Material Icons",
       fontSize: 100,
     });
+    undo.push(fabricCanvas, labelProps);
   };
 
   const onPreviewClosed = () => {
@@ -272,6 +270,7 @@
       originY: "top",
     });
     fabricCanvas.setActiveObject(obj);
+    undo.push(fabricCanvas, labelProps);
   };
 
   const onPaste = (event: ClipboardEvent) => {
@@ -294,6 +293,7 @@
           const blob = item.getAsFile();
           if (blob) {
             ImageEditorUtils.addImageFile(fabricCanvas, blob);
+            undo.push(fabricCanvas, labelProps);
           }
         }
       }
@@ -303,6 +303,7 @@
       if (text) {
         const obj = ImageEditorUtils.addText(fabricCanvas, text);
         fabricCanvas.setActiveObject(obj);
+        undo.push(fabricCanvas, labelProps);
       }
 
       event.preventDefault();
@@ -331,6 +332,7 @@
     });
 
     ImageEditorUtils.addText(fabricCanvas, $tr("editor.default_text"));
+    undo.push(fabricCanvas, labelProps);
 
     // force close dropdowns on touch devices
     fabricCanvas.on("mouse:down", (e: fabric.IEvent<MouseEvent>): void => {
@@ -345,6 +347,14 @@
           top: Math.round(e.target.top / GRID_SIZE) * GRID_SIZE,
         });
       }
+    });
+
+    fabricCanvas.on("object:modified", (): void => {
+      undo.push(fabricCanvas, labelProps);
+    });
+
+    fabricCanvas.on("object:removed", (): void => {
+      undo.push(fabricCanvas, labelProps);
     });
 
     fabricCanvas.on("selection:created", (e: fabric.IEvent<MouseEvent>): void => {
@@ -369,6 +379,7 @@
       if (dragEvt.dataTransfer?.files) {
         [...dragEvt.dataTransfer.files].forEach((file: File, idx: number) => {
           ImageEditorUtils.addImageFile(fabricCanvas, file);
+          undo.push(fabricCanvas, labelProps);
         });
       }
     });
@@ -405,6 +416,22 @@
     <div class="col d-flex justify-content-center">
       <div class="toolbar d-flex flex-wrap gap-1 justify-content-center align-items-center">
         <LabelPropsEditor {labelProps} onChange={onUpdateLabelProps} />
+
+        <button
+          class="btn btn-sm btn-secondary"
+          disabled={undoState.undoDisabled}
+          on:click={() => undo.undo()}
+          title={$tr("editor.undo")}>
+          <MdIcon icon="undo" />
+        </button>
+
+        <button
+          class="btn btn-sm btn-secondary"
+          disabled={undoState.redoDisabled}
+          on:click={() => undo.redo()}
+          title={$tr("editor.redo")}>
+          <MdIcon icon="redo" />
+        </button>
 
         <CsvControl
           csv={csvData}

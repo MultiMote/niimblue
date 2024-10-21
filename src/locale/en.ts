@@ -6,6 +6,8 @@ export const translation_en = {
   "connector.serial": "Serial (USB)",
   "connector.disconnect.heartbeat": "Disconnected (printer does not respond)",
   "editor.clone": "Clone",
+  "editor.undo": "Undo",
+  "editor.redo": "Redo",
   "editor.default_text": "Text",
   "editor.delete": "Delete",
   "editor.save.json": "Save (JSON)",

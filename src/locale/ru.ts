@@ -23,6 +23,8 @@ export const translation_ru: Record<TranslationKey, string> = {
   "editor.print": "Печать",
   "editor.delete": "Удалить",
   "editor.clone": "Клонировать",
+  "editor.undo": "Отменить",
+  "editor.redo": "Повторить",
   "editor.warning.save": "Сохранённые данные будут перезаписаны. Сохранить?",
   "editor.warning.load": "Холст будет заменён на сохранённый",
   /* PrintPreview */

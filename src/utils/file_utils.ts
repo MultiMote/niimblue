@@ -1,5 +1,5 @@
 import type { fabric } from "fabric";
-import { ExportedLabelTemplateSchema, type ExportedLabelTemplate, type LabelProps } from "../types";
+import { ExportedLabelTemplateSchema, type ExportedLabelTemplate, type FabricJson, type LabelProps } from "../types";
 
 export class FileUtils {
   /** Convert label template to JSON and download it */
@@ -56,6 +56,22 @@ export class FileUtils {
         }
       };
       input.click();
+    });
+  }
+
+  static async loadCanvasState(canvas: fabric.Canvas, state: FabricJson): Promise<void> {
+    return new Promise((resolve) => {
+      canvas.loadFromJSON(
+        state,
+        () => {
+          canvas.backgroundColor = "#fff";
+          canvas.requestRenderAll();
+          resolve();
+        },
+        (src: object, obj: fabric.Object, error: any) => {
+          obj.set({ snapAngle: 10 });
+        }
+      );
     });
   }
 }

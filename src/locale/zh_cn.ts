@@ -10,6 +10,8 @@ export const translation_zh_cn: Partial<Record<TranslationKey, string>> = {
   "connector.serial": "串口（USB）",
   /* ImageEditor */
   "editor.clone": "复制",
+  "editor.undo": "撤消",
+  "editor.redo": "重做",
   "editor.default_text": "文本",
   "editor.delete": "删除",
   "editor.iconpicker.mdi_link_title": "在这里查看详细列表",
