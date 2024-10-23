@@ -1,37 +1,37 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
+  import Dropdown from "bootstrap/js/dist/dropdown";
   import { fabric } from "fabric";
+  import { onDestroy, onMount } from "svelte";
+  import { Barcode } from "../fabric-object/barcode.class";
+  import { QRCode } from "../fabric-object/qrcode.class";
+  import { iconCodepoints, type MaterialIcon } from "../mdi_icons";
+  import { connectionState } from "../stores";
   import {
-    type LabelProps,
-    type OjectType,
-    type MoveDirection,
-    type FabricJson,
     ExportedLabelTemplateSchema,
     type ExportedLabelTemplate,
+    type FabricJson,
+    type LabelProps,
+    type MoveDirection,
+    type OjectType,
   } from "../types";
-  import LabelPropsEditor from "./LabelPropsEditor.svelte";
-  import IconPicker from "./IconPicker.svelte";
-  import ObjectPicker from "./ObjectPicker.svelte";
-  import PrintPreview from "./PrintPreview.svelte";
-  import TextParamsPanel from "./TextParamsControls.svelte";
-  import GenericObjectParamsControls from "./GenericObjectParamsControls.svelte";
-  import { ImageEditorUtils } from "../utils/image_editor_utils";
-  import { QRCode } from "../fabric-object/qrcode.class";
-  import QrCodeParamsPanel from "./QRCodeParamsControls.svelte";
-  import { Barcode } from "../fabric-object/barcode.class";
-  import BarcodeParamsPanel from "./BarcodeParamsControls.svelte";
-  import Dropdown from "bootstrap/js/dist/dropdown";
   import { FileUtils } from "../utils/file_utils";
-  import ZplImportButton from "./ZplImportButton.svelte";
-  import { connectionState } from "../stores";
   import { tr } from "../utils/i18n";
-  import VariableInsertControl from "./VariableInsertControl.svelte";
-  import CsvControl from "./CsvControl.svelte";
+  import { ImageEditorObjectHelper } from "../utils/image_editor_object_helper";
   import { LocalStoragePersistence } from "../utils/persistence";
-  import { iconCodepoints, type MaterialIcon } from "../mdi_icons";
-  import MdIcon from "./MdIcon.svelte";
   import { Toasts } from "../utils/toasts";
   import { UndoRedo, type UndoState } from "../utils/undo_redo";
+  import BarcodeParamsPanel from "./BarcodeParamsControls.svelte";
+  import CsvControl from "./CsvControl.svelte";
+  import GenericObjectParamsControls from "./GenericObjectParamsControls.svelte";
+  import IconPicker from "./IconPicker.svelte";
+  import LabelPropsEditor from "./LabelPropsEditor.svelte";
+  import MdIcon from "./MdIcon.svelte";
+  import ObjectPicker from "./ObjectPicker.svelte";
+  import PrintPreview from "./PrintPreview.svelte";
+  import QrCodeParamsPanel from "./QRCodeParamsControls.svelte";
+  import TextParamsPanel from "./TextParamsControls.svelte";
+  import VariableInsertControl from "./VariableInsertControl.svelte";
+  import ZplImportButton from "./ZplImportButton.svelte";
 
   const GRID_SIZE: number = 5;
 
@@ -105,7 +105,7 @@
 
   const isAnyInputFocused = (): boolean => {
     const focused: Element | null = document.activeElement;
-    
+
     if (focused !== null && (focused.tagName === "INPUT" || focused.tagName === "TEXTAREA")) {
       return true;
     }
@@ -140,7 +140,7 @@
       return;
     }
 
-    if (e.key === "Delete") {
+   if (e.key === "Delete") {
       deleteSelected();
       return;
     }
@@ -232,7 +232,7 @@
   };
 
   const onObjectPicked = (objectType: OjectType) => {
-    const obj = ImageEditorUtils.addObject(fabricCanvas, objectType);
+    const obj = ImageEditorObjectHelper.addObject(fabricCanvas, objectType);
     if (obj !== undefined) {
       fabricCanvas.setActiveObject(obj);
       undo.push(fabricCanvas, labelProps);
@@ -241,7 +241,7 @@
 
   const onIconPicked = (i: MaterialIcon) => {
     // todo: icon is not vertically centered
-    ImageEditorUtils.addStaticText(fabricCanvas, String.fromCodePoint(iconCodepoints[i]), {
+    ImageEditorObjectHelper.addStaticText(fabricCanvas, String.fromCodePoint(iconCodepoints[i]), {
       fontFamily: "Material Icons",
       fontSize: 100,
     });
@@ -279,7 +279,7 @@
   };
 
   const onCsvPlaceholderPicked = (name: string) => {
-    const obj = ImageEditorUtils.addText(fabricCanvas, `{${name}}`, {
+    const obj = ImageEditorObjectHelper.addText(fabricCanvas, `{${name}}`, {
       textAlign: "left",
       originX: "left",
       originY: "top",
@@ -304,7 +304,7 @@
         if (item.type.indexOf("image") !== -1) {
           const blob = item.getAsFile();
           if (blob) {
-            ImageEditorUtils.addImageFile(fabricCanvas, blob);
+            ImageEditorObjectHelper.addImageFile(fabricCanvas, blob);
             undo.push(fabricCanvas, labelProps);
           }
         }
@@ -313,7 +313,7 @@
       // paste text
       const text = event.clipboardData.getData("text");
       if (text) {
-        const obj = ImageEditorUtils.addText(fabricCanvas, text);
+        const obj = ImageEditorObjectHelper.addText(fabricCanvas, text);
         fabricCanvas.setActiveObject(obj);
         undo.push(fabricCanvas, labelProps);
       }
@@ -343,7 +343,7 @@
       backgroundColor: "#fff",
     });
 
-    ImageEditorUtils.addText(fabricCanvas, $tr("editor.default_text"));
+    ImageEditorObjectHelper.addText(fabricCanvas, $tr("editor.default_text"));
     undo.push(fabricCanvas, labelProps);
 
     // force close dropdowns on touch devices
@@ -390,7 +390,7 @@
 
       if (dragEvt.dataTransfer?.files) {
         [...dragEvt.dataTransfer.files].forEach((file: File, idx: number) => {
-          ImageEditorUtils.addImageFile(fabricCanvas, file);
+          ImageEditorObjectHelper.addImageFile(fabricCanvas, file);
           undo.push(fabricCanvas, labelProps);
         });
       }

@@ -1,19 +1,17 @@
 import { fabric } from "fabric";
-import { QRCode } from "../fabric-object/qrcode.class";
-import Barcode from "../fabric-object/barcode.class";
-import type { OjectType } from "../types";
 import type { ITextOptions, TextOptions } from "fabric/fabric-impl";
+import Barcode from "../fabric-object/barcode.class";
+import { QRCode } from "../fabric-object/qrcode.class";
+import type { OjectType } from "../types";
 
-export class ImageEditorUtils {
+export class ImageEditorObjectHelper {
   static readonly SIZE_DEFAULT: number = 64;
   static readonly OBJECT_DEFAULTS = {
     fill: "black",
     snapAngle: 10,
     top: 10,
     left: 10,
-    // objectCaching: false
     strokeUniform: true,
-    // noScaleCache: true,
   };
 
   static addSvg(canvas: fabric.Canvas, svgCode: string): void {
