@@ -88,17 +88,18 @@
     const amount = ctrl ? 1 : GRID_SIZE;
 
     selected.forEach((obj) => {
-      if (direction === "Left") {
+      if (direction === "left") {
         // round to fix inter-pixel positions
         obj.left = Math.round(obj.left!) - amount;
-      } else if (direction === "Right") {
+      } else if (direction === "right") {
         obj.left = Math.round(obj.left!) + amount;
-      } else if (direction === "Up") {
+      } else if (direction === "up") {
         obj.top = Math.round(obj.top!) - amount;
-      } else if (direction === "Down") {
+      } else if (direction === "down") {
         obj.top = Math.round(obj.top!) + amount;
       }
       obj.setCoords();
+      undo.push(fabricCanvas, labelProps);
     });
     fabricCanvas.requestRenderAll();
   };
@@ -121,7 +122,10 @@
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Escape") {
+    const key: string = e.key.toLowerCase();
+
+    // Esc
+    if (key === "escape") {
       fabricCanvas.discardActiveObject();
       fabricCanvas.requestRenderAll();
       return;
@@ -131,8 +135,9 @@
       return;
     }
 
-    if (e.key.startsWith("Arrow")) {
-      moveSelected(e.key.slice("Arrow".length) as MoveDirection, e.ctrlKey);
+    // Arrows
+    if (key.startsWith("arrow")) {
+      moveSelected(key.slice("arrow".length) as MoveDirection, e.ctrlKey);
       return;
     }
 
@@ -140,7 +145,33 @@
       return;
     }
 
-   if (e.key === "Delete") {
+    // Ctrl + D
+    if (e.ctrlKey && key === "d") {
+      e.preventDefault();
+      cloneSelected();
+      return;
+    }
+
+    // Ctrl + Y, Ctrl + Shift + Z
+    if ((e.ctrlKey && key === "y") || (e.ctrlKey && e.shiftKey && key === "z")) {
+      e.preventDefault();
+      if (!undoState.redoDisabled) {
+        undo.redo();
+      }
+      return;
+    }
+
+    // Ctrl + Z
+    if (e.ctrlKey && key === "z") {
+      e.preventDefault();
+      if (!undoState.undoDisabled) {
+        undo.undo();
+      }
+      return;
+    }
+
+    // Del
+    if (key === "delete") {
       deleteSelected();
       return;
     }
