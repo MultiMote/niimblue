@@ -62,11 +62,6 @@
 
   const deleteSelected = () => {
     const selected: fabric.Object[] = fabricCanvas.getActiveObjects();
-    for (const obj of selected) {
-      if (obj instanceof fabric.IText && obj.isEditing) {
-        return;
-      }
-    }
     selected.forEach((obj) => {
       fabricCanvas.remove(obj);
     });
@@ -90,12 +85,6 @@
 
   const moveSelected = (direction: MoveDirection, ctrl?: boolean) => {
     const selected: fabric.Object[] = fabricCanvas.getActiveObjects();
-    for (const obj of selected) {
-      if (obj instanceof fabric.IText && obj.isEditing) {
-        return;
-      }
-    }
-
     const amount = ctrl ? 1 : GRID_SIZE;
 
     selected.forEach((obj) => {
@@ -114,9 +103,37 @@
     fabricCanvas.requestRenderAll();
   };
 
+  const isAnyInputFocused = (): boolean => {
+    const focused: Element | null = document.activeElement;
+    
+    if (focused !== null && (focused.tagName === "INPUT" || focused.tagName === "TEXTAREA")) {
+      return true;
+    }
+
+    const selected: fabric.Object[] = fabricCanvas.getActiveObjects();
+    const editing = selected.some((obj) => obj instanceof fabric.IText && obj.isEditing);
+
+    if (editing) {
+      return true;
+    }
+
+    return false;
+  };
+
   const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "Escape") {
+      fabricCanvas.discardActiveObject();
+      fabricCanvas.requestRenderAll();
+      return;
+    }
+
+    if (isAnyInputFocused()) {
+      return;
+    }
+
     if (e.key.startsWith("Arrow")) {
       moveSelected(e.key.slice("Arrow".length) as MoveDirection, e.ctrlKey);
+      return;
     }
 
     if (e.repeat) {
@@ -125,9 +142,7 @@
 
     if (e.key === "Delete") {
       deleteSelected();
-    } else if (e.key === "Escape") {
-      fabricCanvas.discardActiveObject();
-      fabricCanvas.requestRenderAll();
+      return;
     }
   };
 
@@ -274,11 +289,8 @@
   };
 
   const onPaste = (event: ClipboardEvent) => {
-    const selected: fabric.Object[] = fabricCanvas.getActiveObjects();
-    for (const obj of selected) {
-      if ((obj instanceof fabric.IText && obj.isEditing) || obj instanceof QRCode) {
-        return;
-      }
+    if (isAnyInputFocused()) {
+      return;
     }
 
     const openedDropdowns = document.querySelectorAll(".dropdown-menu.show");
