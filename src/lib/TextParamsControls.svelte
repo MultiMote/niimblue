@@ -3,14 +3,14 @@
   import { tr } from "../utils/i18n";
   import MdIcon from "./MdIcon.svelte";
   import { Toasts } from "../utils/toasts";
+  import { OBJECT_DEFAULTS_TEXT } from "../defaults";
 
   export let selectedObject: fabric.Object;
   export let valueUpdated: () => void;
 
-  const DEFAULT_FONT = "Noto Sans Variable";
 
   let selectedText: fabric.IText | undefined;
-  let fontFamilies: string[] = [DEFAULT_FONT];
+  let fontFamilies: string[] = [OBJECT_DEFAULTS_TEXT.fontFamily];
 
   const toggleBold = () => {
     if (selectedText!.fontWeight === "bold") {
@@ -77,7 +77,7 @@
   const getFonts = async () => {
     try {
       const fonts = await queryLocalFonts();
-      fontFamilies = [DEFAULT_FONT, ...new Set(fonts.map((f: FontData) => f.family))].sort();
+      fontFamilies = [OBJECT_DEFAULTS_TEXT.fontFamily, ...new Set(fonts.map((f: FontData) => f.family))].sort();
       console.log(fontFamilies);
     } catch (e) {
       Toasts.error(e);

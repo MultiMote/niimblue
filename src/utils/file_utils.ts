@@ -1,5 +1,6 @@
 import type { fabric } from "fabric";
 import { ExportedLabelTemplateSchema, type ExportedLabelTemplate, type FabricJson, type LabelProps } from "../types";
+import { OBJECT_DEFAULTS } from "../defaults";
 
 export class FileUtils {
   /** Convert label template to JSON and download it */
@@ -69,7 +70,7 @@ export class FileUtils {
           resolve();
         },
         (src: object, obj: fabric.Object, error: any) => {
-          obj.set({ snapAngle: 10 });
+          obj.set({ snapAngle: OBJECT_DEFAULTS.snapAngle });
         }
       );
     });

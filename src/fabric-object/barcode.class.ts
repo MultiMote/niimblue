@@ -1,6 +1,7 @@
 import { fabric } from "fabric";
 import { code128b, ean13 } from "../utils/barcode";
 import { equalSpacingFillText } from "../utils/canvas_utils";
+import { OBJECT_DEFAULTS_TEXT } from "../defaults";
 
 const ALL_PROPERTIES = ["text", "encoding", "printText", "scaleFactor", "fontSize", "font", "fontFamily"];
 const EAN13_LONG_BAR_INDEXES: number[] = [0, 1, 2, 45, 46, 47, 48, 49, 92, 93, 94];
@@ -49,7 +50,7 @@ export class Barcode extends fabric.Object {
     this.printText = options?.printText ?? true;
     this.scaleFactor = options?.scaleFactor ?? 1;
     this.fontSize = options?.fontSize ?? 12;
-    this.fontFamily = options?.fontFamily ?? "Noto Sans Variable";
+    this.fontFamily = options?.fontFamily ?? OBJECT_DEFAULTS_TEXT.fontFamily;
     this._createBandCode();
   }
 

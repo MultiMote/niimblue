@@ -32,12 +32,11 @@
   import TextParamsPanel from "./TextParamsControls.svelte";
   import VariableInsertControl from "./VariableInsertControl.svelte";
   import ZplImportButton from "./ZplImportButton.svelte";
-
-  const GRID_SIZE: number = 5;
+  import { DEFAULT_LABEL_PROPS, GRID_SIZE, OBJECT_DEFAULTS } from "../defaults";
 
   let htmlCanvas: HTMLCanvasElement;
   let fabricCanvas: fabric.Canvas;
-  let labelProps: LabelProps = { printDirection: "left", size: { width: 240, height: 96 } };
+  let labelProps: LabelProps = DEFAULT_LABEL_PROPS;
   let previewOpened: boolean = false;
   let selectedObject: fabric.Object | undefined = undefined;
   let selectedCount: number = 0;
@@ -73,7 +72,7 @@
   const cloneSelected = () => {
     if (selectedObject) {
       selectedObject.clone((obj: fabric.Object) => {
-        obj.snapAngle = 10;
+        obj.snapAngle = OBJECT_DEFAULTS.snapAngle;
         obj.top! += GRID_SIZE;
         obj.left! += GRID_SIZE;
         fabricCanvas.add(obj);
@@ -250,7 +249,7 @@
     reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
       if (readerEvt?.target?.result) {
         fabric.Image.fromURL(readerEvt.target.result as string, (img: fabric.Image) => {
-          img.set({ left: 0, top: 0, snapAngle: 10 });
+          img.set({ left: 0, top: 0, snapAngle: OBJECT_DEFAULTS.snapAngle });
           fabricCanvas.add(img);
           undo.push(fabricCanvas, labelProps);
         });
