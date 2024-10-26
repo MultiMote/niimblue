@@ -33,6 +33,7 @@
   import VariableInsertControl from "./VariableInsertControl.svelte";
   import ZplImportButton from "./ZplImportButton.svelte";
   import { DEFAULT_LABEL_PROPS, GRID_SIZE, OBJECT_DEFAULTS } from "../defaults";
+  import { ImageEditorUtils } from "../utils/image_editor_utils";
 
   let htmlCanvas: HTMLCanvasElement;
   let fabricCanvas: fabric.Canvas;
@@ -47,6 +48,13 @@
   const undo = new UndoRedo();
   let undoState: UndoState = { undoDisabled: false, redoDisabled: false };
 
+  const discardSelection = () => {
+    fabricCanvas.discardActiveObject();
+    fabricCanvas.requestRenderAll();
+    selectedObject = undefined;
+    selectedCount = 0;
+  };
+
   const loadLabelData = async (data: ExportedLabelTemplate) => {
     undo.paused = true;
     onUpdateLabelProps(data.label);
@@ -60,64 +68,19 @@
   };
 
   const deleteSelected = () => {
-    const selected: fabric.Object[] = fabricCanvas.getActiveObjects();
-    selected.forEach((obj) => {
-      fabricCanvas.remove(obj);
-    });
-    selectedObject = undefined;
-    selectedCount = 0;
-    fabricCanvas.discardActiveObject();
+    ImageEditorUtils.deleteSelection(fabricCanvas);
+    discardSelection();
   };
 
   const cloneSelected = () => {
     if (selectedObject) {
-      selectedObject.clone((obj: fabric.Object) => {
-        obj.snapAngle = OBJECT_DEFAULTS.snapAngle;
-        obj.top! += GRID_SIZE;
-        obj.left! += GRID_SIZE;
-        fabricCanvas.add(obj);
-        fabricCanvas.setActiveObject(obj);
-        undo.push(fabricCanvas, labelProps);
-      });
+      ImageEditorUtils.cloneObject(fabricCanvas, selectedObject).then(() => undo.push(fabricCanvas, labelProps));
     }
   };
 
   const moveSelected = (direction: MoveDirection, ctrl?: boolean) => {
-    const selected: fabric.Object[] = fabricCanvas.getActiveObjects();
-    const amount = ctrl ? 1 : GRID_SIZE;
-
-    selected.forEach((obj) => {
-      if (direction === "left") {
-        // round to fix inter-pixel positions
-        obj.left = Math.round(obj.left!) - amount;
-      } else if (direction === "right") {
-        obj.left = Math.round(obj.left!) + amount;
-      } else if (direction === "up") {
-        obj.top = Math.round(obj.top!) - amount;
-      } else if (direction === "down") {
-        obj.top = Math.round(obj.top!) + amount;
-      }
-      obj.setCoords();
-      undo.push(fabricCanvas, labelProps);
-    });
-    fabricCanvas.requestRenderAll();
-  };
-
-  const isAnyInputFocused = (): boolean => {
-    const focused: Element | null = document.activeElement;
-
-    if (focused !== null && (focused.tagName === "INPUT" || focused.tagName === "TEXTAREA")) {
-      return true;
-    }
-
-    const selected: fabric.Object[] = fabricCanvas.getActiveObjects();
-    const editing = selected.some((obj) => obj instanceof fabric.IText && obj.isEditing);
-
-    if (editing) {
-      return true;
-    }
-
-    return false;
+    ImageEditorUtils.moveSelection(fabricCanvas, direction, ctrl);
+    undo.push(fabricCanvas, labelProps);
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
@@ -125,12 +88,11 @@
 
     // Esc
     if (key === "escape") {
-      fabricCanvas.discardActiveObject();
-      fabricCanvas.requestRenderAll();
+      discardSelection();
       return;
     }
 
-    if (isAnyInputFocused()) {
+    if (ImageEditorUtils.isAnyInputFocused(fabricCanvas)) {
       return;
     }
 
@@ -319,7 +281,7 @@
   };
 
   const onPaste = (event: ClipboardEvent) => {
-    if (isAnyInputFocused()) {
+    if (ImageEditorUtils.isAnyInputFocused(fabricCanvas)) {
       return;
     }
 
