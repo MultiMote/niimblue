@@ -27,4 +27,8 @@
     text-rendering: optimizeLegibility;
     font-feature-settings: "liga";
   }
+
+  .mdi.r-90 {
+    transform: rotate(90deg);
+  }
 </style>

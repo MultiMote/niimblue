@@ -16,6 +16,7 @@
   import { Toasts } from "../utils/toasts";
   import { onMount } from "svelte";
   import { LocalStoragePersistence } from "../utils/persistence";
+  import type { MaterialIcon } from "material-icons";
 
   let connectionType: ConnectionType = "bluetooth";
   let rfidInfo: RfidInfo | undefined = undefined;
@@ -66,6 +67,19 @@
   const switchConnectionType = (c: ConnectionType) => {
     LocalStoragePersistence.saveLastConnectionType(c);
     connectionType = c;
+  };
+
+  const batteryIcon = (value: number): MaterialIcon => {
+    if (value === 4) {
+      return "battery_full";
+    } else if (value === 3) {
+      return "battery_5_bar";
+    } else if (value === 2) {
+      return "battery_3_bar";
+    } else if (value === 1) {
+      return "battery_2_bar";
+    }
+    return "battery_0_bar";
   };
 
   onMount(() => {
@@ -135,6 +149,9 @@
     </div>
     <span class="input-group-text {$heartbeatFails > 0 ? 'text-warning' : ''}">
       {$printerMeta?.model ?? $connectedPrinterName}
+      {#if $heartbeatData}
+      <MdIcon icon={batteryIcon($heartbeatData.powerLevel)} class="r-90"></MdIcon>
+      {/if}
     </span>
   {:else}
     <button
