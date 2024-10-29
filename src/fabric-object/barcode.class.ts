@@ -126,9 +126,9 @@ export class Barcode extends fabric.Object {
     ctx.font = this._getFont();
     ctx.textBaseline = "bottom";
 
-    let longBarHeight = this.height;
+    const longBarHeight = this.height;
     let shortBarHeight = this.height;
-    let barcodeStartPos = this.encoding === "EAN13" ? letterWidth : 0;
+    const barcodeStartPos = this.encoding === "EAN13" ? letterWidth : 0;
 
     if (this.printText) {
       shortBarHeight -= this.fontSize * 1.2;
@@ -212,7 +212,7 @@ export class Barcode extends fabric.Object {
   }
 }
 
-// @ts-ignore
+// @ts-expect-error Dynamic field create
 fabric.Barcode = Barcode;
 
 export default Barcode;

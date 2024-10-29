@@ -1,67 +1,119 @@
 import { fabric } from "fabric";
 import type { ITextOptions, TextOptions } from "fabric/fabric-impl";
+import { OBJECT_DEFAULTS, OBJECT_DEFAULTS_TEXT, OBJECT_DEFAULTS_VECTOR, OBJECT_SIZE_DEFAULTS } from "../defaults";
 import Barcode from "../fabric-object/barcode.class";
 import { QRCode } from "../fabric-object/qrcode.class";
 import type { OjectType } from "../types";
-import { OBJECT_DEFAULTS, OBJECT_DEFAULTS_TEXT, OBJECT_DEFAULTS_VECTOR, OBJECT_SIZE_DEFAULTS } from "../defaults";
 
 export class ImageEditorObjectHelper {
-  static addSvg(canvas: fabric.Canvas, svgCode: string): void {
-    fabric.loadSVGFromString(svgCode, (objects, options) => {
-      const obj = fabric.util.groupSVGElements(objects, options);
-      obj.scaleToWidth(OBJECT_SIZE_DEFAULTS.width).scaleToHeight(OBJECT_SIZE_DEFAULTS.height);
-      obj.set({ ...OBJECT_DEFAULTS });
-      canvas.add(obj).renderAll();
-      canvas.renderAll();
+  static async addSvg(canvas: fabric.Canvas, svgCode: string): Promise<fabric.Object | fabric.Group> {
+    return new Promise((resolve) => {
+      fabric.loadSVGFromString(svgCode, (objects, options) => {
+        const obj = fabric.util.groupSVGElements(objects, options);
+        obj.scaleToWidth(OBJECT_SIZE_DEFAULTS.width).scaleToHeight(OBJECT_SIZE_DEFAULTS.height);
+        obj.set({ ...OBJECT_DEFAULTS });
+        canvas.add(obj).renderAll();
+        canvas.renderAll();
+        resolve(obj);
+      });
     });
   }
 
-  // todo: return object
-  static addImageFile(canvas: fabric.Canvas, file: File) {
-    const reader = new FileReader();
+  static async addImageFile(canvas: fabric.Canvas, file: File): Promise<fabric.Object | fabric.Group> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
 
-    if (file.type.startsWith("image/svg")) {
-      reader.readAsText(file, "UTF-8");
-      reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
-        if (readerEvt?.target?.result) {
-          this.addSvg(canvas, readerEvt.target.result as string);
+      if (file.type.startsWith("image/svg")) {
+        reader.readAsText(file, "UTF-8");
+        reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
+          if (readerEvt?.target?.result) {
+            this.addSvg(canvas, readerEvt.target.result as string).then(resolve);
+          }
+        };
+        reader.onerror = (readerEvt: ProgressEvent<FileReader>) => {
+          console.error(readerEvt);
+          reject(new Error("File read error"));
+        };
+      } else if (file.type === "image/png" || file.type === "image/jpeg") {
+        reader.readAsDataURL(file);
+        reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
+          if (readerEvt?.target?.result) {
+            fabric.Image.fromURL(readerEvt.target.result as string, (img: fabric.Image) => {
+              img.set({ ...OBJECT_DEFAULTS });
+              img.scaleToHeight(OBJECT_SIZE_DEFAULTS.width).scaleToHeight(OBJECT_SIZE_DEFAULTS.height);
+              canvas.add(img);
+              resolve(img);
+            });
+          }
+        };
+        reader.onerror = (readerEvt: ProgressEvent<FileReader>) => {
+          console.error(readerEvt);
+          reject(new Error("File read error"));
+        };
+      }
+    });
+  }
+
+  static async addImageWithFilePicker(fabricCanvas: fabric.Canvas): Promise<fabric.Object | fabric.Group> {
+    return new Promise((resolve) => {
+      const input: HTMLInputElement = document.createElement("input");
+
+      input.type = "file";
+
+      input.onchange = (e: Event) => {
+        const target = e.target as HTMLInputElement;
+        if (target.files !== null) {
+          this.addImageFile(fabricCanvas, target.files[0]).then(resolve);
         }
       };
-      reader.onerror = (readerEvt: ProgressEvent<FileReader>) => {
-        console.error(readerEvt);
-      };
-    } else if (file.type === "image/png" || file.type === "image/jpeg") {
-      reader.readAsDataURL(file);
+
+      input.click();
+    });
+  }
+
+  static async addImageBlob(fabricCanvas: fabric.Canvas, img: Blob): Promise<fabric.Image> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.readAsDataURL(img);
       reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
         if (readerEvt?.target?.result) {
           fabric.Image.fromURL(readerEvt.target.result as string, (img: fabric.Image) => {
-            img.set({ ...OBJECT_DEFAULTS });
-            img.scaleToHeight(OBJECT_SIZE_DEFAULTS.width).scaleToHeight(OBJECT_SIZE_DEFAULTS.height);
-            canvas.add(img);
+            img.set({ left: 0, top: 0, snapAngle: OBJECT_DEFAULTS.snapAngle });
+            fabricCanvas.add(img);
+            resolve(img);
           });
         }
       };
+
       reader.onerror = (readerEvt: ProgressEvent<FileReader>) => {
         console.error(readerEvt);
+        reject(new Error("Image read error"));
       };
-    }
+    });
   }
 
-  // todo: return object
-  static addImageWithFilePicker(fabricCanvas: fabric.Canvas) {
-    const input: HTMLInputElement = document.createElement("input");
-
-    input.type = "file";
-
-    input.onchange = (e: Event) => {
-      let target = e.target as HTMLInputElement;
-      if (target.files !== null) {
-        let file: File = target.files[0];
-        this.addImageFile(fabricCanvas, file);
+  static async addObjectFromClipboard(
+    fabricCanvas: fabric.Canvas,
+    data: DataTransfer
+  ): Promise<fabric.Object | undefined> {
+    // paste image
+    for (const item of data.items) {
+      if (item.type.indexOf("image") !== -1) {
+        const file = item.getAsFile();
+        if (file) {
+          return await ImageEditorObjectHelper.addImageFile(fabricCanvas, file);
+        }
       }
-    };
+    }
 
-    input.click();
+    // paste text
+    const text = data.getData("text");
+    if (text) {
+      const obj = ImageEditorObjectHelper.addText(fabricCanvas, text);
+      fabricCanvas.setActiveObject(obj);
+      return obj;
+    }
   }
 
   static addText(canvas: fabric.Canvas, text?: string, options?: ITextOptions): fabric.IText {

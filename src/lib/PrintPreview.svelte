@@ -153,7 +153,7 @@
     const keyObj = key as keyof typeof savedProps;
 
     if (savedProps[keyObj] !== undefined) {
-      savedProps[keyObj] = savedProps[keyObj] = value;
+      savedProps[keyObj] = value;
       try {
         LocalStoragePersistence.savePreviewProps(savedProps);
       } catch (e) {

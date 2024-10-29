@@ -69,7 +69,7 @@ export class FileUtils {
           canvas.requestRenderAll();
           resolve();
         },
-        (src: object, obj: fabric.Object, error: any) => {
+        (src: object, obj: fabric.Object/*, error: any*/) => {
           obj.set({ snapAngle: OBJECT_DEFAULTS.snapAngle });
         }
       );

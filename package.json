@@ -11,7 +11,9 @@
 		"build-rel": "vite build --base=./",
 		"preview": "vite preview",
 		"sv-check": "svelte-check --tsconfig ./tsconfig.json",
-		"gen-mdi-list": "node gen-mdi-list.mjs > src/mdi_icons.ts"
+		"gen-mdi-list": "node gen-mdi-list.mjs > src/mdi_icons.ts",
+		"lint": "eslint ."
+
 	},
 	"dependencies": {
 		"@fontsource-variable/noto-sans": "^5.0.5",

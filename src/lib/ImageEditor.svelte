@@ -32,7 +32,7 @@
   import TextParamsPanel from "./TextParamsControls.svelte";
   import VariableInsertControl from "./VariableInsertControl.svelte";
   import ZplImportButton from "./ZplImportButton.svelte";
-  import { DEFAULT_LABEL_PROPS, GRID_SIZE, OBJECT_DEFAULTS } from "../defaults";
+  import { DEFAULT_LABEL_PROPS, GRID_SIZE } from "../defaults";
   import { ImageEditorUtils } from "../utils/image_editor_utils";
 
   let htmlCanvas: HTMLCanvasElement;
@@ -205,22 +205,7 @@
   };
 
   const zplImageReady = (img: Blob) => {
-    const reader = new FileReader();
-
-    reader.readAsDataURL(img);
-    reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
-      if (readerEvt?.target?.result) {
-        fabric.Image.fromURL(readerEvt.target.result as string, (img: fabric.Image) => {
-          img.set({ left: 0, top: 0, snapAngle: OBJECT_DEFAULTS.snapAngle });
-          fabricCanvas.add(img);
-          undo.push(fabricCanvas, labelProps);
-        });
-      }
-    };
-
-    reader.onerror = (readerEvt: ProgressEvent<FileReader>) => {
-      console.error(readerEvt);
-    };
+    ImageEditorObjectHelper.addImageBlob(fabricCanvas, img).then(() => undo.push(fabricCanvas, labelProps));
   };
 
   const onObjectPicked = (objectType: OjectType) => {
@@ -280,7 +265,7 @@
     undo.push(fabricCanvas, labelProps);
   };
 
-  const onPaste = (event: ClipboardEvent) => {
+  const onPaste = async (event: ClipboardEvent) => {
     if (ImageEditorUtils.isAnyInputFocused(fabricCanvas)) {
       return;
     }
@@ -290,27 +275,14 @@
       return;
     }
 
-    if (event.clipboardData) {
-      // paste image
-      for (const item of event.clipboardData.items) {
-        if (item.type.indexOf("image") !== -1) {
-          const blob = item.getAsFile();
-          if (blob) {
-            ImageEditorObjectHelper.addImageFile(fabricCanvas, blob);
-            undo.push(fabricCanvas, labelProps);
-          }
-        }
-      }
+    if (event.clipboardData != null) {
+      event.preventDefault();
+      const obj = await ImageEditorObjectHelper.addObjectFromClipboard(fabricCanvas, event.clipboardData);
 
-      // paste text
-      const text = event.clipboardData.getData("text");
-      if (text) {
-        const obj = ImageEditorObjectHelper.addText(fabricCanvas, text);
+      if (obj !== undefined) {
         fabricCanvas.setActiveObject(obj);
         undo.push(fabricCanvas, labelProps);
       }
-
-      event.preventDefault();
     }
   };
 
@@ -339,7 +311,7 @@
     undo.push(fabricCanvas, labelProps);
 
     // force close dropdowns on touch devices
-    fabricCanvas.on("mouse:down", (e: fabric.IEvent<MouseEvent>): void => {
+    fabricCanvas.on("mouse:down", (): void => {
       const dropdowns = document.querySelectorAll("[data-bs-toggle='dropdown']");
       dropdowns.forEach((el) => new Dropdown(el).hide());
     });
@@ -381,7 +353,7 @@
       dragEvt.preventDefault();
 
       if (dragEvt.dataTransfer?.files) {
-        [...dragEvt.dataTransfer.files].forEach((file: File, idx: number) => {
+        [...dragEvt.dataTransfer.files].forEach((file: File) => {
           ImageEditorObjectHelper.addImageFile(fabricCanvas, file);
           undo.push(fabricCanvas, labelProps);
         });

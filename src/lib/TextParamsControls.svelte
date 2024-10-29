@@ -10,6 +10,7 @@
 
 
   let selectedText: fabric.IText | undefined;
+  let fontQuerySupported = typeof queryLocalFonts !== "undefined";
   let fontFamilies: string[] = [OBJECT_DEFAULTS_TEXT.fontFamily];
 
   const toggleBold = () => {
@@ -95,7 +96,6 @@
 </script>
 
 {#if selectedText}
-  <!-- <div class="d-flex flex-wrap gap-1"> -->
   <button
     title={$tr("params.text.align.left")}
     class="btn btn-sm {selectedText.textAlign === 'left' ? 'btn-secondary' : ''}"
@@ -188,8 +188,7 @@
     <span class="input-group-text" title={$tr("params.text.font_family")}>
       <MdIcon icon="text_format" />
     </span>
-    <!-- svelte-ignore missing-declaration -->
-    {#if typeof queryLocalFonts !== "undefined"}
+    {#if fontQuerySupported }
       <select class="form-select" bind:value={selectedText.fontFamily} on:change={commit}>
         {#each fontFamilies as font}
           <option value={font}>{font}</option>

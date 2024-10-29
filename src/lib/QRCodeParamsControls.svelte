@@ -3,6 +3,7 @@
   import { QRCode, type ErrorCorrectionLevel } from "../fabric-object/qrcode.class";
   import { tr } from "../utils/i18n";
   import MdIcon from "./MdIcon.svelte";
+  import type { fabric } from "fabric";
 
   export let selectedObject: fabric.Object | undefined;
   export let valueUpdated: () => void;
@@ -15,14 +16,14 @@
     ecl = selectedQRCode?.ecl;
   };
 
-  const textChange: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
+  const textChange: ChangeEventHandler<HTMLTextAreaElement> = () => {
     if (selectedQRCode) {
       selectedQRCode.set({ text });
       valueUpdated();
     }
   };
 
-  const eclChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+  const eclChange: ChangeEventHandler<HTMLSelectElement> = () => {
     if (selectedQRCode) {
       selectedQRCode.set({ ecl: ecl as ErrorCorrectionLevel });
       valueUpdated();

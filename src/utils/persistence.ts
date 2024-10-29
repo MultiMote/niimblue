@@ -100,8 +100,8 @@ export class LocalStoragePersistence {
    * @throws {z.ZodError}
    */
   static loadLabel(): ExportedLabelTemplate | null {
-    let label = this.loadAndValidateObject("saved_canvas_props", LabelPropsSchema);
-    let canvas = this.loadAndValidateObject("saved_canvas_data", FabricJsonSchema);
+    const label = this.loadAndValidateObject("saved_canvas_props", LabelPropsSchema);
+    const canvas = this.loadAndValidateObject("saved_canvas_data", FabricJsonSchema);
 
     if (label !== null && canvas !== null) {
       this.saveLabel(label, canvas);

@@ -22,7 +22,7 @@
     onItemDelete(idx);
   };
 
-  const deleteRejected = (e: MouseEvent, idx: number) => {
+  const deleteRejected = (e: MouseEvent) => {
     e.stopPropagation();
     deleteIndex = -1;
   };
@@ -46,7 +46,7 @@
             <button class="remove btn text-danger-emphasis" on:click={(e) => deleteConfirmed(e, idx)}>
               <MdIcon icon="delete" />
             </button>
-            <button class="remove btn text-success" on:click={(e) => deleteRejected(e, idx)}>
+            <button class="remove btn text-success" on:click={(e) => deleteRejected(e)}>
               <MdIcon icon="close" />
             </button>
           {:else}

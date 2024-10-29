@@ -21,7 +21,7 @@ export default defineConfig({
         manualChunks: {
           fabric: ["fabric"],
         },
-        chunkFileNames: (chunkInfo) => {
+        chunkFileNames: () => {
           return "assets/[name].[hash].js";
         },
       },

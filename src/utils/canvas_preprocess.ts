@@ -1,5 +1,4 @@
 import { fabric } from "fabric";
-import type { FabricJson } from "../types";
 import QRCode from "../fabric-object/qrcode.class";
 import Barcode from "../fabric-object/barcode.class";
 import dayjs from "dayjs";

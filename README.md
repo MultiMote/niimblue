@@ -4,9 +4,9 @@ Niimbot printers webui. Design and print labels right from your browser.
 
 Uses [NiimBlueLib](https://github.com/MultiMote/niimbluelib) for communication.
 
-> [!NOTE]  
+> [!NOTE]
 > If you have printing problems, try different print task versions in print preview dialog. Make if default by pressing "Lock" button.
-> 
+>
 > If you found version suitable for your model, please write [here](https://github.com/MultiMote/niimbluelib/issues/1).
 
 ## Features
@@ -86,3 +86,9 @@ Skip steps you have done.
     ```bash
     yarn dev
     ```
+
+Eslint not included. Install it with:
+
+```bash
+npm install --no-save --no-package-lock eslint@9.x globals @types/eslint @eslint/js typescript-eslint eslint-plugin-svelte
+```
