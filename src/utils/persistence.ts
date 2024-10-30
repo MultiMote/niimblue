@@ -6,12 +6,12 @@ import {
   PreviewPropsSchema,
   type ConnectionType,
   type ExportedLabelTemplate,
-  type FabricJson,
   type LabelPreset,
   type LabelProps,
   type PreviewProps,
 } from "../types";
 import { z } from "zod";
+import { FileUtils } from "./file_utils";
 
 export class LocalStoragePersistence {
   static saveObject(key: string, data: any) {
@@ -88,29 +88,71 @@ export class LocalStoragePersistence {
     this.validateAndSaveObject("last_label_props", labelData, LabelPropsSchema);
   }
 
-  /**
-   * @throws {z.ZodError}
-   */
-  static saveLabel(labelData: LabelProps, canvasData: FabricJson) {
-    const obj = { label: labelData, canvas: canvasData };
-    this.validateAndSaveObject("saved_label", obj, ExportedLabelTemplateSchema);
+  static saveLabels(labels: ExportedLabelTemplate[]): z.ZodError[] {
+    const errors: z.ZodError[] = [];
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith("saved_label")) {
+        localStorage.removeItem(key);
+      }
+    });
+
+    labels.forEach((label) => {
+      try {
+        if (label.timestamp == undefined) {
+          label.timestamp = FileUtils.timestamp();
+        }
+
+        const basename = `saved_label_${label.timestamp}`;
+        let counter = 0;
+
+        while (`${basename}_${counter}` in localStorage) {
+          counter++;
+        }
+
+        this.validateAndSaveObject(`${basename}_${counter}`, label, ExportedLabelTemplateSchema);
+      } catch (e) {
+        console.error(e);
+        if (e instanceof z.ZodError) {
+          errors.push(e);
+        }
+      }
+    });
+    return errors;
   }
 
   /**
    * @throws {z.ZodError}
    */
-  static loadLabel(): ExportedLabelTemplate | null {
-    const label = this.loadAndValidateObject("saved_canvas_props", LabelPropsSchema);
-    const canvas = this.loadAndValidateObject("saved_canvas_data", FabricJsonSchema);
+  static loadLabels(): ExportedLabelTemplate[] {
+    const legacyLabel = this.loadAndValidateObject("saved_canvas_props", LabelPropsSchema);
+    const legacyCanvas = this.loadAndValidateObject("saved_canvas_data", FabricJsonSchema);
+    const items: ExportedLabelTemplate[] = [];
 
-    if (label !== null && canvas !== null) {
-      this.saveLabel(label, canvas);
+    if (legacyLabel !== null && legacyCanvas !== null) {
       localStorage.removeItem("saved_canvas_props");
       localStorage.removeItem("saved_canvas_data");
-      return { label, canvas };
+      const item: ExportedLabelTemplate = {
+        label: legacyLabel,
+        canvas: legacyCanvas,
+        timestamp: FileUtils.timestamp(),
+      };
+      this.validateAndSaveObject(`saved_label_${item.timestamp}`, item, ExportedLabelTemplateSchema);
     }
 
-    return this.loadAndValidateObject("saved_label", ExportedLabelTemplateSchema);
+    Object.keys(localStorage).sort().forEach((key) => {
+      if (key.startsWith("saved_label")) {
+        try {
+          const item = this.loadAndValidateObject(key, ExportedLabelTemplateSchema);
+          if (item != null) {
+            items.push(item);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    });
+
+    return items;
   }
 
   /**

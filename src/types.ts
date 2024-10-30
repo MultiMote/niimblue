@@ -39,6 +39,9 @@ export const FabricJsonSchema = z.object({
 export const ExportedLabelTemplateSchema = z.object({
   canvas: FabricJsonSchema,
   label: LabelPropsSchema,
+  thumbnailBase64: z.string().optional(),
+  title: z.string().optional(),
+  timestamp: z.number().positive().optional()
 });
 
 const [firstTask, ...otherTasks] = printTaskNames;

@@ -50,3 +50,9 @@ export const OBJECT_DEFAULTS_TEXT = {
   originY: "center",
   lineHeight: 1,
 };
+
+/** Scale image to this height when making a label thumbnail */
+export const THUMBNAIL_HEIGHT = 48;
+
+/** Generate thumbnail in jpeg format with this quality */
+export const THUMBNAIL_QUALITY = 0.7;

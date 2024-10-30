@@ -10,14 +10,12 @@ export const translation_en = {
   "editor.redo": "Redo",
   "editor.default_text": "Text",
   "editor.delete": "Delete",
-  "editor.save.json": "Save (JSON)",
-  "editor.save.browser": "Save (browser)",
-  "editor.load.json": "Load (JSON)",
-  "editor.load.browser": "Load (browser)",
   "editor.import.zpl": "Import ZPL",
+
   "editor.iconpicker.search": "Search",
   "editor.iconpicker.title": "Add icon",
   "editor.iconpicker.mdi_link_title": "See detailed list here",
+
   "editor.objectpicker.barcode": "Barcode",
   "editor.objectpicker.circle": "Circle",
   "editor.objectpicker.image": "Image",
@@ -26,27 +24,33 @@ export const translation_en = {
   "editor.objectpicker.rectangle": "Rectangle",
   "editor.objectpicker.text": "Text",
   "editor.objectpicker.title": "Add object",
+
   "editor.preview": "Preview",
   "editor.print": "Print",
   "editor.warning.load": "Canvas will be replaced with saved data",
   "editor.warning.save": "Saved data will be overwritten. Save?",
+
   "main.built": "built at",
   "main.code": "Code",
+
   "params.barcode.content": "Content",
   "params.barcode.enable_caption": "Enable caption",
   "params.barcode.encoding": "Encoding",
   "params.barcode.font_size": "Font size",
   "params.barcode.scale": "Scale factor",
+
   "params.csv.enabled": "Enabled",
   "params.csv.placeholders": "Variables:",
   "params.csv.rowsfound": "Data rows found:",
   "params.csv.tip": "First row is a header. It used as variable names. Commas are used as separators.",
   "params.csv.title": "Dynamic label data (CSV)",
+
   "params.generic.center.horizontal": "Center horizontally",
   "params.generic.center.vertical": "Center vertically",
+
   "params.label.apply": "Apply",
   "params.label.current": "Current parameters:",
-  "params.label.dialog_title": "Label properties",
+  "params.label.menu_title": "Label properties",
   "params.label.direction.left": "Left",
   "params.label.direction.top": "Top",
   "params.label.direction": "Print from",
@@ -60,7 +64,9 @@ export const translation_en = {
   "params.label.size": "Size",
   "params.label.warning.direction": "Recommended direction for your printer:",
   "params.label.warning.width": "Label width is too big for your printer:",
+
   "params.qrcode.ecl": "Error Correction Level",
+
   "params.text.align.center": "Align text: Center",
   "params.text.align.left": "Align text: Left",
   "params.text.align.right": "Align text: Right",
@@ -78,10 +84,21 @@ export const translation_en = {
   "params.text.vorigin": "Vertical Origin",
   "params.text.edit": "Edit in popup",
   "params.text.edit.title": "Editing text",
+
   "params.variables.insert.date": "Date",
   "params.variables.insert.datetime": "Datetime",
   "params.variables.insert.time": "Time",
   "params.variables.insert": "Insert variable",
+
+  "params.saved_labels.menu_title": "Save/load (browser storage)",
+  "params.saved_labels.save.json": "Export JSON",
+  "params.saved_labels.save.browser": "Save",
+  "params.saved_labels.save.browser.replace": "Save (replace)",
+  "params.saved_labels.load.json": "Import JSON",
+  "params.saved_labels.load.browser": "Load",
+  "params.saved_labels.label_title": "Title",
+  "params.saved_labels.label_title.placeholder": "(optional)",
+
   "preview.close": "Close",
   "preview.copies": "Copies",
   "preview.density": "Density",

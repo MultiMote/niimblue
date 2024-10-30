@@ -33,7 +33,7 @@
   };
 </script>
 
-<div class="preset-browser overflow-y-auto border d-flex gap-1 flex-wrap {$$props.class}">
+<div class="preset-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {$$props.class}">
   {#each presets as item, idx}
     <button
       class="btn p-0 card-wrapper d-flex justify-content-center align-items-center"

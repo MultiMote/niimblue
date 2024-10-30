@@ -18,8 +18,7 @@ export const translation_zh_cn: Partial<Record<TranslationKey, string>> = {
   "editor.iconpicker.search": "搜索",
   "editor.iconpicker.title": "添加图标",
   "editor.import.zpl": "导入 ZPL 文件",
-  "editor.load.browser": "从浏览器导入",
-  "editor.load.json": "导入 JSON 文件",
+
   "editor.objectpicker.barcode": "条码",
   "editor.objectpicker.circle": "圆形",
   "editor.objectpicker.image": "图片",
@@ -30,8 +29,6 @@ export const translation_zh_cn: Partial<Record<TranslationKey, string>> = {
   "editor.objectpicker.title": "添加元素",
   "editor.preview": "预览",
   "editor.print": "打印",
-  "editor.save.browser": "保存到浏览器",
-  "editor.save.json": "导出 JSON 文件",
   "editor.warning.load": "画布将被替换为保存的数据，需要继续吗？",
   "editor.warning.save": "保存的数据将会被覆盖，需要继续吗？",
   /* Main page */
@@ -55,7 +52,7 @@ export const translation_zh_cn: Partial<Record<TranslationKey, string>> = {
   /* LabelPropsEditor */
   "params.label.apply": "应用",
   "params.label.current": "当前设置：",
-  "params.label.dialog_title": "标签设置",
+  "params.label.menu_title": "标签设置",
   "params.label.direction.left": "向左",
   "params.label.direction.top": "向上",
   "params.label.direction": "出纸方向",
@@ -92,6 +89,11 @@ export const translation_zh_cn: Partial<Record<TranslationKey, string>> = {
   "params.variables.insert.datetime": "日期时间",
   "params.variables.insert.time": "时间",
   "params.variables.insert": "插入变量",
+  /* SavedLabelsMenu */
+  "params.saved_labels.load.browser": "从浏览器导入",
+  "params.saved_labels.load.json": "导入 JSON 文件",
+  "params.saved_labels.save.browser": "保存到浏览器",
+  "params.saved_labels.save.json": "导出 JSON 文件",
   /* PrintPreview */
   "preview.close": "关闭",
   "preview.copies": "份数",
