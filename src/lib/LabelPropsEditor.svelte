@@ -167,9 +167,9 @@
     <MdIcon icon="settings" />
   </button>
   <div class="dropdown-menu">
-    <h6 class="dropdown-header">{$tr("params.label.dialog_title")}</h6>
+    <h6 class="dropdown-header">{$tr("params.label.menu_title")}</h6>
 
-    <div class="p-3">
+    <div class="px-3">
       <div class="mb-3 {error ? 'cursor-help text-warning' : 'text-secondary'}" title={error}>
         {$tr("params.label.current")}
         {labelProps.size.width}x{labelProps.size.height}
@@ -186,8 +186,7 @@
         class="mb-1"
         presets={labelPresets}
         onItemSelected={onLabelPresetSelected}
-        onItemDelete={onLabelPresetDelete}
-        onItemAdd={onLabelPresetAdd} />
+        onItemDelete={onLabelPresetDelete} />
 
       <div class="input-group flex-nowrap input-group-sm mb-3">
         <span class="input-group-text">{$tr("params.label.size")}</span>

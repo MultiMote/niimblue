@@ -1,19 +1,36 @@
 import type { fabric } from "fabric";
 import { ExportedLabelTemplateSchema, type ExportedLabelTemplate, type FabricJson, type LabelProps } from "../types";
-import { OBJECT_DEFAULTS } from "../defaults";
+import { OBJECT_DEFAULTS, THUMBNAIL_HEIGHT, THUMBNAIL_QUALITY } from "../defaults";
 
 export class FileUtils {
-  /** Convert label template to JSON and download it */
-  static saveLabelAsJson(canvas: fabric.Canvas, labelProps: LabelProps) {
-    const timestamp = Math.floor(Date.now() / 1000);
+  static timestamp(): number {
+    return Math.floor(Date.now() / 1000);
+  }
 
-    const labelRaw: ExportedLabelTemplate = {
+  static makeExportedLabel (canvas: fabric.Canvas,  labelProps: LabelProps): ExportedLabelTemplate {
+    const thumbnailBase64: string = canvas.toDataURL({
+      width: canvas.width,
+      height: canvas.height,
+      left: 0,
+      top: 0,
+      multiplier: THUMBNAIL_HEIGHT / (canvas.height || 1),
+      quality: THUMBNAIL_QUALITY,
+      format: "jpeg",
+    });
+
+    return {
       canvas: canvas.toJSON(),
       label: labelProps,
+      thumbnailBase64,
+      timestamp: this.timestamp()
     };
+  };
 
-    const label = ExportedLabelTemplateSchema.parse(labelRaw);
-    const json: string = JSON.stringify(label);
+  /** Convert label template to JSON and download it */
+  static saveLabelAsJson(label: ExportedLabelTemplate) {
+    const parsed = ExportedLabelTemplateSchema.parse(label);
+    const timestamp = label.timestamp ?? this.timestamp();
+    const json: string = JSON.stringify(parsed);
     const link = document.createElement("a");
     const file: Blob = new Blob([json], { type: "text/json" });
     link.href = URL.createObjectURL(file);

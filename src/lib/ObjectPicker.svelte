@@ -1,9 +1,12 @@
 <script lang="ts">
-  import { type OjectType } from "../types";
+  import { type LabelProps, type OjectType } from "../types";
   import { tr } from "../utils/i18n";
   import MdIcon from "./MdIcon.svelte";
+  import ZplImportButton from "./ZplImportButton.svelte";
 
   export let onSubmit: (i: OjectType) => void;
+  export let labelProps: LabelProps;
+  export let zplImageReady: (img: Blob) => void;
 </script>
 
 <div class="dropdown">
@@ -44,6 +47,8 @@
         <MdIcon icon="view_week" />
         {$tr("editor.objectpicker.barcode")}
       </button>
+
+      <ZplImportButton {labelProps} onImageReady={zplImageReady} text={$tr("editor.import.zpl")} />
     </div>
   </div>
 </div>

@@ -14,10 +14,6 @@ export const translation_ru: Record<TranslationKey, string> = {
   "connector.disconnect.heartbeat": "Отключено (принтер не отвечает)",
   /* ImageEditor */
   "editor.default_text": "Текст",
-  "editor.save.json": "Сохранить (JSON)",
-  "editor.save.browser": "Сохранить (браузер)",
-  "editor.load.json": "Загрузить (JSON)",
-  "editor.load.browser": "Загрузить (браузер)",
   "editor.import.zpl": "Импорт ZPL",
   "editor.preview": "Предпросмотр",
   "editor.print": "Печать",
@@ -71,7 +67,7 @@ export const translation_ru: Record<TranslationKey, string> = {
   "params.csv.enabled": "Включить",
   "params.csv.placeholders": "Переменные:",
   /* LabelPropsEditor */
-  "params.label.dialog_title": "Настройки этикетки",
+  "params.label.menu_title": "Настройки этикетки",
   "params.label.label_title": "Своё название",
   "params.label.size": "Размер",
   "params.label.mm": "мм",
@@ -114,10 +110,19 @@ export const translation_ru: Record<TranslationKey, string> = {
   "params.generic.center.horizontal": "Выровнять горизонтально",
   /* QRCodeParamsControls */
   "params.qrcode.ecl": "Уровень коррекции ошибок",
-  /** BarcodeParamsControls */
+  /* BarcodeParamsControls */
   "params.barcode.encoding": "Тип",
   "params.barcode.content": "Содержимое",
   "params.barcode.scale": "Масштаб",
   "params.barcode.font_size": "Размер шрифта",
   "params.barcode.enable_caption": "Показывать надпись",
+  /* SavedLabelsMenu */
+  "params.saved_labels.menu_title": "Сохранить/загрузить (хранилище браузера)",
+  "params.saved_labels.save.json": "Экспорт JSON",
+  "params.saved_labels.save.browser": "Сохранить",
+  "params.saved_labels.save.browser.replace": "Сохранить (заменить)",
+  "params.saved_labels.load.json": "Импорт JSON",
+  "params.saved_labels.load.browser": "Открыть",
+  "params.saved_labels.label_title": "Название",
+  "params.saved_labels.label_title.placeholder": "(необязательно)",
 };

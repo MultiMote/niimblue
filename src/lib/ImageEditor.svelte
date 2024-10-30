@@ -7,7 +7,6 @@
   import { iconCodepoints, type MaterialIcon } from "../mdi_icons";
   import { connectionState } from "../stores";
   import {
-    ExportedLabelTemplateSchema,
     type ExportedLabelTemplate,
     type FabricJson,
     type LabelProps,
@@ -31,9 +30,9 @@
   import QrCodeParamsPanel from "./QRCodeParamsControls.svelte";
   import TextParamsPanel from "./TextParamsControls.svelte";
   import VariableInsertControl from "./VariableInsertControl.svelte";
-  import ZplImportButton from "./ZplImportButton.svelte";
   import { DEFAULT_LABEL_PROPS, GRID_SIZE } from "../defaults";
   import { ImageEditorUtils } from "../utils/image_editor_utils";
+  import SavedLabelsMenu from "./SavedLabelsMenu.svelte";
 
   let htmlCanvas: HTMLCanvasElement;
   let fabricCanvas: fabric.Canvas;
@@ -149,59 +148,12 @@
     }
   };
 
-  const onSaveClicked = () => {
-    if (confirm($tr("editor.warning.save"))) {
-      try {
-        LocalStoragePersistence.saveLabel(labelProps, fabricCanvas.toJSON());
-      } catch (e) {
-        Toasts.zodErrors(e, "Canvas save error:");
-      }
-    }
+  const exportCurrentLabel = (): ExportedLabelTemplate => {
+    return FileUtils.makeExportedLabel(fabricCanvas, labelProps);
   };
 
-  const onExportClicked = () => {
-    try {
-      FileUtils.saveLabelAsJson(fabricCanvas, labelProps);
-    } catch (e) {
-      Toasts.zodErrors(e, "Canvas save error:");
-    }
-  };
-
-  const onImportClicked = async () => {
-    const contents = await FileUtils.pickAndReadTextFile("json");
-    const rawData = JSON.parse(contents);
-
-    if (!confirm($tr("editor.warning.load"))) {
-      return;
-    }
-
-    try {
-      const data = ExportedLabelTemplateSchema.parse(rawData);
-      await loadLabelData(data);
-      undo.push(fabricCanvas, labelProps);
-    } catch (e) {
-      Toasts.zodErrors(e, "Canvas load error:");
-    }
-  };
-
-  const onLoadClicked = async () => {
-    if (!confirm($tr("editor.warning.load"))) {
-      return;
-    }
-
-    try {
-      const labelData = LocalStoragePersistence.loadLabel();
-
-      if (labelData === null) {
-        Toasts.error("No saved label data found, or data is corrupt");
-        return;
-      }
-
-      await loadLabelData(labelData);
-      undo.push(fabricCanvas, labelProps);
-    } catch (e) {
-      Toasts.zodErrors(e, "Canvas load error:");
-    }
+  const onLoadRequested = (label: ExportedLabelTemplate) => {
+    loadLabelData(label).then(() => undo.push(fabricCanvas, labelProps));
   };
 
   const zplImageReady = (img: Blob) => {
@@ -393,6 +345,8 @@
       <div class="toolbar d-flex flex-wrap gap-1 justify-content-center align-items-center">
         <LabelPropsEditor {labelProps} onChange={onUpdateLabelProps} />
 
+        <SavedLabelsMenu onRequestCurrentCanvas={exportCurrentLabel} {onLoadRequested} />
+
         <button
           class="btn btn-sm btn-secondary"
           disabled={undoState.undoDisabled}
@@ -415,45 +369,8 @@
           onUpdate={onCsvUpdate}
           onPlaceholderPicked={onCsvPlaceholderPicked} />
 
-        <div class="btn-group btn-group-sm" role="group">
-          <button class="btn btn-secondary dropdown-toggle px-1" data-bs-toggle="dropdown">
-            <MdIcon icon="save" />
-          </button>
-          <div class="dropdown-menu px-2">
-            <div class="d-flex gap-1 flex-wrap">
-              <button class="btn btn-secondary btn-sm" on:click={onSaveClicked}>
-                <MdIcon icon="open_in_browser" />
-                {$tr("editor.save.browser")}
-              </button>
-              <button class="btn btn-secondary btn-sm" on:click={onExportClicked}>
-                <MdIcon icon="data_object" />
-                {$tr("editor.save.json")}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="btn-group btn-group-sm" role="group">
-          <button class="btn btn-secondary dropdown-toggle px-1" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-            <MdIcon icon="folder" />
-          </button>
-          <div class="dropdown-menu px-2">
-            <div class="d-flex gap-1 flex-wrap">
-              <button class="btn btn-secondary btn-sm" on:click={onLoadClicked}>
-                <MdIcon icon="open_in_browser" />
-                {$tr("editor.load.browser")}
-              </button>
-              <button class="btn btn-secondary btn-sm" on:click={onImportClicked}>
-                <MdIcon icon="data_object" />
-                {$tr("editor.load.json")}
-              </button>
-              <ZplImportButton {labelProps} onImageReady={zplImageReady} text={$tr("editor.import.zpl")} />
-            </div>
-          </div>
-        </div>
-
         <IconPicker onSubmit={onIconPicked} />
-        <ObjectPicker onSubmit={onObjectPicked} />
+        <ObjectPicker onSubmit={onObjectPicked} labelProps={labelProps} zplImageReady={zplImageReady} />
 
         <button class="btn btn-sm btn-primary ms-1" on:click={openPreview}>
           <MdIcon icon="visibility" />
