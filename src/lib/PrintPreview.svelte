@@ -104,7 +104,7 @@
         printProgress = Math.floor((e.page / quantity) * ((e.pagePrintProgress + e.pageFeedProgress) / 2));
       };
 
-      $printerClient.addEventListener("printprogress", listener);
+      $printerClient.on("printprogress", listener);
 
       try {
         await printTask.waitForFinished();
@@ -113,7 +113,7 @@
         console.error(e);
       }
 
-      $printerClient.removeEventListener("printprogress", listener);
+      $printerClient.off("printprogress", listener);
 
       await endPrint();
     }

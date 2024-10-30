@@ -1,14 +1,8 @@
 import { get, writable } from "svelte/store";
 import type { ConnectionState, ConnectionType } from "./types";
 import {
-  ConnectEvent,
-  HeartbeatEvent,
-  HeartbeatFailedEvent,
   NiimbotBluetoothClient,
   NiimbotSerialClient,
-  PacketReceivedEvent,
-  PacketSentEvent,
-  PrinterInfoFetchedEvent,
   RequestCommandId,
   ResponseCommandId,
   Utils,
@@ -48,28 +42,28 @@ export const initClient = (connectionType: ConnectionType) => {
         newClient = new NiimbotSerialClient();
       }
 
-      newClient.addEventListener("packetsent", (e: PacketSentEvent) => {
+      newClient.on("packetsent", (e) => {
         console.log(`>> ${Utils.bufToHex(e.packet.toBytes())} (${RequestCommandId[e.packet.command]})`);
       });
 
-      newClient.addEventListener("packetreceived", (e: PacketReceivedEvent) => {
+      newClient.on("packetreceived", (e) => {
         console.log(`<< ${Utils.bufToHex(e.packet.toBytes())} (${ResponseCommandId[e.packet.command]})`);
       });
 
-      newClient.addEventListener("connect", (e: ConnectEvent) => {
+      newClient.on("connect", (e) => {
         console.log("onConnect");
         heartbeatFails.set(0);
         connectionState.set("connected");
         connectedPrinterName.set(e.info.deviceName ?? "unknown");
       });
 
-      newClient.addEventListener("printerinfofetched", (e: PrinterInfoFetchedEvent) => {
+      newClient.on("printerinfofetched", (e) => {
         console.log("printerInfoFetched");
         printerInfo.set(e.info);
         printerMeta.set(newClient.getModelMetadata());
       });
 
-      newClient.addEventListener("disconnect", () => {
+      newClient.on("disconnect", () => {
         console.log("onDisconnect");
         connectionState.set("disconnected");
         connectedPrinterName.set("");
@@ -77,16 +71,16 @@ export const initClient = (connectionType: ConnectionType) => {
         printerMeta.set(undefined);
       });
 
-      newClient.addEventListener("heartbeat", (e: HeartbeatEvent) => {
+      newClient.on("heartbeat", (e) => {
         heartbeatFails.set(0);
         heartbeatData.set(e.data);
       });
 
-      newClient.addEventListener("heartbeatfailed", (e: HeartbeatFailedEvent) => {
+      newClient.on("heartbeatfailed", (e) => {
         const maxFails = 5;
         heartbeatFails.set(e.failedAttempts);
 
-        console.warn(`Heartbeat failed ${e.failedAttempts}/${maxFails}`)
+        console.warn(`Heartbeat failed ${e.failedAttempts}/${maxFails}`);
         if (e.failedAttempts >= maxFails) {
           Toasts.error(get(tr)("connector.disconnect.heartbeat"));
           newClient.disconnect();
