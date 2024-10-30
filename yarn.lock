@@ -162,13 +162,13 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@mmote/niimbluelib@0.0.1-alpha.15":
-  version "0.0.1-alpha.15"
-  resolved "https://registry.yarnpkg.com/@mmote/niimbluelib/-/niimbluelib-0.0.1-alpha.15.tgz#192e6ec853b52c46e80a553a717129231b2f2c80"
-  integrity sha512-TIjW17Rn6oo5en2Ohwf9oI1OYL44uACoTeFM3pFaBP6NFvA72mRt75QiE8CCzZlVMe+YhQk3kymDXG9Y1ii0pg==
+"@mmote/niimbluelib@0.0.1-alpha.16":
+  version "0.0.1-alpha.16"
+  resolved "https://registry.yarnpkg.com/@mmote/niimbluelib/-/niimbluelib-0.0.1-alpha.16.tgz#4db321712d52fed0afd72128390392e0371e775e"
+  integrity sha512-2cpUT7XalxQQYnt1d4EckqLlJ0POPBDH5bLUewBj+UvRgDa4lSOmR3728JEE3dHADU/Wnknzy/Svi4yWEsVn7w==
   dependencies:
     async-mutex "^0.5.0"
-    typescript-event-target "^1.1.1"
+    eventemitter3 "^5.0.1"
 
 "@popperjs/core@^2.11.8", "@popperjs/core@^2.9.2":
   version "2.11.8"
@@ -509,6 +509,11 @@ estree-walker@^3.0.0, estree-walker@^3.0.3:
   integrity sha512-7RUKfXgSMMkzt6ZuXmqapOurLGPPfgj6l9uRZ7lRGolvk0y2yocc35LdcxKC5PQZdn2DMqioAQ2NoWcrTKmm6g==
   dependencies:
     "@types/estree" "^1.0.0"
+
+eventemitter3@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-5.0.1.tgz#53f5ffd0a492ac800721bb42c66b841de96423c4"
+  integrity sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==
 
 fabric@5.4.0-browser:
   version "5.4.0-browser"
@@ -911,11 +916,6 @@ tslib@^2.6.3:
   version "2.6.3"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.6.3.tgz#0438f810ad7a9edcde7a241c3d80db693c8cbfe0"
   integrity sha512-xNvxJEOUiWPGhUuUdQgAJPKOOJfGnIyKySOc09XkKsgdUV/3E2zvwZYdejjmRgPCgcym1juLH3226yA7sEFJKQ==
-
-typescript-event-target@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/typescript-event-target/-/typescript-event-target-1.1.1.tgz#20a6d491b77d2e37dc432c5394ab74c0d7065539"
-  integrity sha512-dFSOFBKV6uwaloBCCUhxlD3Pr/P1a/tJdcmPrTXCHlEFD3faj0mztjcGn6VBAhQ0/Bdy8K3VWrrqwbt/ffsYsg==
 
 typescript@^5.0.3:
   version "5.5.3"
