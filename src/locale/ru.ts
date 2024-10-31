@@ -121,6 +121,7 @@ export const translation_ru: Record<TranslationKey, string> = {
   "params.barcode.enable_caption": "Показывать надпись",
   /* SavedLabelsMenu */
   "params.saved_labels.menu_title": "Сохранить/загрузить (хранилище браузера)",
+  "params.saved_labels.kb_used": "кБ использовано",
   "params.saved_labels.save.json": "Экспорт",
   "params.saved_labels.save.browser": "Сохранить",
   "params.saved_labels.save.browser.replace": "Сохранить (заменить)",

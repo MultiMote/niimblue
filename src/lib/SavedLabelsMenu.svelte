@@ -16,6 +16,11 @@
   let savedLabels: ExportedLabelTemplate[] = [];
   let selectedIndex: number = -1;
   let title: string = "";
+  let usedSpace: number = 0;
+
+  const calcUsedSpace = () => {
+    usedSpace = LocalStoragePersistence.usedSpace();
+  }
 
   const onLabelSelected = (index: number) => {
     selectedIndex = index;
@@ -38,7 +43,20 @@
 
     savedLabels = result;
     title = "";
+    calcUsedSpace();
   };
+
+  const saveLabels = (labels: ExportedLabelTemplate[]) => {
+    const {zodErrors, otherErrors} = LocalStoragePersistence.saveLabels(labels);
+    zodErrors.forEach((e) => Toasts.zodErrors(e, "Label save error"));
+    otherErrors.forEach((e) => Toasts.error(e));
+
+    if (zodErrors.length === 0 && otherErrors.length === 0) {
+      savedLabels = labels;
+    }
+
+    calcUsedSpace();
+  }
 
   const onSaveReplaceClicked = () => {
     if (selectedIndex === -1) {
@@ -55,26 +73,14 @@
     const result = [...savedLabels];
     result[selectedIndex] = label;
 
-    const errors = LocalStoragePersistence.saveLabels(result);
-    errors.forEach((e) => Toasts.zodErrors(e, "Label save error"));
-
-    if (errors.length === 0) {
-      savedLabels = result;
-    }
+    saveLabels(result);
   };
 
   const onSaveClicked = () => {
     const label = onRequestCurrentCanvas();
     label.title = title;
     const result = [...savedLabels, label];
-    console.log(result);
-
-    const errors = LocalStoragePersistence.saveLabels(result);
-    errors.forEach((e) => Toasts.zodErrors(e, "Label save error"));
-
-    if (errors.length === 0) {
-      savedLabels = result;
-    }
+    saveLabels(result);
   };
 
   const onLoadClicked = () => {
@@ -114,12 +120,9 @@
     }
   };
 
-  const reload = () => {
-    savedLabels = LocalStoragePersistence.loadLabels();
-  };
-
   onMount(() => {
-    reload();
+    savedLabels = LocalStoragePersistence.loadLabels();
+    calcUsedSpace();
   });
 </script>
 
@@ -128,7 +131,9 @@
     <MdIcon icon="sd_storage" />
   </button>
   <div class="dropdown-menu" bind:this={dropdownRef}>
-    <h6 class="dropdown-header">{$tr("params.saved_labels.menu_title")}</h6>
+    <h6 class="dropdown-header">
+      {$tr("params.saved_labels.menu_title")} - {usedSpace} {$tr("params.saved_labels.kb_used")}
+    </h6>
 
     <div class="px-3">
       <div class="p-1">

@@ -14,6 +14,15 @@ import { z } from "zod";
 import { FileUtils } from "./file_utils";
 
 export class LocalStoragePersistence {
+  /** Result in kilobytes */
+  static usedSpace(): number {
+    let total = 0;
+    Object.keys(localStorage).forEach((key) => {
+      total += (localStorage[key].length + key.length) * 2;
+    });
+    return Math.floor(total / 1024);
+  }
+
   static saveObject(key: string, data: any) {
     if (data == null || data == undefined) {
       localStorage.removeItem(key);
@@ -88,8 +97,10 @@ export class LocalStoragePersistence {
     this.validateAndSaveObject("last_label_props", labelData, LabelPropsSchema);
   }
 
-  static saveLabels(labels: ExportedLabelTemplate[]): z.ZodError[] {
-    const errors: z.ZodError[] = [];
+  static saveLabels(labels: ExportedLabelTemplate[]): {zodErrors: z.ZodError[], otherErrors: Error[]} {
+    const zodErrors: z.ZodError[] = [];
+    const otherErrors: Error[] = [];
+
     Object.keys(localStorage).forEach((key) => {
       if (key.startsWith("saved_label")) {
         localStorage.removeItem(key);
@@ -111,13 +122,14 @@ export class LocalStoragePersistence {
 
         this.validateAndSaveObject(`${basename}_${counter}`, label, ExportedLabelTemplateSchema);
       } catch (e) {
-        console.error(e);
         if (e instanceof z.ZodError) {
-          errors.push(e);
+          zodErrors.push(e);
+        } if (e instanceof Error) {
+          otherErrors.push(e);
         }
       }
     });
-    return errors;
+    return {zodErrors, otherErrors};
   }
 
   /**
@@ -139,18 +151,20 @@ export class LocalStoragePersistence {
       this.validateAndSaveObject(`saved_label_${item.timestamp}`, item, ExportedLabelTemplateSchema);
     }
 
-    Object.keys(localStorage).sort().forEach((key) => {
-      if (key.startsWith("saved_label")) {
-        try {
-          const item = this.loadAndValidateObject(key, ExportedLabelTemplateSchema);
-          if (item != null) {
-            items.push(item);
+    Object.keys(localStorage)
+      .sort()
+      .forEach((key) => {
+        if (key.startsWith("saved_label")) {
+          try {
+            const item = this.loadAndValidateObject(key, ExportedLabelTemplateSchema);
+            if (item != null) {
+              items.push(item);
+            }
+          } catch (e) {
+            console.error(e);
           }
-        } catch (e) {
-          console.error(e);
         }
-      }
-    });
+      });
 
     return items;
   }

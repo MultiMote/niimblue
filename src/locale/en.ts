@@ -94,6 +94,7 @@ export const translation_en = {
   "params.variables.insert": "Insert variable",
 
   "params.saved_labels.menu_title": "Save/load (browser storage)",
+  "params.saved_labels.kb_used": "kB used",
   "params.saved_labels.save.json": "Export",
   "params.saved_labels.save.browser": "Save",
   "params.saved_labels.save.browser.replace": "Save (replace)",
