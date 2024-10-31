@@ -68,7 +68,8 @@
 
 <style>
   .dropdown-menu {
-    min-width: 450px;
+    width: 100vw;
+    max-width: 450px;
   }
   textarea.dsv {
     font-family: monospace;

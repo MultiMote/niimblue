@@ -55,6 +55,7 @@
 
 <style>
   .dropdown-menu {
-    min-width: 400px;
+    width: 100vw;
+    max-width: 450px;
   }
 </style>
