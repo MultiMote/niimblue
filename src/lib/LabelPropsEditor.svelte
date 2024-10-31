@@ -138,6 +138,7 @@
 
   const fillWithCurrentParams = () => {
     unit = "px";
+    prevUnit = "px";
     width = labelProps.size.width;
     height = labelProps.size.height;
     printDirection = labelProps.printDirection;
