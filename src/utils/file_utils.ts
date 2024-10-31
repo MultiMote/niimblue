@@ -1,6 +1,7 @@
 import type { fabric } from "fabric";
-import { ExportedLabelTemplateSchema, type ExportedLabelTemplate, type FabricJson, type LabelProps } from "../types";
+import { ExportedLabelTemplateSchema, LabelPresetSchema, type ExportedLabelTemplate, type FabricJson, type LabelPreset, type LabelProps } from "../types";
 import { OBJECT_DEFAULTS, THUMBNAIL_HEIGHT, THUMBNAIL_QUALITY } from "../defaults";
+import { z } from "zod";
 
 export class FileUtils {
   static timestamp(): number {
@@ -26,17 +27,28 @@ export class FileUtils {
     };
   };
 
+  /** Convert object JSON and download it */
+  static saveObjectAsJson(obj: unknown, basename: string) {
+    const json: string = JSON.stringify(obj);
+    const link = document.createElement("a");
+    const file: Blob = new Blob([json], { type: "text/json" });
+    link.href = URL.createObjectURL(file);
+    link.download = `${basename}.json`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
+
   /** Convert label template to JSON and download it */
   static saveLabelAsJson(label: ExportedLabelTemplate) {
     const parsed = ExportedLabelTemplateSchema.parse(label);
     const timestamp = label.timestamp ?? this.timestamp();
-    const json: string = JSON.stringify(parsed);
-    const link = document.createElement("a");
-    const file: Blob = new Blob([json], { type: "text/json" });
-    link.href = URL.createObjectURL(file);
-    link.download = `label_${timestamp}.json`;
-    link.click();
-    URL.revokeObjectURL(link.href);
+    this.saveObjectAsJson(parsed, `label_${timestamp}`)
+  }
+
+  /** Convert label template to JSON and download it */
+  static saveLabelPresetsAsJson(presets: LabelPreset[]) {
+    const parsed = z.array(LabelPresetSchema).parse(presets);
+    this.saveObjectAsJson(parsed, `presets_${this.timestamp()}`)
   }
 
   /**

@@ -64,6 +64,9 @@ export const translation_en = {
   "params.label.size": "Size",
   "params.label.warning.direction": "Recommended direction for your printer:",
   "params.label.warning.width": "Label width is too big for your printer:",
+  "params.label.warning.import": "All saved templates will be overwritten",
+  "params.label.export": "Export",
+  "params.label.import": "Import",
 
   "params.qrcode.ecl": "Error Correction Level",
 
@@ -91,10 +94,10 @@ export const translation_en = {
   "params.variables.insert": "Insert variable",
 
   "params.saved_labels.menu_title": "Save/load (browser storage)",
-  "params.saved_labels.save.json": "Export JSON",
+  "params.saved_labels.save.json": "Export",
   "params.saved_labels.save.browser": "Save",
   "params.saved_labels.save.browser.replace": "Save (replace)",
-  "params.saved_labels.load.json": "Import JSON",
+  "params.saved_labels.load.json": "Import",
   "params.saved_labels.load.browser": "Load",
   "params.saved_labels.label_title": "Title",
   "params.saved_labels.label_title.placeholder": "(optional)",

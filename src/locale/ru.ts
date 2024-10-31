@@ -83,6 +83,9 @@ export const translation_ru: Record<TranslationKey, string> = {
   "params.label.head_density.help": "Вычисление: DPI / 25.4",
   "params.label.warning.width": "Ширина этикетки слишком велика для принтера:",
   "params.label.warning.direction": "Рекомендуемое направление печати для вашего принтера:",
+  "params.label.warning.import": "Все сохранённые шаблоны будут перезаписаны",
+  "params.label.export": "Экспорт",
+  "params.label.import": "Импорт",
   /* TextParamsControls */
   "params.text.fetch_fonts": "Получить список шрифтов",
   "params.text.align.left": "Выравнивание текста: Слева",
@@ -118,10 +121,10 @@ export const translation_ru: Record<TranslationKey, string> = {
   "params.barcode.enable_caption": "Показывать надпись",
   /* SavedLabelsMenu */
   "params.saved_labels.menu_title": "Сохранить/загрузить (хранилище браузера)",
-  "params.saved_labels.save.json": "Экспорт JSON",
+  "params.saved_labels.save.json": "Экспорт",
   "params.saved_labels.save.browser": "Сохранить",
   "params.saved_labels.save.browser.replace": "Сохранить (заменить)",
-  "params.saved_labels.load.json": "Импорт JSON",
+  "params.saved_labels.load.json": "Импорт",
   "params.saved_labels.load.browser": "Открыть",
   "params.saved_labels.label_title": "Название",
   "params.saved_labels.label_title.placeholder": "(необязательно)",

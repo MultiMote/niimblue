@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type LabelPreset, type LabelProps, type LabelUnit } from "../types";
+  import { LabelPresetSchema, type LabelPreset, type LabelProps, type LabelUnit } from "../types";
   import LabelPresetsBrowser from "./LabelPresetsBrowser.svelte";
   import { printerMeta } from "../stores";
   import { tr } from "../utils/i18n";
@@ -9,6 +9,8 @@
   import type { PrintDirection } from "@mmote/niimbluelib";
   import MdIcon from "./MdIcon.svelte";
   import { Toasts } from "../utils/toasts";
+  import { FileUtils } from "../utils/file_utils";
+  import { z } from "zod";
 
   export let labelProps: LabelProps;
   export let onChange: (newProps: LabelProps) => void;
@@ -141,6 +143,32 @@
     printDirection = labelProps.printDirection;
   };
 
+  const onImportClicked = async () => {
+    const contents = await FileUtils.pickAndReadTextFile("json");
+    const rawData = JSON.parse(contents);
+
+    if (!confirm($tr("params.label.warning.import"))) {
+      return;
+    }
+
+    try {
+      const presets = z.array(LabelPresetSchema).parse(rawData);
+      LocalStoragePersistence.saveLabelPresets(presets);
+      labelPresets = presets;
+
+    } catch (e) {
+      Toasts.zodErrors(e, "Presets load error:");
+    }
+  };
+
+  const onExportClicked = () => {
+    try {
+      FileUtils.saveLabelPresetsAsJson(labelPresets);
+    } catch (e) {
+      Toasts.zodErrors(e, "Presets save error:");
+    }
+  };
+
   onMount(() => {
     const defaultPreset: LabelPreset = DEFAULT_LABEL_PRESETS[0];
     width = defaultPreset.width;
@@ -170,6 +198,17 @@
     <h6 class="dropdown-header">{$tr("params.label.menu_title")}</h6>
 
     <div class="px-3">
+      <div class="p-1">
+        <button class="btn btn-sm btn-outline-secondary" on:click={onImportClicked}>
+          <MdIcon icon="data_object" />
+          {$tr("params.label.import")}
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" on:click={onExportClicked}>
+          <MdIcon icon="data_object" />
+          {$tr("params.label.export")}
+        </button>
+      </div>
+
       <div class="mb-3 {error ? 'cursor-help text-warning' : 'text-secondary'}" title={error}>
         {$tr("params.label.current")}
         {labelProps.size.width}x{labelProps.size.height}
