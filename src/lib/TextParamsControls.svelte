@@ -191,7 +191,7 @@
     {#if fontQuerySupported }
       <select class="form-select" bind:value={selectedText.fontFamily} on:change={commit}>
         {#each fontFamilies as font}
-          <option value={font}>{font}</option>
+          <option value={font} style="font-family: {font}">{font}</option>
         {/each}
       </select>
       <button class="btn btn-secondary" on:click={getFonts} title={$tr("params.text.fetch_fonts")}>
