@@ -25,7 +25,7 @@ Your browser must support Web Bluetooth API: [supported browsers](https://develo
 
 For serial communication: [supported browsers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility).
 
-In some systems you need to enable Chrome Experimantal Web features (navigate to `chrome://flags`).
+In some systems you need to enable Chrome `Experimental Web Platform Features` (navigate to `chrome://flags`).
 
 ## Feedback needed!
 
