@@ -25,6 +25,8 @@ Your browser must support Web Bluetooth API: [supported browsers](https://develo
 
 For serial communication: [supported browsers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility).
 
+In some systems you need to enable Chrome `Experimental Web Platform Features` (navigate to `chrome://flags`).
+
 ## Feedback needed!
 
 I only have D110 and B1 printers. If you own other models, please write a comment [here](https://github.com/MultiMote/niimbluelib/issues/1) describing your model working or not.
