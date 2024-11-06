@@ -47,9 +47,9 @@ export const ExportedLabelTemplateSchema = z.object({
 const [firstTask, ...otherTasks] = printTaskNames;
 
 export const PreviewPropsOffsetSchema = z.object({
-  x: z.number().default(0),
-  y: z.number().default(0),
-  offsetType: z.enum(["inner", "outer"]).default("inner"),
+  x: z.number(),
+  y: z.number(),
+  offsetType: z.enum(["inner", "outer"]),
 });
 
 export const PreviewPropsSchema = z.object({
