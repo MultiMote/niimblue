@@ -13,7 +13,7 @@
     type PrintProgressEvent,
     type PrintTaskName,
   } from "@mmote/niimbluelib";
-  import type { LabelProps, PostProcessType, FabricJson, PreviewProps } from "../types";
+  import type { LabelProps, PostProcessType, FabricJson, PreviewProps, PreviewPropsOffset } from "../types";
   import ParamLockButton from "./ParamLockButton.svelte";
   import { tr, type TranslationKey } from "../utils/i18n";
   import { canvasPreprocess } from "../utils/canvas_preprocess";
@@ -46,8 +46,10 @@
   let error: string = "";
   let detectedPrintTaskName: PrintTaskName | undefined = $printerClient?.getPrintTaskType();
   let csvParsed: DSVRowArray<string>;
-  let page = 0;
-  let pagesTotal = 1;
+  let page: number = 0;
+  let pagesTotal: number = 1;
+  let offset: PreviewPropsOffset = {x: 0, y: 0, offsetType: "inner"};
+  let offsetWarning: string = "";
 
   let savedProps = {} as PreviewProps;
 
@@ -80,8 +82,8 @@
         density,
         labelType,
         statusPollIntervalMs: 100,
-        statusTimeoutMs: 8_000
-      })
+        statusTimeoutMs: 8_000,
+      });
 
       page = curPage;
       console.log("Printing page", page);
@@ -118,7 +120,6 @@
       await endPrint();
     }
 
-
     printState = "idle";
     $printerClient.startHeartbeat();
 
@@ -136,7 +137,30 @@
       iData = atkinson(iData, thresholdValue);
     }
 
-    previewContext.putImageData(iData, 0, 0);
+    offsetWarning = "";
+
+    if (offset.offsetType === "inner") {
+      previewCanvas.width = originalImage.width;
+      previewCanvas.height = originalImage.height;
+      previewContext.fillStyle = "white";
+      previewContext.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+      previewContext.putImageData(iData, offset.x, offset.y);
+    } else {
+      previewCanvas.width = originalImage.width + Math.abs(offset.x);
+      previewCanvas.height = originalImage.height + Math.abs(offset.y);
+      previewContext.fillStyle = "white";
+      previewContext.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+      previewContext.putImageData(iData, Math.max(offset.x, 0), Math.max(offset.y, 0));
+    }
+
+    if ($printerMeta !== undefined) {
+      const headSize = labelProps.printDirection == "left" ? previewCanvas.height : previewCanvas.width;
+      if (headSize > $printerMeta.printheadPixels) {
+        offsetWarning += $tr("params.label.warning.width") + " ";
+        offsetWarning += `(${headSize} > ${$printerMeta.printheadPixels})`;
+        offsetWarning += "\n";
+      }
+    }
   };
 
   const toggleSavedProp = (key: string, value: any) => {
@@ -179,6 +203,7 @@
       if (saved.density) density = saved.density;
       if (saved.labelType) labelType = saved.labelType;
       if (saved.printTaskName) printTaskName = saved.printTaskName;
+      if (saved.offset) offset = saved.offset;
     } catch (e) {
       Toasts.zodErrors(e, "Preview parameters load error:");
     }
@@ -302,7 +327,7 @@
         {#if printState === "sending"}
           <div>Sending...</div>
         {/if}
-        {#if printState === "printing" }
+        {#if printState === "printing"}
           <div>
             Printing...
             <div class="progress" role="progressbar">
@@ -410,7 +435,8 @@
             on:change={() => updateSavedProp("printTaskName", printTaskName)}>
             {#each printTaskNames as name}
               <option value={name}>
-                {#if detectedPrintTaskName === name}✔{/if} {name}
+                {#if detectedPrintTaskName === name}✔{/if}
+                {name}
               </option>
             {/each}
           </select>
@@ -422,11 +448,39 @@
             onClick={toggleSavedProp} />
         </div>
 
+        <div class="input-group input-group-sm">
+          <span class="input-group-text">{$tr("preview.offset")}</span>
+          {#if offsetWarning}
+            <span class="input-group-text text-warning" title={offsetWarning}><MdIcon icon="warning" /></span>
+          {/if}
+          <span class="input-group-text"><MdIcon icon="unfold_more" class="r-90" /></span>
+          <input
+            class="form-control"
+            type="number"
+            bind:value={offset.x}
+            on:change={() => updateSavedProp("offset", offset, true)} />
+          <span class="input-group-text"><MdIcon icon="unfold_more" /></span>
+          <input
+            class="form-control"
+            type="number"
+            bind:value={offset.y}
+            on:change={() => updateSavedProp("offset", offset, true)} />
+          <select
+            class="form-select"
+            bind:value={offset.offsetType}
+            on:change={() => updateSavedProp("offset", offset, true)}>
+            <option value="inner">{$tr("preview.offset.inner")}</option>
+            <option value="outer">{$tr("preview.offset.outer")}</option>
+          </select>
+
+          <ParamLockButton propName="offset" value={offset} savedValue={savedProps.offset} onClick={toggleSavedProp} />
+        </div>
+
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{$tr("preview.close")}</button>
 
         {#if printState !== "idle"}
           <button type="button" class="btn btn-primary" disabled={$disconnected} on:click={endPrint}>
-            Cancel print
+            {$tr("preview.print.cancel")}
           </button>
         {/if}
 

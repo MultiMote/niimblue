@@ -35,6 +35,7 @@ export const translation_ru: Record<TranslationKey, string> = {
   "preview.not_implemented": "НЕ РЕАЛИЗОВАНО",
   "preview.close": "Закрыть",
   "preview.print": "Печать",
+  "preview.print.cancel": "Отменить печать",
   "preview.not_connected": "Принтер не подключен",
   "preview.label_type": "Тип этикетки",
   "preview.label_type.Invalid": "Некорректный",
@@ -46,6 +47,9 @@ export const translation_ru: Record<TranslationKey, string> = {
   "preview.label_type.PvcTag": "ПВХ",
   "preview.label_type.BlackMarkGap": "С чёрными метками",
   "preview.label_type.HeatShrinkTube": "Термоусадочная трубка",
+  "preview.offset": "Смещение",
+  "preview.offset.inner": "Внутри",
+  "preview.offset.outer": "Снаружи",
   /* ObjectPicker */
   "editor.objectpicker.title": "Добавить объект",
   "editor.objectpicker.text": "Текст",

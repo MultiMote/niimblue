@@ -125,4 +125,9 @@ export const translation_en = {
   "preview.print": "Print",
   "preview.threshold": "Threshold",
   "preview.title": "Print preview",
+  "preview.print.cancel": "Cancel print",
+  "preview.offset": "Offset",
+  "preview.offset.inner": "Inner",
+  "preview.offset.outer": "Outer",
+
 } as const;

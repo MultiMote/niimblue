@@ -117,11 +117,11 @@
     error = "";
 
     if ($printerMeta !== undefined) {
-      const headSide = props.printDirection == "left" ? props.size.height : props.size.width;
+      const headSize = props.printDirection == "left" ? props.size.height : props.size.width;
 
-      if (headSide > $printerMeta.printheadPixels) {
+      if (headSize > $printerMeta.printheadPixels) {
         error += $tr("params.label.warning.width") + " ";
-        error += `(${headSide} > ${$printerMeta.printheadPixels})`;
+        error += `(${headSize} > ${$printerMeta.printheadPixels})`;
         error += "\n";
       }
 
