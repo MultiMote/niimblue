@@ -3,6 +3,8 @@ import { z } from "zod";
 
 export class Toasts {
   static error(e: any) {
+    console.error(e);
+
     Toastify({
       text: `${e}`,
       gravity: "bottom",
@@ -13,7 +15,6 @@ export class Toasts {
 
   static zodErrors(e: any, prefix: string) {
     if (e instanceof z.ZodError) {
-      console.error(e);
       e.issues.forEach((i) => {
         this.error(`${prefix} "${i.path.join("→")}" ${i.message}`);
       });

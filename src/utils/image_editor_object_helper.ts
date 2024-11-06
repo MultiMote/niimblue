@@ -1,5 +1,5 @@
 import { fabric } from "fabric";
-import type { ITextOptions, TextOptions } from "fabric/fabric-impl";
+import type { ITextboxOptions, TextOptions } from "fabric/fabric-impl";
 import { OBJECT_DEFAULTS, OBJECT_DEFAULTS_TEXT, OBJECT_DEFAULTS_VECTOR, OBJECT_SIZE_DEFAULTS } from "../defaults";
 import Barcode from "../fabric-object/barcode.class";
 import { QRCode } from "../fabric-object/qrcode.class";
@@ -116,8 +116,8 @@ export class ImageEditorObjectHelper {
     }
   }
 
-  static addText(canvas: fabric.Canvas, text?: string, options?: ITextOptions): fabric.IText {
-    const obj = new fabric.IText(text ?? "Text", {
+  static addText(canvas: fabric.Canvas, text?: string, options?: ITextboxOptions): fabric.Textbox {
+    const obj = new fabric.Textbox(text ?? "Text", {
       ...OBJECT_DEFAULTS_TEXT,
       ...options,
     });
