@@ -11,7 +11,7 @@ Uses [NiimBlueLib](https://github.com/MultiMote/niimbluelib) for communication.
 
 ## Features
 
-You can see implemented and planned feature list [in this issue](https://github.com/MultiMote/niimblue/issues/3).
+You can see the list of implemented and planned features [on the Wiki](https://github.com/MultiMote/niimblue/wiki#features).
 
 List of supported models you can find in [niimluelib](https://github.com/MultiMote/niimbluelib/issues/1) repository.
 
