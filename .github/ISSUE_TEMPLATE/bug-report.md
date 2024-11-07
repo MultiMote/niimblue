@@ -7,20 +7,36 @@ assignees: ''
 
 ---
 
-* Transport:
-- [ ] Bluetooth (what adapter are you using?)
-- [ ] Serial (USB)
+### Printer info
 
-* Browser console logs (press F12 and copy "Console" tab contents):
+<details>
+<summary>info from niimbue</summary>
 
-  <details>
-  <summary>logs</summary>
+```
+*contents of "gear" menu near printer connector*
+```
+</details>
 
-  ```
-  *paste logs here*
-  ```
-  </details>
+*if you can't connect, just write your model here*
 
-* Label JSON: *export your label to JSON and attach it here*
+### Transport
+? Bluetooth (what adapter are you using?)
+? Serial (USB)
 
+### Browser console logs
+
+*press F12 and copy "Console" tab contents*
+
+<details>
+<summary>logs</summary>
+
+```
+*paste logs here*
+```
+</details>
+
+### Label
+*export your label and attach it here (drag and drop)*
+
+### Description
 *describe your issue here*
