@@ -498,6 +498,7 @@
 
 <style>
   canvas {
+    image-rendering: pixelated;
     border: 1px solid #6d6d6d;
     max-width: 100%;
   }
