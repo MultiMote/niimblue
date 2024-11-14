@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SoundSettingsItemType, type RfidInfo } from "@mmote/niimbluelib";
+  import { SoundSettingsItemType, Utils, type RfidInfo } from "@mmote/niimbluelib";
   import {
     printerClient,
     connectedPrinterName,
@@ -10,7 +10,7 @@
     printerMeta,
     heartbeatFails,
   } from "../stores";
-  import type { ConnectionType } from "../types";
+  import type { ConnectionSupport, ConnectionType } from "../types";
   import { tr } from "../utils/i18n";
   import MdIcon from "./MdIcon.svelte";
   import { Toasts } from "../utils/toasts";
@@ -20,6 +20,7 @@
 
   let connectionType: ConnectionType = "bluetooth";
   let rfidInfo: RfidInfo | undefined = undefined;
+  let featureSupport: ConnectionSupport = { webBle: false, webSerial: false };
 
   const onConnectClicked = async () => {
     initClient(connectionType);
@@ -83,7 +84,16 @@
   };
 
   onMount(() => {
+    featureSupport = {
+      webBle: Utils.isBluetoothSupported(),
+      webSerial: Utils.isSerialSupported(),
+    };
+
     connectionType = LocalStoragePersistence.loadLastConnectionType() ?? "bluetooth";
+
+    if (!featureSupport.webSerial && connectionType === "serial") {
+      connectionType = "bluetooth";
+    }
   });
 </script>
 
@@ -150,26 +160,33 @@
     <span class="input-group-text {$heartbeatFails > 0 ? 'text-warning' : ''}">
       {$printerMeta?.model ?? $connectedPrinterName}
       {#if $heartbeatData}
-      <MdIcon icon={batteryIcon($heartbeatData.powerLevel)} class="r-90"></MdIcon>
+        <MdIcon icon={batteryIcon($heartbeatData.powerLevel)} class="r-90"></MdIcon>
       {/if}
     </span>
   {:else}
-    <button
-      class="btn text-nowrap {connectionType === 'bluetooth' ? 'btn-light' : 'btn-outline-secondary'}"
-      on:click={() => switchConnectionType("bluetooth")}>
-      <MdIcon icon="bluetooth" />
-      {$tr("connector.bluetooth")}
-    </button>
-    <button
-      class="btn text-nowrap {connectionType === 'serial' ? 'btn-light' : 'btn-outline-secondary'}"
-      on:click={() => switchConnectionType((connectionType = "serial"))}>
-      <MdIcon icon="usb" />
-      {$tr("connector.serial")}
-    </button>
+    {#if featureSupport.webBle}
+      <button
+        class="btn text-nowrap {connectionType === 'bluetooth' ? 'btn-light' : 'btn-outline-secondary'}"
+        on:click={() => switchConnectionType("bluetooth")}>
+        <MdIcon icon="bluetooth" />
+        {$tr("connector.bluetooth")}
+      </button>
+    {/if}
+    {#if featureSupport.webSerial}
+      <button
+        class="btn text-nowrap {connectionType === 'serial' ? 'btn-light' : 'btn-outline-secondary'}"
+        on:click={() => switchConnectionType((connectionType = "serial"))}>
+        <MdIcon icon="usb" />
+        {$tr("connector.serial")}
+      </button>
+    {/if}
   {/if}
 
   {#if $connectionState !== "connected"}
-    <button class="btn btn-primary" disabled={$connectionState === "connecting"} on:click={onConnectClicked}>
+    <button
+      class="btn btn-primary"
+      disabled={$connectionState === "connecting" || (!featureSupport.webBle && !featureSupport.webSerial)}
+      on:click={onConnectClicked}>
       <MdIcon icon="power" />
     </button>
   {/if}

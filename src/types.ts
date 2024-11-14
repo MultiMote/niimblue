@@ -4,6 +4,8 @@ import { z } from "zod";
 
 export type ConnectionState = "connecting" | "connected" | "disconnected";
 export type ConnectionType = "bluetooth" | "serial";
+export type ConnectionSupport = { webBle: boolean; webSerial: boolean };
+
 export type LabelUnit = "mm" | "px";
 export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qrcode" | "barcode";
 export type PostProcessType = "threshold" | "dither";
