@@ -345,7 +345,7 @@
       <div class="toolbar d-flex flex-wrap gap-1 justify-content-center align-items-center">
         <LabelPropsEditor {labelProps} onChange={onUpdateLabelProps} />
 
-        <SavedLabelsMenu onRequestCurrentCanvas={exportCurrentLabel} {onLoadRequested} />
+        <SavedLabelsMenu canvas={fabricCanvas} onRequestLabelTemplate={exportCurrentLabel} {onLoadRequested} />
 
         <button
           class="btn btn-sm btn-secondary"

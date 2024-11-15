@@ -8,9 +8,11 @@
   import { Toasts } from "../utils/toasts";
   import Dropdown from "bootstrap/js/dist/dropdown";
   import { FileUtils } from "../utils/file_utils";
+  import type { fabric } from "fabric";
 
-  export let onRequestCurrentCanvas: () => ExportedLabelTemplate;
+  export let onRequestLabelTemplate: () => ExportedLabelTemplate;
   export let onLoadRequested: (label: ExportedLabelTemplate) => void;
+  export let canvas: fabric.Canvas;
 
   let dropdownRef: Element;
   let savedLabels: ExportedLabelTemplate[] = [];
@@ -20,7 +22,7 @@
 
   const calcUsedSpace = () => {
     usedSpace = LocalStoragePersistence.usedSpace();
-  }
+  };
 
   const onLabelSelected = (index: number) => {
     selectedIndex = index;
@@ -47,7 +49,7 @@
   };
 
   const saveLabels = (labels: ExportedLabelTemplate[]) => {
-    const {zodErrors, otherErrors} = LocalStoragePersistence.saveLabels(labels);
+    const { zodErrors, otherErrors } = LocalStoragePersistence.saveLabels(labels);
     zodErrors.forEach((e) => Toasts.zodErrors(e, "Label save error"));
     otherErrors.forEach((e) => Toasts.error(e));
 
@@ -56,7 +58,7 @@
     }
 
     calcUsedSpace();
-  }
+  };
 
   const onSaveReplaceClicked = () => {
     if (selectedIndex === -1) {
@@ -67,7 +69,7 @@
       return;
     }
 
-    const label = onRequestCurrentCanvas();
+    const label = onRequestLabelTemplate();
     label.title = title;
 
     const result = [...savedLabels];
@@ -77,7 +79,7 @@
   };
 
   const onSaveClicked = () => {
-    const label = onRequestCurrentCanvas();
+    const label = onRequestLabelTemplate();
     label.title = title;
     const result = [...savedLabels, label];
     saveLabels(result);
@@ -114,7 +116,15 @@
 
   const onExportClicked = () => {
     try {
-      FileUtils.saveLabelAsJson(onRequestCurrentCanvas());
+      FileUtils.saveLabelAsJson(onRequestLabelTemplate());
+    } catch (e) {
+      Toasts.zodErrors(e, "Canvas save error:");
+    }
+  };
+
+  const onExportPngClicked = () => {
+    try {
+      FileUtils.saveCanvasAsPng(canvas);
     } catch (e) {
       Toasts.zodErrors(e, "Canvas save error:");
     }
@@ -130,9 +140,10 @@
   <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
     <MdIcon icon="sd_storage" />
   </button>
-  <div class="dropdown-menu" bind:this={dropdownRef}>
+  <div class="saved-labels dropdown-menu" bind:this={dropdownRef}>
     <h6 class="dropdown-header">
-      {$tr("params.saved_labels.menu_title")} - {usedSpace} {$tr("params.saved_labels.kb_used")}
+      {$tr("params.saved_labels.menu_title")} - {usedSpace}
+      {$tr("params.saved_labels.kb_used")}
     </h6>
 
     <div class="px-3">
@@ -141,10 +152,22 @@
           <MdIcon icon="data_object" />
           {$tr("params.saved_labels.load.json")}
         </button>
-        <button class="btn btn-sm btn-outline-secondary" on:click={onExportClicked}>
-          <MdIcon icon="data_object" />
-          {$tr("params.saved_labels.save.json")}
-        </button>
+        <div class="btn-group btn-group-sm">
+          <button class="btn btn-outline-secondary" on:click={onExportClicked}>
+            <MdIcon icon="data_object" />
+            {$tr("params.saved_labels.save.json")}
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
+            data-bs-toggle="dropdown">
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <button class="dropdown-item" on:click={onExportPngClicked}>PNG</button>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <SavedLabelsBrowser
@@ -187,7 +210,7 @@
 </div>
 
 <style>
-  .dropdown-menu {
+  .saved-labels.dropdown-menu {
     width: 100vw;
     max-width: 450px;
   }

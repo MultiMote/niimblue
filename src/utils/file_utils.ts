@@ -8,7 +8,7 @@ export class FileUtils {
     return Math.floor(Date.now() / 1000);
   }
 
-  static makeExportedLabel (canvas: fabric.Canvas,  labelProps: LabelProps): ExportedLabelTemplate {
+  static makeExportedLabel(canvas: fabric.Canvas, labelProps: LabelProps): ExportedLabelTemplate {
     const thumbnailBase64: string = canvas.toDataURL({
       width: canvas.width,
       height: canvas.height,
@@ -23,9 +23,9 @@ export class FileUtils {
       canvas: canvas.toJSON(),
       label: labelProps,
       thumbnailBase64,
-      timestamp: this.timestamp()
+      timestamp: this.timestamp(),
     };
-  };
+  }
 
   /** Convert object JSON and download it */
   static saveObjectAsJson(obj: unknown, basename: string) {
@@ -42,13 +42,32 @@ export class FileUtils {
   static saveLabelAsJson(label: ExportedLabelTemplate) {
     const parsed = ExportedLabelTemplateSchema.parse(label);
     const timestamp = label.timestamp ?? this.timestamp();
-    this.saveObjectAsJson(parsed, `label_${timestamp}`)
+    this.saveObjectAsJson(parsed, `label_${timestamp}`);
+  }
+
+  /** Convert canvas to PNG and download it */
+  static saveCanvasAsPng(canvas: fabric.Canvas) {
+    const timestamp = this.timestamp();
+
+    const url = canvas.toDataURL({
+      width: canvas.width,
+      height: canvas.height,
+      left: 0,
+      top: 0,
+      format: "png",
+    });
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `label_${timestamp}.png`;
+    link.click();
+    URL.revokeObjectURL(link.href);
   }
 
   /** Convert label template to JSON and download it */
   static saveLabelPresetsAsJson(presets: LabelPreset[]) {
     const parsed = z.array(LabelPresetSchema).parse(presets);
-    this.saveObjectAsJson(parsed, `presets_${this.timestamp()}`)
+    this.saveObjectAsJson(parsed, `presets_${this.timestamp()}`);
   }
 
   /**
@@ -98,7 +117,7 @@ export class FileUtils {
           canvas.requestRenderAll();
           resolve();
         },
-        (src: object, obj: fabric.Object/*, error: any*/) => {
+        (src: object, obj: fabric.Object /*, error: any*/) => {
           obj.set({ snapAngle: OBJECT_DEFAULTS.snapAngle });
         }
       );
