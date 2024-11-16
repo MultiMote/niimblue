@@ -18,7 +18,7 @@ export type TranslationKey = keyof typeof translation_en;
 export type SupportedLanguage = keyof typeof langPack;
 
 export const languageNames: Record<SupportedLanguage, string> = {
-  en: "Deutsch",
+  de: "Deutsch",
   en: "English",
   ru: "Русский",
   zh_cn: "简体中文",
