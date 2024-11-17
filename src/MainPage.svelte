@@ -30,7 +30,7 @@
 </div>
 
 <!-- svelte-ignore missing-declaration -->
-<div class="version text-end text-secondary">
+<div class="version text-end text-secondary p-2">
   <div>
     <select class="form-select form-select-sm d-inline-block w-auto" bind:value={$locale}>
       {#each Object.entries(locales) as [key, name]}
@@ -66,5 +66,11 @@
     bottom: 0;
     right: 0;
     z-index: -1;
+  }
+
+  @media only screen and (max-device-width: 540px) {
+    .version {
+      position: relative !important;
+    }
   }
 </style>
