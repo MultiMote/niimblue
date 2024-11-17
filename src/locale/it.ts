@@ -110,7 +110,7 @@ export const translation_it: Record<TranslationKey, string> = {
   "preview.postprocess.atkinson": "Dither (Atkinson)",
   "preview.postprocess.threshold": "Soglia",
   "preview.postprocess": "Post-processo",
-  "preview.print_task": "Attività di stampa",
+  "preview.print_task": "Stampante",
   "preview.print": "Stampa",
   "preview.threshold": "Soglia",
   "preview.title": "Anteprima",

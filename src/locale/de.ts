@@ -2,10 +2,10 @@ import type { TranslationKey } from ".";
 
 /** German */
 export const translation_de: Record<TranslationKey, string> = {
-  "browser_warning.lines.first": "Oh nein, Ihr Browser unterstützt kein Bluetooth und keine serielle Schnittstelle",
+  "browser_warning.lines.first": "Oh nein, Dein Browser unterstützt kein Bluetooth und keine serielle Schnittstelle",
   "browser_warning.lines.second": "Du kannst trotzdem Etiketten erstellen.",
   "connector.bluetooth": "Bluetooth",
-  "connector.serial": "Serliell (USB)",
+  "connector.serial": "Seriell (USB)",
   "connector.disconnect.heartbeat": "Getrennt (Drucker reagiert nicht)",
   "editor.clone": "Klonen",
   "editor.undo": "Rückgängig machen",
@@ -110,7 +110,7 @@ export const translation_de: Record<TranslationKey, string> = {
   "preview.postprocess.atkinson": "Dither (Atkinson)",
   "preview.postprocess.threshold": "Schwellenwert",
   "preview.postprocess": "Nachbearbeitung",
-  "preview.print_task": "Druckaufgabe",
+  "preview.print_task": "Drucker",
   "preview.print": "Drucken",
   "preview.threshold": "Schwellenwert",
   "preview.title": "Druckvorschau",
