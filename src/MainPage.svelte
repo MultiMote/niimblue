@@ -67,4 +67,10 @@
     right: 0;
     z-index: -1;
   }
+
+  @media only screen and (max-device-width: 540px) {
+    .version {
+      position: relative !important;
+    }
+  }
 </style>
