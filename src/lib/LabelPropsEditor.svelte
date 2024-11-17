@@ -4,7 +4,7 @@
   import { printerMeta } from "../stores";
   import { tr } from "../utils/i18n";
   import { DEFAULT_LABEL_PRESETS } from "../defaults";
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import { LocalStoragePersistence } from "../utils/persistence";
   import type { PrintDirection } from "@mmote/niimbluelib";
   import MdIcon from "./MdIcon.svelte";
@@ -137,11 +137,11 @@
   };
 
   const fillWithCurrentParams = () => {
-    unit = "px";
     prevUnit = "px";
     width = labelProps.size.width;
     height = labelProps.size.height;
     printDirection = labelProps.printDirection;
+    onUnitChange();
   };
 
   const onImportClicked = async () => {
@@ -186,6 +186,8 @@
     } catch (e) {
       Toasts.zodErrors(e, "Presets load error:");
     }
+    
+    tick().then(() => fillWithCurrentParams());
   });
 
   $: checkError(labelProps);
