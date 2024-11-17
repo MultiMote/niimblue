@@ -1,6 +1,6 @@
 import { translation_de } from "./de";
 import { translation_en } from "./en";
-import { translation_de } from "./it";
+import { translation_it } from "./it";
 import { translation_ru } from "./ru";
 import { translation_zh_cn } from "./zh_cn";
 
