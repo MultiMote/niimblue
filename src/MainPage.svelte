@@ -30,7 +30,7 @@
 </div>
 
 <!-- svelte-ignore missing-declaration -->
-<div class="version text-end text-secondary">
+<div class="version text-end text-secondary p-2">
   <div>
     <select class="form-select form-select-sm d-inline-block w-auto" bind:value={$locale}>
       {#each Object.entries(locales) as [key, name]}
