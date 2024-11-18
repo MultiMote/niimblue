@@ -16,7 +16,7 @@ const guessBrowserLanguage = (): SupportedLanguage => {
     case "it":
     case "it-CH":
     case "it-IT":
-      return "ru";
+      return "it";
     case "ru":
     case "ru-RU":
       return "ru";

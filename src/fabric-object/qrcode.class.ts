@@ -108,7 +108,7 @@ export class QRCode extends fabric.Object {
   }
 }
 
-// @ts-ignore
+// @ts-expect-error Dynamic field create
 fabric.QRCode = QRCode;
 
 export default QRCode;
