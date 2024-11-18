@@ -36,4 +36,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/multimote/niimblue:latest
+          tags: ghcr.io/multimote/niimblue:latest,ghcr.io/multimote/niimblue:gh-${{github.sha}}
