@@ -27,7 +27,7 @@
   };
 </script>
 
-<div class="btn-group btn-group-sm" role="group" title={$tr("params.variables.insert")}>
+<div class="btn-group " role="group" title={$tr("params.variables.insert")}>
   <button class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside">
     <MdIcon icon="data_object" />
   </button>

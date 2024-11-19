@@ -152,7 +152,7 @@
           <MdIcon icon="data_object" />
           {$tr("params.saved_labels.load.json")}
         </button>
-        <div class="btn-group btn-group-sm">
+        <div class="btn-group ">
           <button class="btn btn-outline-secondary" on:click={onExportClicked}>
             <MdIcon icon="data_object" />
             {$tr("params.saved_labels.save.json")}
