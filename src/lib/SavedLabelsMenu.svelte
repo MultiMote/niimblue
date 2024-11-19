@@ -137,7 +137,7 @@
 </script>
 
 <div class="dropdown">
-  <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+  <button class="btn btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
     <MdIcon icon="sd_storage" />
   </button>
   <div class="saved-labels dropdown-menu" bind:this={dropdownRef}>
@@ -148,7 +148,7 @@
 
     <div class="px-3">
       <div class="p-1">
-        <button class="btn btn-sm btn-outline-secondary" on:click={onImportClicked}>
+        <button class="btn btn-outline-secondary" on:click={onImportClicked}>
           <MdIcon icon="data_object" />
           {$tr("params.saved_labels.load.json")}
         </button>
@@ -188,18 +188,18 @@
       </div>
 
       <div class="d-flex gap-1 flex-wrap justify-content-end">
-        <button class="btn btn-sm btn-secondary" on:click={onSaveClicked}>
+        <button class="btn btn-secondary" on:click={onSaveClicked}>
           <MdIcon icon="save" />
           {$tr("params.saved_labels.save.browser")}
         </button>
 
         {#if selectedIndex !== -1}
-          <button class="btn btn-sm btn-secondary" on:click={onSaveReplaceClicked}>
+          <button class="btn btn-secondary" on:click={onSaveReplaceClicked}>
             <MdIcon icon="edit_note" />
             {$tr("params.saved_labels.save.browser.replace")}
           </button>
 
-          <button class="btn btn-sm btn-primary" on:click={onLoadClicked}>
+          <button class="btn btn-primary" on:click={onLoadClicked}>
             <MdIcon icon="folder" />
             {$tr("params.saved_labels.load.browser")}
           </button>

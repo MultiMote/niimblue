@@ -45,7 +45,7 @@
   };
 </script>
 
-<button class="btn btn-sm" on:click={onImportClicked}>
+<button class="btn" on:click={onImportClicked}>
   <MdIcon icon="receipt_long" />
   {text}
   {#if state === "processing"}

@@ -6,7 +6,7 @@
   export let onClick: (key: string, value: any) => void;
 </script>
 
-<button class="btn btn-sm btn-outline-secondary param-lock-btn" on:click={() => onClick(propName, value)}>
+<button class="btn btn-outline-secondary param-lock-btn" on:click={() => onClick(propName, value)}>
   {#if savedValue}
     <MdIcon icon="lock" class="text-warning" />
   {:else}

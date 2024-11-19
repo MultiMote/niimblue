@@ -3,19 +3,18 @@
   import BrowserWarning from "./lib/BrowserWarning.svelte";
   import ImageEditor from "./lib/ImageEditor.svelte";
   import PrinterConnector from "./lib/PrinterConnector.svelte";
-  import { locale, locales, tr } from "./utils/i18n";
 
   let isStandalone = Utils.getAvailableTransports().capacitorBle;
 </script>
 
 <div class="container my-2">
   <div class="row align-items-center mb-2">
-    <div class="col">
-      <h1 class="title">
+    <div class="col-sm-12">
+      <h1 class="title text-center">        
         <span class="niim">Niim</span><span class="blue">Blue{isStandalone ? "s" : ""}</span>
       </h1>
     </div>
-    <div class="col-md-3">
+    <div class="col-sm-12">
       <PrinterConnector />
     </div>
   </div>
@@ -32,29 +31,6 @@
   </div>
 </div>
 
-<!-- svelte-ignore missing-declaration -->
-<div class="version text-end text-secondary p-2">
-  <div>
-    <select class="form-select form-select-sm d-inline-block w-auto" bind:value={$locale}>
-      {#each Object.entries(locales) as [key, name]}
-        <option value={key}>{name}</option>
-      {/each}
-    </select>
-  </div>
-  <div>
-    {#if __APP_COMMIT__}
-      <a class="text-secondary" href="https://github.com/MultiMote/niimblue/commit/{__APP_COMMIT__}">
-        {__APP_COMMIT__.slice(0, 6)}
-      </a>
-    {/if}
-    {$tr("main.built")}
-    {__BUILD_DATE__}
-  </div>
-  <div>
-    <a class="text-secondary" href="https://github.com/MultiMote/niimblue">{$tr("main.code")}</a>
-  </div>
-</div>
-
 <style>
   .niim {
     color: #ff5349;
@@ -62,13 +38,6 @@
 
   .blue {
     color: #0b7eff;
-  }
-
-  .version {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    z-index: -1;
   }
 
   @media only screen and (max-device-width: 540px) {

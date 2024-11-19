@@ -72,7 +72,7 @@
   </div>
 
   <button
-    class="btn btn-sm {printText ? 'btn-secondary' : ''}"
+    class="btn {printText ? 'btn-secondary' : ''}"
     title={$tr("params.barcode.enable_caption")}
     on:click={togglePrintText}>
     123

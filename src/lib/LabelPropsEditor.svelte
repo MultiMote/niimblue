@@ -194,7 +194,7 @@
 </script>
 
 <div class="dropdown">
-  <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+  <button class="btn btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
     <MdIcon icon="settings" />
   </button>
   <div class="dropdown-menu">
@@ -202,11 +202,11 @@
 
     <div class="px-3">
       <div class="p-1">
-        <button class="btn btn-sm btn-outline-secondary" on:click={onImportClicked}>
+        <button class="btn btn-outline-secondary" on:click={onImportClicked}>
           <MdIcon icon="data_object" />
           {$tr("params.label.import")}
         </button>
-        <button class="btn btn-sm btn-outline-secondary" on:click={onExportClicked}>
+        <button class="btn btn-outline-secondary" on:click={onExportClicked}>
           <MdIcon icon="data_object" />
           {$tr("params.label.export")}
         </button>
@@ -221,7 +221,7 @@
         {:else if labelProps.printDirection === "left"}
           ({$tr("params.label.direction")} {$tr("params.label.direction.left")})
         {/if}
-        <button class="btn btn-sm" on:click={fillWithCurrentParams}><MdIcon icon="arrow_downward" /></button>
+        <button class="btn" on:click={fillWithCurrentParams}><MdIcon icon="arrow_downward" /></button>
       </div>
 
       <LabelPresetsBrowser
@@ -233,7 +233,7 @@
       <div class="input-group flex-nowrap input-group-sm mb-3">
         <span class="input-group-text">{$tr("params.label.size")}</span>
         <input class="form-control" type="number" min="1" step={dpmm} bind:value={width} />
-        <button class="btn btn-sm btn-secondary" on:click={onFlip}><MdIcon icon="swap_horiz" /></button>
+        <button class="btn btn-secondary" on:click={onFlip}><MdIcon icon="swap_horiz" /></button>
         <input class="form-control" type="number" min="1" step={dpmm} bind:value={height} />
         <select class="form-select" bind:value={unit} on:change={onUnitChange}>
           <option value="mm"> {$tr("params.label.mm")}</option>
@@ -269,10 +269,10 @@
       </div>
 
       <div class="text-end">
-        <button class="btn btn-sm btn-secondary" on:click={onLabelPresetAdd}>
+        <button class="btn btn-secondary" on:click={onLabelPresetAdd}>
           {$tr("params.label.save_template")}
         </button>
-        <button class="btn btn-sm btn-primary" on:click={onApply}>{$tr("params.label.apply")}</button>
+        <button class="btn btn-primary" on:click={onApply}>{$tr("params.label.apply")}</button>
       </div>
     </div>
   </div>

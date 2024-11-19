@@ -100,7 +100,7 @@
   });
 </script>
 
-<div class="input-group input-group-sm flex-nowrap justify-content-end">
+<div class="input-group input-group-sm flex-nowrap justify-content-center">
   {#if $connectionState === "connected"}
     <button class="btn btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
       <MdIcon icon="settings" />
@@ -152,13 +152,13 @@
 
       <div>Tests</div>
 
-      <button class="btn btn-sm btn-primary" on:click={getRfidInfo}>Rfid</button>
-      <button class="btn btn-sm btn-primary" on:click={startHeartbeat}>Heartbeat on</button>
-      <button class="btn btn-sm btn-primary" on:click={stopHeartbeat}>Heartbeat off</button>
-      <button class="btn btn-sm btn-primary" on:click={soundOn}>Sound on</button>
-      <button class="btn btn-sm btn-primary" on:click={soundOff}>Sound off</button>
-      <button class="btn btn-sm btn-primary" on:click={fetchInfo}>Fetch info again</button>
-      <button class="btn btn-sm btn-primary" on:click={reset}>Reset</button>
+      <button class="btn btn-primary" on:click={getRfidInfo}>Rfid</button>
+      <button class="btn btn-primary" on:click={startHeartbeat}>Heartbeat on</button>
+      <button class="btn btn-primary" on:click={stopHeartbeat}>Heartbeat off</button>
+      <button class="btn btn-primary" on:click={soundOn}>Sound on</button>
+      <button class="btn btn-primary" on:click={soundOff}>Sound off</button>
+      <button class="btn btn-primary" on:click={fetchInfo}>Fetch info again</button>
+      <button class="btn btn-primary" on:click={reset}>Reset</button>
     </div>
     <span class="input-group-text {$heartbeatFails > 0 ? 'text-warning' : ''}">
       {$printerMeta?.model ?? $connectedPrinterName}

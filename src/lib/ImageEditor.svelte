@@ -14,7 +14,7 @@
     type OjectType,
   } from "../types";
   import { FileUtils } from "../utils/file_utils";
-  import { tr } from "../utils/i18n";
+  import { locale, locales, tr } from "../utils/i18n";
   import { ImageEditorObjectHelper } from "../utils/image_editor_object_helper";
   import { LocalStoragePersistence } from "../utils/persistence";
   import { Toasts } from "../utils/toasts";
@@ -33,6 +33,7 @@
   import { DEFAULT_LABEL_PROPS, GRID_SIZE } from "../defaults";
   import { ImageEditorUtils } from "../utils/image_editor_utils";
   import SavedLabelsMenu from "./SavedLabelsMenu.svelte";
+  import { Capacitor } from '@capacitor/core';
 
   let htmlCanvas: HTMLCanvasElement;
   let fabricCanvas: fabric.Canvas;
@@ -332,7 +333,7 @@
 <svelte:window on:keydown={onKeyDown} on:paste={onPaste} />
 
 <div class="image-editor">
-  <div class="row mb-1">
+  <div class="col d-flex justify-content-center align-items-center">    
     <div class="col d-flex justify-content-center">
       <div class="canvas-wrapper print-start-{labelProps.printDirection}">
         <canvas bind:this={htmlCanvas}></canvas>
@@ -340,83 +341,107 @@
     </div>
   </div>
 
-  <div class="row mb-1">
-    <div class="col d-flex justify-content-center">
-      <div class="toolbar d-flex flex-wrap gap-1 justify-content-center align-items-center">
-        <LabelPropsEditor {labelProps} onChange={onUpdateLabelProps} />
+  <div class:fixed-bottom={Capacitor.getPlatform() !== 'web'}>
+    <div class="row mb-1">
+      <div class="col d-flex justify-content-center">
+        <div class="toolbar d-flex flex-wrap gap-1 justify-content-center align-items-center">
+          {#if selectedCount > 0}
+            <button class="btn btn-danger me-1" on:click={deleteSelected} title={$tr("editor.delete")}>
+              <MdIcon icon="delete" />
+            </button>
+          {/if}
 
-        <SavedLabelsMenu canvas={fabricCanvas} onRequestLabelTemplate={exportCurrentLabel} {onLoadRequested} />
+          {#if selectedObject && selectedCount === 1}
+            <button class="btn btn-secondary me-1" on:click={cloneSelected} title={$tr("editor.clone")}>
+              <MdIcon icon="content_copy" />
+            </button>
+            <GenericObjectParamsControls {selectedObject} valueUpdated={controlValueUpdated} />
+          {/if}
 
-        <button
-          class="btn btn-sm btn-secondary"
-          disabled={undoState.undoDisabled}
-          on:click={() => undo.undo()}
-          title={$tr("editor.undo")}>
-          <MdIcon icon="undo" />
-        </button>
+          {#if selectedObject instanceof fabric.IText}
+            <TextParamsPanel {selectedObject} valueUpdated={controlValueUpdated} />
+          {/if}
+          {#if selectedObject instanceof QRCode}
+            <QrCodeParamsPanel {selectedObject} valueUpdated={controlValueUpdated} />
+          {/if}
+          {#if selectedObject instanceof Barcode}
+            <BarcodeParamsPanel {selectedObject} valueUpdated={controlValueUpdated} />
+          {/if}
+          {#if selectedObject instanceof fabric.IText || selectedObject instanceof QRCode || (selectedObject instanceof Barcode && selectedObject.encoding === "CODE128B")}
+            <VariableInsertControl {selectedObject} valueUpdated={controlValueUpdated} />
+          {/if}
+        </div>
+      </div>
+    </div>
 
-        <button
-          class="btn btn-sm btn-secondary"
-          disabled={undoState.redoDisabled}
-          on:click={() => undo.redo()}
-          title={$tr("editor.redo")}>
-          <MdIcon icon="redo" />
-        </button>
+    <div class="row mb-1">
+      <div class="col d-flex justify-content-center">
+        <div class="toolbar d-flex flex-wrap gap-1 justify-content-center align-items-center">
+          <LabelPropsEditor {labelProps} onChange={onUpdateLabelProps} />
 
-        <CsvControl
-          csv={csvData}
-          enabled={csvEnabled}
-          onUpdate={onCsvUpdate}
-          onPlaceholderPicked={onCsvPlaceholderPicked} />
+          <SavedLabelsMenu canvas={fabricCanvas} onRequestLabelTemplate={exportCurrentLabel} {onLoadRequested} />
 
-        <IconPicker onSubmit={onIconPicked} />
-        <ObjectPicker onSubmit={onObjectPicked} labelProps={labelProps} zplImageReady={zplImageReady} />
+          <button
+            class="btn btn-secondary"
+            disabled={undoState.undoDisabled}
+            on:click={() => undo.undo()}
+            title={$tr("editor.undo")}>
+            <MdIcon icon="undo" />
+          </button>
 
-        <button class="btn btn-sm btn-primary ms-1" on:click={openPreview}>
-          <MdIcon icon="visibility" />
-          {$tr("editor.preview")}
-        </button>
-        <button
-          title="Print with default or saved parameters"
-          class="btn btn-sm btn-primary ms-1"
-          on:click={openPreviewAndPrint}
-          disabled={$connectionState !== "connected"}><MdIcon icon="print" /> {$tr("editor.print")}</button>
+          <button
+            class="btn btn-secondary"
+            disabled={undoState.redoDisabled}
+            on:click={() => undo.redo()}
+            title={$tr("editor.redo")}>
+            <MdIcon icon="redo" />
+          </button>
+
+          <CsvControl
+            csv={csvData}
+            enabled={csvEnabled}
+            onUpdate={onCsvUpdate}
+            onPlaceholderPicked={onCsvPlaceholderPicked} />
+
+          <IconPicker onSubmit={onIconPicked} />
+          <ObjectPicker onSubmit={onObjectPicked} labelProps={labelProps} zplImageReady={zplImageReady} />
+
+          <button class="btn btn-primary ms-1" on:click={openPreview}>
+            <MdIcon icon="visibility" />
+            {$tr("editor.preview")}
+          </button>
+          <button
+            title="Print with default or saved parameters"
+            class="btn btn-primary ms-1"
+            on:click={openPreviewAndPrint}
+            disabled={$connectionState !== "connected"}><MdIcon icon="print" /> {$tr("editor.print")}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- svelte-ignore missing-declaration -->
+    <div class="text-center text-secondary p-2">
+      <div>
+        <select class="form-select form-select-sm d-inline-block w-auto" bind:value={$locale}>
+          {#each Object.entries(locales) as [key, name]}
+            <option value={key}>{name}</option>
+          {/each}
+        </select>
+      </div>
+      <div>
+        {#if __APP_COMMIT__}
+          <a class="text-secondary" href="https://github.com/MultiMote/niimblue/commit/{__APP_COMMIT__}">
+            {__APP_COMMIT__.slice(0, 6)}
+          </a>
+        {/if}
+        {$tr("main.built")}
+        {__BUILD_DATE__}
+      </div>
+      <div>
+        <a class="text-secondary" href="https://github.com/MultiMote/niimblue">{$tr("main.code")}</a>
       </div>
     </div>
   </div>
-
-  <div class="row mb-1">
-    <div class="col d-flex justify-content-center">
-      <div class="toolbar d-flex flex-wrap gap-1 justify-content-center align-items-center">
-        {#if selectedCount > 0}
-          <button class="btn btn-sm btn-danger me-1" on:click={deleteSelected} title={$tr("editor.delete")}>
-            <MdIcon icon="delete" />
-          </button>
-        {/if}
-
-        {#if selectedObject && selectedCount === 1}
-          <button class="btn btn-sm btn-secondary me-1" on:click={cloneSelected} title={$tr("editor.clone")}>
-            <MdIcon icon="content_copy" />
-          </button>
-          <GenericObjectParamsControls {selectedObject} valueUpdated={controlValueUpdated} />
-        {/if}
-
-        {#if selectedObject instanceof fabric.IText}
-          <TextParamsPanel {selectedObject} valueUpdated={controlValueUpdated} />
-        {/if}
-        {#if selectedObject instanceof QRCode}
-          <QrCodeParamsPanel {selectedObject} valueUpdated={controlValueUpdated} />
-        {/if}
-        {#if selectedObject instanceof Barcode}
-          <BarcodeParamsPanel {selectedObject} valueUpdated={controlValueUpdated} />
-        {/if}
-        {#if selectedObject instanceof fabric.IText || selectedObject instanceof QRCode || (selectedObject instanceof Barcode && selectedObject.encoding === "CODE128B")}
-          <VariableInsertControl {selectedObject} valueUpdated={controlValueUpdated} />
-        {/if}
-      </div>
-    </div>
-  </div>
-
   {#if previewOpened}
     <PrintPreview
       onClosed={onPreviewClosed}

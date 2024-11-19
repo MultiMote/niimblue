@@ -98,18 +98,18 @@
 {#if selectedText}
   <button
     title={$tr("params.text.align.left")}
-    class="btn btn-sm {selectedText.textAlign === 'left' ? 'btn-secondary' : ''}"
+    class="btn {selectedText.textAlign === 'left' ? 'btn-secondary' : ''}"
     on:click={() => setXAlign("left")}><MdIcon icon="format_align_left" /></button>
   <button
     title={$tr("params.text.align.center")}
-    class="btn btn-sm {selectedText.textAlign === 'center' ? 'btn-secondary' : ''}"
+    class="btn {selectedText.textAlign === 'center' ? 'btn-secondary' : ''}"
     on:click={() => setXAlign("center")}><MdIcon icon="format_align_center" /></button>
   <button
     title={$tr("params.text.align.right")}
-    class="btn btn-sm {selectedText.textAlign === 'right' ? 'btn-secondary' : ''}"
+    class="btn {selectedText.textAlign === 'right' ? 'btn-secondary' : ''}"
     on:click={() => setXAlign("right")}><MdIcon icon="format_align_right" /></button>
   <div class="dropdown">
-    <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" title={$tr("params.text.vorigin")}>
+    <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" title={$tr("params.text.vorigin")}>
       {#if selectedText.originY === "top"}
         <MdIcon icon="vertical_align_top" />
       {:else if selectedText.originY === "center"}
@@ -120,19 +120,19 @@
     </button>
     <div class="dropdown-menu p-2">
       <button
-        class="btn btn-sm {selectedText.originY === 'top' ? 'btn-secondary' : ''}"
+        class="btn {selectedText.originY === 'top' ? 'btn-secondary' : ''}"
         on:click={() => setYAlign("top")}
         title={$tr("params.text.vorigin.top")}>
         <MdIcon icon="vertical_align_top" />
       </button>
       <button
-        class="btn btn-sm {selectedText.originY === 'center' ? 'btn-secondary' : ''}"
+        class="btn {selectedText.originY === 'center' ? 'btn-secondary' : ''}"
         on:click={() => setYAlign("center")}
         title={$tr("params.text.vorigin.center")}>
         <MdIcon icon="vertical_align_center" />
       </button>
       <button
-        class="btn btn-sm {selectedText.originY === 'bottom' ? 'btn-secondary' : ''}"
+        class="btn {selectedText.originY === 'bottom' ? 'btn-secondary' : ''}"
         on:click={() => setYAlign("bottom")}
         title={$tr("params.text.vorigin.bottom")}>
         <MdIcon icon="vertical_align_bottom" />
@@ -141,13 +141,13 @@
   </div>
 
   <button
-    class="btn btn-sm {selectedText.fontWeight === 'bold' ? 'btn-secondary' : ''}"
+    class="btn {selectedText.fontWeight === 'bold' ? 'btn-secondary' : ''}"
     on:click={toggleBold}
     title={$tr("params.text.bold")}>
     <MdIcon icon="format_bold" />
   </button>
   <button
-    class="btn btn-sm {selectedText.backgroundColor === 'black' ? 'btn-secondary' : ''}"
+    class="btn {selectedText.backgroundColor === 'black' ? 'btn-secondary' : ''}"
     on:click={invertColors}
     title={$tr("params.text.invert_colors")}>
     <MdIcon icon="invert_colors" />
@@ -202,7 +202,7 @@
     {/if}
   </div>
 
-  <button class="btn btn-sm btn-secondary" on:click={editInPopup} title={$tr("params.text.edit")}>
+  <button class="btn btn-secondary" on:click={editInPopup} title={$tr("params.text.edit")}>
     <MdIcon icon="edit" />
   </button>
 {/if}
