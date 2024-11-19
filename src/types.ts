@@ -3,8 +3,7 @@ import { fabric } from "fabric";
 import { z } from "zod";
 
 export type ConnectionState = "connecting" | "connected" | "disconnected";
-export type ConnectionType = "bluetooth" | "serial";
-export type ConnectionSupport = { webBle: boolean; webSerial: boolean };
+export type ConnectionType = "bluetooth" | "serial" | "capacitor-ble";
 
 export type LabelUnit = "mm" | "px";
 export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qrcode" | "barcode";

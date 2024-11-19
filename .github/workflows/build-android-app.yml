@@ -1,0 +1,77 @@
+name: Build an android app
+
+on:
+  # push:
+  #   branches:
+  #     - capacitor
+
+  schedule:
+    # Every week
+    - cron: '0 0 * * 0'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+
+jobs:
+  build-app:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: yarn
+          cache-dependency-path: ./yarn.lock
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          log-accepted-android-sdk-licenses: false
+
+      - name: Add build tools to PATH for apksigner
+        run: echo "$ANDROID_HOME/build-tools/34.0.0" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Install capacitor dependencies
+        run: yarn --cwd capacitor install
+
+      - name: Build niimblue www
+        run: yarn --cwd capacitor build-www
+
+      - name: Decode Keystore
+        run: mkdir -p .keystore && echo $KEYSTORE_BASE_64 | base64 -d > .keystore/keystore.jks
+        env:
+          KEYSTORE_BASE_64: ${{ secrets.KEYSTORE_BASE_64 }}
+
+      - name: Build and sign capacitor app
+        run: yarn --cwd capacitor build-android
+        env:
+          KEYSTORE_PATH: ${{ github.workspace }}/.keystore/keystore.jks
+          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_ALIAS_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+
+      - name: Upload apk to Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+           name: app
+           path: ./capacitor/android/app/build/outputs/apk/release/app-release-signed.apk
+
+

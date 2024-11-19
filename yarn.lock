@@ -10,6 +10,27 @@
     "@jridgewell/gen-mapping" "^0.3.5"
     "@jridgewell/trace-mapping" "^0.3.24"
 
+"@byteowls/capacitor-filesharer@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@byteowls/capacitor-filesharer/-/capacitor-filesharer-6.0.0.tgz#983f6b65b4276afcaedaf7789c21f06e38716052"
+  integrity sha512-+C5HzwZ3aSgI6t6eu6x5RfmHtPO71mWraOzrEIL5AC0V9s/wlCim6E5tbAnLdhe/Np2hz0PSIYTCvspCNPJq4A==
+  dependencies:
+    file-saver "2.0.5"
+
+"@capacitor-community/bluetooth-le@^6.0.2":
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/@capacitor-community/bluetooth-le/-/bluetooth-le-6.0.2.tgz#ba7bcb72126bd4cac4b70e79e8cfed24251b4f6c"
+  integrity sha512-X7ytHoHQzMTo89IR1UAu4JCmAJ3hraf+CPPLH/9zy9mUIlpZqcw0eN14vSMAtEBhb0vYz8qGQBQvN8FTRoz1Jw==
+  dependencies:
+    "@types/web-bluetooth" "^0.0.20"
+
+"@capacitor/core@^6.0.0", "@capacitor/core@^6.1.2":
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/@capacitor/core/-/core-6.1.2.tgz#a072e78b46693a6a47047cfc90d5f7cc48299fe9"
+  integrity sha512-xFy1/4qLFLp5WCIzIhtwUuVNNoz36+V7/BzHmLqgVJcvotc4MMjswW/TshnPQaLLujEOaLkA4h8ZJ0uoK3ImGg==
+  dependencies:
+    tslib "^2.1.0"
+
 "@esbuild/aix-ppc64@0.21.5":
   version "0.21.5"
   resolved "https://registry.yarnpkg.com/@esbuild/aix-ppc64/-/aix-ppc64-0.21.5.tgz#c7184a326533fcdf1b8ee0733e21c713b975575f"
@@ -162,11 +183,13 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@mmote/niimbluelib@0.0.1-alpha.17":
-  version "0.0.1-alpha.17"
-  resolved "https://registry.yarnpkg.com/@mmote/niimbluelib/-/niimbluelib-0.0.1-alpha.17.tgz#6684ce1226c608e21d2f485040561ea794fa948a"
-  integrity sha512-jfWiGtFTevdPgxOfWGUr+mj0EGEgGwD3PjlO+8FebJuV4CuaAsbB1T8Pj3tcjBDzmKEPgUFTj9WxS02CBYi0aw==
+"@mmote/niimbluelib@0.0.1-alpha.20":
+  version "0.0.1-alpha.20"
+  resolved "https://registry.yarnpkg.com/@mmote/niimbluelib/-/niimbluelib-0.0.1-alpha.20.tgz#dc70f1e43f30aa503477bc3572e2e1eb2a539107"
+  integrity sha512-Ny4Dozft1CtNz+VhiHCqIDoBhckMeELUxILhQSRXAUn452N8JhJSm6QllicA56/C+p7u2/VcHRTS/qJ3nfh7Qg==
   dependencies:
+    "@capacitor-community/bluetooth-le" "^6.0.2"
+    "@capacitor/core" "^6.0.0"
     async-mutex "^0.5.0"
     eventemitter3 "^5.0.1"
 
@@ -328,6 +351,11 @@
   version "1.12.3"
   resolved "https://registry.yarnpkg.com/@types/toastify-js/-/toastify-js-1.12.3.tgz#a9f696401aba3f79ba9e5540849cc69a99e69b77"
   integrity sha512-9RjLlbAHMSaae/KZNHGv19VG4gcLIm3YjvacCXBtfMfYn26h76YP5oxXI8k26q4iKXCB9LNfv18lsoS0JnFPTg==
+
+"@types/web-bluetooth@^0.0.20":
+  version "0.0.20"
+  resolved "https://registry.yarnpkg.com/@types/web-bluetooth/-/web-bluetooth-0.0.20.tgz#f066abfcd1cbe66267cdbbf0de010d8a41b41597"
+  integrity sha512-g9gZnnXVq7gM7v3tJCWV/qw7w+KeOlSHAhgF9RytFyifW6AF61hdT2ucrYhPq9hLs5JIryeupHV3qGk95dH9ow==
 
 acorn@^8.10.0, acorn@^8.9.0:
   version "8.12.1"
@@ -519,6 +547,11 @@ fabric@5.4.0-browser:
   version "5.4.0-browser"
   resolved "https://registry.yarnpkg.com/fabric/-/fabric-5.4.0-browser.tgz#d56726411ea798af36cd3b7b4ad7110b02f2936a"
   integrity sha512-TlKNEA4Gg4zPXnelfyLDZIC9Vsx5kMwrFqBsfbRWZSBOpfpjqwcJ1Ymt5bJ2OxMYBv1mDBYstpnRht/CNnZvHg==
+
+file-saver@2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/file-saver/-/file-saver-2.0.5.tgz#d61cfe2ce059f414d899e9dd6d4107ee25670c38"
+  integrity sha512-P9bmyZ3h/PRG+Nzga+rbdI4OEpNDzAVyy74uVO9ATgzLK6VtAsYybF/+TOCvrc0MO793d6+42lLyZTw7/ArVzA==
 
 fill-range@^7.1.1:
   version "7.1.1"
@@ -906,6 +939,11 @@ toastify-js@^1.12.0:
   version "1.12.0"
   resolved "https://registry.yarnpkg.com/toastify-js/-/toastify-js-1.12.0.tgz#cc1c4f5c7e7380e854e20bedceb51980ea29f64d"
   integrity sha512-HeMHCO9yLPvP9k0apGSdPUWrUbLnxUKNFzgUoZp1PHCLploIX/4DSQ7V8H25ef+h4iO9n0he7ImfcndnN6nDrQ==
+
+tslib@^2.1.0:
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.8.1.tgz#612efe4ed235d567e8aba5f2a5fab70280ade83f"
+  integrity sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==
 
 tslib@^2.4.0:
   version "2.7.0"

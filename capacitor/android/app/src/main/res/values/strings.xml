@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">NiimBlues</string>
+    <string name="title_activity_main">NiimBlues</string>
+    <string name="package_name">ru.mmote.niimblues</string>
+    <string name="custom_url_scheme">ru.mmote.niimblues</string>
+</resources>

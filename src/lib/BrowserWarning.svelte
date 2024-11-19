@@ -2,11 +2,10 @@
   import { Utils } from "@mmote/niimbluelib";
   import { tr } from "../utils/i18n";
   import MdIcon from "./MdIcon.svelte";
-  let bluetooth = Utils.isBluetoothSupported();
-  let serial = Utils.isSerialSupported();
+  let caps = Utils.getAvailableTransports();
 </script>
 
-{#if !bluetooth && !serial}
+{#if !caps.webSerial && !caps.webBluetooth && !caps.capacitorBle }
   <div class="alert alert-danger" role="alert">
     <div>
       {$tr("browser_warning.lines.first")}

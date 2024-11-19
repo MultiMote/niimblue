@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SoundSettingsItemType, Utils, type RfidInfo } from "@mmote/niimbluelib";
+  import { SoundSettingsItemType, Utils, type AvailableTransports, type RfidInfo } from "@mmote/niimbluelib";
   import {
     printerClient,
     connectedPrinterName,
@@ -10,7 +10,7 @@
     printerMeta,
     heartbeatFails,
   } from "../stores";
-  import type { ConnectionSupport, ConnectionType } from "../types";
+  import type { ConnectionType } from "../types";
   import { tr } from "../utils/i18n";
   import MdIcon from "./MdIcon.svelte";
   import { Toasts } from "../utils/toasts";
@@ -20,7 +20,7 @@
 
   let connectionType: ConnectionType = "bluetooth";
   let rfidInfo: RfidInfo | undefined = undefined;
-  let featureSupport: ConnectionSupport = { webBle: false, webSerial: false };
+  let featureSupport: AvailableTransports = { webBluetooth: false, webSerial: false, capacitorBle: false };
 
   const onConnectClicked = async () => {
     initClient(connectionType);
@@ -84,15 +84,18 @@
   };
 
   onMount(() => {
-    featureSupport = {
-      webBle: Utils.isBluetoothSupported(),
-      webSerial: Utils.isSerialSupported(),
-    };
+    featureSupport = Utils.getAvailableTransports();
 
     connectionType = LocalStoragePersistence.loadLastConnectionType() ?? "bluetooth";
 
+    if (!featureSupport.capacitorBle && connectionType === "capacitor-ble") {
+      connectionType = "bluetooth";
+    }
     if (!featureSupport.webSerial && connectionType === "serial") {
       connectionType = "bluetooth";
+    }
+    if (!featureSupport.webBluetooth && connectionType === "bluetooth" && featureSupport.capacitorBle) {
+      connectionType = "capacitor-ble";
     }
   });
 </script>
@@ -164,7 +167,7 @@
       {/if}
     </span>
   {:else}
-    {#if featureSupport.webBle}
+    {#if featureSupport.webBluetooth}
       <button
         class="btn text-nowrap {connectionType === 'bluetooth' ? 'btn-light' : 'btn-outline-secondary'}"
         on:click={() => switchConnectionType("bluetooth")}>
@@ -180,12 +183,20 @@
         {$tr("connector.serial")}
       </button>
     {/if}
+    {#if featureSupport.capacitorBle}
+      <button
+        class="btn text-nowrap {connectionType === 'capacitor-ble' ? 'btn-light' : 'btn-outline-secondary'}"
+        on:click={() => switchConnectionType((connectionType = "capacitor-ble"))}>
+        <MdIcon icon="usb" />
+        Capacitor BLE
+      </button>
+    {/if}
   {/if}
 
   {#if $connectionState !== "connected"}
     <button
       class="btn btn-primary"
-      disabled={$connectionState === "connecting" || (!featureSupport.webBle && !featureSupport.webSerial)}
+      disabled={$connectionState === "connecting" || (!featureSupport.capacitorBle && !featureSupport.webBluetooth && !featureSupport.webSerial)}
       on:click={onConnectClicked}>
       <MdIcon icon="power" />
     </button>

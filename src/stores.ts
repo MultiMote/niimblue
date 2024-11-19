@@ -2,10 +2,12 @@ import { get, writable } from "svelte/store";
 import type { ConnectionState, ConnectionType } from "./types";
 import {
   NiimbotBluetoothClient,
+  NiimbotCapacitorBleClient,
   NiimbotSerialClient,
   RequestCommandId,
   ResponseCommandId,
   Utils,
+  instantiateClient,
   type HeartbeatData,
   type NiimbotAbstractClient,
   type PrinterInfo,
@@ -29,18 +31,14 @@ export const initClient = (connectionType: ConnectionType) => {
     if (
       prevClient === undefined ||
       (connectionType !== "bluetooth" && prevClient instanceof NiimbotBluetoothClient) ||
-      (connectionType !== "serial" && prevClient instanceof NiimbotSerialClient)
+      (connectionType !== "serial" && prevClient instanceof NiimbotSerialClient) ||
+      (connectionType !== "capacitor-ble" && prevClient instanceof NiimbotCapacitorBleClient)
     ) {
       if (prevClient !== undefined) {
         prevClient.disconnect();
       }
-      if (connectionType === "bluetooth") {
-        console.log("new NiimbotBluetoothClient");
-        newClient = new NiimbotBluetoothClient();
-      } else {
-        console.log("new NiimbotSerialClient");
-        newClient = new NiimbotSerialClient();
-      }
+      
+      newClient = instantiateClient(connectionType);
 
       newClient.on("packetsent", (e) => {
         console.log(`>> ${Utils.bufToHex(e.packet.toBytes())} (${RequestCommandId[e.packet.command]})`);

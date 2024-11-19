@@ -1,11 +1,33 @@
 import type { fabric } from "fabric";
-import { ExportedLabelTemplateSchema, LabelPresetSchema, type ExportedLabelTemplate, type FabricJson, type LabelPreset, type LabelProps } from "../types";
+import {
+  ExportedLabelTemplateSchema,
+  LabelPresetSchema,
+  type ExportedLabelTemplate,
+  type FabricJson,
+  type LabelPreset,
+  type LabelProps,
+} from "../types";
 import { OBJECT_DEFAULTS, THUMBNAIL_HEIGHT, THUMBNAIL_QUALITY } from "../defaults";
 import { z } from "zod";
+import { FileSharer } from "@byteowls/capacitor-filesharer";
+import { Toasts } from "./toasts";
 
 export class FileUtils {
   static timestamp(): number {
     return Math.floor(Date.now() / 1000);
+  }
+
+  /** Convert string to base64 string */
+  static base64str(str: string): string {
+    const bytes = new TextEncoder().encode(str);
+    const binString = String.fromCodePoint(...bytes);
+    return btoa(binString);
+  }
+
+  /** Convert object to base64 string */
+  static base64obj(obj: unknown): string {
+    const json: string = JSON.stringify(obj);
+    return this.base64str(json);
   }
 
   static makeExportedLabel(canvas: fabric.Canvas, labelProps: LabelProps): ExportedLabelTemplate {
@@ -27,22 +49,18 @@ export class FileUtils {
     };
   }
 
-  /** Convert object JSON and download it */
-  static saveObjectAsJson(obj: unknown, basename: string) {
-    const json: string = JSON.stringify(obj);
-    const link = document.createElement("a");
-    const file: Blob = new Blob([json], { type: "text/json" });
-    link.href = URL.createObjectURL(file);
-    link.download = `${basename}.json`;
-    link.click();
-    URL.revokeObjectURL(link.href);
-  }
-
   /** Convert label template to JSON and download it */
   static saveLabelAsJson(label: ExportedLabelTemplate) {
     const parsed = ExportedLabelTemplateSchema.parse(label);
     const timestamp = label.timestamp ?? this.timestamp();
-    this.saveObjectAsJson(parsed, `label_${timestamp}`);
+
+    FileSharer.share({
+      filename: `label_${timestamp}.json`,
+      contentType: "application/json",
+      base64Data: this.base64obj(parsed),
+    }).catch((e) => {
+      if (e.message !== "USER_CANCELLED") Toasts.error(e);
+    });
   }
 
   /** Convert canvas to PNG and download it */
@@ -57,17 +75,26 @@ export class FileUtils {
       format: "png",
     });
 
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `label_${timestamp}.png`;
-    link.click();
-    URL.revokeObjectURL(link.href);
+    FileSharer.share({
+      filename: `label_${timestamp}.png`,
+      contentType: "image/png",
+      base64Data: url.split("base64,")[1],
+    }).catch((e) => {
+      if (e.message !== "USER_CANCELLED") Toasts.error(e);
+    });
   }
 
   /** Convert label template to JSON and download it */
   static saveLabelPresetsAsJson(presets: LabelPreset[]) {
     const parsed = z.array(LabelPresetSchema).parse(presets);
-    this.saveObjectAsJson(parsed, `presets_${this.timestamp()}`);
+
+    FileSharer.share({
+      filename: `presets_${this.timestamp()}.json`,
+      contentType: "application/json",
+      base64Data: this.base64obj(parsed),
+    }).catch((e) => {
+      if (e.message !== "USER_CANCELLED") Toasts.error(e);
+    });
   }
 
   /**
