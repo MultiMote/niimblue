@@ -420,7 +420,7 @@
     </div>
 
     <!-- svelte-ignore missing-declaration -->
-    <div class="text-center text-secondary p-2">
+    <div class="text-center text-secondary p-2" class:fixed-bottom={Capacitor.getPlatform() === 'web'}>
       <div>
         <select class="form-select form-select-sm d-inline-block w-auto" bind:value={$locale}>
           {#each Object.entries(locales) as [key, name]}
