@@ -39,11 +39,4 @@
   .blue {
     color: #0b7eff;
   }
-
-  @media only screen and (max-device-width: 540px) {
-    .version {
-      position: relative !important;
-      z-index: 0 !important;
-    }
-  }
 </style>

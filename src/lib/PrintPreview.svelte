@@ -342,7 +342,7 @@
       {/if}
 
       <div class="modal-footer">
-        <div class="input-group input-group-sm">
+        <div class="input-group input-group">
           <span class="input-group-text">{$tr("preview.postprocess")}</span>
 
           <select
@@ -360,7 +360,7 @@
             onClick={toggleSavedProp} />
         </div>
 
-        <div class="input-group input-group-sm">
+        <div class="input-group input-group">
           <span class="input-group-text">{$tr("preview.threshold")}</span>
 
           <input
@@ -380,7 +380,7 @@
             onClick={toggleSavedProp} />
         </div>
 
-        <div class="input-group flex-nowrap input-group-sm">
+        <div class="input-group flex-nowrap input-group">
           <span class="input-group-text">{$tr("preview.copies")}</span>
           <input
             class="form-control"
@@ -395,7 +395,7 @@
             onClick={toggleSavedProp} />
         </div>
 
-        <div class="input-group flex-nowrap input-group-sm">
+        <div class="input-group flex-nowrap input-group">
           <span class="input-group-text">{$tr("preview.density")}</span>
           <input
             class="form-control"
@@ -407,7 +407,7 @@
           <ParamLockButton propName="density" value={density} savedValue={savedProps.density} onClick={toggleSavedProp} />
         </div>
 
-        <div class="input-group input-group-sm">
+        <div class="input-group input-group">
           <span class="input-group-text">{$tr("preview.label_type")}</span>
           <select class="form-select" bind:value={labelType} on:change={() => updateSavedProp("labelType", labelType)}>
             {#each Object.values(LabelType) as lt}
@@ -427,7 +427,7 @@
             onClick={toggleSavedProp} />
         </div>
 
-        <div class="input-group input-group-sm">
+        <div class="input-group input-group">
           <span class="input-group-text">{$tr("preview.print_task")}</span>
           <select
             class="form-select"
@@ -448,7 +448,7 @@
             onClick={toggleSavedProp} />
         </div>
 
-        <div class="input-group input-group-sm">
+        <div class="input-group input-group">
           <span class="input-group-text">{$tr("preview.offset")}</span>
           {#if offsetWarning}
             <span class="input-group-text text-warning" title={offsetWarning}><MdIcon icon="warning" /></span>

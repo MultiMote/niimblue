@@ -346,13 +346,13 @@
       <div class="col d-flex justify-content-center">
         <div class="toolbar d-flex flex-wrap gap-1 justify-content-center align-items-center">
           {#if selectedCount > 0}
-            <button class="btn btn-danger me-1" on:click={deleteSelected} title={$tr("editor.delete")}>
+            <button class="btn btn-danger" on:click={deleteSelected} title={$tr("editor.delete")}>
               <MdIcon icon="delete" />
             </button>
           {/if}
 
           {#if selectedObject && selectedCount === 1}
-            <button class="btn btn-secondary me-1" on:click={cloneSelected} title={$tr("editor.clone")}>
+            <button class="btn btn-secondary" on:click={cloneSelected} title={$tr("editor.clone")}>
               <MdIcon icon="content_copy" />
             </button>
             <GenericObjectParamsControls {selectedObject} valueUpdated={controlValueUpdated} />
@@ -406,13 +406,13 @@
           <IconPicker onSubmit={onIconPicked} />
           <ObjectPicker onSubmit={onObjectPicked} labelProps={labelProps} zplImageReady={zplImageReady} />
 
-          <button class="btn btn-primary ms-1" on:click={openPreview}>
+          <button class="btn btn-primary" on:click={openPreview}>
             <MdIcon icon="visibility" />
             {$tr("editor.preview")}
           </button>
           <button
             title="Print with default or saved parameters"
-            class="btn btn-primary ms-1"
+            class="btn btn-primary"
             on:click={openPreviewAndPrint}
             disabled={$connectionState !== "connected"}><MdIcon icon="print" /> {$tr("editor.print")}</button>
         </div>
@@ -420,7 +420,7 @@
     </div>
 
     <!-- svelte-ignore missing-declaration -->
-    <div class="text-center text-secondary p-2" class:fixed-bottom={Capacitor.getPlatform() === 'web'}>
+    <div class="text-center text-secondary p-2 version" class:fixed-bottom={Capacitor.getPlatform() === 'web'}>
       <div>
         <select class="form-select form-select-sm d-inline-block w-auto" bind:value={$locale}>
           {#each Object.entries(locales) as [key, name]}
@@ -462,5 +462,9 @@
   }
   .canvas-wrapper canvas {
     image-rendering: pixelated;
+  }
+  
+  .version {
+    z-index: 0 !important;
   }
 </style>

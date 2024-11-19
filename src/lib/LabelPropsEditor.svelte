@@ -230,7 +230,7 @@
         onItemSelected={onLabelPresetSelected}
         onItemDelete={onLabelPresetDelete} />
 
-      <div class="input-group flex-nowrap input-group-sm mb-3">
+      <div class="input-group flex-nowrap input-group mb-3">
         <span class="input-group-text">{$tr("params.label.size")}</span>
         <input class="form-control" type="number" min="1" step={dpmm} bind:value={width} />
         <button class="btn btn-secondary" on:click={onFlip}><MdIcon icon="swap_horiz" /></button>
@@ -241,7 +241,7 @@
         </select>
       </div>
 
-      <div class="input-group flex-nowrap input-group-sm mb-3">
+      <div class="input-group flex-nowrap input-group mb-3">
         <span class="input-group-text">{$tr("params.label.head_density")}</span>
         <input class="form-control" type="number" min="1" bind:value={dpmm} />
         <span class="input-group-text cursor-help" title={$tr("params.label.head_density.help")}>
@@ -249,7 +249,7 @@
         </span>
       </div>
 
-      <div class="input-group flex-nowrap input-group-sm mb-3">
+      <div class="input-group flex-nowrap input-group mb-3">
         <span class="input-group-text">{$tr("params.label.direction")}</span>
         <select class="form-select" bind:value={printDirection}>
           <option value="left">
@@ -263,7 +263,7 @@
         </select>
       </div>
 
-      <div class="input-group flex-nowrap input-group-sm mb-3">
+      <div class="input-group flex-nowrap input-group mb-3">
         <span class="input-group-text">{$tr("params.label.label_title")}</span>
         <input class="form-control" type="text" bind:value={title} />
       </div>

@@ -153,7 +153,7 @@
     <MdIcon icon="invert_colors" />
   </button>
 
-  <div class="input-group flex-nowrap input-group-sm font-size">
+  <div class="input-group flex-nowrap input-group font-size">
     <span class="input-group-text" title={$tr("params.text.font_size")}><MdIcon icon="format_size" /></span>
     <input
       type="number"
@@ -170,7 +170,7 @@
       ><MdIcon icon="text_decrease" /></button>
   </div>
 
-  <div class="input-group flex-nowrap input-group-sm">
+  <div class="input-group flex-nowrap input-group">
     <span class="input-group-text" title={$tr("params.text.line_height")}>
       <MdIcon icon="density_medium" />
     </span>
@@ -184,7 +184,7 @@
       on:input={commit} />
   </div>
 
-  <div class="input-group flex-nowrap input-group-sm font-family">
+  <div class="input-group flex-nowrap input-group font-family">
     <span class="input-group-text" title={$tr("params.text.font_family")}>
       <MdIcon icon="text_format" />
     </span>

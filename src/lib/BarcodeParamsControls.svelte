@@ -56,7 +56,7 @@
 </script>
 
 {#if selectedBarcode}
-  <div class="input-group input-group-sm flex-nowrap">
+  <div class="input-group input-group flex-nowrap">
     <span class="input-group-text" title={$tr("params.barcode.encoding")}><MdIcon icon="code" /></span>
     <select class="form-select" bind:value={encoding} on:change={encodingChange}>
       <option value="EAN13">EAN13</option>
@@ -64,7 +64,7 @@
     </select>
   </div>
 
-  <div class="input-group input-group-sm flex-nowrap">
+  <div class="input-group input-group flex-nowrap">
     <span class="input-group-text" title={$tr("params.barcode.scale")}>
       <MdIcon icon="settings_ethernet" />
     </span>
@@ -78,7 +78,7 @@
     123
   </button>
 
-  <div class="input-group input-group-sm flex-nowrap">
+  <div class="input-group input-group flex-nowrap">
     <span class="input-group-text" title={$tr("params.barcode.font_size")}>
       <MdIcon icon="format_size" />
     </span>
@@ -86,7 +86,7 @@
   </div>
 
   {#if encoding === "EAN13"}
-    <div class="input-group input-group-sm flex-nowrap">
+    <div class="input-group input-group flex-nowrap">
       <span class="input-group-text" title={$tr("params.barcode.content")}><MdIcon icon="view_week" /></span>
       <input class="barcode-content form-control" maxlength="12" bind:value={text} on:input={textChange} />
     </div>

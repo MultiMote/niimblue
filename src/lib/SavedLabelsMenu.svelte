@@ -178,7 +178,7 @@
         onItemDelete={onLabelDelete}
         onItemExport={onLabelExport} />
 
-      <div class="input-group flex-nowrap input-group-sm mb-3">
+      <div class="input-group flex-nowrap input-group mb-3">
         <span class="input-group-text">{$tr("params.saved_labels.label_title")}</span>
         <input
           class="form-control"

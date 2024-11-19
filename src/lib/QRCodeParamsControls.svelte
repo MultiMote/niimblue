@@ -37,7 +37,7 @@
 </script>
 
 {#if selectedQRCode}
-  <div class="input-group input-group-sm flex-nowrap">
+  <div class="input-group input-group flex-nowrap">
     <span class="input-group-text" title={$tr("params.qrcode.ecl")}>
       <MdIcon icon="auto_fix_high" />
     </span>
