@@ -9,7 +9,7 @@
 </script>
 
 <div class="container my-2">
-  <div class="row align-items-center mb-2">
+  <div class="row align-items-center mb-3">
     <div class="col">
       <h1 class="title">
         <span class="niim">Niim</span><span class="blue">Blue{isStandalone ? "s" : ""}</span>
@@ -33,9 +33,9 @@
 </div>
 
 <!-- svelte-ignore missing-declaration -->
-<div class="version text-end text-secondary p-2">
+<div class="footer text-end text-secondary p-3">
   <div>
-    <select class="form-select form-select-sm d-inline-block w-auto" bind:value={$locale}>
+    <select class="form-select form-select-sm text-secondary d-inline-block w-auto" bind:value={$locale}>
       {#each Object.entries(locales) as [key, name]}
         <option value={key}>{name}</option>
       {/each}
@@ -64,7 +64,7 @@
     color: #0b7eff;
   }
 
-  .version {
+  .footer {
     position: absolute;
     bottom: 0;
     right: 0;
@@ -72,7 +72,7 @@
   }
 
   @media only screen and (max-device-width: 540px) {
-    .version {
+    .footer {
       position: relative !important;
       z-index: 0 !important;
     }

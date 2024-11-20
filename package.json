@@ -18,7 +18,7 @@
 		"@byteowls/capacitor-filesharer": "^6.0.0",
 		"@capacitor/core": "^6.1.2",
 		"@fontsource-variable/noto-sans": "^5.0.5",
-		"@mmote/niimbluelib": "0.0.1-alpha.20",
+		"@mmote/niimbluelib": "0.0.1-alpha.21",
 		"@popperjs/core": "^2.11.8",
 		"bootstrap": "5.3.3",
 		"d3-dsv": "^3.0.1",

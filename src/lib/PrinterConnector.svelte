@@ -100,7 +100,7 @@
   });
 </script>
 
-<div class="input-group input-group-sm flex-nowrap justify-content-end">
+<div class="input-group w-auto input-group-sm flex-nowrap justify-content-end">
   {#if $connectionState === "connected"}
     <button class="btn btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
       <MdIcon icon="settings" />
@@ -210,4 +210,8 @@
 </div>
 
 <style>
+  .dropdown-menu {
+    width: 100vw;
+    max-width: 300px;
+  }
 </style>

@@ -332,7 +332,7 @@
 <svelte:window on:keydown={onKeyDown} on:paste={onPaste} />
 
 <div class="image-editor">
-  <div class="row mb-1">
+  <div class="row mb-3">
     <div class="col d-flex justify-content-center">
       <div class="canvas-wrapper print-start-{labelProps.printDirection}">
         <canvas bind:this={htmlCanvas}></canvas>
@@ -370,7 +370,7 @@
           onPlaceholderPicked={onCsvPlaceholderPicked} />
 
         <IconPicker onSubmit={onIconPicked} />
-        <ObjectPicker onSubmit={onObjectPicked} labelProps={labelProps} zplImageReady={zplImageReady} />
+        <ObjectPicker onSubmit={onObjectPicked} {labelProps} {zplImageReady} />
 
         <button class="btn btn-sm btn-primary ms-1" on:click={openPreview}>
           <MdIcon icon="visibility" />
