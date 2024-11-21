@@ -1,5 +1,5 @@
 import { get, writable } from "svelte/store";
-import type { ConnectionState, ConnectionType } from "./types";
+import type { AutomationProps, ConnectionState, ConnectionType } from "./types";
 import {
   NiimbotBluetoothClient,
   NiimbotCapacitorBleClient,
@@ -15,6 +15,7 @@ import {
 } from "@mmote/niimbluelib";
 import { Toasts } from "./utils/toasts";
 import { tr } from "./utils/i18n";
+import { LocalStoragePersistence } from "./utils/persistence";
 
 export const connectionState = writable<ConnectionState>("disconnected");
 export const connectedPrinterName = writable<string>("");
@@ -23,6 +24,26 @@ export const heartbeatData = writable<HeartbeatData>();
 export const printerInfo = writable<PrinterInfo>();
 export const printerMeta = writable<PrinterModelMeta | undefined>();
 export const heartbeatFails = writable<number>(0);
+export const automation = writable<AutomationProps | undefined>(
+  (() => {
+    try {
+      return LocalStoragePersistence.loadAutomation() ?? undefined;
+    } catch (e) {
+      console.error(e);
+    }
+    return undefined;
+  })()
+);
+
+let automationLoaded = false;
+automation.subscribe((val: AutomationProps | undefined) => {
+  // ignore first event that fires immediately after subscribe
+  if (!automationLoaded) {
+    automationLoaded = true;
+    return;
+  }
+  LocalStoragePersistence.saveAutomation(val);
+});
 
 export const initClient = (connectionType: ConnectionType) => {
   printerClient.update((prevClient: NiimbotAbstractClient) => {
@@ -37,7 +58,7 @@ export const initClient = (connectionType: ConnectionType) => {
       if (prevClient !== undefined) {
         prevClient.disconnect();
       }
-      
+
       newClient = instantiateClient(connectionType);
 
       newClient.on("packetsent", (e) => {

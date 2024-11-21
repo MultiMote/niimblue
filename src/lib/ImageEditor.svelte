@@ -1,11 +1,11 @@
 <script lang="ts">
   import Dropdown from "bootstrap/js/dist/dropdown";
   import { fabric } from "fabric";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
   import { Barcode } from "../fabric-object/barcode.class";
   import { QRCode } from "../fabric-object/qrcode.class";
   import { iconCodepoints, type MaterialIcon } from "../mdi_icons";
-  import { connectionState } from "../stores";
+  import { automation, connectionState } from "../stores";
   import {
     type ExportedLabelTemplate,
     type FabricJson,
@@ -322,6 +322,29 @@
         });
       }
     });
+
+    if ($automation !== undefined) {
+      if ($automation.loadLabelTemplate !== undefined) {
+        try {
+          onLoadRequested($automation.loadLabelTemplate);
+        } catch (e) {
+          Toasts.error(e);
+        }
+      }
+
+      if ($automation.startPrint !== undefined) {
+        if ($automation.startPrint === "immediately") {
+          openPreview();
+        } else if ($automation.startPrint === "after_connect") {
+          const unsubscribe = connectionState.subscribe((st) => {
+            if (st === "connected") {
+              tick().then(() => unsubscribe());
+              openPreviewAndPrint();
+            }
+          });
+        }
+      }
+    }
   });
 
   onDestroy(() => {

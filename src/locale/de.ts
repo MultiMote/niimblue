@@ -86,6 +86,7 @@ export const translation_de: Record<TranslationKey, string> = {
   "params.saved_labels.menu_title": "Speichern/Laden (Browserspeicher)",
   "params.saved_labels.kb_used": "kB benutzt",
   "params.saved_labels.save.json": "Export",
+  "params.saved_labels.make_default": "Standard machen",
   "params.saved_labels.save.browser": "Speichern",
   "params.saved_labels.save.browser.replace": "Speichern (Ersetzen)",
   "params.saved_labels.load.json": "Import",

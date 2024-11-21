@@ -9,6 +9,7 @@
   import Dropdown from "bootstrap/js/dist/dropdown";
   import { FileUtils } from "../utils/file_utils";
   import type { fabric } from "fabric";
+  import { automation } from "../stores";
 
   export let onRequestLabelTemplate: () => ExportedLabelTemplate;
   export let onLoadRequested: (label: ExportedLabelTemplate) => void;
@@ -78,6 +79,19 @@
     saveLabels(result);
   };
 
+  const onMakeDefaultClicked = () => {
+    const label = onRequestLabelTemplate();
+    label.title = title;
+    label.thumbnailBase64 = undefined;
+
+    automation.update((prev) => ({
+      ...prev,
+      loadLabelTemplate: label,
+    }));
+
+    calcUsedSpace();
+  };
+
   const onSaveClicked = () => {
     const label = onRequestLabelTemplate();
     label.title = title;
@@ -141,7 +155,7 @@
     <MdIcon icon="sd_storage" />
   </button>
   <div class="saved-labels dropdown-menu" bind:this={dropdownRef}>
-    <h6 class="dropdown-header">
+    <h6 class="dropdown-header text-wrap">
       {$tr("params.saved_labels.menu_title")} - {usedSpace}
       {$tr("params.saved_labels.kb_used")}
     </h6>
@@ -188,6 +202,10 @@
       </div>
 
       <div class="d-flex gap-1 flex-wrap justify-content-end">
+        <button class="btn btn-sm text-secondary make-default" on:click={onMakeDefaultClicked}>
+          {$tr("params.saved_labels.make_default")}
+        </button>
+
         <button class="btn btn-sm btn-secondary" on:click={onSaveClicked}>
           <MdIcon icon="save" />
           {$tr("params.saved_labels.save.browser")}
@@ -213,5 +231,8 @@
   .saved-labels.dropdown-menu {
     width: 100vw;
     max-width: 450px;
+  }
+  .make-default {
+    margin-right: auto;
   }
 </style>

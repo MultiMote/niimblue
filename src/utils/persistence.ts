@@ -1,9 +1,11 @@
 import {
+  AutomationPropsSchema,
   ExportedLabelTemplateSchema,
   FabricJsonSchema,
   LabelPresetSchema,
   LabelPropsSchema,
   PreviewPropsSchema,
+  type AutomationProps,
   type ConnectionType,
   type ExportedLabelTemplate,
   type LabelPreset,
@@ -208,5 +210,19 @@ export class LocalStoragePersistence {
 
   static saveLastConnectionType(value: ConnectionType) {
     localStorage.setItem("connection_type", value);
+  }
+
+  /**
+   * @throws {z.ZodError}
+   */
+  static saveAutomation(value?: AutomationProps) {
+    this.validateAndSaveObject("automation", value, AutomationPropsSchema);
+  }
+
+  /**
+   * @throws {z.ZodError}
+   */
+  static loadAutomation(): AutomationProps | null {
+    return this.loadAndValidateObject("automation", AutomationPropsSchema);
   }
 }

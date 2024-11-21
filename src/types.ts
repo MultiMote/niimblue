@@ -63,9 +63,21 @@ export const PreviewPropsSchema = z.object({
   offset: PreviewPropsOffsetSchema.optional(),
 });
 
+export const AutomationPropsSchema = z.object({
+  /** Request device connect on page load. Works only for Capacitor BLE connection. */
+  autoConnect: z.boolean().optional(),
+  /** Connect to MAC or device id. Works only for Capacitor BLE connection. */
+  autoConnectDeviceId: z.string().optional(),
+  /** immediately - just open print preview dialog */
+  startPrint: z.enum(["after_connect", "immediately"]).optional(),
+  /** Load label template on page load */
+  loadLabelTemplate: ExportedLabelTemplateSchema.optional(),
+});
+
 export type LabelProps = z.infer<typeof LabelPropsSchema>;
 export type LabelPreset = z.infer<typeof LabelPresetSchema>;
 export type FabricJson = z.infer<typeof FabricJsonSchema>;
 export type ExportedLabelTemplate = z.infer<typeof ExportedLabelTemplateSchema>;
 export type PreviewPropsOffset = z.infer<typeof PreviewPropsOffsetSchema>;
 export type PreviewProps = z.infer<typeof PreviewPropsSchema>;
+export type AutomationProps = z.infer<typeof AutomationPropsSchema>;

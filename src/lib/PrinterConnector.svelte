@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { SoundSettingsItemType, Utils, type AvailableTransports, type RfidInfo } from "@mmote/niimbluelib";
+  import {
+    NiimbotCapacitorBleClient,
+    SoundSettingsItemType,
+    Utils,
+    type AvailableTransports,
+    type RfidInfo,
+  } from "@mmote/niimbluelib";
   import {
     printerClient,
     connectedPrinterName,
@@ -9,6 +15,7 @@
     printerInfo,
     printerMeta,
     heartbeatFails,
+    automation,
   } from "../stores";
   import type { ConnectionType } from "../types";
   import { tr } from "../utils/i18n";
@@ -27,7 +34,11 @@
     connectionState.set("connecting");
 
     try {
-      await $printerClient.connect();
+      if ($printerClient instanceof NiimbotCapacitorBleClient && $automation?.autoConnectDeviceId !== undefined) {
+        await $printerClient.connect({ deviceId: $automation.autoConnectDeviceId });
+      } else {
+        await $printerClient.connect();
+      }
     } catch (e) {
       connectionState.set("disconnected");
       Toasts.error(e);
@@ -96,6 +107,10 @@
     }
     if (!featureSupport.webBluetooth && connectionType === "bluetooth" && featureSupport.capacitorBle) {
       connectionType = "capacitor-ble";
+    }
+
+    if ($automation !== undefined && $automation.autoConnect && connectionType === "capacitor-ble") {
+      onConnectClicked();
     }
   });
 </script>
@@ -196,7 +211,8 @@
   {#if $connectionState !== "connected"}
     <button
       class="btn btn-primary"
-      disabled={$connectionState === "connecting" || (!featureSupport.capacitorBle && !featureSupport.webBluetooth && !featureSupport.webSerial)}
+      disabled={$connectionState === "connecting" ||
+        (!featureSupport.capacitorBle && !featureSupport.webBluetooth && !featureSupport.webSerial)}
       on:click={onConnectClicked}>
       <MdIcon icon="power" />
     </button>

@@ -78,6 +78,7 @@ export const translation_zh_cn: Partial<Record<TranslationKey, string>> = {
   "params.saved_labels.load.browser": "载入到画布",
   "params.saved_labels.load.json": "导入 JSON 文件",
   "params.saved_labels.menu_title": "已保存的标签",
+  "params.saved_labels.make_default": "设置默认",
   "params.saved_labels.save.browser.replace": "保存/替换",
   "params.saved_labels.save.browser": "另存为",
   "params.saved_labels.save.json": "导出 JSON 文件",
