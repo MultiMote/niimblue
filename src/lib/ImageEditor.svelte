@@ -259,7 +259,16 @@
       backgroundColor: "#fff",
     });
 
-    ImageEditorObjectHelper.addText(fabricCanvas, $tr("editor.default_text"));
+    const defaultTemplate = LocalStoragePersistence.loadDefaultTemplate();
+    try {
+      if (defaultTemplate !== null) {
+        onLoadRequested(defaultTemplate);
+      } else {
+        ImageEditorObjectHelper.addText(fabricCanvas, $tr("editor.default_text"));
+      }
+    } catch (e) {
+      Toasts.error(e);
+    }
     undo.push(fabricCanvas, labelProps);
 
     // force close dropdowns on touch devices
@@ -324,14 +333,6 @@
     });
 
     if ($automation !== undefined) {
-      if ($automation.loadLabelTemplate !== undefined) {
-        try {
-          onLoadRequested($automation.loadLabelTemplate);
-        } catch (e) {
-          Toasts.error(e);
-        }
-      }
-
       if ($automation.startPrint !== undefined) {
         if ($automation.startPrint === "immediately") {
           openPreview();

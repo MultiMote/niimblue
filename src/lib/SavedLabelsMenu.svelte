@@ -9,7 +9,6 @@
   import Dropdown from "bootstrap/js/dist/dropdown";
   import { FileUtils } from "../utils/file_utils";
   import type { fabric } from "fabric";
-  import { automation } from "../stores";
 
   export let onRequestLabelTemplate: () => ExportedLabelTemplate;
   export let onLoadRequested: (label: ExportedLabelTemplate) => void;
@@ -20,6 +19,7 @@
   let selectedIndex: number = -1;
   let title: string = "";
   let usedSpace: number = 0;
+  let customDefaultTemplate: boolean = LocalStoragePersistence.hasCustomDefaultTemplate();
 
   const calcUsedSpace = () => {
     usedSpace = LocalStoragePersistence.usedSpace();
@@ -83,12 +83,14 @@
     const label = onRequestLabelTemplate();
     label.title = title;
     label.thumbnailBase64 = undefined;
+    LocalStoragePersistence.saveDefaultTemplate(label);
+    customDefaultTemplate = true;
+    calcUsedSpace();
+  };
 
-    automation.update((prev) => ({
-      ...prev,
-      loadLabelTemplate: label,
-    }));
-
+  const onRemoveDefaultClicked = () => {
+    LocalStoragePersistence.saveDefaultTemplate(undefined);
+    customDefaultTemplate = false;
     calcUsedSpace();
   };
 
@@ -202,9 +204,16 @@
       </div>
 
       <div class="d-flex gap-1 flex-wrap justify-content-end">
-        <button class="btn btn-sm text-secondary make-default" on:click={onMakeDefaultClicked}>
-          {$tr("params.saved_labels.make_default")}
-        </button>
+        <div class="btn-group btn-group-sm make-default">
+          <button class="btn text-secondary" on:click={onMakeDefaultClicked}>
+            {$tr("params.saved_labels.make_default")}
+          </button>
+          {#if customDefaultTemplate}
+            <button class="btn text-secondary" on:click={onRemoveDefaultClicked}>
+              <MdIcon icon="close" />
+            </button>
+          {/if}
+        </div>
 
         <button class="btn btn-sm btn-secondary" on:click={onSaveClicked}>
           <MdIcon icon="save" />

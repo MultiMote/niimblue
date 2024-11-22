@@ -225,4 +225,22 @@ export class LocalStoragePersistence {
   static loadAutomation(): AutomationProps | null {
     return this.loadAndValidateObject("automation", AutomationPropsSchema);
   }
+
+  /**
+   * @throws {z.ZodError}
+   */
+  static saveDefaultTemplate(value?: ExportedLabelTemplate) {
+    this.validateAndSaveObject("default_template", value, ExportedLabelTemplateSchema);
+  }
+
+  /**
+   * @throws {z.ZodError}
+   */
+  static loadDefaultTemplate(): ExportedLabelTemplate | null {
+    return this.loadAndValidateObject("default_template", ExportedLabelTemplateSchema);
+  }
+
+  static hasCustomDefaultTemplate(): boolean {
+    return "default_template" in localStorage;
+  }
 }

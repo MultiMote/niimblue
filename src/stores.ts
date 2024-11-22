@@ -1,4 +1,4 @@
-import { get, writable } from "svelte/store";
+import { get, readable, writable } from "svelte/store";
 import type { AutomationProps, ConnectionState, ConnectionType } from "./types";
 import {
   NiimbotBluetoothClient,
@@ -24,7 +24,7 @@ export const heartbeatData = writable<HeartbeatData>();
 export const printerInfo = writable<PrinterInfo>();
 export const printerMeta = writable<PrinterModelMeta | undefined>();
 export const heartbeatFails = writable<number>(0);
-export const automation = writable<AutomationProps | undefined>(
+export const automation = readable<AutomationProps | undefined>(
   (() => {
     try {
       return LocalStoragePersistence.loadAutomation() ?? undefined;
@@ -34,16 +34,6 @@ export const automation = writable<AutomationProps | undefined>(
     return undefined;
   })()
 );
-
-let automationLoaded = false;
-automation.subscribe((val: AutomationProps | undefined) => {
-  // ignore first event that fires immediately after subscribe
-  if (!automationLoaded) {
-    automationLoaded = true;
-    return;
-  }
-  LocalStoragePersistence.saveAutomation(val);
-});
 
 export const initClient = (connectionType: ConnectionType) => {
   printerClient.update((prevClient: NiimbotAbstractClient) => {

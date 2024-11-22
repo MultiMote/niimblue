@@ -69,9 +69,7 @@ export const AutomationPropsSchema = z.object({
   /** Connect to MAC or device id. Works only for Capacitor BLE connection. */
   autoConnectDeviceId: z.string().optional(),
   /** immediately - just open print preview dialog */
-  startPrint: z.enum(["after_connect", "immediately"]).optional(),
-  /** Load label template on page load */
-  loadLabelTemplate: ExportedLabelTemplateSchema.optional(),
+  startPrint: z.enum(["after_connect", "immediately"]).optional()
 });
 
 export type LabelProps = z.infer<typeof LabelPropsSchema>;
