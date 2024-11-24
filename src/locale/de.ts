@@ -63,7 +63,7 @@ export const translation_de: Partial<Record<TranslationKey, string>> = {
   "params.label.import": "Import",
   "params.label.shape": "Etikettenform",
   "params.label.split": "Geteiltes Etikett",
-  "params.label.tail.length": "Länge des Teilung",
+  "params.label.tail.length": "Länge der Teilung",
   "params.label.tail.position": "Position der Teilung",
 
   "params.qrcode.ecl": "Fehlerkorrekturstufe",
