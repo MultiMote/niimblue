@@ -63,8 +63,8 @@ export const translation_it: Partial<Record<TranslationKey, string>> = {
   "params.label.import": "Importa",
   "params.label.shape": "Forma dell'etichetta",
   "params.label.split": "Etichetta divisa",
-  "params.label.tail.length": "Lunghezza della coda",
-  "params.label.tail.position": "Posizione della coda",
+  "params.label.tail.length": "Lunghezza della divisone",
+  "params.label.tail.position": "Posizione della divisone",
 
   "params.qrcode.ecl": "Livello di correzione degli errori",
   "params.text.align.center": "Allinea il testo: al centro",
