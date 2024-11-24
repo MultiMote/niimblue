@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { ExportedLabelTemplate, LabelProps } from "../types";
   import { tr } from "../utils/i18n";
-  import MdIcon from "./MdIcon.svelte";
+  import MdIcon from "./basic/MdIcon.svelte";
 
   export let onItemClicked: (index: number) => void;
   export let onItemDelete: (index: number) => void;

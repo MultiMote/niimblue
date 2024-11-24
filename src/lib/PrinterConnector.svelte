@@ -19,7 +19,7 @@
   } from "../stores";
   import type { ConnectionType } from "../types";
   import { tr } from "../utils/i18n";
-  import MdIcon from "./MdIcon.svelte";
+  import MdIcon from "./basic/MdIcon.svelte";
   import { Toasts } from "../utils/toasts";
   import { onMount } from "svelte";
   import { LocalStoragePersistence } from "../utils/persistence";

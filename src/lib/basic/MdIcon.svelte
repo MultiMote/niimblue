@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { iconCodepoints, type MaterialIcon } from "../mdi_icons";
+  import { iconCodepoints, type MaterialIcon } from "../../mdi_icons";
   export let icon: MaterialIcon;
 </script>
 

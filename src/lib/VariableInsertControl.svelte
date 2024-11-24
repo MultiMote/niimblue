@@ -3,7 +3,7 @@
   import { tr } from "../utils/i18n";
   import QRCode from "../fabric-object/qrcode.class";
   import Barcode from "../fabric-object/barcode.class";
-  import MdIcon from "./MdIcon.svelte";
+  import MdIcon from "./basic/MdIcon.svelte";
 
   export let selectedObject: fabric.Object;
   export let valueUpdated: () => void;

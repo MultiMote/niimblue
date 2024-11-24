@@ -77,7 +77,7 @@ export const translation_ru: Record<TranslationKey, string> = {
   "params.label.mm": "мм",
   "params.label.dpmm": "пикс/мм",
   "params.label.px": "пикс.",
-  "params.label.direction": "Печатать",
+  "params.label.direction": "Направление печати",
   "params.label.direction.left": "Слева",
   "params.label.direction.top": "Сверху",
   "params.label.apply": "Применить",
@@ -90,6 +90,11 @@ export const translation_ru: Record<TranslationKey, string> = {
   "params.label.warning.import": "Все сохранённые шаблоны будут перезаписаны",
   "params.label.export": "Экспорт",
   "params.label.import": "Импорт",
+  "params.label.shape": "Форма этикетки",
+  "params.label.split": "Разделение этикетки",
+  "params.label.tail.length": "Длина хвостовика",
+  "params.label.tail.position": "Положение хвостовика",
+
   /* TextParamsControls */
   "params.text.fetch_fonts": "Получить список шрифтов",
   "params.text.align.left": "Выравнивание текста: Слева",

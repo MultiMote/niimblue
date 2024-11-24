@@ -1,5 +1,13 @@
 <script lang="ts">
-  import { LabelPresetSchema, type LabelPreset, type LabelProps, type LabelUnit } from "../types";
+  import {
+    LabelPresetSchema,
+    type LabelPreset,
+    type LabelProps,
+    type LabelShape,
+    type LabelSplit,
+    type LabelUnit,
+    type TailPosition,
+  } from "../types";
   import LabelPresetsBrowser from "./LabelPresetsBrowser.svelte";
   import { printerMeta } from "../stores";
   import { tr } from "../utils/i18n";
@@ -7,13 +15,18 @@
   import { onMount, tick } from "svelte";
   import { LocalStoragePersistence } from "../utils/persistence";
   import type { PrintDirection } from "@mmote/niimbluelib";
-  import MdIcon from "./MdIcon.svelte";
+  import MdIcon from "./basic/MdIcon.svelte";
   import { Toasts } from "../utils/toasts";
   import { FileUtils } from "../utils/file_utils";
   import { z } from "zod";
 
   export let labelProps: LabelProps;
   export let onChange: (newProps: LabelProps) => void;
+
+  const tailPositions: TailPosition[] = ["right", "bottom", "left", "top"];
+  const printDirections: PrintDirection[] = ["left", "top"];
+  const labelShapes: LabelShape[] = ["rect", "rounded_rect", "circle"];
+  const labelSplits: LabelSplit[] = ["none", "vertical", "horizontal"];
 
   let labelPresets: LabelPreset[] = DEFAULT_LABEL_PRESETS;
 
@@ -24,19 +37,25 @@
   let width = 0;
   let height = 0;
   let printDirection: PrintDirection = "left";
+  let shape: LabelShape = "rect";
+  let split: LabelSplit = "none";
+  let tailLength: number = 0;
+  let tailPos: TailPosition = "right";
   let error: string = "";
 
   const onApply = () => {
     let newWidth = width;
     let newHeight = height;
+    let newTailLength = tailLength;
 
     // mm to px
     if (unit === "mm") {
       newWidth *= dpmm;
       newHeight *= dpmm;
+      newTailLength *= dpmm;
     }
 
-    // limit min siz
+    // limit min size
     newWidth = newWidth < dpmm ? dpmm : newWidth;
     newHeight = newHeight < dpmm ? dpmm : newHeight;
 
@@ -53,6 +72,10 @@
         width: Math.floor(newWidth),
         height: Math.floor(newHeight),
       },
+      shape,
+      split,
+      tailPos,
+      tailLength: Math.floor(newTailLength),
     });
   };
 
@@ -66,6 +89,10 @@
     width = preset.width;
     height = preset.height;
     title = preset.title ?? "";
+    shape = preset.shape ?? "rect";
+    split = preset.split ?? "none";
+    tailPos = preset.tailPos ?? "right";
+    tailLength = preset.tailLength ?? 0;
 
     onApply();
   };
@@ -85,6 +112,10 @@
       width,
       height,
       title,
+      shape,
+      split,
+      tailPos,
+      tailLength,
     };
     const newPresets = [...labelPresets, newPreset];
     try {
@@ -106,9 +137,11 @@
     if (prevUnit === "mm" && unit === "px") {
       width = Math.floor(width * dpmm);
       height = Math.floor(height * dpmm);
+      tailLength = Math.floor(tailLength * dpmm);
     } else if (prevUnit === "px" && unit === "mm") {
       width = Math.floor(width / dpmm);
       height = Math.floor(height / dpmm);
+      tailLength = Math.floor(tailLength / dpmm);
     }
     prevUnit = unit;
   };
@@ -141,6 +174,10 @@
     width = labelProps.size.width;
     height = labelProps.size.height;
     printDirection = labelProps.printDirection;
+    shape = labelProps.shape ?? "rect";
+    split = labelProps.split ?? "none";
+    tailPos = labelProps.tailPos ?? "right";
+    tailLength = labelProps.tailLength ?? 0;
     onUnitChange();
   };
 
@@ -156,7 +193,6 @@
       const presets = z.array(LabelPresetSchema).parse(rawData);
       LocalStoragePersistence.saveLabelPresets(presets);
       labelPresets = presets;
-
     } catch (e) {
       Toasts.zodErrors(e, "Presets load error:");
     }
@@ -177,6 +213,10 @@
     prevUnit = defaultPreset.unit;
     unit = defaultPreset.unit;
     printDirection = defaultPreset.printDirection;
+    shape = defaultPreset.shape ?? "rect";
+    split = defaultPreset.split ?? "none";
+    tailPos = defaultPreset.tailPos ?? "right";
+    tailLength = defaultPreset.tailLength ?? 0;
 
     try {
       const savedPresets: LabelPreset[] | null = LocalStoragePersistence.loadLabelPresets();
@@ -186,11 +226,14 @@
     } catch (e) {
       Toasts.zodErrors(e, "Presets load error:");
     }
-    
+
     tick().then(() => fillWithCurrentParams());
   });
 
   $: checkError(labelProps);
+  $: if (shape === "circle" && split !== "none") split = "none";
+  $: if (split === "none") tailLength = 0;
+  $: if (tailLength < 0) tailLength = 0;
 </script>
 
 <div class="dropdown">
@@ -211,7 +254,6 @@
           {$tr("params.label.export")}
         </button>
       </div>
-
       <div class="mb-3 {error ? 'cursor-help text-warning' : 'text-secondary'}" title={error}>
         {$tr("params.label.current")}
         {labelProps.size.width}x{labelProps.size.height}
@@ -230,7 +272,7 @@
         onItemSelected={onLabelPresetSelected}
         onItemDelete={onLabelPresetDelete} />
 
-      <div class="input-group flex-nowrap input-group-sm mb-3">
+      <div class="input-group flex-nowrap input-group-sm mb-2">
         <span class="input-group-text">{$tr("params.label.size")}</span>
         <input class="form-control" type="number" min="1" step={dpmm} bind:value={width} />
         <button class="btn btn-sm btn-secondary" on:click={onFlip}><MdIcon icon="swap_horiz" /></button>
@@ -241,7 +283,7 @@
         </select>
       </div>
 
-      <div class="input-group flex-nowrap input-group-sm mb-3">
+      <div class="input-group flex-nowrap input-group-sm mb-2">
         <span class="input-group-text">{$tr("params.label.head_density")}</span>
         <input class="form-control" type="number" min="1" bind:value={dpmm} />
         <span class="input-group-text cursor-help" title={$tr("params.label.head_density.help")}>
@@ -249,21 +291,88 @@
         </span>
       </div>
 
-      <div class="input-group flex-nowrap input-group-sm mb-3">
-        <span class="input-group-text">{$tr("params.label.direction")}</span>
-        <select class="form-select" bind:value={printDirection}>
-          <option value="left">
-            {#if $printerMeta?.printDirection === "left"}✔{/if}
-            {$tr("params.label.direction.left")}
-          </option>
-          <option value="top">
-            {#if $printerMeta?.printDirection === "top"}✔{/if}
-            {$tr("params.label.direction.top")}
-          </option>
-        </select>
+      <div class="input-group flex-nowrap input-group-sm print-dir-switch mb-2" role="group">
+        <span class="input-group-text w-100">{$tr("params.label.direction")}</span>
+        {#each printDirections as v}
+          <input
+            type="radio"
+            class="btn-check"
+            name="print-dir"
+            id="print-dir-{v}"
+            autocomplete="off"
+            bind:group={printDirection}
+            value={v} />
+          <label class="btn btn-outline-secondary px-3" for="print-dir-{v}">
+            <div class="svg-icon"></div>
+          </label>
+        {/each}
       </div>
 
-      <div class="input-group flex-nowrap input-group-sm mb-3">
+      <div class="input-group flex-nowrap input-group-sm label-shape-switch mb-2" role="group">
+        <span class="input-group-text w-100">{$tr("params.label.shape")}</span>
+        {#each labelShapes as v}
+          <input
+            type="radio"
+            class="btn-check"
+            name="label-shape"
+            id="label-shape-{v}"
+            autocomplete="off"
+            bind:group={shape}
+            value={v} />
+          <label class="btn btn-outline-secondary px-3" for="label-shape-{v}">
+            <div class="svg-icon"></div>
+          </label>
+        {/each}
+      </div>
+
+      {#if shape !== "circle"}
+        <div class="input-group flex-nowrap input-group-sm label-split-switch mb-2" role="group">
+          <span class="input-group-text w-100">{$tr("params.label.split")}</span>
+          {#each labelSplits as v}
+            <input
+              type="radio"
+              class="btn-check"
+              name="label-split"
+              id="label-split-{v}"
+              autocomplete="off"
+              bind:group={split}
+              value={v} />
+            <label class="btn btn-outline-secondary px-3" for="label-split-{v}">
+              <div class="svg-icon"></div>
+            </label>
+          {/each}
+        </div>
+      {/if}
+
+      {#if split !== "none"}
+        <div class="input-group flex-nowrap input-group-sm tail-pos-switch mb-2" role="group">
+          <span class="input-group-text w-100">{$tr("params.label.tail.position")}</span>
+          {#each tailPositions as v}
+            <input
+              type="radio"
+              class="btn-check"
+              name="tail-pos"
+              id="tail-{v}"
+              autocomplete="off"
+              bind:group={tailPos}
+              value={v} />
+            <label class="btn btn-outline-secondary px-3" for="tail-{v}">
+              <div class="svg-icon"></div>
+            </label>
+          {/each}
+        </div>
+
+        <div class="input-group flex-nowrap input-group-sm mb-2">
+          <span class="input-group-text">{$tr("params.label.tail.length")}</span>
+          <input class="form-control" type="number" min="0" bind:value={tailLength} />
+          <span class="input-group-text">
+            {#if unit === "mm"}{$tr("params.label.mm")}{/if}
+            {#if unit === "px"}{$tr("params.label.px")}{/if}
+          </span>
+        </div>
+      {/if}
+
+      <div class="input-group flex-nowrap input-group-sm mb-2">
         <span class="input-group-text">{$tr("params.label.label_title")}</span>
         <input class="form-control" type="text" bind:value={title} />
       </div>
@@ -286,5 +395,54 @@
 
   .cursor-help {
     cursor: help;
+  }
+
+  .svg-icon {
+    height: 1.5em;
+    width: 1.5em;
+    background-size: cover;
+  }
+
+  .tail-pos-switch .svg-icon {
+    background-image: url("./assets/tail-pos.svg");
+  }
+  .tail-pos-switch label[for="tail-bottom"] .svg-icon {
+    transform: rotate(90deg);
+  }
+  .tail-pos-switch label[for="tail-bottom"] .svg-icon {
+    transform: rotate(90deg);
+  }
+  .tail-pos-switch label[for="tail-left"] .svg-icon {
+    transform: rotate(180deg);
+  }
+  .tail-pos-switch label[for="tail-top"] .svg-icon {
+    transform: rotate(270deg);
+  }
+  .print-dir-switch .svg-icon {
+    background-image: url("./assets/print-dir.svg");
+  }
+  .print-dir-switch label[for="print-dir-top"] .svg-icon {
+    transform: rotate(90deg);
+  }
+
+  .label-shape-switch label[for="label-shape-rect"] .svg-icon {
+    background-image: url("./assets/shape-rect.svg");
+  }
+  .label-shape-switch label[for="label-shape-rounded_rect"] .svg-icon {
+    background-image: url("./assets/shape-rrect.svg");
+  }
+  .label-shape-switch label[for="label-shape-circle"] .svg-icon {
+    background-image: url("./assets/shape-circle.svg");
+  }
+
+  .label-split-switch label[for="label-split-none"] .svg-icon {
+    background-image: url("./assets/shape-rrect.svg");
+  }
+  .label-split-switch label[for="label-split-vertical"] .svg-icon {
+    background-image: url("./assets/split-vertical.svg");
+    transform: rotate(90deg);
+  }
+  .label-split-switch label[for="label-split-horizontal"] .svg-icon {
+    background-image: url("./assets/split-vertical.svg");
   }
 </style>

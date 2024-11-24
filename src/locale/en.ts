@@ -53,7 +53,7 @@ export const translation_en = {
   "params.label.menu_title": "Label properties",
   "params.label.direction.left": "Left",
   "params.label.direction.top": "Top",
-  "params.label.direction": "Print from",
+  "params.label.direction": "Print direction",
   "params.label.dpmm": "dpmm",
   "params.label.head_density.help": "Calculation: DPI / 25.4",
   "params.label.head_density": "Pixel density",
@@ -67,6 +67,10 @@ export const translation_en = {
   "params.label.warning.import": "All saved templates will be overwritten",
   "params.label.export": "Export",
   "params.label.import": "Import",
+  "params.label.shape": "Label shape",
+  "params.label.split": "Label split",
+  "params.label.tail.length": "Tail length",
+  "params.label.tail.position": "Tail position",
 
   "params.qrcode.ecl": "Error Correction Level",
 

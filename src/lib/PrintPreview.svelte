@@ -14,12 +14,12 @@
     type PrintTaskName,
   } from "@mmote/niimbluelib";
   import type { LabelProps, PostProcessType, FabricJson, PreviewProps, PreviewPropsOffset } from "../types";
-  import ParamLockButton from "./ParamLockButton.svelte";
+  import ParamLockButton from "./basic/ParamLockButton.svelte";
   import { tr, type TranslationKey } from "../utils/i18n";
   import { canvasPreprocess } from "../utils/canvas_preprocess";
   import { type DSVRowArray, csvParse } from "d3-dsv";
   import { LocalStoragePersistence } from "../utils/persistence";
-  import MdIcon from "./MdIcon.svelte";
+  import MdIcon from "./basic/MdIcon.svelte";
   import { Toasts } from "../utils/toasts";
 
   export let onClosed: () => void;
@@ -48,7 +48,7 @@
   let csvParsed: DSVRowArray<string>;
   let page: number = 0;
   let pagesTotal: number = 1;
-  let offset: PreviewPropsOffset = {x: 0, y: 0, offsetType: "inner"};
+  let offset: PreviewPropsOffset = { x: 0, y: 0, offsetType: "inner" };
   let offsetWarning: string = "";
 
   let savedProps = {} as PreviewProps;
@@ -229,9 +229,14 @@
 
   const generatePreviewData = async (page: number): Promise<void> => {
     return new Promise((resolve) => {
-      const fabricTempCanvas = new fabric.Canvas(null, { width: labelProps.size.width, height: labelProps.size.height });
+      const fabricTempCanvas = new fabric.Canvas(null, {
+        width: labelProps.size.width,
+        height: labelProps.size.height
+      });
 
       fabricTempCanvas.loadFromJSON(canvasCallback(), () => {
+        fabricTempCanvas.backgroundColor = "white";
+
         let variables = {};
 
         if (csvEnabled) {

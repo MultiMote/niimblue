@@ -42,8 +42,8 @@ export const translation_zh_cn: Partial<Record<TranslationKey, string>> = {
   "params.barcode.scale": "缩放比例",
   /* CsvControl */
   "params.csv.enabled": "启用",
-  "params.csv.placeholders": "变量：",
-  "params.csv.rowsfound": "数据行数：",
+  "params.csv.placeholders": "变量:",
+  "params.csv.rowsfound": "数据行数:",
   "params.csv.tip": "第一行是表头，用作变量名。英文逗号用作分隔符。",
   "params.csv.title": "动态标签数据（CSV）",
   /* GenericObjectParamsControls */
@@ -51,13 +51,13 @@ export const translation_zh_cn: Partial<Record<TranslationKey, string>> = {
   "params.generic.center.vertical": "竖向居中",
   /* LabelPropsEditor */
   "params.label.apply": "应用",
-  "params.label.current": "当前设置：",
+  "params.label.current": "当前设置:",
   "params.label.direction.left": "向左",
   "params.label.direction.top": "向上",
   "params.label.direction": "出纸方向",
   "params.label.dpmm": "点/毫米",
   "params.label.export": "导出 JSON 文件",
-  "params.label.head_density.help": "计算方法：DPI / 25.4",
+  "params.label.head_density.help": "计算方法:DPI / 25.4",
   "params.label.head_density": "像素密度",
   "params.label.import": "导入 JSON 文件",
   "params.label.label_title": "自定义名称",
@@ -66,9 +66,14 @@ export const translation_zh_cn: Partial<Record<TranslationKey, string>> = {
   "params.label.px": "像素",
   "params.label.save_template": "保存模版",
   "params.label.size": "尺寸",
-  "params.label.warning.direction": "根据你的打印机推荐使用：",
+  "params.label.warning.direction": "根据你的打印机推荐使用:",
   "params.label.warning.import": "所有已保存的标签规格将会被覆盖，是否继续？",
-  "params.label.warning.width": "标签宽度对于你的打印机来说可能太宽了：",
+  "params.label.warning.width": "标签宽度对于你的打印机来说可能太宽了:",
+  "params.label.shape": "标签形状",
+  "params.label.split": "标签分割",
+  "params.label.tail.length": "尾巴长度",
+  "params.label.tail.position": "尾部位置",
+
   /* QRCodeParamsControls */
   "params.qrcode.ecl": "误差校正级别",
   /* SavedLabelsMenu */

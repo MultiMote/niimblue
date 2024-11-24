@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fabric } from "fabric";
   import { tr } from "../utils/i18n";
-  import MdIcon from "./MdIcon.svelte";
+  import MdIcon from "./basic/MdIcon.svelte";
 
   export let selectedObject: fabric.Object;
   export let valueUpdated: () => void;

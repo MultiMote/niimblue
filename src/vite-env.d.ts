@@ -46,4 +46,8 @@ declare namespace fabric {
      */
     joinPath(pathData: PathCommand[]): string;
   }
+
+  interface Canvas {
+    _renderBackground(ctx: CanvasRenderingContext2D): void
+  }
 }

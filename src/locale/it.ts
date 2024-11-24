@@ -1,7 +1,7 @@
 import type { TranslationKey } from ".";
 
 /** Italian */
-export const translation_it: Record<TranslationKey, string> = {
+export const translation_it: Partial<Record<TranslationKey, string>> = {
   "browser_warning.lines.first": "Oh no, il tuo browser non supporta le comunicazioni Bluetooth e seriali",
   "browser_warning.lines.second": "Comunque, puoi disegnare etichette.",
   "connector.bluetooth": "Bluetooth",
@@ -61,6 +61,11 @@ export const translation_it: Record<TranslationKey, string> = {
   "params.label.warning.import": "Tutti i modelli salvati verranno sovrascritti",
   "params.label.export": "Esporta",
   "params.label.import": "Importa",
+  "params.label.shape": "Forma dell'etichetta",
+  "params.label.split": "Etichetta divisa",
+  "params.label.tail.length": "Lunghezza della coda",
+  "params.label.tail.position": "Posizione della coda",
+
   "params.qrcode.ecl": "Livello di correzione degli errori",
   "params.text.align.center": "Allinea il testo: al centro",
   "params.text.align.left": "Allinea il testo: a sinistra",

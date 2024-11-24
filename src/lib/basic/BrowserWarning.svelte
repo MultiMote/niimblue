@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Utils } from "@mmote/niimbluelib";
-  import { tr } from "../utils/i18n";
+  import { tr } from "../../utils/i18n";
   import MdIcon from "./MdIcon.svelte";
   let caps = Utils.getAvailableTransports();
 </script>

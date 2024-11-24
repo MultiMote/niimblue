@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Utils } from "@mmote/niimbluelib";
-  import BrowserWarning from "./lib/BrowserWarning.svelte";
+  import BrowserWarning from "./lib/basic/BrowserWarning.svelte";
   import ImageEditor from "./lib/ImageEditor.svelte";
   import PrinterConnector from "./lib/PrinterConnector.svelte";
   import { locale, locales, tr } from "./utils/i18n";

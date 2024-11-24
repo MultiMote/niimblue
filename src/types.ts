@@ -9,6 +9,9 @@ export type LabelUnit = "mm" | "px";
 export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qrcode" | "barcode";
 export type PostProcessType = "threshold" | "dither";
 export type MoveDirection = "up" | "down" | "left" | "right";
+export type LabelShape = "rect" | "rounded_rect" | "circle";
+export type LabelSplit = "none" | "vertical" | "horizontal";
+export type TailPosition = "right" | "bottom" | "left" | "top";
 
 /** Not validated */
 export const FabricObjectSchema = z.custom<fabric.Object>((val: any): boolean => {
@@ -21,6 +24,10 @@ export const LabelPropsSchema = z.object({
     width: z.number().positive(),
     height: z.number().positive(),
   }),
+  shape: z.enum(["rect", "rounded_rect", "circle"]).default("rect").optional(),
+  split: z.enum(["none", "vertical", "horizontal"]).default("none").optional(),
+  tailPos: z.enum(["right", "bottom", "left", "top"]).default("right").optional(),
+  tailLength: z.number().default(0).optional(),
 });
 
 export const LabelPresetSchema = z.object({
@@ -30,6 +37,10 @@ export const LabelPresetSchema = z.object({
   dpmm: z.number().positive(),
   printDirection: z.enum(["left", "top"]),
   title: z.string().optional(),
+  shape: z.enum(["rect", "rounded_rect", "circle"]).default("rect").optional(),
+  split: z.enum(["none", "vertical", "horizontal"]).default("none").optional(),
+  tailPos: z.enum(["right", "bottom", "left", "top"]).default("right").optional(),
+  tailLength: z.number().default(0).optional(),
 });
 
 export const FabricJsonSchema = z.object({
@@ -42,7 +53,7 @@ export const ExportedLabelTemplateSchema = z.object({
   label: LabelPropsSchema,
   thumbnailBase64: z.string().optional(),
   title: z.string().optional(),
-  timestamp: z.number().positive().optional()
+  timestamp: z.number().positive().optional(),
 });
 
 const [firstTask, ...otherTasks] = printTaskNames;
@@ -69,7 +80,7 @@ export const AutomationPropsSchema = z.object({
   /** Connect to MAC or device id. Works only for Capacitor BLE connection. */
   autoConnectDeviceId: z.string().optional(),
   /** immediately - just open print preview dialog */
-  startPrint: z.enum(["after_connect", "immediately"]).optional()
+  startPrint: z.enum(["after_connect", "immediately"]).optional(),
 });
 
 export type LabelProps = z.infer<typeof LabelPropsSchema>;

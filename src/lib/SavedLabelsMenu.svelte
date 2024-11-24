@@ -1,7 +1,7 @@
 <script lang="ts">
   import { tr } from "../utils/i18n";
   import { onMount } from "svelte";
-  import MdIcon from "./MdIcon.svelte";
+  import MdIcon from "./basic/MdIcon.svelte";
   import SavedLabelsBrowser from "./SavedLabelsBrowser.svelte";
   import { ExportedLabelTemplateSchema, type ExportedLabelTemplate } from "../types";
   import { LocalStoragePersistence } from "../utils/persistence";

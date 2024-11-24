@@ -2,8 +2,8 @@ import type { LabelPreset, LabelProps } from "./types";
 
 /** Default presets for LabelPropsEditor */
 export const DEFAULT_LABEL_PRESETS: LabelPreset[] = [
-  { width: 30, height: 12, unit: "mm", dpmm: 8, printDirection: "left" },
-  { width: 50, height: 30, unit: "mm", dpmm: 8, printDirection: "top" },
+  { width: 30, height: 12, unit: "mm", dpmm: 8, printDirection: "left", shape: "rect" },
+  { width: 50, height: 30, unit: "mm", dpmm: 8, printDirection: "top", shape: "rect" },
 ];
 
 /** Default canvas dimensions */

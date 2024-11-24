@@ -1,7 +1,7 @@
 import type { TranslationKey } from ".";
 
 /** German */
-export const translation_de: Record<TranslationKey, string> = {
+export const translation_de: Partial<Record<TranslationKey, string>> = {
   "browser_warning.lines.first": "Oh nein, Dein Browser unterstützt kein Bluetooth und keine serielle Schnittstelle",
   "browser_warning.lines.second": "Du kannst trotzdem Etiketten erstellen.",
   "connector.bluetooth": "Bluetooth",
@@ -61,6 +61,11 @@ export const translation_de: Record<TranslationKey, string> = {
   "params.label.warning.import": "Alle gespeicherten Vorlagen werden überschrieben",
   "params.label.export": "Export",
   "params.label.import": "Import",
+  "params.label.shape": "Form des Etiketts",
+  "params.label.split": "Etikett geteilt",
+  "params.label.tail.length": "Länge des Schwanzes",
+  "params.label.tail.position": "Position des Schwanzes",
+
   "params.qrcode.ecl": "Fehlerkorrekturstufe",
   "params.text.align.center": "Text ausrichten: Zentriert",
   "params.text.align.left": "Text ausrichten: Links",

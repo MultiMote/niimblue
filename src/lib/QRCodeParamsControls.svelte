@@ -2,7 +2,7 @@
   import type { ChangeEventHandler } from "svelte/elements";
   import { QRCode, type ErrorCorrectionLevel } from "../fabric-object/qrcode.class";
   import { tr } from "../utils/i18n";
-  import MdIcon from "./MdIcon.svelte";
+  import MdIcon from "./basic/MdIcon.svelte";
   import type { fabric } from "fabric";
 
   export let selectedObject: fabric.Object | undefined;
