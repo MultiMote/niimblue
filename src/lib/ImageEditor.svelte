@@ -456,12 +456,14 @@
 </div>
 
 <style>
+  .canvas-wrapper {
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    background-color: rgba(60, 55, 63, 0.5);
+  }
   .canvas-wrapper.print-start-left {
-    border: 1px solid #333333;
     border-left: 2px solid #ff4646;
   }
   .canvas-wrapper.print-start-top {
-    border: 1px solid #333333;
     border-top: 2px solid #ff4646;
   }
   .canvas-wrapper canvas {
