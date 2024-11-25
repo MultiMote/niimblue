@@ -1,23 +1,25 @@
-import { translation_de } from "./de";
-import { translation_en } from "./en";
-import { translation_it } from "./it";
-import { translation_ru } from "./ru";
-import { translation_zh_cn } from "./zh_cn";
+import lang_de from "./dicts/de.json";
+import lang_en from "./dicts/en.json";
+import lang_it from "./dicts/it.json";
+import lang_ru from "./dicts/ru.json";
+import lang_zh_cn from "./dicts/zh_cn.json";
+
+export type TranslationKey = keyof typeof lang_en;
+export type TranslationDict = Record<TranslationKey, string>;
 
 export const langPack = {
-  /** German */
-  de: translation_de,
   /** English (fallback) */
-  en: translation_en,
+  en: lang_en,
+  /** German */
+  de: lang_de as TranslationDict,
   /** Italian */
-  it: translation_it,
+  it: lang_it as TranslationDict,
   /** Russian */
-  ru: translation_ru,
+  ru: lang_ru as TranslationDict,
   /** Simplified Chinese */
-  zh_cn: translation_zh_cn,
+  zh_cn: lang_zh_cn as TranslationDict,
 } as const;
 
-export type TranslationKey = keyof typeof translation_en;
 export type SupportedLanguage = keyof typeof langPack;
 
 export const languageNames: Record<SupportedLanguage, string> = {
