@@ -1,5 +1,5 @@
 {
-    "browser_warning.lines.first": "О нет, ваш браузер не поддерживает Bluetooth и последовательный порт...",
+    "browser_warning.lines.first": "О нет, ваш браузер не поддерживает Bluetooth и последовательный порт",
     "browser_warning.lines.second": "В любом случае, вы можете рисовать этикетки.",
     "connector.bluetooth": "Bluetooth 123",
     "connector.disconnect.heartbeat": "Отключено (принтер не отвечает)",
@@ -87,7 +87,7 @@
     "params.text.invert_colors": "Инвертировать цвета",
     "params.text.line_height": "Межстрочный интервал",
     "params.text.vorigin.bottom": "Снизу",
-    "params.text.vorigin.center": "Снизу",
+    "params.text.vorigin.center": "По центру",
     "params.text.vorigin.top": "Сверху",
     "params.text.vorigin": "Вертикальная привязка",
     "params.variables.insert.date": "Дата",
