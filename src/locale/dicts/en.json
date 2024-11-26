@@ -1,4 +1,5 @@
 {
+    "lang.name": "English",
     "browser_warning.lines.first": "Oh no, your browser does not support bluetooth and serial communications",
     "browser_warning.lines.second": "Anyway, you still can draw labels.",
     "connector.bluetooth": "Bluetooth",

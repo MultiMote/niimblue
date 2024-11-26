@@ -1,4 +1,5 @@
 {
+    "lang.name": "简体中文",
     "browser_warning.lines.first": "哦豁，你的浏览器貌似不支持蓝牙和串口通讯",
     "browser_warning.lines.second": "但是你依然可以使用标签编辑功能",
     "connector.bluetooth": "蓝牙",

@@ -22,10 +22,9 @@ export const langPack = {
 
 export type SupportedLanguage = keyof typeof langPack;
 
-export const languageNames: Record<SupportedLanguage, string> = {
-  de: "Deutsch",
-  en: "English",
-  it: "Italiano",
-  ru: "Русский",
-  zh_cn: "简体中文",
-};
+export const languageNames = Object.assign(
+  {},
+  ...Object.entries(langPack).map(([k, v]) => ({
+    [k]: v["lang.name"] ?? k,
+  }))
+) as Record<SupportedLanguage, string>;
