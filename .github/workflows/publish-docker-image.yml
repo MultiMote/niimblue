@@ -18,6 +18,7 @@ permissions:
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
+    if: github.repository == 'MultiMote/niimblue'
 
     steps:
       - name: Checkout repository
