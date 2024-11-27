@@ -60,6 +60,7 @@
     "params.label.split": "Label split",
     "params.label.tail.length": "Tail length",
     "params.label.tail.position": "Tail position",
+    "params.label.mirror": "Object mirroring",
     "params.label.warning.direction": "Recommended direction for your printer:",
     "params.label.warning.import": "All saved templates will be overwritten",
     "params.label.warning.width": "Label width is too big for your printer:",

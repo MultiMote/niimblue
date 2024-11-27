@@ -12,6 +12,7 @@ export type MoveDirection = "up" | "down" | "left" | "right";
 export type LabelShape = "rect" | "rounded_rect" | "circle";
 export type LabelSplit = "none" | "vertical" | "horizontal";
 export type TailPosition = "right" | "bottom" | "left" | "top";
+export type MirrorType = "none" | "copy" | "flip";
 
 /** Not validated */
 export const FabricObjectSchema = z.custom<fabric.Object>((val: any): boolean => {
@@ -28,6 +29,7 @@ export const LabelPropsSchema = z.object({
   split: z.enum(["none", "vertical", "horizontal"]).default("none").optional(),
   tailPos: z.enum(["right", "bottom", "left", "top"]).default("right").optional(),
   tailLength: z.number().default(0).optional(),
+  mirror: z.enum(["none", "copy", "flip"]).default("none").optional(),
 });
 
 export const LabelPresetSchema = z.object({
@@ -41,6 +43,7 @@ export const LabelPresetSchema = z.object({
   split: z.enum(["none", "vertical", "horizontal"]).default("none").optional(),
   tailPos: z.enum(["right", "bottom", "left", "top"]).default("right").optional(),
   tailLength: z.number().default(0).optional(),
+  mirror: z.enum(["none", "copy", "flip"]).default("none").optional(),
 });
 
 export const FabricJsonSchema = z.object({

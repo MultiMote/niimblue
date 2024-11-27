@@ -49,5 +49,6 @@ declare namespace fabric {
 
   interface Canvas {
     _renderBackground(ctx: CanvasRenderingContext2D): void
+    _renderObjects(ctx: CanvasRenderingContext2D, objects: fabric.Object[]): void;
   }
 }
