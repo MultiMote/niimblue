@@ -120,5 +120,6 @@
     "preview.print.cancel": "Отменить печать",
     "preview.print": "Печать",
     "preview.threshold": "Порог",
-    "preview.title": "Предпросмотр печати"
+    "preview.title": "Предпросмотр печати",
+    "params.label.mirror": "Зеркалирование объектов"
 }
