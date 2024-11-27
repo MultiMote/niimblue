@@ -193,18 +193,20 @@ export class CustomCanvas extends fabric.Canvas {
 
     if (fold.axis === "vertical") {
       newObject = true;
-      pos.setX(fold.pos + (fold.pos - pos.x));
+      pos.setX(fold.pos + (pos.x - bounds.startX));
 
       if (this.labelProps.mirror === "flip") {
         flip = true;
+        pos.setX(fold.pos + (fold.pos - pos.x));
         pos.setY(bounds.startY + bounds.endY - pos.y);
       }
     } else if (fold.axis === "horizontal") {
       newObject = true;
-      pos.setY(fold.pos + (fold.pos - pos.y));
+      pos.setY(fold.pos + (pos.y - bounds.startY));
 
       if (this.labelProps.mirror === "flip") {
         flip = true;
+        pos.setY(fold.pos + (fold.pos - pos.y));
         pos.setX(bounds.startX + bounds.endX - pos.x);
       }
     }
