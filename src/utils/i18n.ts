@@ -37,7 +37,7 @@ locale.subscribe((value: SupportedLanguage) => localStorage.setItem("locale", va
 
 export const tr = derived(locale, ($locale) => (key: TranslationKey) => {
   const result = langPack[$locale] ? langPack[$locale][key] : undefined;
-  if (result === undefined) {
+  if (result === undefined || result === "") {
     if ($locale !== "en") {
       console.warn(`${key} of ${$locale} locale is not translated`);
     }
