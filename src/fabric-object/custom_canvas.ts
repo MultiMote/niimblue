@@ -70,7 +70,6 @@ export class CustomCanvas extends fabric.Canvas {
     // Draw simple white background and exit
     if (!this.customBackground) {
       ctx.fillRect(0, 0, this.width, this.height);
-      ctx.fill();
       ctx.restore();
       return;
     }
@@ -97,18 +96,18 @@ export class CustomCanvas extends fabric.Canvas {
     ctx.beginPath();
     if (this.labelProps.tailLength !== undefined) {
       if (this.labelProps.tailPos === "right") {
-        ctx.fillRect(endX - roundRadius, endY / 2 - this.TAIL_WIDTH / 2, this.width - endX + roundRadius, this.TAIL_WIDTH);
+        ctx.rect(endX - roundRadius, endY / 2 - this.TAIL_WIDTH / 2, this.width - endX + roundRadius, this.TAIL_WIDTH);
       } else if (this.labelProps.tailPos === "bottom") {
-        ctx.fillRect(
+        ctx.rect(
           endX / 2 - this.TAIL_WIDTH / 2,
           endY - roundRadius,
           this.TAIL_WIDTH,
           this.height - endY + roundRadius
         );
       } else if (this.labelProps.tailPos === "left") {
-        ctx.fillRect(0, endY / 2 - this.TAIL_WIDTH / 2, startX + roundRadius, this.TAIL_WIDTH);
+        ctx.rect(0, endY / 2 - this.TAIL_WIDTH / 2, startX + roundRadius, this.TAIL_WIDTH);
       } else if (this.labelProps.tailPos === "top") {
-        ctx.fillRect(endX / 2 - this.TAIL_WIDTH / 2, 0, this.TAIL_WIDTH, startY + roundRadius);
+        ctx.rect(endX / 2 - this.TAIL_WIDTH / 2, 0, this.TAIL_WIDTH, startY + roundRadius);
       }
     }
     ctx.fill();
@@ -128,7 +127,7 @@ export class CustomCanvas extends fabric.Canvas {
         ctx.roundRect(0, 0, this.width, this.height, roundRadius);
       }
     } else {
-      ctx.fillRect(startX, startY, endX - startX, endY - startY);
+      ctx.rect(startX, startY, endX - startX, endY - startY);
     }
     ctx.fill();
 
@@ -166,10 +165,8 @@ export class CustomCanvas extends fabric.Canvas {
       const info = this.getMirroredObjectCoords(obj);
       if (info !== undefined) {
         const bbox = obj.getBoundingRect(true);
-        ctx.beginPath();
         ctx.fillStyle = this.MIRROR_GHOST_COLOR;
         ctx.fillRect(info.pos.x - bbox.width / 2, info.pos.y - bbox.height / 2, bbox.width, bbox.height);
-        ctx.fill();
         ctx.restore();
       }
     });
