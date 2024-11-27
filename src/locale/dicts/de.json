@@ -120,5 +120,6 @@
     "preview.print.cancel": "Druck abbrechen",
     "preview.print": "Drucken",
     "preview.threshold": "Schwellenwert",
-    "preview.title": "Druckvorschau"
+    "preview.title": "Druckvorschau",
+    "params.label.mirror": "Objektspiegelung"
 }
