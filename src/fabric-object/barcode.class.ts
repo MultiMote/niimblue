@@ -89,6 +89,7 @@ export class Barcode <
       mr: false,
       mtr: false,
     });
+    this.objectCaching = false;
     this._createBandCode();
   }
 
