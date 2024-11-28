@@ -2,7 +2,7 @@
     "lang.name": "Русский",
     "browser_warning.lines.first": "О нет, ваш браузер не поддерживает Bluetooth и последовательный порт",
     "browser_warning.lines.second": "В любом случае, вы можете рисовать этикетки.",
-    "connector.bluetooth": "Bluetooth 123",
+    "connector.bluetooth": "Bluetooth",
     "connector.disconnect.heartbeat": "Отключено (принтер не отвечает)",
     "connector.serial": "Посл. порт (USB)",
     "editor.clone": "Клонировать",
@@ -120,5 +120,6 @@
     "preview.print.cancel": "Отменить печать",
     "preview.print": "Печать",
     "preview.threshold": "Порог",
-    "preview.title": "Предпросмотр печати"
+    "preview.title": "Предпросмотр печати",
+    "params.label.mirror": "Зеркалирование объектов"
 }

@@ -21,6 +21,7 @@
   import { LocalStoragePersistence } from "../utils/persistence";
   import MdIcon from "./basic/MdIcon.svelte";
   import { Toasts } from "../utils/toasts";
+  import { CustomCanvas } from "../fabric-object/custom_canvas";
 
   export let onClosed: () => void;
   export let labelProps: LabelProps;
@@ -229,14 +230,17 @@
 
   const generatePreviewData = async (page: number): Promise<void> => {
     return new Promise((resolve) => {
-      const fabricTempCanvas = new fabric.Canvas(null, {
+      const fabricTempCanvas = new CustomCanvas(null, {
         width: labelProps.size.width,
         height: labelProps.size.height
       });
 
-      fabricTempCanvas.loadFromJSON(canvasCallback(), () => {
-        fabricTempCanvas.backgroundColor = "white";
+      fabricTempCanvas.setCustomBackground(false);
+      fabricTempCanvas.setHighlightMirror(false);
 
+      fabricTempCanvas.setLabelProps(labelProps);
+
+      fabricTempCanvas.loadFromJSON(canvasCallback(), () => {
         let variables = {};
 
         if (csvEnabled) {
@@ -250,6 +254,8 @@
         console.log("Page variables:", variables);
 
         canvasPreprocess(fabricTempCanvas, variables);
+
+        fabricTempCanvas.createMirroredObjects();
 
         fabricTempCanvas.requestRenderAll();
 

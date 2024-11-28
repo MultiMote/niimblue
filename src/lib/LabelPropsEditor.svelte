@@ -6,6 +6,7 @@
     type LabelShape,
     type LabelSplit,
     type LabelUnit,
+    type MirrorType,
     type TailPosition,
   } from "../types";
   import LabelPresetsBrowser from "./LabelPresetsBrowser.svelte";
@@ -27,6 +28,7 @@
   const printDirections: PrintDirection[] = ["left", "top"];
   const labelShapes: LabelShape[] = ["rect", "rounded_rect", "circle"];
   const labelSplits: LabelSplit[] = ["none", "vertical", "horizontal"];
+  const mirrorTypes: MirrorType[] = ["none", "flip", "copy"];
 
   let labelPresets: LabelPreset[] = DEFAULT_LABEL_PRESETS;
 
@@ -41,6 +43,7 @@
   let split: LabelSplit = "none";
   let tailLength: number = 0;
   let tailPos: TailPosition = "right";
+  let mirror: MirrorType = "none";
   let error: string = "";
 
   const onApply = () => {
@@ -76,6 +79,7 @@
       split,
       tailPos,
       tailLength: Math.floor(newTailLength),
+      mirror
     });
   };
 
@@ -93,6 +97,7 @@
     split = preset.split ?? "none";
     tailPos = preset.tailPos ?? "right";
     tailLength = preset.tailLength ?? 0;
+    mirror = preset.mirror ?? "none";
 
     onApply();
   };
@@ -116,6 +121,7 @@
       split,
       tailPos,
       tailLength,
+      mirror
     };
     const newPresets = [...labelPresets, newPreset];
     try {
@@ -178,6 +184,7 @@
     split = labelProps.split ?? "none";
     tailPos = labelProps.tailPos ?? "right";
     tailLength = labelProps.tailLength ?? 0;
+    mirror = labelProps.mirror ?? "none";
     onUnitChange();
   };
 
@@ -217,6 +224,7 @@
     split = defaultPreset.split ?? "none";
     tailPos = defaultPreset.tailPos ?? "right";
     tailLength = defaultPreset.tailLength ?? 0;
+    mirror = defaultPreset.mirror ?? "none";
 
     try {
       const savedPresets: LabelPreset[] | null = LocalStoragePersistence.loadLabelPresets();
@@ -345,6 +353,23 @@
       {/if}
 
       {#if split !== "none"}
+        <div class="input-group flex-nowrap input-group-sm mirror-switch mb-2" role="group">
+          <span class="input-group-text w-100">{$tr("params.label.mirror")}</span>
+          {#each mirrorTypes as v}
+            <input
+              type="radio"
+              class="btn-check"
+              name="mirror"
+              id="mirror-{v}"
+              autocomplete="off"
+              bind:group={mirror}
+              value={v} />
+            <label class="btn btn-outline-secondary px-3" for="mirror-{v}">
+              <div class="svg-icon"></div>
+            </label>
+          {/each}
+        </div>
+
         <div class="input-group flex-nowrap input-group-sm tail-pos-switch mb-2" role="group">
           <span class="input-group-text w-100">{$tr("params.label.tail.position")}</span>
           {#each tailPositions as v}
@@ -444,5 +469,15 @@
   }
   .label-split-switch label[for="label-split-horizontal"] .svg-icon {
     background-image: url("./assets/split-vertical.svg");
+  }
+
+  .mirror-switch label[for="mirror-none"] .svg-icon {
+    background-image: url("./assets/mirror-none.svg");
+  }
+  .mirror-switch label[for="mirror-copy"] .svg-icon {
+    background-image: url("./assets/mirror-copy.svg");
+  }
+  .mirror-switch label[for="mirror-flip"] .svg-icon {
+    background-image: url("./assets/mirror-flip.svg");
   }
 </style>
