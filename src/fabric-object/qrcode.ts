@@ -3,7 +3,7 @@ import * as fabric from "fabric";
 import {OBJECT_SIZE_DEFAULTS} from '../defaults'
 export type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
 
-export const qrcodeDefaultValues: Partial<fabric.TClassProperties<QRCode>> = {
+export const qrCodeDefaultValues: Partial<fabric.TClassProperties<QRCode>> = {
   text: "Text",
   ecl: "M",
   stroke: "#000000",
@@ -47,7 +47,7 @@ implements QRCodeProps
 
   constructor(options?: Props) {
     super();
-    Object.assign(this, qrcodeDefaultValues);
+    Object.assign(this, qrCodeDefaultValues);
     this.setOptions(options);
     this.setControlsVisibility({
       ml: false,
@@ -89,7 +89,7 @@ implements QRCodeProps
       super._render(ctx);
       return;
     }
-    
+
     const w2 = this.width / 2;
     const h2 = this.height / 2;
 

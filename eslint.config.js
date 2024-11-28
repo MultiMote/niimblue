@@ -26,7 +26,7 @@ export default ts.config(
     },
   },
   {
-    ignores: ["build/", "dist/"],
+    ignores: ["build/", "dist/", "capacitor/"],
   },
   {
     rules: {

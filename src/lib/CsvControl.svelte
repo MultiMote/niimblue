@@ -11,8 +11,8 @@
   let placeholders: string[] = [];
   let rows: number = 0;
 
-  const refresh = () => {
-    const result = csvParse(csv);
+  const refresh = (val: string) => {
+    const result = csvParse(val);
     placeholders = result.columns;
     rows = result.length;
   };
@@ -21,7 +21,7 @@
     onUpdate(enabled, csv);
   };
 
-  $: csv, refresh();
+  $: refresh(csv);
 </script>
 
 <div class="dropdown">

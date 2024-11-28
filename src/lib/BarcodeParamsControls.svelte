@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as fabric from "fabric";
-  import { Barcode } from "../fabric-object/barcode.class";
+  import { Barcode } from "../fabric-object/barcode";
   import { tr } from "../utils/i18n";
   import MdIcon from "./basic/MdIcon.svelte";
 

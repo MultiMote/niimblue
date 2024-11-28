@@ -6,8 +6,8 @@ export class ImageEditorUtils {
   static async cloneObject(canvas: fabric.Canvas, selected: fabric.FabricObject): Promise<void> {
     const obj = await selected.clone();
     obj.snapAngle = OBJECT_DEFAULTS.snapAngle;
-    obj.top! += GRID_SIZE;
-    obj.left! += GRID_SIZE;
+    obj.top += GRID_SIZE;
+    obj.left += GRID_SIZE;
     canvas.add(obj);
     canvas.setActiveObject(obj);
   }
@@ -19,13 +19,13 @@ export class ImageEditorUtils {
     selected.forEach((obj) => {
       if (direction === "left") {
         // round to fix inter-pixel positions
-        obj.left = Math.round(obj.left!) - amount;
+        obj.left = Math.round(obj.left) - amount;
       } else if (direction === "right") {
-        obj.left = Math.round(obj.left!) + amount;
+        obj.left = Math.round(obj.left) + amount;
       } else if (direction === "up") {
-        obj.top = Math.round(obj.top!) - amount;
+        obj.top = Math.round(obj.top) - amount;
       } else if (direction === "down") {
-        obj.top = Math.round(obj.top!) + amount;
+        obj.top = Math.round(obj.top) + amount;
       }
       obj.setCoords();
     });
@@ -39,7 +39,7 @@ export class ImageEditorUtils {
     });
   }
 
-  static isAnyInputFocused = (canvas: fabric.Canvas): boolean => {
+  static isAnyInputFocused(canvas: fabric.Canvas): boolean {
     const focused: Element | null = document.activeElement;
 
     if (focused !== null && (focused.tagName === "INPUT" || focused.tagName === "TEXTAREA")) {

@@ -13,12 +13,12 @@
   let fontQuerySupported = typeof queryLocalFonts !== "undefined";
   let fontFamilies: string[] = [OBJECT_DEFAULTS_TEXT.fontFamily];
 
-  const setXAlign = (align: "left" | "center" | "right") => {
+  const setXAlign = (align: fabric.TOriginX) => {
     selectedText!.set("textAlign", align);
     commit();
   };
 
-  const setYAlign = (align: "top" | "bottom" | "center") => {
+  const setYAlign = (align: fabric.TOriginY) => {
     // change object origin, but keep position
     const pos = selectedText!.getPointByOrigin("left", "top");
     selectedText!.set("originY", align);

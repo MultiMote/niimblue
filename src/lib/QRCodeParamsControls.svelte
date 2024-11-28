@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { QRCode } from "../fabric-object/qrcode.class";
+  import { QRCode } from "../fabric-object/qrcode";
   import { tr } from "../utils/i18n";
   import MdIcon from "./basic/MdIcon.svelte";
   import * as fabric from "fabric";

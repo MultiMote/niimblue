@@ -1,7 +1,7 @@
 import * as fabric from "fabric";
 import { OBJECT_DEFAULTS, OBJECT_DEFAULTS_TEXT, OBJECT_DEFAULTS_VECTOR, OBJECT_SIZE_DEFAULTS } from "../defaults";
-import Barcode from "../fabric-object/barcode.class";
-import { QRCode } from "../fabric-object/qrcode.class";
+import Barcode from "../fabric-object/barcode";
+import { QRCode } from "../fabric-object/qrcode";
 import type { OjectType } from "../types";
 
 export class ImageEditorObjectHelper {
