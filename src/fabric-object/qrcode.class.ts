@@ -1,6 +1,6 @@
 import QRCodeSVG from "qrcode-svg";
 import * as fabric from "fabric";
-import {DEFAULT_LABEL_PROPS} from '../defaults'
+import {OBJECT_SIZE_DEFAULTS} from '../defaults'
 export type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
 
 export const qrcodeDefaultValues: Partial<fabric.TClassProperties<QRCode>> = {
@@ -8,7 +8,7 @@ export const qrcodeDefaultValues: Partial<fabric.TClassProperties<QRCode>> = {
   ecl: "M",
   stroke: "#000000",
   fill: "#ffffff",
-  ...DEFAULT_LABEL_PROPS.size,
+  ...OBJECT_SIZE_DEFAULTS,
 }
 
 interface UniqueQRCodeProps {

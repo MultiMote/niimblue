@@ -141,7 +141,6 @@ export class FileUtils {
       if ('set' in obj)
         obj.set({ snapAngle: OBJECT_DEFAULTS.snapAngle });
     });
-    canvas.backgroundColor = "#fff";
     canvas.requestRenderAll();
   }
 }
