@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { fabric } from "fabric";
+  import * as fabric from "fabric";
   import { tr } from "../utils/i18n";
   import MdIcon from "./basic/MdIcon.svelte";
   import { Toasts } from "../utils/toasts";
   import { OBJECT_DEFAULTS_TEXT } from "../defaults";
 
-  export let selectedObject: fabric.Object;
+  export let selectedObject: fabric.FabricObject;
   export let valueUpdated: () => void;
 
 
@@ -13,57 +13,16 @@
   let fontQuerySupported = typeof queryLocalFonts !== "undefined";
   let fontFamilies: string[] = [OBJECT_DEFAULTS_TEXT.fontFamily];
 
-  const toggleBold = () => {
-    if (selectedText!.fontWeight === "bold") {
-      selectedText!.fontWeight = "normal";
-    } else {
-      selectedText!.fontWeight = "bold";
-    }
-
-    commit();
-  };
-
-  const invertColors = () => {
-    if (selectedText!.backgroundColor === "black") {
-      selectedText!.set({
-        backgroundColor: "transparent",
-        fill: "black",
-      });
-    } else {
-      selectedText!.set({
-        backgroundColor: "black",
-        fill: "white",
-      });
-    }
-    commit();
-  };
-
   const setXAlign = (align: "left" | "center" | "right") => {
-    selectedText!.textAlign = align;
-
-    // change object origin, but keep position
-    const pos = selectedText!.getPointByOrigin("left", "top");
-    selectedText!.originX = align;
-    selectedText!.setPositionByOrigin(pos, "left", "top");
-
+    selectedText!.set("textAlign", align);
     commit();
   };
 
   const setYAlign = (align: "top" | "bottom" | "center") => {
     // change object origin, but keep position
     const pos = selectedText!.getPointByOrigin("left", "top");
-    selectedText!.originY = align;
+    selectedText!.set("originY", align);
     selectedText!.setPositionByOrigin(pos, "left", "top");
-
-    commit();
-  };
-
-  const fontSizeUp = () => {
-    selectedText!.fontSize! += selectedText!.fontSize! > 40 ? 10 : 2;
-    commit();
-  };
-  const fontSizeDown = () => {
-    selectedText!.fontSize! -= selectedText!.fontSize! > 40 ? 10 : 2;
     commit();
   };
 
@@ -141,15 +100,33 @@
   </div>
 
   <button
-    class="btn btn-sm {selectedText.fontWeight === 'bold' ? 'btn-secondary' : ''}"
-    on:click={toggleBold}
-    title={$tr("params.text.bold")}>
+    class="btn btn-sm {selectedText.fontWeight === 'bold' ? 'btn-secondary' : ''}" title={$tr("params.text.bold")} on:click={() => {
+      if (!selectedText) return;
+      if (selectedText.fontWeight === "bold") {
+        selectedText.fontWeight = "normal";
+      } else {
+        selectedText.fontWeight = "bold";
+      }
+      commit();
+    }}>
     <MdIcon icon="format_bold" />
   </button>
   <button
-    class="btn btn-sm {selectedText.backgroundColor === 'black' ? 'btn-secondary' : ''}"
-    on:click={invertColors}
-    title={$tr("params.text.invert_colors")}>
+    class="btn btn-sm {selectedText.backgroundColor === 'black' ? 'btn-secondary' : ''}" title={$tr("params.text.invert_colors")} on:click={() => {
+    if (!selectedText) return;
+    if (selectedText.backgroundColor === "black") {
+      selectedText.set({
+        backgroundColor: "transparent",
+        fill: "black",
+      });
+    } else {
+      selectedText.set({
+        backgroundColor: "black",
+        fill: "white",
+      });
+    }
+    commit();
+    }}>
     <MdIcon icon="invert_colors" />
   </button>
 
@@ -161,13 +138,23 @@
       max="999"
       step="2"
       class="form-control"
-      bind:value={selectedText.fontSize}
-      on:input={commit} />
-    <button class="btn btn-secondary" on:click={fontSizeUp} title={$tr("params.text.font_size.up")}>
+      value={selectedText.fontSize}
+      on:input={(e) => {
+        selectedText?.set('fontSize', e.currentTarget.valueAsNumber ?? 1)
+        commit();
+      }} />
+    <button class="btn btn-secondary" title={$tr("params.text.font_size.up")} on:click={() => {
+      selectedText?.set('fontSize', selectedText.fontSize + (selectedText.fontSize > 40 ? 10 : 2))
+      commit();
+    }}>
       <MdIcon icon="text_increase" />
     </button>
-    <button class="btn btn-secondary" on:click={fontSizeDown} title={$tr("params.text.font_size.down")}
-      ><MdIcon icon="text_decrease" /></button>
+    <button class="btn btn-secondary" title={$tr("params.text.font_size.down")} on:click={() => {
+      selectedText?.set('fontSize', selectedText.fontSize - (selectedText.fontSize > 40 ? 10 : 2))
+      commit();
+    }}>
+      <MdIcon icon="text_decrease" />
+    </button>
   </div>
 
   <div class="input-group flex-nowrap input-group-sm">
@@ -180,8 +167,11 @@
       step="0.1"
       max="10"
       class="form-control"
-      bind:value={selectedText.lineHeight}
-      on:input={commit} />
+      value={selectedText.lineHeight}
+      on:input={(e) => {
+        selectedText?.set('lineHeight', e.currentTarget.valueAsNumber ?? 1)
+        commit();
+      }} />
   </div>
 
   <div class="input-group flex-nowrap input-group-sm font-family">
@@ -189,7 +179,10 @@
       <MdIcon icon="text_format" />
     </span>
     {#if fontQuerySupported }
-      <select class="form-select" bind:value={selectedText.fontFamily} on:change={commit}>
+      <select class="form-select" value={selectedText.fontFamily} on:change={(e) => {
+        selectedText?.set('fontFamily', e.currentTarget.value)
+        commit();
+      }}>
         {#each fontFamilies as font}
           <option value={font} style="font-family: {font}">{font}</option>
         {/each}
@@ -198,7 +191,10 @@
         <MdIcon icon="refresh" />
       </button>
     {:else}
-      <input type="text" class="form-control" bind:value={selectedText.fontFamily} on:input={commit} />
+      <input type="text" class="form-control" value={selectedText.fontFamily} on:input={(e) => {
+        selectedText?.set('fontFamily', e.currentTarget.value)
+        commit();
+      }} />
     {/if}
   </div>
 

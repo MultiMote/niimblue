@@ -1,5 +1,5 @@
 import { LabelType, printTaskNames } from "@mmote/niimbluelib";
-import { fabric } from "fabric";
+import * as fabric from "fabric";
 import { z } from "zod";
 
 export type ConnectionState = "connecting" | "connected" | "disconnected";
@@ -15,7 +15,7 @@ export type TailPosition = "right" | "bottom" | "left" | "top";
 export type MirrorType = "none" | "copy" | "flip";
 
 /** Not validated */
-export const FabricObjectSchema = z.custom<fabric.Object>((val: any): boolean => {
+export const FabricObjectSchema = z.custom<fabric.FabricObject>((val: any): boolean => {
   return typeof val === "object";
 });
 

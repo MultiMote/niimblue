@@ -1,4 +1,4 @@
-import { fabric } from "fabric";
+import * as fabric from "fabric";
 import { DEFAULT_LABEL_PROPS } from "../defaults";
 import type { LabelProps } from "../types";
 
@@ -152,7 +152,7 @@ export class CustomCanvas extends fabric.Canvas {
 
     ctx.restore();
   }
-  override _renderObjects(ctx: CanvasRenderingContext2D, objects: fabric.Object[]) {
+  override _renderObjects(ctx: CanvasRenderingContext2D, objects: fabric.FabricObject[]) {
     super._renderObjects(ctx, objects);
 
     if (!this.highlightMirror || this.getActiveObjects().length > 1) {
@@ -164,7 +164,7 @@ export class CustomCanvas extends fabric.Canvas {
     objects.forEach((obj) => {
       const info = this.getMirroredObjectCoords(obj);
       if (info !== undefined) {
-        const bbox = obj.getBoundingRect(true);
+        const bbox = obj.getBoundingRect();
         ctx.fillStyle = this.MIRROR_GHOST_COLOR;
         ctx.fillRect(info.pos.x - bbox.width / 2, info.pos.y - bbox.height / 2, bbox.width, bbox.height);
         ctx.restore();
@@ -176,7 +176,7 @@ export class CustomCanvas extends fabric.Canvas {
   /**
    * Return new object pos (origin is top-left) if object needs mirroring
    **/
-  getMirroredObjectCoords(obj: fabric.Object): { pos: fabric.Point; flip: boolean } | undefined {
+  getMirroredObjectCoords(obj: fabric.FabricObject): { pos: fabric.Point; flip: boolean } | undefined {
     const fold = this.getFoldLine();
 
     if (fold.axis === "none" || !(this.labelProps.mirror === "flip" || this.labelProps.mirror === "copy")) {
@@ -216,18 +216,18 @@ export class CustomCanvas extends fabric.Canvas {
   }
 
   createMirroredObjects() {
-    this.forEachObject((obj: fabric.Object) => {
+    this.forEachObject((obj: fabric.FabricObject) => {
       const info = this.getMirroredObjectCoords(obj);
 
       if (info != undefined) {
-        obj.clone((newObj: fabric.Object) => {
+        obj.clone().then(newObj => {
           newObj.setPositionByOrigin(info.pos, "center", "center");
           if (info.flip) {
             newObj.centeredRotation = true;
             newObj.rotate(180);
           }
           this.add(newObj);
-        });
+        })
       }
     });
   }

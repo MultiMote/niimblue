@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { fabric } from "fabric";
+  import * as fabric from "fabric";
   import { tr } from "../utils/i18n";
   import QRCode from "../fabric-object/qrcode.class";
   import Barcode from "../fabric-object/barcode.class";
   import MdIcon from "./basic/MdIcon.svelte";
 
-  export let selectedObject: fabric.Object;
+  export let selectedObject: fabric.FabricObject;
   export let valueUpdated: () => void;
 
   const insertDateTime = (format?: string) => {

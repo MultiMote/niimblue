@@ -1,4 +1,4 @@
-import type { fabric } from "fabric";
+import * as fabric from "fabric";
 import {
   ExportedLabelTemplateSchema,
   LabelPresetSchema,
@@ -73,6 +73,7 @@ export class FileUtils {
       left: 0,
       top: 0,
       format: "png",
+      multiplier: 1,
     });
 
     FileSharer.share({
@@ -136,18 +137,11 @@ export class FileUtils {
   }
 
   static async loadCanvasState(canvas: fabric.Canvas, state: FabricJson): Promise<void> {
-    return new Promise((resolve) => {
-      canvas.loadFromJSON(
-        state,
-        () => {
-          canvas.backgroundColor = "#fff";
-          canvas.requestRenderAll();
-          resolve();
-        },
-        (src: object, obj: fabric.Object /*, error: any*/) => {
-          obj.set({ snapAngle: OBJECT_DEFAULTS.snapAngle });
-        }
-      );
+    await canvas.loadFromJSON(state, (_, obj) => {
+      if ('set' in obj)
+        obj.set({ snapAngle: OBJECT_DEFAULTS.snapAngle });
     });
+    canvas.backgroundColor = "#fff";
+    canvas.requestRenderAll();
   }
 }

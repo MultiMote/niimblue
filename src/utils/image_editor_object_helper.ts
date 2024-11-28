@@ -1,25 +1,22 @@
-import { fabric } from "fabric";
-import type { ITextboxOptions, TextOptions } from "fabric/fabric-impl";
+import * as fabric from "fabric";
 import { OBJECT_DEFAULTS, OBJECT_DEFAULTS_TEXT, OBJECT_DEFAULTS_VECTOR, OBJECT_SIZE_DEFAULTS } from "../defaults";
 import Barcode from "../fabric-object/barcode.class";
 import { QRCode } from "../fabric-object/qrcode.class";
 import type { OjectType } from "../types";
 
 export class ImageEditorObjectHelper {
-  static async addSvg(canvas: fabric.Canvas, svgCode: string): Promise<fabric.Object | fabric.Group> {
-    return new Promise((resolve) => {
-      fabric.loadSVGFromString(svgCode, (objects, options) => {
-        const obj = fabric.util.groupSVGElements(objects, options);
-        obj.scaleToWidth(OBJECT_SIZE_DEFAULTS.width).scaleToHeight(OBJECT_SIZE_DEFAULTS.height);
-        obj.set({ ...OBJECT_DEFAULTS });
-        canvas.add(obj).renderAll();
-        canvas.renderAll();
-        resolve(obj);
-      });
-    });
+  static async addSvg(canvas: fabric.Canvas, svgCode: string): Promise<fabric.FabricObject | fabric.Group> {
+    const { objects, options } = await fabric.loadSVGFromString(svgCode);
+    const obj = fabric.util.groupSVGElements(objects.filter(o => o !== null), options);
+    obj.scaleToWidth(OBJECT_SIZE_DEFAULTS.width);
+    obj.scaleToHeight(OBJECT_SIZE_DEFAULTS.height);
+    obj.set({ ...OBJECT_DEFAULTS });
+    canvas.add(obj);
+    canvas.renderAll();
+    return obj;
   }
 
-  static async addImageFile(canvas: fabric.Canvas, file: File): Promise<fabric.Object | fabric.Group> {
+  static async addImageFile(canvas: fabric.Canvas, file: File): Promise<fabric.FabricObject | fabric.Group> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
 
@@ -38,9 +35,10 @@ export class ImageEditorObjectHelper {
         reader.readAsDataURL(file);
         reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
           if (readerEvt?.target?.result) {
-            fabric.Image.fromURL(readerEvt.target.result as string, (img: fabric.Image) => {
+            fabric.FabricImage.fromURL(readerEvt.target.result as string).then(img => {
               img.set({ ...OBJECT_DEFAULTS });
-              img.scaleToHeight(OBJECT_SIZE_DEFAULTS.width).scaleToHeight(OBJECT_SIZE_DEFAULTS.height);
+              img.scaleToHeight(OBJECT_SIZE_DEFAULTS.width);
+              img.scaleToHeight(OBJECT_SIZE_DEFAULTS.height);
               canvas.add(img);
               resolve(img);
             });
@@ -54,7 +52,7 @@ export class ImageEditorObjectHelper {
     });
   }
 
-  static async addImageWithFilePicker(fabricCanvas: fabric.Canvas): Promise<fabric.Object | fabric.Group> {
+  static async addImageWithFilePicker(fabricCanvas: fabric.Canvas): Promise<fabric.FabricObject | fabric.Group> {
     return new Promise((resolve) => {
       const input: HTMLInputElement = document.createElement("input");
 
@@ -71,14 +69,14 @@ export class ImageEditorObjectHelper {
     });
   }
 
-  static async addImageBlob(fabricCanvas: fabric.Canvas, img: Blob): Promise<fabric.Image> {
+  static async addImageBlob(fabricCanvas: fabric.Canvas, img: Blob): Promise<fabric.FabricImage> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
 
       reader.readAsDataURL(img);
       reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
         if (readerEvt?.target?.result) {
-          fabric.Image.fromURL(readerEvt.target.result as string, (img: fabric.Image) => {
+          fabric.FabricImage.fromURL(readerEvt.target.result as string).then(img => {
             img.set({ left: 0, top: 0, snapAngle: OBJECT_DEFAULTS.snapAngle });
             fabricCanvas.add(img);
             resolve(img);
@@ -96,7 +94,7 @@ export class ImageEditorObjectHelper {
   static async addObjectFromClipboard(
     fabricCanvas: fabric.Canvas,
     data: DataTransfer
-  ): Promise<fabric.Object | undefined> {
+  ): Promise<fabric.FabricObject | undefined> {
     // paste image
     for (const item of data.items) {
       if (item.type.indexOf("image") !== -1) {
@@ -116,23 +114,23 @@ export class ImageEditorObjectHelper {
     }
   }
 
-  static addText(canvas: fabric.Canvas, text?: string, options?: ITextboxOptions): fabric.Textbox {
+  static addText(canvas: fabric.Canvas, text?: string, options?: Partial<fabric.TextboxProps>): fabric.Textbox {
     const obj = new fabric.Textbox(text ?? "Text", {
       ...OBJECT_DEFAULTS_TEXT,
       ...options,
     });
     canvas.add(obj);
-    obj.center();
+    canvas.centerObject(obj);
     return obj;
   }
 
-  static addStaticText(canvas: fabric.Canvas, text?: string, options?: TextOptions): fabric.Text {
-    const obj = new fabric.Text(text ?? "Text", {
+  static addStaticText(canvas: fabric.Canvas, text?: string, options?: Partial<fabric.TextProps>): fabric.FabricText {
+    const obj = new fabric.FabricText(text ?? "Text", {
       ...OBJECT_DEFAULTS_TEXT,
       ...options,
     });
     canvas.add(obj);
-    obj.center();
+    canvas.centerObject(obj);
     return obj;
   }
 
@@ -150,7 +148,7 @@ export class ImageEditorObjectHelper {
       mb: false,
     });
     canvas.add(obj);
-    obj.centerV();
+    canvas.centerObjectV(obj);
     return obj;
   }
 
@@ -160,7 +158,7 @@ export class ImageEditorObjectHelper {
       radius: OBJECT_SIZE_DEFAULTS.width / 2,
     });
     canvas.add(obj);
-    obj.centerV();
+    canvas.centerObjectV(obj);
     return obj;
   }
 
@@ -170,7 +168,7 @@ export class ImageEditorObjectHelper {
       ...OBJECT_DEFAULTS_VECTOR,
     });
     canvas.add(obj);
-    obj.centerV();
+    canvas.centerObjectV(obj);
     return obj;
   }
 
@@ -195,7 +193,7 @@ export class ImageEditorObjectHelper {
     return barcode;
   }
 
-  static addObject(canvas: fabric.Canvas, objType: OjectType): fabric.Object | undefined {
+  static addObject(canvas: fabric.Canvas, objType: OjectType): fabric.FabricObject | undefined {
     switch (objType) {
       case "text":
         return this.addText(canvas);

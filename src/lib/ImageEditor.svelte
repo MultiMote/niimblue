@@ -1,6 +1,6 @@
 <script lang="ts">
   import Dropdown from "bootstrap/js/dist/dropdown";
-  import { fabric } from "fabric";
+  import * as fabric from "fabric";
   import { onDestroy, onMount, tick } from "svelte";
   import { Barcode } from "../fabric-object/barcode.class";
   import { QRCode } from "../fabric-object/qrcode.class";
@@ -39,7 +39,7 @@
   let fabricCanvas: CustomCanvas;
   let labelProps: LabelProps = DEFAULT_LABEL_PROPS;
   let previewOpened: boolean = false;
-  let selectedObject: fabric.Object | undefined = undefined;
+  let selectedObject: fabric.FabricObject | undefined = undefined;
   let selectedCount: number = 0;
   let printNow: boolean = false;
   let csvData: string = "";
@@ -194,6 +194,10 @@
   };
 
   const controlValueUpdated = () => {
+    if (selectedObject) {
+      selectedObject.setCoords();
+      selectedObject.dirty = true;
+    }
     fabricCanvas.requestRenderAll();
     selectedObject = selectedObject;
   };
@@ -252,8 +256,6 @@
       Toasts.zodErrors(e, "Label parameters load error:");
     }
 
-    fabric.disableStyleCopyPaste = true;
-
     fabricCanvas = new CustomCanvas(htmlCanvas, {
       width: labelProps.size.width,
       height: labelProps.size.height,
@@ -278,7 +280,7 @@
       dropdowns.forEach((el) => new Dropdown(el).hide());
     });
 
-    fabricCanvas.on("object:moving", (e: fabric.IEvent<MouseEvent>): void => {
+    fabricCanvas.on("object:moving", (e): void => {
       if (e.target && e.target.left !== undefined && e.target.top !== undefined) {
         e.target.set({
           left: Math.round(e.target.left / GRID_SIZE) * GRID_SIZE,
@@ -295,12 +297,12 @@
       undo.push(fabricCanvas, labelProps);
     });
 
-    fabricCanvas.on("selection:created", (e: fabric.IEvent<MouseEvent>): void => {
+    fabricCanvas.on("selection:created", (e): void => {
       selectedCount = e.selected?.length ?? 0;
       selectedObject = e.selected?.length === 1 ? e.selected[0] : undefined;
     });
 
-    fabricCanvas.on("selection:updated", (e: fabric.IEvent<MouseEvent>): void => {
+    fabricCanvas.on("selection:updated", (e): void => {
       selectedCount = e.selected?.length ?? 0;
       selectedObject = e.selected?.length === 1 ? e.selected[0] : undefined;
     });
@@ -310,7 +312,7 @@
       selectedCount = 0;
     });
 
-    fabricCanvas.on("drop", (e: fabric.IEvent<MouseEvent>): void => {
+    fabricCanvas.on("drop", (e): void => {
       const dragEvt = e.e as DragEvent;
       dragEvt.preventDefault();
 
@@ -322,7 +324,7 @@
       }
     });
 
-    fabricCanvas.on("object:scaling", (e: fabric.IEvent<MouseEvent>): void => {
+    fabricCanvas.on("object:scaling", (e): void => {
       if (e.target && e.target instanceof Barcode && e.target.width !== undefined && e.target.height !== undefined) {
         e.target.set({
           width: Math.round(e.target.width * (e.target.scaleX ?? 1)),

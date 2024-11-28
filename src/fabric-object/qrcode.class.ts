@@ -1,85 +1,100 @@
 import QRCodeSVG from "qrcode-svg";
-import { fabric } from "fabric";
-
-const PRESERVE_PROPERTIES = ["text", "size", "ecl"];
-
+import * as fabric from "fabric";
+import {DEFAULT_LABEL_PROPS} from '../defaults'
 export type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
 
-export interface IQRCodeOptions extends fabric.IObjectOptions {
-  text: string;
-  ecl?: ErrorCorrectionLevel;
+export const qrcodeDefaultValues: Partial<fabric.TClassProperties<QRCode>> = {
+  text: "Text",
+  ecl: "M",
+  stroke: "#000000",
+  fill: "#ffffff",
+  ...DEFAULT_LABEL_PROPS.size,
 }
 
-export class QRCode extends fabric.Object {
-  /** QRCode text */
+interface UniqueQRCodeProps {
   text: string;
-  /** Error Correction Level */
   ecl: ErrorCorrectionLevel;
+}
+export interface QRCodeProps extends fabric.FabricObjectProps, UniqueQRCodeProps {}
+export interface SerializedQRCodeProps extends fabric.SerializedObjectProps, UniqueQRCodeProps {}
+const QRCODE_PROPS = ['text', 'ecl', 'size'] as const;
 
-  paths: fabric.PathCommand[];
+export class QRCode<
+  Props extends fabric.TOptions<QRCodeProps> = Partial<QRCodeProps>,
+  SProps extends SerializedQRCodeProps = SerializedQRCodeProps,
+  EventSpec extends fabric.ObjectEvents = fabric.ObjectEvents,
+>
+extends fabric.FabricObject<Props, SProps, EventSpec>
+implements QRCodeProps
+{
+  static override type = QRCode.name;
 
-  constructor(options?: IQRCodeOptions) {
-    super(options);
-    this.type = "QRCode";
-    this.stateProperties = PRESERVE_PROPERTIES.concat(...(fabric.Object.prototype.stateProperties ?? []));
-    this.cacheProperties = PRESERVE_PROPERTIES.concat(...(fabric.Object.prototype.cacheProperties ?? []));
+  /**
+   * QRCode text
+   * @type string
+   * @default "Text"
+   */
+  declare text: string;
 
+  /**
+   * Error Correction Level
+   * @type ErrorCorrectionLevel
+   * @default "M"
+   */
+  declare ecl: ErrorCorrectionLevel;
+
+  private _paths: fabric.util.TSimplePathData = [];
+
+  constructor(options?: Props) {
+    super();
+    Object.assign(this, qrcodeDefaultValues);
+    this.setOptions(options);
     this.setControlsVisibility({
       ml: false,
-      mr: false,
       mt: false,
+      mr: false,
       mb: false,
     });
-
-    this.paths = [];
-    this.text = options?.text ?? "Text";
-    this.ecl = options?.ecl ?? "M";
-
     this._createPathData();
   }
 
-  override _set(key: string, value: any): this {
-    super._set(key, value);
-
-    if (key === "text" || key === "ecl") {
-      this._createPathData();
-    }
-
-    return this;
-  }
-
   _createPathData() {
-    if (this.text === "" || this.height === undefined || this.width === undefined || this.ecl === undefined) {
-      return;
-    }
     const qr = new QRCodeSVG({
       content: this.text,
       padding: 0,
       width: this.width,
       height: this.height,
-      color: this.stroke!,
-      background: this.fill! as string,
+      color: this.stroke!.toString(),
+      background: this.fill!.toString(),
       ecl: this.ecl,
       join: true,
     });
-
     const svg = qr.svg();
     const match = /<path[^>]*?d=(["'])?((?:.(?!\1|>))*.?)\1?/.exec(svg);
     const path_str = match ? match[2] : "";
-    this.paths = fabric.util.makePathSimpler(fabric.util.parsePath(path_str));
+    this._paths = fabric.util.makePathSimpler(fabric.util.parsePath(path_str));
   }
 
-  override _render(ctx: CanvasRenderingContext2D) {
-    if (this.height === undefined || this.width === undefined) {
+  override _set(key: string, value: any): this {
+    super._set(key, value);
+    if (key === "text" || key === "ecl") {
+      this._createPathData();
+      this.dirty = true;
+    }
+    return this;
+  }
+
+  override _render(ctx: CanvasRenderingContext2D): void {
+    if (this._paths.length === 0) {
+      super._render(ctx);
       return;
     }
-
+    
     const w2 = this.width / 2;
     const h2 = this.height / 2;
 
     ctx.beginPath();
-
-    for (const path of this.paths) {
+    for (const path of this._paths) {
       const [action, x, y] = path;
 
       if (action === "M") {
@@ -97,18 +112,15 @@ export class QRCode extends fabric.Object {
     ctx.fillStyle = this.stroke as string;
     ctx.fill();
     ctx.restore();
+
+    super._render(ctx);
   }
 
-  override toObject(propertiesToInclude: string[] = []) {
-    return super.toObject(PRESERVE_PROPERTIES.concat(...propertiesToInclude));
-  }
-
-  static fromObject(object: any, callback: Function): fabric.Object {
-    return fabric.Object._fromObject("QRCode", object, callback);
+  override toObject(propertiesToInclude: any[] = []) {
+    return super.toObject([...QRCODE_PROPS, ...propertiesToInclude])
   }
 }
 
-// @ts-expect-error Dynamic field create
-fabric.QRCode = QRCode;
+fabric.classRegistry.setClass(QRCode, QRCode.name);
 
 export default QRCode;
