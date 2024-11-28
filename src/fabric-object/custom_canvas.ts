@@ -13,8 +13,8 @@ export class CustomCanvas extends fabric.Canvas {
   private highlightMirror: boolean = true;
   private virtualZoomRatio: number = 1;
 
-  constructor(element: HTMLCanvasElement, options?: fabric.TOptions<fabric.CanvasOptions>) {
-    super(element, options);
+  constructor(el?: string | HTMLCanvasElement, options?: fabric.TOptions<fabric.CanvasOptions>) {
+    super(el, options);
     this.setupZoom();
   }
 
