@@ -254,7 +254,7 @@
 
     canvasPreprocess(fabricTempCanvas, variables);
 
-    fabricTempCanvas.createMirroredObjects();
+    await fabricTempCanvas.createMirroredObjects();
 
     fabricTempCanvas.requestRenderAll();
 

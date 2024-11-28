@@ -215,20 +215,19 @@ export class CustomCanvas extends fabric.Canvas {
     return { pos, flip };
   }
 
-  createMirroredObjects() {
-    this.forEachObject((obj: fabric.FabricObject) => {
+  async createMirroredObjects() {
+    const objects = this.getObjects();
+    for (const obj of objects) {
       const info = this.getMirroredObjectCoords(obj);
-
       if (info != undefined) {
-        obj.clone().then(newObj => {
-          newObj.setPositionByOrigin(info.pos, "center", "center");
-          if (info.flip) {
-            newObj.centeredRotation = true;
-            newObj.rotate(180);
-          }
-          this.add(newObj);
-        })
+        const newObj = await obj.clone();
+        newObj.setPositionByOrigin(info.pos, "center", "center");
+        if (info.flip) {
+          newObj.centeredRotation = true;
+          newObj.rotate(180);
+        }
+        this.add(newObj);
       }
-    });
+    }
   }
 }
