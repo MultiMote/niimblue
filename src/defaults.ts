@@ -1,3 +1,4 @@
+import * as fabric from "fabric";
 import type { LabelPreset, LabelProps } from "./types";
 
 /** Default presets for LabelPropsEditor */
@@ -45,9 +46,9 @@ export const OBJECT_DEFAULTS_TEXT = {
   ...OBJECT_DEFAULTS,
   fill: "black",
   fontFamily: "Noto Sans Variable",
-  textAlign: "center",
-  originX: "center",
-  originY: "center",
+  textAlign: "center" as CanvasTextAlign,
+  originX: 'center' as fabric.TOriginX,
+  originY: "center" as fabric.TOriginY,
   lineHeight: 1,
 };
 

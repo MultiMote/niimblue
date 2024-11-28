@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { fabric } from "fabric";
   import { onDestroy, onMount } from "svelte";
   import { derived } from "svelte/store";
   import Modal from "bootstrap/js/dist/modal";
@@ -229,49 +228,46 @@
   };
 
   const generatePreviewData = async (page: number): Promise<void> => {
-    return new Promise((resolve) => {
-      const fabricTempCanvas = new CustomCanvas(null, {
-        width: labelProps.size.width,
-        height: labelProps.size.height
-      });
-
-      fabricTempCanvas.setCustomBackground(false);
-      fabricTempCanvas.setHighlightMirror(false);
-
-      fabricTempCanvas.setLabelProps(labelProps);
-
-      fabricTempCanvas.loadFromJSON(canvasCallback(), () => {
-        let variables = {};
-
-        if (csvEnabled) {
-          if (page >= 0 && page < csvParsed.length) {
-            variables = csvParsed[page];
-          } else {
-            console.warn(`Page ${page} is out of csv bounds (csv length is ${csvParsed.length})`);
-          }
-        }
-
-        console.log("Page variables:", variables);
-
-        canvasPreprocess(fabricTempCanvas, variables);
-
-        fabricTempCanvas.createMirroredObjects();
-
-        fabricTempCanvas.requestRenderAll();
-
-        const preRenderedCanvas = fabricTempCanvas.toCanvasElement();
-        const ctx = preRenderedCanvas.getContext("2d")!;
-        previewCanvas.width = preRenderedCanvas.width;
-        previewCanvas.height = preRenderedCanvas.height;
-        previewContext = previewCanvas.getContext("2d")!;
-        originalImage = ctx.getImageData(0, 0, preRenderedCanvas.width, preRenderedCanvas.height);
-
-        updatePreview();
-
-        fabricTempCanvas.dispose();
-        resolve();
-      });
+    const fabricTempCanvas = new CustomCanvas(undefined, {
+      width: labelProps.size.width,
+      height: labelProps.size.height
     });
+
+    fabricTempCanvas.setCustomBackground(false);
+    fabricTempCanvas.setHighlightMirror(false);
+
+    fabricTempCanvas.setLabelProps(labelProps);
+
+    await fabricTempCanvas.loadFromJSON(canvasCallback())
+
+    let variables = {};
+
+    if (csvEnabled) {
+      if (page >= 0 && page < csvParsed.length) {
+        variables = csvParsed[page];
+      } else {
+        console.warn(`Page ${page} is out of csv bounds (csv length is ${csvParsed.length})`);
+      }
+    }
+
+    console.log("Page variables:", variables);
+
+    canvasPreprocess(fabricTempCanvas, variables);
+
+    await fabricTempCanvas.createMirroredObjects();
+
+    fabricTempCanvas.requestRenderAll();
+
+    const preRenderedCanvas = fabricTempCanvas.toCanvasElement();
+    const ctx = preRenderedCanvas.getContext("2d")!;
+    previewCanvas.width = preRenderedCanvas.width;
+    previewCanvas.height = preRenderedCanvas.height;
+    previewContext = previewCanvas.getContext("2d")!;
+    originalImage = ctx.getImageData(0, 0, preRenderedCanvas.width, preRenderedCanvas.height);
+
+    updatePreview();
+
+    fabricTempCanvas.dispose();
   };
 
   onMount(async () => {

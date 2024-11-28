@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { fabric } from "fabric";
+  import * as fabric from "fabric";
   import { tr } from "../utils/i18n";
   import MdIcon from "./basic/MdIcon.svelte";
 
-  export let selectedObject: fabric.Object;
+  export let selectedObject: fabric.FabricObject;
   export let valueUpdated: () => void;
 
   const putToCenterV = () => {
-    selectedObject.centerV();
+    selectedObject.canvas?.centerObjectV(selectedObject)
     valueUpdated();
   };
 
   const putToCenterH = () => {
-    selectedObject.centerH();
+    selectedObject.canvas?.centerObjectH(selectedObject)
     valueUpdated();
   };
 </script>

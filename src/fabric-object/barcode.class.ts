@@ -1,40 +1,85 @@
-import { fabric } from "fabric";
+import * as fabric from "fabric";
 import { code128b, ean13 } from "../utils/barcode";
 import { equalSpacingFillText } from "../utils/canvas_utils";
 import { OBJECT_DEFAULTS_TEXT } from "../defaults";
 
-const ALL_PROPERTIES = ["text", "encoding", "printText", "scaleFactor", "fontSize", "font", "fontFamily"];
 const EAN13_LONG_BAR_INDEXES: number[] = [0, 1, 2, 45, 46, 47, 48, 49, 92, 93, 94];
-
 export type BarcodeCoding = "EAN13" | "CODE128B";
 
-export interface IBarcodeOptions extends fabric.IObjectOptions {
-  text: string;
-  encoding?: BarcodeCoding;
-  printText?: boolean;
-  scaleFactor?: number;
-  fontSize?: number;
-  fontFamily?: string;
+export const barcodeDefaultValues: Partial<fabric.TClassProperties<Barcode>> = {
+  text: "",
+  encoding: "EAN13",
+  printText: true,
+  scaleFactor: 1,
+  fontSize: 12,
+  fontFamily: OBJECT_DEFAULTS_TEXT.fontFamily,
 }
 
-export class Barcode extends fabric.Object {
+interface UniqueBarcodeProps {
   text: string;
   encoding: BarcodeCoding;
   printText: boolean;
   scaleFactor: number;
   fontSize: number;
   fontFamily: string;
+}
+export interface BarcodeProps extends fabric.FabricObjectProps, UniqueBarcodeProps {}
+export interface SerializedBarcodeProps extends fabric.SerializedObjectProps, UniqueBarcodeProps {}
+const BARCODE_PROPS = ["text", "encoding", "printText", "scaleFactor", "fontSize", "fontFamily"] as const;
 
-  barcodeEncoded: string = "";
-  displayText: string = "";
+export class Barcode <
+  Props extends fabric.TOptions<BarcodeProps> = Partial<BarcodeProps>,
+  SProps extends SerializedBarcodeProps = SerializedBarcodeProps,
+  EventSpec extends fabric.ObjectEvents = fabric.ObjectEvents,
+> extends fabric.FabricObject<Props, SProps, EventSpec> implements BarcodeProps {
+  static override type = Barcode.name;
 
-  constructor(options?: IBarcodeOptions) {
-    super(options);
-    this.type = "Barcode";
-    this.stateProperties = ALL_PROPERTIES.concat(...(fabric.Object.prototype.stateProperties ?? []));
-    this.cacheProperties = ALL_PROPERTIES.concat(...(fabric.Object.prototype.cacheProperties ?? []));
-    this.objectCaching = false; // todo: fix cache (blur on scaleFactor change)
+  /**
+   * Barcode text
+   * @type string
+   * @default ""
+   */
+  declare text: string;
+  /**
+   * Barcode encoding
+   * @type BarcodeCoding
+   * @default "EAN13"
+   */
+  declare encoding: BarcodeCoding;
+  /**
+   * Print text
+   * @type boolean
+   * @default true
+   */
+  declare printText: boolean;
+  /**
+   * Scale factor
+   * @type number
+   * @default 1
+   */
+  declare scaleFactor: number;
+  /**
+   * Font size
+   * @type number
+   * @default 12
+   */
+  declare fontSize: number;
+  /**
+   * Font family
+   * @type string
+   * @default "Noto Sans Variable"
+   */
+  declare fontFamily: string;
 
+  private barcodeEncoded: string = "";
+  private displayText: string = "";
+
+  constructor(options?: Props) {
+    super();
+    Object.assign(this, barcodeDefaultValues);
+    const {text, ...other} = options ?? {}
+    this.setOptions(other); // Must be set separately because the encoding needs to be set first
+    this.set("text", text);
     this.setControlsVisibility({
       tl: false,
       tr: false,
@@ -44,37 +89,32 @@ export class Barcode extends fabric.Object {
       mr: false,
       mtr: false,
     });
-
-    this.text = options?.text ?? "";
-    this.encoding = options?.encoding ?? "EAN13";
-    this.printText = options?.printText ?? true;
-    this.scaleFactor = options?.scaleFactor ?? 1;
-    this.fontSize = options?.fontSize ?? 12;
-    this.fontFamily = options?.fontFamily ?? OBJECT_DEFAULTS_TEXT.fontFamily;
+    this.objectCaching = false;
     this._createBandCode();
   }
 
-  override _set(key: string, value: any): this {
+  override _set(key: string, value?: any): this {
     super._set(key, value);
 
     if (key === "text" || key == "encoding") {
       this._createBandCode();
     }
 
-    if (this.barcodeEncoded && (ALL_PROPERTIES.includes(key) || key == "canvas")) {
+    if (this.barcodeEncoded && (BARCODE_PROPS.includes(key as any) || key == "canvas")) {
       const letterWidth = this._measureLetterWidth();
       let barcodeWidth = (this.scaleFactor ?? 1) * this.barcodeEncoded.length;
 
       if (this.encoding === "EAN13") {
         barcodeWidth += letterWidth * 2; // side margins
       }
-      super._set("width", barcodeWidth);
+      super.set("width", barcodeWidth);
+      this.setCoords();
     }
 
     return this;
   }
 
-  _createBandCode(): fabric.Object {
+  _createBandCode() {
     if (this.encoding === "EAN13") {
       const { text, bandcode } = ean13(this.text);
       this.displayText = text;
@@ -83,7 +123,6 @@ export class Barcode extends fabric.Object {
       this.displayText = this.text;
       this.barcodeEncoded = code128b(this.text);
     }
-    return this;
   }
 
   _getFont(): string {
@@ -105,15 +144,8 @@ export class Barcode extends fabric.Object {
   }
 
   override _render(ctx: CanvasRenderingContext2D) {
-    super._render(ctx);
-
-    if (
-      this.barcodeEncoded === "" ||
-      this.height === undefined ||
-      this.width === undefined ||
-      this.fontSize === undefined ||
-      this.fontFamily === undefined
-    ) {
+    if (this.barcodeEncoded === "") {
+      super._render(ctx);
       return;
     }
 
@@ -201,18 +233,15 @@ export class Barcode extends fabric.Object {
     }
 
     ctx.restore();
+
+    super._render(ctx);
   }
 
-  override toObject(propertiesToInclude: string[] = []) {
-    return super.toObject(ALL_PROPERTIES.concat(...propertiesToInclude));
-  }
-
-  static fromObject(object: any, callback: Function): fabric.Object {
-    return fabric.Object._fromObject("Barcode", object, callback);
+  override toObject(propertiesToInclude: any[] = []) {
+    return super.toObject([...BARCODE_PROPS, ...propertiesToInclude]);
   }
 }
 
-// @ts-expect-error Dynamic field create
-fabric.Barcode = Barcode;
+fabric.classRegistry.setClass(Barcode, Barcode.name);
 
 export default Barcode;

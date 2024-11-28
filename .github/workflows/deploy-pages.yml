@@ -25,6 +25,8 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    if: github.repository == 'MultiMote/niimblue'
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -76,6 +78,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     name: Deploy
+    if: github.repository == 'MultiMote/niimblue'
+
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

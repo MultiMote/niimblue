@@ -16,6 +16,7 @@ on:
 jobs:
   build-app:
     runs-on: ubuntu-latest
+    if: github.repository == 'MultiMote/niimblue'
 
     steps:
       - name: Checkout repository

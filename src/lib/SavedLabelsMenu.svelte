@@ -8,7 +8,7 @@
   import { Toasts } from "../utils/toasts";
   import Dropdown from "bootstrap/js/dist/dropdown";
   import { FileUtils } from "../utils/file_utils";
-  import type { fabric } from "fabric";
+  import * as fabric from "fabric";
 
   export let onRequestLabelTemplate: () => ExportedLabelTemplate;
   export let onLoadRequested: (label: ExportedLabelTemplate) => void;

@@ -1,4 +1,4 @@
-import { fabric } from "fabric";
+import * as fabric from "fabric";
 import QRCode from "../fabric-object/qrcode.class";
 import Barcode from "../fabric-object/barcode.class";
 import dayjs from "dayjs";
@@ -26,7 +26,7 @@ const preprocessString = (input: string, variables?: { [v: string]: string }): s
 
 /** Replace text templates in some canvas objects */
 export const canvasPreprocess = (canvas: fabric.Canvas, variables?: { [key: string]: string }) => {
-  canvas.forEachObject((obj: fabric.Object) => {
+  canvas.forEachObject((obj: fabric.FabricObject) => {
     if (obj instanceof fabric.IText) {
       obj.set({ text: preprocessString(obj.text ?? "", variables) });
     } else if (obj instanceof QRCode) {

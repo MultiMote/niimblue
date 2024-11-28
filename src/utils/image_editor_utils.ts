@@ -1,23 +1,19 @@
-import { fabric } from "fabric";
+import * as fabric from "fabric";
 import { GRID_SIZE, OBJECT_DEFAULTS } from "../defaults";
 import type { MoveDirection } from "../types";
 
 export class ImageEditorUtils {
-  static cloneObject(canvas: fabric.Canvas, selected: fabric.Object): Promise<void> {
-    return new Promise((resolve) => {
-      selected.clone((obj: fabric.Object) => {
-        obj.snapAngle = OBJECT_DEFAULTS.snapAngle;
-        obj.top! += GRID_SIZE;
-        obj.left! += GRID_SIZE;
-        canvas.add(obj);
-        canvas.setActiveObject(obj);
-        resolve();
-      });
-    });
+  static async cloneObject(canvas: fabric.Canvas, selected: fabric.FabricObject): Promise<void> {
+    const obj = await selected.clone();
+    obj.snapAngle = OBJECT_DEFAULTS.snapAngle;
+    obj.top! += GRID_SIZE;
+    obj.left! += GRID_SIZE;
+    canvas.add(obj);
+    canvas.setActiveObject(obj);
   }
 
   static moveSelection(canvas: fabric.Canvas, direction: MoveDirection, ctrl?: boolean) {
-    const selected: fabric.Object[] = canvas.getActiveObjects();
+    const selected: fabric.FabricObject[] = canvas.getActiveObjects();
     const amount = ctrl ? 1 : GRID_SIZE;
 
     selected.forEach((obj) => {
@@ -37,7 +33,7 @@ export class ImageEditorUtils {
   }
 
   static deleteSelection(canvas: fabric.Canvas) {
-    const selected: fabric.Object[] = canvas.getActiveObjects();
+    const selected: fabric.FabricObject[] = canvas.getActiveObjects();
     selected.forEach((obj) => {
       canvas.remove(obj);
     });
@@ -49,8 +45,7 @@ export class ImageEditorUtils {
     if (focused !== null && (focused.tagName === "INPUT" || focused.tagName === "TEXTAREA")) {
       return true;
     }
-
-    const selected: fabric.Object[] = canvas.getActiveObjects();
+    const selected: fabric.FabricObject[] = canvas.getActiveObjects();
     const editing = selected.some((obj) => obj instanceof fabric.IText && obj.isEditing);
 
     if (editing) {
