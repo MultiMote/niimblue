@@ -14,8 +14,6 @@ export class UndoRedo {
   public onLabelUpdate?: (data: ExportedLabelTemplate) => Promise<void>;
   public onStateUpdate?: (state: UndoState) => void;
 
-  constructor() {}
-
   private updateState() {
     this.onStateUpdate?.({
       undoDisabled: this.index === 0,

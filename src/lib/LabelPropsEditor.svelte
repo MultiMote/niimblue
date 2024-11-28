@@ -79,7 +79,7 @@
       split,
       tailPos,
       tailLength: Math.floor(newTailLength),
-      mirror
+      mirror,
     });
   };
 
@@ -121,7 +121,7 @@
       split,
       tailPos,
       tailLength,
-      mirror
+      mirror,
     };
     const newPresets = [...labelPresets, newPreset];
     try {

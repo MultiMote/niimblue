@@ -13,7 +13,7 @@ export const barcodeDefaultValues: Partial<fabric.TClassProperties<Barcode>> = {
   scaleFactor: 1,
   fontSize: 12,
   fontFamily: OBJECT_DEFAULTS_TEXT.fontFamily,
-}
+};
 
 interface UniqueBarcodeProps {
   text: string;
@@ -27,11 +27,14 @@ export interface BarcodeProps extends fabric.FabricObjectProps, UniqueBarcodePro
 export interface SerializedBarcodeProps extends fabric.SerializedObjectProps, UniqueBarcodeProps {}
 const BARCODE_PROPS = ["text", "encoding", "printText", "scaleFactor", "fontSize", "fontFamily"] as const;
 
-export class Barcode <
-  Props extends fabric.TOptions<BarcodeProps> = Partial<BarcodeProps>,
-  SProps extends SerializedBarcodeProps = SerializedBarcodeProps,
-  EventSpec extends fabric.ObjectEvents = fabric.ObjectEvents,
-> extends fabric.FabricObject<Props, SProps, EventSpec> implements BarcodeProps {
+export class Barcode<
+    Props extends fabric.TOptions<BarcodeProps> = Partial<BarcodeProps>,
+    SProps extends SerializedBarcodeProps = SerializedBarcodeProps,
+    EventSpec extends fabric.ObjectEvents = fabric.ObjectEvents
+  >
+  extends fabric.FabricObject<Props, SProps, EventSpec>
+  implements BarcodeProps
+{
   static override type = Barcode.name;
 
   /**
@@ -77,7 +80,7 @@ export class Barcode <
   constructor(options?: Props) {
     super();
     Object.assign(this, barcodeDefaultValues);
-    const {text, ...other} = options ?? {}
+    const { text, ...other } = options ?? {};
     this.setOptions(other); // Must be set separately because the encoding needs to be set first
     this.set("text", text);
     this.setControlsVisibility({

@@ -44,13 +44,18 @@
 <div class="labels-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {$$props.class}">
   {#each labels as item, idx}
     <button
-      class="btn p-0 card-wrapper d-flex justify-content-center align-items-center {selectedIndex===idx ? 'border-primary' : ''}"
+      class="btn p-0 card-wrapper d-flex justify-content-center align-items-center {selectedIndex === idx
+        ? 'border-primary'
+        : ''}"
       on:click={() => onItemClicked(idx)}>
       <div
         class="card print-start-{item.label.printDirection} d-flex justify-content-center align-items-center"
         style="width: {scaleDimensions(item.label).width}%; height: {scaleDimensions(item.label).height}%;">
         <div class="buttons d-flex">
-          <button class="btn text-primary-emphasis" on:click={(e) => exportRequested(e, idx)} title={$tr("params.saved_labels.save.json")}>
+          <button
+            class="btn text-primary-emphasis"
+            on:click={(e) => exportRequested(e, idx)}
+            title={$tr("params.saved_labels.save.json")}>
             <MdIcon icon="download" />
           </button>
 

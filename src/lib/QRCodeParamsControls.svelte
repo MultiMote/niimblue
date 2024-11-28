@@ -18,20 +18,26 @@
     <span class="input-group-text" title={$tr("params.qrcode.ecl")}>
       <MdIcon icon="auto_fix_high" />
     </span>
-    <select class="form-select" value={selectedQRCode.ecl} on:change={(e) => {
-      selectedQRCode?.set('ecl', e.currentTarget.value)
-      valueUpdated()
-    }}>
+    <select
+      class="form-select"
+      value={selectedQRCode.ecl}
+      on:change={(e) => {
+        selectedQRCode?.set("ecl", e.currentTarget.value);
+        valueUpdated();
+      }}>
       <option value="L">Level L</option>
       <option value="M">Level M</option>
       <option value="Q">Level Q</option>
       <option value="H">Level H</option>
     </select>
   </div>
-  <textarea class="qrcode-content form-control" value={selectedQRCode.text} on:input={(e) => {
-    selectedQRCode?.set('text', e.currentTarget.value)
-    valueUpdated()
-  }} />
+  <textarea
+    class="qrcode-content form-control"
+    value={selectedQRCode.text}
+    on:input={(e) => {
+      selectedQRCode?.set("text", e.currentTarget.value);
+      valueUpdated();
+    }} />
 {/if}
 
 <style>

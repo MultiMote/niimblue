@@ -7,7 +7,10 @@ import type { OjectType } from "../types";
 export class ImageEditorObjectHelper {
   static async addSvg(canvas: fabric.Canvas, svgCode: string): Promise<fabric.FabricObject | fabric.Group> {
     const { objects, options } = await fabric.loadSVGFromString(svgCode);
-    const obj = fabric.util.groupSVGElements(objects.filter(o => o !== null), options);
+    const obj = fabric.util.groupSVGElements(
+      objects.filter((o) => o !== null),
+      options
+    );
     obj.scaleToWidth(OBJECT_SIZE_DEFAULTS.width);
     obj.scaleToHeight(OBJECT_SIZE_DEFAULTS.height);
     obj.set({ ...OBJECT_DEFAULTS });
@@ -35,7 +38,7 @@ export class ImageEditorObjectHelper {
         reader.readAsDataURL(file);
         reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
           if (readerEvt?.target?.result) {
-            fabric.FabricImage.fromURL(readerEvt.target.result as string).then(img => {
+            fabric.FabricImage.fromURL(readerEvt.target.result as string).then((img) => {
               img.set({ ...OBJECT_DEFAULTS });
               img.scaleToHeight(OBJECT_SIZE_DEFAULTS.width);
               img.scaleToHeight(OBJECT_SIZE_DEFAULTS.height);
@@ -76,7 +79,7 @@ export class ImageEditorObjectHelper {
       reader.readAsDataURL(img);
       reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
         if (readerEvt?.target?.result) {
-          fabric.FabricImage.fromURL(readerEvt.target.result as string).then(img => {
+          fabric.FabricImage.fromURL(readerEvt.target.result as string).then((img) => {
             img.set({ left: 0, top: 0, snapAngle: OBJECT_DEFAULTS.snapAngle });
             fabricCanvas.add(img);
             resolve(img);

@@ -98,12 +98,7 @@ export class CustomCanvas extends fabric.Canvas {
       if (this.labelProps.tailPos === "right") {
         ctx.rect(endX - roundRadius, endY / 2 - this.TAIL_WIDTH / 2, this.width - endX + roundRadius, this.TAIL_WIDTH);
       } else if (this.labelProps.tailPos === "bottom") {
-        ctx.rect(
-          endX / 2 - this.TAIL_WIDTH / 2,
-          endY - roundRadius,
-          this.TAIL_WIDTH,
-          this.height - endY + roundRadius
-        );
+        ctx.rect(endX / 2 - this.TAIL_WIDTH / 2, endY - roundRadius, this.TAIL_WIDTH, this.height - endY + roundRadius);
       } else if (this.labelProps.tailPos === "left") {
         ctx.rect(0, endY / 2 - this.TAIL_WIDTH / 2, startX + roundRadius, this.TAIL_WIDTH);
       } else if (this.labelProps.tailPos === "top") {

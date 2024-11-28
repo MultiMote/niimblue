@@ -1,6 +1,6 @@
 import QRCodeSVG from "qrcode-svg";
 import * as fabric from "fabric";
-import {OBJECT_SIZE_DEFAULTS} from '../defaults'
+import { OBJECT_SIZE_DEFAULTS } from "../defaults";
 export type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
 
 export const qrCodeDefaultValues: Partial<fabric.TClassProperties<QRCode>> = {
@@ -9,7 +9,7 @@ export const qrCodeDefaultValues: Partial<fabric.TClassProperties<QRCode>> = {
   stroke: "#000000",
   fill: "#ffffff",
   ...OBJECT_SIZE_DEFAULTS,
-}
+};
 
 interface UniqueQRCodeProps {
   text: string;
@@ -17,15 +17,15 @@ interface UniqueQRCodeProps {
 }
 export interface QRCodeProps extends fabric.FabricObjectProps, UniqueQRCodeProps {}
 export interface SerializedQRCodeProps extends fabric.SerializedObjectProps, UniqueQRCodeProps {}
-const QRCODE_PROPS = ['text', 'ecl', 'size'] as const;
+const QRCODE_PROPS = ["text", "ecl", "size"] as const;
 
 export class QRCode<
-  Props extends fabric.TOptions<QRCodeProps> = Partial<QRCodeProps>,
-  SProps extends SerializedQRCodeProps = SerializedQRCodeProps,
-  EventSpec extends fabric.ObjectEvents = fabric.ObjectEvents,
->
-extends fabric.FabricObject<Props, SProps, EventSpec>
-implements QRCodeProps
+    Props extends fabric.TOptions<QRCodeProps> = Partial<QRCodeProps>,
+    SProps extends SerializedQRCodeProps = SerializedQRCodeProps,
+    EventSpec extends fabric.ObjectEvents = fabric.ObjectEvents
+  >
+  extends fabric.FabricObject<Props, SProps, EventSpec>
+  implements QRCodeProps
 {
   static override type = QRCode.name;
 
@@ -117,7 +117,7 @@ implements QRCodeProps
   }
 
   override toObject(propertiesToInclude: any[] = []) {
-    return super.toObject([...QRCODE_PROPS, ...propertiesToInclude])
+    return super.toObject([...QRCODE_PROPS, ...propertiesToInclude]);
   }
 }
 

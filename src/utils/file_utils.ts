@@ -138,8 +138,7 @@ export class FileUtils {
 
   static async loadCanvasState(canvas: fabric.Canvas, state: FabricJson): Promise<void> {
     await canvas.loadFromJSON(state, (_, obj) => {
-      if ('set' in obj)
-        obj.set({ snapAngle: OBJECT_DEFAULTS.snapAngle });
+      if ("set" in obj) obj.set({ snapAngle: OBJECT_DEFAULTS.snapAngle });
     });
     canvas.requestRenderAll();
   }

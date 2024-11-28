@@ -8,7 +8,6 @@
   export let selectedObject: fabric.FabricObject;
   export let valueUpdated: () => void;
 
-
   let selectedText: fabric.IText | undefined;
   let fontQuerySupported = typeof queryLocalFonts !== "undefined";
   let fontFamilies: string[] = [OBJECT_DEFAULTS_TEXT.fontFamily];
@@ -100,7 +99,9 @@
   </div>
 
   <button
-    class="btn btn-sm {selectedText.fontWeight === 'bold' ? 'btn-secondary' : ''}" title={$tr("params.text.bold")} on:click={() => {
+    class="btn btn-sm {selectedText.fontWeight === 'bold' ? 'btn-secondary' : ''}"
+    title={$tr("params.text.bold")}
+    on:click={() => {
       if (!selectedText) return;
       if (selectedText.fontWeight === "bold") {
         selectedText.fontWeight = "normal";
@@ -112,20 +113,22 @@
     <MdIcon icon="format_bold" />
   </button>
   <button
-    class="btn btn-sm {selectedText.backgroundColor === 'black' ? 'btn-secondary' : ''}" title={$tr("params.text.invert_colors")} on:click={() => {
-    if (!selectedText) return;
-    if (selectedText.backgroundColor === "black") {
-      selectedText.set({
-        backgroundColor: "transparent",
-        fill: "black",
-      });
-    } else {
-      selectedText.set({
-        backgroundColor: "black",
-        fill: "white",
-      });
-    }
-    commit();
+    class="btn btn-sm {selectedText.backgroundColor === 'black' ? 'btn-secondary' : ''}"
+    title={$tr("params.text.invert_colors")}
+    on:click={() => {
+      if (!selectedText) return;
+      if (selectedText.backgroundColor === "black") {
+        selectedText.set({
+          backgroundColor: "transparent",
+          fill: "black",
+        });
+      } else {
+        selectedText.set({
+          backgroundColor: "black",
+          fill: "white",
+        });
+      }
+      commit();
     }}>
     <MdIcon icon="invert_colors" />
   </button>
@@ -140,19 +143,25 @@
       class="form-control"
       value={selectedText.fontSize}
       on:input={(e) => {
-        selectedText?.set('fontSize', e.currentTarget.valueAsNumber ?? 1)
+        selectedText?.set("fontSize", e.currentTarget.valueAsNumber ?? 1);
         commit();
       }} />
-    <button class="btn btn-secondary" title={$tr("params.text.font_size.up")} on:click={() => {
-      selectedText?.set('fontSize', selectedText.fontSize + (selectedText.fontSize > 40 ? 10 : 2))
-      commit();
-    }}>
+    <button
+      class="btn btn-secondary"
+      title={$tr("params.text.font_size.up")}
+      on:click={() => {
+        selectedText?.set("fontSize", selectedText.fontSize + (selectedText.fontSize > 40 ? 10 : 2));
+        commit();
+      }}>
       <MdIcon icon="text_increase" />
     </button>
-    <button class="btn btn-secondary" title={$tr("params.text.font_size.down")} on:click={() => {
-      selectedText?.set('fontSize', selectedText.fontSize - (selectedText.fontSize > 40 ? 10 : 2))
-      commit();
-    }}>
+    <button
+      class="btn btn-secondary"
+      title={$tr("params.text.font_size.down")}
+      on:click={() => {
+        selectedText?.set("fontSize", selectedText.fontSize - (selectedText.fontSize > 40 ? 10 : 2));
+        commit();
+      }}>
       <MdIcon icon="text_decrease" />
     </button>
   </div>
@@ -169,7 +178,7 @@
       class="form-control"
       value={selectedText.lineHeight}
       on:input={(e) => {
-        selectedText?.set('lineHeight', e.currentTarget.valueAsNumber ?? 1)
+        selectedText?.set("lineHeight", e.currentTarget.valueAsNumber ?? 1);
         commit();
       }} />
   </div>
@@ -178,11 +187,14 @@
     <span class="input-group-text" title={$tr("params.text.font_family")}>
       <MdIcon icon="text_format" />
     </span>
-    {#if fontQuerySupported }
-      <select class="form-select" value={selectedText.fontFamily} on:change={(e) => {
-        selectedText?.set('fontFamily', e.currentTarget.value)
-        commit();
-      }}>
+    {#if fontQuerySupported}
+      <select
+        class="form-select"
+        value={selectedText.fontFamily}
+        on:change={(e) => {
+          selectedText?.set("fontFamily", e.currentTarget.value);
+          commit();
+        }}>
         {#each fontFamilies as font}
           <option value={font} style="font-family: {font}">{font}</option>
         {/each}
@@ -191,10 +203,14 @@
         <MdIcon icon="refresh" />
       </button>
     {:else}
-      <input type="text" class="form-control" value={selectedText.fontFamily} on:input={(e) => {
-        selectedText?.set('fontFamily', e.currentTarget.value)
-        commit();
-      }} />
+      <input
+        type="text"
+        class="form-control"
+        value={selectedText.fontFamily}
+        on:input={(e) => {
+          selectedText?.set("fontFamily", e.currentTarget.value);
+          commit();
+        }} />
     {/if}
   </div>
 

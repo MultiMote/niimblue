@@ -7,12 +7,12 @@
   export let valueUpdated: () => void;
 
   const putToCenterV = () => {
-    selectedObject.canvas?.centerObjectV(selectedObject)
+    selectedObject.canvas?.centerObjectV(selectedObject);
     valueUpdated();
   };
 
   const putToCenterH = () => {
-    selectedObject.canvas?.centerObjectH(selectedObject)
+    selectedObject.canvas?.centerObjectH(selectedObject);
     valueUpdated();
   };
 </script>
@@ -23,4 +23,3 @@
 <button class="btn btn-sm btn-secondary" on:click={putToCenterH} title={$tr("params.generic.center.horizontal")}>
   <MdIcon icon="horizontal_distribute" />
 </button>
-

@@ -5,7 +5,7 @@
   let caps = Utils.getAvailableTransports();
 </script>
 
-{#if !caps.webSerial && !caps.webBluetooth && !caps.capacitorBle }
+{#if !caps.webSerial && !caps.webBluetooth && !caps.capacitorBle}
   <div class="alert alert-danger" role="alert">
     <div>
       {$tr("browser_warning.lines.first")}

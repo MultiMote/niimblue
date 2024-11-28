@@ -47,7 +47,7 @@ export const OBJECT_DEFAULTS_TEXT = {
   fill: "black",
   fontFamily: "Noto Sans Variable",
   textAlign: "center" as CanvasTextAlign,
-  originX: 'center' as fabric.TOriginX,
+  originX: "center" as fabric.TOriginX,
   originY: "center" as fabric.TOriginY,
   lineHeight: 1,
 };

@@ -230,7 +230,7 @@
   const generatePreviewData = async (page: number): Promise<void> => {
     const fabricTempCanvas = new CustomCanvas(undefined, {
       width: labelProps.size.width,
-      height: labelProps.size.height
+      height: labelProps.size.height,
     });
 
     fabricTempCanvas.setCustomBackground(false);
@@ -238,7 +238,7 @@
 
     fabricTempCanvas.setLabelProps(labelProps);
 
-    await fabricTempCanvas.loadFromJSON(canvasCallback())
+    await fabricTempCanvas.loadFromJSON(canvasCallback());
 
     let variables = {};
 

@@ -53,5 +53,5 @@ export class ImageEditorUtils {
     }
 
     return false;
-  };
+  }
 }

@@ -99,7 +99,7 @@ export class LocalStoragePersistence {
     this.validateAndSaveObject("last_label_props", labelData, LabelPropsSchema);
   }
 
-  static saveLabels(labels: ExportedLabelTemplate[]): {zodErrors: z.ZodError[], otherErrors: Error[]} {
+  static saveLabels(labels: ExportedLabelTemplate[]): { zodErrors: z.ZodError[]; otherErrors: Error[] } {
     const zodErrors: z.ZodError[] = [];
     const otherErrors: Error[] = [];
 
@@ -126,12 +126,13 @@ export class LocalStoragePersistence {
       } catch (e) {
         if (e instanceof z.ZodError) {
           zodErrors.push(e);
-        } if (e instanceof Error) {
+        }
+        if (e instanceof Error) {
           otherErrors.push(e);
         }
       }
     });
-    return {zodErrors, otherErrors};
+    return { zodErrors, otherErrors };
   }
 
   /**
