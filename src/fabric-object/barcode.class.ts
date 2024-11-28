@@ -77,7 +77,9 @@ export class Barcode <
   constructor(options?: Props) {
     super();
     Object.assign(this, barcodeDefaultValues);
-    this.setOptions(options);
+    const {text, ...other} = options ?? {}
+    this.setOptions(other); // Must be set separately because the encoding needs to be set first
+    this.set("text", text);
     this.setControlsVisibility({
       tl: false,
       tr: false,
