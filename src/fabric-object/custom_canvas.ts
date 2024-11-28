@@ -174,7 +174,7 @@ export class CustomCanvas extends fabric.Canvas {
   }
 
   /**
-   * Return new object pos (origin is top-left) if object needs mirroring
+   * Return new object pos (origin is center) if object needs mirroring
    **/
   getMirroredObjectCoords(obj: fabric.FabricObject): { pos: fabric.Point; flip: boolean } | undefined {
     const fold = this.getFoldLine();
@@ -224,7 +224,7 @@ export class CustomCanvas extends fabric.Canvas {
         newObj.setPositionByOrigin(info.pos, "center", "center");
         if (info.flip) {
           newObj.centeredRotation = true;
-          newObj.rotate(180);
+          newObj.rotate((newObj.angle + 180) % 360);
         }
         this.add(newObj);
       }
