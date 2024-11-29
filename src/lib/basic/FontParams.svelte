@@ -1,49 +1,63 @@
+<script context="module" lang="ts">
+  export type ChangeValue = { family: string | undefined; size: number | undefined };
+  export type ChangeEvent = { newValue: ChangeValue };
+</script>
+
 <script lang="ts">
-  import { createEventDispatcher, onMount } from "svelte";
+  import { createEventDispatcher, onDestroy, onMount } from "svelte";
   import { tr } from "../../utils/i18n";
   import MdIcon from "./MdIcon.svelte";
-
-  type ChangeValue = { family: string | undefined; size: number | undefined };
+  import { fontCache } from "../../stores";
+  import type { Unsubscriber } from "svelte/motion";
 
   export let hasFamily: boolean = true;
   export let hasSize: boolean = true;
-  export let family: string = '';
+  export let family: string = "";
   export let size: number = 0;
   export let sizeMin: number = 1;
   export let sizeMax: number = 999;
   export let sizeStep: number = 2;
 
   const dispatch = createEventDispatcher<{
-    change: { newValue: ChangeValue };
+    change: ChangeEvent;
   }>();
 
-  let familys: Record<string, string> = {};
-
   const fontQuerySupported = typeof queryLocalFonts !== "undefined";
+
+  let loading = false;
   async function refreshFonts() {
     if (fontQuerySupported) {
-      window.fontCache = await queryLocalFonts();
+      try {
+        loading = true;
+        fontCache.set(await queryLocalFonts());
+      } finally {
+        loading = false;
+      }
     }
-    resetFamilyAndStyle();
   }
+
+  let families: Record<string, string> = {};
   function resetFamilyAndStyle() {
-    if (window.fontCache) {
-      familys = window.fontCache.reduce(
-        (pv, i) => {
-          pv[i.postscriptName] = `${i.family} - ${i.style}`;
-          return pv;
-        },
-        {} as typeof familys,
-      );
+    if ($fontCache) {
+      families = {
+        "NotoSans-Regular": "Noto Sans - Regular",
+        ...$fontCache.reduce(
+          (pv, i) => {
+            pv[i.postscriptName] = `${i.family} - ${i.style}`;
+            return pv;
+          },
+          {} as typeof families,
+        ),
+      };
     } else {
-      familys = {
+      families = {
         [family]: family,
+        "NotoSans-Regular": "Noto Sans - Regular",
       };
     }
   }
 
   function emitChange(newValue: Partial<ChangeValue>) {
-    // debugger;
     dispatch("change", {
       newValue: {
         ...{ family: family, size },
@@ -52,9 +66,12 @@
     });
   }
 
+  let unsubscriber: Unsubscriber;
   onMount(() => {
     resetFamilyAndStyle();
+    unsubscriber = fontCache.subscribe(resetFamilyAndStyle);
   });
+  onDestroy(() => unsubscriber());
 </script>
 
 {#if hasFamily}
@@ -64,12 +81,12 @@
     </span>
     {#if fontQuerySupported}
       <select class="form-select" value={family} on:change={(e) => emitChange({ family: e.currentTarget.value })}>
-        {#each Object.keys(familys).sort() as family}
-          <option value={family} style="font-family: {family}">{familys[family]}</option>
+        {#each Object.keys(families).sort() as family}
+          <option value={family} style="font-family: {family}">{families[family]}</option>
         {/each}
       </select>
-      <button class="btn btn-secondary" title={$tr("params.text.fetch_fonts")} on:click={refreshFonts}>
-        <MdIcon icon="refresh" />
+      <button class="btn btn-secondary" title={$tr("params.text.fetch_fonts")} on:click={refreshFonts} disabled={loading}>
+        <MdIcon icon="refresh" spin={loading} />
       </button>
     {:else}
       <input
@@ -95,13 +112,13 @@
     <button
       class="btn btn-secondary"
       title={$tr("params.text.font_size.up")}
-      on:click={() => emitChange({ size: Math.min(size > 40 ? Math.round(size * 1.1) : size + 2, sizeMax)})}>
+      on:click={() => emitChange({ size: Math.min(size > 40 ? Math.round(size * 1.1) : size + 2, sizeMax) })}>
       <MdIcon icon="text_increase" />
     </button>
     <button
       class="btn btn-secondary"
       title={$tr("params.text.font_size.down")}
-      on:click={() => emitChange({ size: Math.max(size > 40 ? Math.round(size * 0.9) : size - 2, sizeMin)})}>
+      on:click={() => emitChange({ size: Math.max(size > 40 ? Math.round(size * 0.9) : size - 2, sizeMin) })}>
       <MdIcon icon="text_decrease" />
     </button>
   </div>

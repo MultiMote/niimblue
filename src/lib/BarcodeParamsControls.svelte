@@ -3,11 +3,22 @@
   import { Barcode } from "../fabric-object/barcode";
   import { tr } from "../utils/i18n";
   import MdIcon from "./basic/MdIcon.svelte";
-  import FontParams from "./basic/FontParams.svelte";
+  import FontParams, { type ChangeEvent } from "./basic/FontParams.svelte";
 
   export let selectedObject: fabric.FabricObject | undefined;
   export let valueUpdated: () => void;
   let selectedBarcode: Barcode | undefined;
+
+  function fontChange(e: CustomEvent<ChangeEvent>) {
+    const {
+      newValue: { family, size },
+    } = e.detail;
+    selectedBarcode?.set({
+      fontFamily: family,
+      fontSize: size,
+    });
+    valueUpdated();
+  }
 
   $: {
     selectedBarcode = selectedObject instanceof Barcode ? (selectedObject as Barcode) : undefined;
@@ -55,19 +66,7 @@
   </button>
 
   {#if selectedBarcode.printText}
-    <FontParams
-      family={selectedBarcode.fontFamily}
-      size={selectedBarcode.fontSize}
-      on:change={(e) => {
-        const {
-          newValue: { family, size },
-        } = e.detail;
-        selectedBarcode?.set({
-          fontFamily: family,
-          fontSize: size,
-        });
-        valueUpdated();
-      }} />
+    <FontParams family={selectedBarcode.fontFamily} size={selectedBarcode.fontSize} on:change={fontChange} />
   {/if}
 
   {#if selectedBarcode.encoding === "EAN13"}

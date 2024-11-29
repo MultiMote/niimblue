@@ -34,6 +34,7 @@ export const automation = readable<AutomationProps | undefined>(
     return undefined;
   })()
 );
+export const fontCache = writable<ReadonlyArray<FontData> | undefined>(undefined);
 
 export const initClient = (connectionType: ConnectionType) => {
   printerClient.update((prevClient: NiimbotAbstractClient) => {

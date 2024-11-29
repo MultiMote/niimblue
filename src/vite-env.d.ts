@@ -13,7 +13,3 @@ declare type FontData = {
 };
 
 declare function queryLocalFonts(options?: { postscriptNames?: string[] }): Promise<ReadonlyArray<FontData>>;
-
-interface Window {
-  fontCache: ReadonlyArray<FontData> | undefined;
-}

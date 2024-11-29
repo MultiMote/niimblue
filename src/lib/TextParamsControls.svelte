@@ -34,16 +34,6 @@
     }
   };
 
-  const getFonts = async () => {
-    try {
-      const fonts = await queryLocalFonts();
-      fontFamilies = [OBJECT_DEFAULTS_TEXT.fontFamily, ...new Set(fonts.map((f: FontData) => f.family))].sort();
-      console.log(fontFamilies);
-    } catch (e) {
-      Toasts.error(e);
-    }
-  };
-
   const commit = () => {
     selectedText!.fontSize = Math.max(selectedText!.fontSize!, 1);
     valueUpdated();

@@ -1,9 +1,10 @@
 <script lang="ts">
   import { iconCodepoints, type MaterialIcon } from "../../mdi_icons";
   export let icon: MaterialIcon;
+  export let spin: boolean = false;
 </script>
 
-<span class="mdi {$$restProps.class || ''}">
+<span class="mdi {spin ? 'spinner' : ''} {$$restProps.class || ''}">
   {String.fromCodePoint(iconCodepoints[icon])}
 </span>
 
@@ -30,5 +31,13 @@
 
   .mdi.r-90 {
     transform: rotate(90deg);
+  }
+
+  .spinner {
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); } /* 起始状态 */
+    100% { transform: rotate(360deg); } /* 结束状态 */
   }
 </style>

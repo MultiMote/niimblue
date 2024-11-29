@@ -45,7 +45,7 @@ export const OBJECT_DEFAULTS_VECTOR = {
 export const OBJECT_DEFAULTS_TEXT = {
   ...OBJECT_DEFAULTS,
   fill: "black",
-  fontFamily: "Verdana",
+  fontFamily: "NotoSans-Regular",
   textAlign: "center" as CanvasTextAlign,
   originX: "center" as fabric.TOriginX,
   originY: "center" as fabric.TOriginY,
