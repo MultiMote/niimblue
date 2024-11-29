@@ -70,7 +70,7 @@ export class Barcode<
   /**
    * Font family
    * @type string
-   * @default "Noto Sans Variable"
+   * @default "Verdana"
    */
   declare fontFamily: string;
 

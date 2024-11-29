@@ -3,6 +3,7 @@
   import { Barcode } from "../fabric-object/barcode";
   import { tr } from "../utils/i18n";
   import MdIcon from "./basic/MdIcon.svelte";
+  import FontParams from "./basic/FontParams.svelte";
 
   export let selectedObject: fabric.FabricObject | undefined;
   export let valueUpdated: () => void;
@@ -53,20 +54,21 @@
     123
   </button>
 
-  <div class="input-group input-group-sm flex-nowrap">
-    <span class="input-group-text" title={$tr("params.barcode.font_size")}>
-      <MdIcon icon="format_size" />
-    </span>
-    <input
-      class="barcode-width form-control"
-      type="number"
-      min="1"
-      value={selectedBarcode.fontSize}
-      on:input={(e) => {
-        selectedBarcode?.set("fontSize", e.currentTarget.valueAsNumber ?? 12);
+  {#if selectedBarcode.printText}
+    <FontParams
+      family={selectedBarcode.fontFamily}
+      size={selectedBarcode.fontSize}
+      on:change={(e) => {
+        const {
+          newValue: { family, size },
+        } = e.detail;
+        selectedBarcode?.set({
+          fontFamily: family,
+          fontSize: size,
+        });
         valueUpdated();
       }} />
-  </div>
+  {/if}
 
   {#if selectedBarcode.encoding === "EAN13"}
     <div class="input-group input-group-sm flex-nowrap">

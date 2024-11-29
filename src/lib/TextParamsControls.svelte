@@ -4,6 +4,7 @@
   import MdIcon from "./basic/MdIcon.svelte";
   import { Toasts } from "../utils/toasts";
   import { OBJECT_DEFAULTS_TEXT } from "../defaults";
+  import FontParams from "./basic/FontParams.svelte";
 
   export let selectedObject: fabric.FabricObject;
   export let valueUpdated: () => void;
@@ -133,38 +134,22 @@
     <MdIcon icon="invert_colors" />
   </button>
 
-  <div class="input-group flex-nowrap input-group-sm font-size">
-    <span class="input-group-text" title={$tr("params.text.font_size")}><MdIcon icon="format_size" /></span>
-    <input
-      type="number"
-      min="1"
-      max="999"
-      step="2"
-      class="form-control"
-      value={selectedText.fontSize}
-      on:input={(e) => {
-        selectedText?.set("fontSize", e.currentTarget.valueAsNumber ?? 1);
-        commit();
-      }} />
-    <button
-      class="btn btn-secondary"
-      title={$tr("params.text.font_size.up")}
-      on:click={() => {
-        selectedText?.set("fontSize", selectedText.fontSize + (selectedText.fontSize > 40 ? 10 : 2));
-        commit();
-      }}>
-      <MdIcon icon="text_increase" />
-    </button>
-    <button
-      class="btn btn-secondary"
-      title={$tr("params.text.font_size.down")}
-      on:click={() => {
-        selectedText?.set("fontSize", selectedText.fontSize - (selectedText.fontSize > 40 ? 10 : 2));
-        commit();
-      }}>
-      <MdIcon icon="text_decrease" />
-    </button>
-  </div>
+  <FontParams
+    hasFamily
+    hasSize
+    family={selectedText.fontFamily}
+    size={selectedText.fontSize}
+    on:change={(e) => {
+      const {
+        newValue: { family, size },
+      } = e.detail;
+      console.log(family, size);
+      selectedText?.set({
+        fontSize: size,
+        fontFamily: family,
+      });
+      commit();
+    }} />
 
   <div class="input-group flex-nowrap input-group-sm">
     <span class="input-group-text" title={$tr("params.text.line_height")}>
@@ -183,37 +168,6 @@
       }} />
   </div>
 
-  <div class="input-group flex-nowrap input-group-sm font-family">
-    <span class="input-group-text" title={$tr("params.text.font_family")}>
-      <MdIcon icon="text_format" />
-    </span>
-    {#if fontQuerySupported}
-      <select
-        class="form-select"
-        value={selectedText.fontFamily}
-        on:change={(e) => {
-          selectedText?.set("fontFamily", e.currentTarget.value);
-          commit();
-        }}>
-        {#each fontFamilies as font}
-          <option value={font} style="font-family: {font}">{font}</option>
-        {/each}
-      </select>
-      <button class="btn btn-secondary" on:click={getFonts} title={$tr("params.text.fetch_fonts")}>
-        <MdIcon icon="refresh" />
-      </button>
-    {:else}
-      <input
-        type="text"
-        class="form-control"
-        value={selectedText.fontFamily}
-        on:input={(e) => {
-          selectedText?.set("fontFamily", e.currentTarget.value);
-          commit();
-        }} />
-    {/if}
-  </div>
-
   <button class="btn btn-sm btn-secondary" on:click={editInPopup} title={$tr("params.text.edit")}>
     <MdIcon icon="edit" />
   </button>
@@ -222,11 +176,5 @@
 <style>
   .input-group {
     width: 7em;
-  }
-  .font-size {
-    width: 12em;
-  }
-  .font-family {
-    width: 16em;
   }
 </style>
