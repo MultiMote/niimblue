@@ -30,6 +30,13 @@ export class CustomCanvas extends fabric.Canvas {
         this.virtualZoomIn();
       }
     });
+    this.on("mouse:down:before", (opt) => {
+      const event = opt.e as MouseEvent;
+      if (event.button == 1) {
+        event.preventDefault();
+        this.resetVirtualZoom();
+      }
+    });
   }
 
   public virtualZoom(newZoom: number) {
