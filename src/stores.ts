@@ -16,6 +16,9 @@ import {
 import { Toasts } from "./utils/toasts";
 import { tr } from "./utils/i18n";
 import { LocalStoragePersistence } from "./utils/persistence";
+import { OBJECT_DEFAULTS_TEXT } from "./defaults";
+
+export const fontCache = writable<string[]>([OBJECT_DEFAULTS_TEXT.fontFamily]);
 
 export const connectionState = writable<ConnectionState>("disconnected");
 export const connectedPrinterName = writable<string>("");

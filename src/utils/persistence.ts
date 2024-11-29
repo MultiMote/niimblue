@@ -244,4 +244,18 @@ export class LocalStoragePersistence {
   static hasCustomDefaultTemplate(): boolean {
     return "default_template" in localStorage;
   }
+
+  /**
+   * @throws {z.ZodError}
+   */
+  static saveCachedFonts(fonts: string[]) {
+    this.validateAndSaveObject("font_cache", fonts, z.array(z.string()));
+  }
+
+  /**
+   * @throws {z.ZodError}
+   */
+  static loadCachedFonts(): string[] {
+    return this.loadAndValidateObject("font_cache", z.array(z.string())) ?? [];
+  }
 }
