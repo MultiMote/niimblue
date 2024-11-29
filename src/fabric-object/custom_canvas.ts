@@ -11,6 +11,60 @@ export class CustomCanvas extends fabric.Canvas {
   private readonly MIRROR_GHOST_COLOR = "rgba(0, 0, 0, 0.3)";
   private customBackground: boolean = true;
   private highlightMirror: boolean = true;
+  private virtualZoomRatio: number = 1;
+
+  constructor(el?: string | HTMLCanvasElement, options?: fabric.TOptions<fabric.CanvasOptions>) {
+    super(el, options);
+    this.setupZoom();
+  }
+
+  private setupZoom() {
+    this.on("mouse:wheel", (opt) => {
+      const event = opt.e as WheelEvent;
+      event.preventDefault();
+
+      const delta = event.deltaY;
+      if (delta > 0) {
+        this.virtualZoomOut();
+      } else {
+        this.virtualZoomIn();
+      }
+    });
+    this.on("mouse:down:before", (opt) => {
+      const event = opt.e as MouseEvent;
+      if (event.button == 1) {
+        event.preventDefault();
+        this.resetVirtualZoom();
+      }
+    });
+  }
+
+  public virtualZoom(newZoom: number) {
+    this.virtualZoomRatio = Math.min(Math.max(0.25, newZoom), 4);
+    this.setDimensions(
+      {
+        width: this.virtualZoomRatio * this.getWidth() + "px",
+        height: this.virtualZoomRatio * this.getHeight() + "px",
+      },
+      { cssOnly: true }
+    );
+  }
+
+  public virtualZoomIn() {
+    this.virtualZoom(this.virtualZoomRatio * 1.05);
+  }
+
+  public virtualZoomOut() {
+    this.virtualZoom(this.virtualZoomRatio * 0.95);
+  }
+
+  public getVirtualZoom(): number {
+    return this.virtualZoomRatio;
+  }
+
+  public resetVirtualZoom() {
+    this.virtualZoom(1);
+  }
 
   setLabelProps(value: LabelProps) {
     this.labelProps = value;
