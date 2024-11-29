@@ -25,9 +25,9 @@ export class CustomCanvas extends fabric.Canvas {
 
       const delta = event.deltaY;
       if (delta > 0) {
-        this.virtualZoomIn();
-      } else {
         this.virtualZoomOut();
+      } else {
+        this.virtualZoomIn();
       }
     });
   }
