@@ -11,6 +11,7 @@ import { OBJECT_DEFAULTS, THUMBNAIL_HEIGHT, THUMBNAIL_QUALITY } from "../default
 import { z } from "zod";
 import { FileSharer } from "@byteowls/capacitor-filesharer";
 import { Toasts } from "./toasts";
+import { CustomCanvas } from "../fabric-object/custom_canvas";
 
 export class FileUtils {
   static timestamp(): number {
@@ -140,6 +141,9 @@ export class FileUtils {
     await canvas.loadFromJSON(state, (_, obj) => {
       if ("set" in obj) obj.set({ snapAngle: OBJECT_DEFAULTS.snapAngle });
     });
+    if (canvas instanceof CustomCanvas) {
+      canvas.virtualZoom(canvas.getVirtualZoom())
+    }
     canvas.requestRenderAll();
   }
 }
