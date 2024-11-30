@@ -70,6 +70,30 @@
     printProgress = 0;
   };
 
+  const onPrintOnSystemPrinter = async () => {
+    const src = previewCanvas.toDataURL("image/png");
+
+    const win = window.open("about:blank", "_new");
+
+    if (win === null) {
+      Toasts.error("Window open error");
+      return;
+    }
+
+    win.document.open();
+    win.document.write(
+      `
+          <html>
+             <head>
+             </head>
+             <body onload="window.print()" onafterprint="window.close()">
+                 <img src="${src}"/>
+             </body>
+          </html
+      `,
+    );
+    win.document.close();
+  };
   const onPrint = async () => {
     printState = "sending";
     error = "";
@@ -491,6 +515,10 @@
           </button>
         {/if}
 
+        <button type="button" class="btn btn-primary" on:click={onPrintOnSystemPrinter}>
+          <MdIcon icon="print" />
+        </button>
+        
         <button type="button" class="btn btn-primary" disabled={$disconnected || printState !== "idle"} on:click={onPrint}>
           {#if $disconnected}
             {$tr("preview.not_connected")}
@@ -498,6 +526,7 @@
             <MdIcon icon="print" /> {$tr("preview.print")}
           {/if}
         </button>
+
       </div>
     </div>
   </div>
