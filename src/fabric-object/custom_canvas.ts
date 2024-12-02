@@ -2,6 +2,8 @@ import * as fabric from "fabric";
 import { DEFAULT_LABEL_PROPS } from "../defaults";
 import type { LabelProps } from "../types";
 
+type LabelBounds = { startX: number; startY: number; endX: number; endY: number; width: number; height: number };
+
 export class CustomCanvas extends fabric.Canvas {
   private labelProps: LabelProps = DEFAULT_LABEL_PROPS;
   private readonly SEPARATOR_LINE_WIDTH = 2;
@@ -80,7 +82,7 @@ export class CustomCanvas extends fabric.Canvas {
   }
 
   /** Get label bounds without tail */
-  getLabelBounds(): { startX: number; startY: number; endX: number; endY: number } {
+  getLabelBounds(): LabelBounds {
     let endX = this.width ?? 1;
     let endY = this.height ?? 1;
     let startX = 0;
@@ -96,7 +98,10 @@ export class CustomCanvas extends fabric.Canvas {
       startY += this.labelProps.tailLength ?? 0;
     }
 
-    return { startX, startY, endX, endY };
+    let width = endX - startX;
+    let height = endY - startY;
+
+    return { startX, startY, endX, endY, width, height };
   }
 
   /** Get fold line position for splitted labels */
@@ -278,5 +283,49 @@ export class CustomCanvas extends fabric.Canvas {
         this.add(newObj);
       }
     }
+  }
+
+  /** Centers object horizontally in the canvas or label part */
+  override centerObjectH(object: fabric.FabricObject): void {
+    if ((this.labelProps.split ?? "none") !== "none") {
+      const pos = object.getPointByOrigin("center", "center");
+      const bounds = this.getLabelBounds();
+      const centerX = bounds.startX + bounds.width / 2;
+
+      if (this.labelProps.split === "horizontal") {
+        pos.setX(centerX);
+      } else if (pos.x < centerX) {
+        pos.setX(centerX - bounds.width / 4);
+      } else {
+        pos.setX(centerX + bounds.width / 4);
+      }
+
+      object.setPositionByOrigin(pos, "center", "center");
+      return;
+    }
+
+    super.centerObjectH(object);
+  }
+
+  /** Centers object vertically in the canvas or label part */
+  override centerObjectV(object: fabric.FabricObject): void {
+    if ((this.labelProps.split ?? "none") !== "none") {
+      const pos = object.getPointByOrigin("center", "center");
+      const bounds = this.getLabelBounds();
+      const centerY = bounds.startY + bounds.height / 2;
+
+      if (this.labelProps.split === "vertical") {
+        pos.setY(centerY);
+      } else if (pos.y < centerY) {
+        pos.setY(centerY - bounds.height / 4);
+      } else {
+        pos.setY(centerY + bounds.height / 4);
+      }
+
+      object.setPositionByOrigin(pos, "center", "center");
+      return;
+    }
+
+    super.centerObjectV(object);
   }
 }
