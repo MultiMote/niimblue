@@ -3,12 +3,15 @@ apply plugin: 'com.android.application'
 android {
     namespace "ru.mmote.niimblues"
     compileSdk rootProject.ext.compileSdkVersion
+
+    def appVersionCode = Integer.valueOf(System.getenv("APP_VERSION_CODE") ?: "1")
+
     defaultConfig {
         applicationId "ru.mmote.niimblues"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode appVersionCode
+        versionName "0.0.${appVersionCode}"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

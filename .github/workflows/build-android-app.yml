@@ -74,6 +74,7 @@ jobs:
           KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEYSTORE_ALIAS_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          APP_VERSION_CODE: ${{ github.run_number }}
 
       - name: Upload apk to Artifacts
         uses: actions/upload-artifact@v4
