@@ -83,17 +83,17 @@
     win.document.open();
     win.document.write(
       `
-          <html>
-             <head>
-              <style>
-              html, body { margin: 0; }
-              img { width: 100vw; image-rendering: pixelated; }
-              </style>
-             </head>
-             <body onload="window.print()" onafterprint="window.close()">
-                 <img src="${src}"/>
-             </body>
-          </html
+        <html>
+            <head>
+            <style>
+            html, body { margin: 0; }
+            img { width: 100vw; image-rendering: pixelated; }
+            </style>
+            </head>
+            <body onload="window.print()" onafterprint="window.close()">
+                <img src="${src}"/>
+            </body>
+        </html>
       `,
     );
     win.document.close();
