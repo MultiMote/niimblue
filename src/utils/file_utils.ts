@@ -149,18 +149,18 @@ export class FileUtils {
 
   static printImageUrl(src: string) {
     const html = `
-        <html>
-            <head>
-            <style>
-            html, body { margin: 0; }
-            img { width: 100vw; image-rendering: pixelated; }
-            </style>
-            </head>
-            <body onload="/*window.print()*/" onafterprint="window.close()">
-                <img src="${src}"/>
-            </body>
-        </html>
-      `;
+    <html>
+      <head>
+        <style>
+          html, body { margin: 0; padding: 0; }
+          img { display: block; width: 100vw; height: 100vh; image-rendering: pixelated; }
+        </style>
+      </head>
+      <body>
+        <img src="${src}"/>
+      </body>
+    </html>
+    `;
 
     const iframe = document.createElement("iframe");
 
