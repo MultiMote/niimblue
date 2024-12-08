@@ -519,7 +519,7 @@
           </button>
         {/if}
 
-        <button type="button" class="btn btn-primary" on:click={onPrintOnSystemPrinter}>
+        <button type="button" class="btn btn-secondary" title={$tr("preview.print.system")} on:click={onPrintOnSystemPrinter}>
           <MdIcon icon="print" />
         </button>
 
