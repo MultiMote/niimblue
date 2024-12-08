@@ -142,8 +142,38 @@ export class FileUtils {
       if ("set" in obj) obj.set({ snapAngle: OBJECT_DEFAULTS.snapAngle });
     });
     if (canvas instanceof CustomCanvas) {
-      canvas.virtualZoom(canvas.getVirtualZoom())
+      canvas.virtualZoom(canvas.getVirtualZoom());
     }
     canvas.requestRenderAll();
+  }
+
+  static printImageUrl(src: string) {
+    const html = `
+        <html>
+            <head>
+            <style>
+            html, body { margin: 0; }
+            img { width: 100vw; image-rendering: pixelated; }
+            </style>
+            </head>
+            <body onload="/*window.print()*/" onafterprint="window.close()">
+                <img src="${src}"/>
+            </body>
+        </html>
+      `;
+
+    const iframe = document.createElement("iframe");
+
+    iframe.onload = () => {
+      const iframeWindow = iframe.contentWindow!;
+      iframeWindow.onafterprint = () => iframe.remove();
+      iframeWindow.print();
+    };
+
+    iframe.style.display = "none";
+    iframe.src = "about:blank";
+    iframe.srcdoc = html;
+
+    document.body.appendChild(iframe);
   }
 }

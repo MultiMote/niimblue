@@ -21,6 +21,7 @@
   import MdIcon from "./basic/MdIcon.svelte";
   import { Toasts } from "../utils/toasts";
   import { CustomCanvas } from "../fabric-object/custom_canvas";
+  import { FileUtils } from "../utils/file_utils";
 
   export let onClosed: () => void;
   export let labelProps: LabelProps;
@@ -71,33 +72,10 @@
   };
 
   const onPrintOnSystemPrinter = async () => {
-    const src = previewCanvas.toDataURL("image/png");
-
-    const win = window.open("about:blank", "_new");
-
-    if (win === null) {
-      Toasts.error("Window open error");
-      return;
-    }
-
-    win.document.open();
-    win.document.write(
-      `
-        <html>
-            <head>
-            <style>
-            html, body { margin: 0; }
-            img { width: 100vw; image-rendering: pixelated; }
-            </style>
-            </head>
-            <body onload="window.print()" onafterprint="window.close()">
-                <img src="${src}"/>
-            </body>
-        </html>
-      `,
-    );
-    win.document.close();
+    const src: string = previewCanvas.toDataURL("image/png");
+    FileUtils.printImageUrl(src);
   };
+
   const onPrint = async () => {
     printState = "sending";
     error = "";
