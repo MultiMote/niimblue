@@ -12,6 +12,12 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+permissions:
+  # Release upload permission
+  contents: write
 
 jobs:
   build-app:
@@ -68,11 +74,15 @@ jobs:
           KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEYSTORE_ALIAS_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          APP_VERSION_CODE: ${{ github.run_number }}
 
       - name: Upload apk to Artifacts
         uses: actions/upload-artifact@v4
         with:
            name: app
            path: ./capacitor/android/app/build/outputs/apk/release/app-release-signed.apk
+
+      - name: Update release
+        run: gh release upload snapshot ./capacitor/android/app/build/outputs/apk/release/app-release-signed.apk -R ${{github.repository}} --clobber
 
 

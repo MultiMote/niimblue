@@ -18,6 +18,17 @@ Run debug build on android device (adb)
 yarn run-android
 ```
 
-To see console, go to `vivaldi:inspect/#devices` on desktop chrome browser and select niimblue on your device.
+Or build release apk (`apksigner` should be in your PATH):
+
+```bash
+export KEYSTORE_PATH=/path/to/keystore.jks
+export KEYSTORE_ALIAS=your_alias_name
+export KEYSTORE_PASSWORD=pa$$word
+export KEYSTORE_ALIAS_PASSWORD=pa$$word
+
+yarn build-android
+```
+
+To see console, go to `chrome:inspect/#devices` on desktop chrome browser and select niimblue on your device.
 
 To get prebuilt apk, see the latest artifact in [build-android-app](https://github.com/MultiMote/niimblue/actions/workflows/build-android-app.yml) Actions task.
