@@ -118,6 +118,7 @@
     "preview.postprocess": "Постобработка",
     "preview.print_task": "Задача печати",
     "preview.print.cancel": "Отменить печать",
+    "preview.print.system": "Печатать с помощью принтера ОС",
     "preview.print": "Печать",
     "preview.threshold": "Порог",
     "preview.title": "Предпросмотр печати",

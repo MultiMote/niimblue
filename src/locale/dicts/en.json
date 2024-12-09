@@ -119,6 +119,7 @@
     "preview.postprocess": "Post-process",
     "preview.print_task": "Print task",
     "preview.print.cancel": "Cancel print",
+    "preview.print.system": "Print with OS printer",
     "preview.print": "Print",
     "preview.threshold": "Threshold",
     "preview.title": "Print preview"

@@ -21,6 +21,7 @@
   import MdIcon from "./basic/MdIcon.svelte";
   import { Toasts } from "../utils/toasts";
   import { CustomCanvas } from "../fabric-object/custom_canvas";
+  import { FileUtils } from "../utils/file_utils";
 
   export let onClosed: () => void;
   export let labelProps: LabelProps;
@@ -68,6 +69,19 @@
 
     printState = "idle";
     printProgress = 0;
+  };
+
+  const onPrintOnSystemPrinter = async () => {
+    const sources: string[] = [];
+
+    for (let curPage = 0; curPage < pagesTotal; curPage++) {
+      page = curPage;
+      await generatePreviewData(page);
+      sources.push(previewCanvas.toDataURL("image/png"))
+    }
+    
+
+    FileUtils.printImageUrls(sources);
   };
 
   const onPrint = async () => {
@@ -491,6 +505,10 @@
           </button>
         {/if}
 
+        <button type="button" class="btn btn-secondary" title={$tr("preview.print.system")} on:click={onPrintOnSystemPrinter}>
+          <MdIcon icon="print" />
+        </button>
+
         <button type="button" class="btn btn-primary" disabled={$disconnected || printState !== "idle"} on:click={onPrint}>
           {#if $disconnected}
             {$tr("preview.not_connected")}
@@ -498,6 +516,7 @@
             <MdIcon icon="print" /> {$tr("preview.print")}
           {/if}
         </button>
+
       </div>
     </div>
   </div>
