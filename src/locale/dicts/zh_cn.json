@@ -121,5 +121,6 @@
     "preview.print": "打印",
     "preview.threshold": "阈值",
     "preview.title": "打印预览",
-    "params.label.mirror": "镜像元素"
+    "params.label.mirror": "镜像元素",
+    "preview.print.system": "使用系统打印接口打印"
 }
