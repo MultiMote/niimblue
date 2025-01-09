@@ -102,10 +102,13 @@
 
       Toasts.message("Flashing is finished, the printer will shut down now");
     } catch (e) {
-      Toasts.error(e);
       $printerClient.startHeartbeat();
       $printerClient.off("firmwareprogress", listener);
+      
+      Toasts.error(e);
     }
+
+    fwProgress = "";
   };
 
   const switchConnectionType = (c: ConnectionType) => {
