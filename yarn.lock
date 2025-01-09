@@ -183,14 +183,15 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@mmote/niimbluelib@0.0.1-alpha.21":
-  version "0.0.1-alpha.21"
-  resolved "https://registry.yarnpkg.com/@mmote/niimbluelib/-/niimbluelib-0.0.1-alpha.21.tgz#35b2c31094070c69aec4663521ce64475662ebfb"
-  integrity sha512-wSJ1d7VgLwl6G71DOmKITX7XX1OypZaPNim+Aa2Dpa6nyifo1v8WrYOr4aKGGJzZt1oSxQ+spWv2thsQrX2Baw==
+"@mmote/niimbluelib@0.0.1-alpha.22":
+  version "0.0.1-alpha.22"
+  resolved "https://registry.yarnpkg.com/@mmote/niimbluelib/-/niimbluelib-0.0.1-alpha.22.tgz#34ee209616dcf3988a063eb154d83251315928d6"
+  integrity sha512-XsD9DyyD7RaNlZwqZinLopFy6knjov1JU4nnrA9iqJ4Tdv5sDu6WFHdUKR8Ip8+fkJ7sBF6UHi7y+Ucc4A5wIg==
   dependencies:
     "@capacitor-community/bluetooth-le" "^6.0.2"
     "@capacitor/core" "^6.0.0"
     async-mutex "^0.5.0"
+    crc-32 "^1.2.2"
     eventemitter3 "^5.0.1"
 
 "@popperjs/core@^2.11.8", "@popperjs/core@^2.9.2":
@@ -506,6 +507,11 @@ concat-map@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
   integrity sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==
+
+crc-32@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/crc-32/-/crc-32-1.2.2.tgz#3cad35a934b8bf71f25ca524b6da51fb7eace2ff"
+  integrity sha512-ROmzCKrTnOwybPcJApAA6WBWij23HVfGVNKqqrZpuyZOHqK2CwHSvpGuyt/UNNvaIjEd8X5IFGp4Mh+Ie1IHJQ==
 
 css-tree@^2.3.1:
   version "2.3.1"

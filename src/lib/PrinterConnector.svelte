@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+    FirmwareProgressEvent,
     NiimbotCapacitorBleClient,
     SoundSettingsItemType,
     Utils,
@@ -24,10 +25,13 @@
   import { onMount } from "svelte";
   import { LocalStoragePersistence } from "../utils/persistence";
   import type { MaterialIcon } from "material-icons";
+  import { FileUtils } from "../utils/file_utils";
 
   let connectionType: ConnectionType = "bluetooth";
   let rfidInfo: RfidInfo | undefined = undefined;
   let featureSupport: AvailableTransports = { webBluetooth: false, webSerial: false, capacitorBle: false };
+  let fwVersion: string = "";
+  let fwProgress: string = "";
 
   const onConnectClicked = async () => {
     initClient(connectionType);
@@ -74,6 +78,34 @@
 
   const reset = async () => {
     await $printerClient.abstraction.printerReset();
+  };
+
+  const upgradeFw = async () => {
+    if (!confirm("Flashing wrong firmware can make your printer dead. Are you sure?")) {
+      return;
+    }
+
+    const data = await FileUtils.pickAndReadBinaryFile("bin");
+
+    const listener = (e: FirmwareProgressEvent) => {
+      fwProgress = `${e.currentChunk}/${e.totalChunks}`;
+    };
+
+    $printerClient.stopHeartbeat();
+
+    try {
+      $printerClient.on("firmwareprogress", listener);
+      fwProgress = "...";
+      await $printerClient.abstraction.firmwareUpgrade(data, fwVersion);
+      $printerClient.off("firmwareprogress", listener);
+      await $printerClient.disconnect();
+
+      Toasts.message("Flashing is finished, the printer will shut down now");
+    } catch (e) {
+      Toasts.error(e);
+      $printerClient.startHeartbeat();
+      $printerClient.off("firmwareprogress", listener);
+    }
   };
 
   const switchConnectionType = (c: ConnectionType) => {
@@ -133,8 +165,15 @@
       {/if}
 
       {#if $printerMeta}
-        <div>
-          Model metadata:
+        <button
+          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#modelMeta">
+          Model metadata <MdIcon icon="expand_more" />
+        </button>
+
+        <div class="collapse" id="modelMeta">
           <ul>
             {#each Object.entries($printerMeta) as [k, v]}
               <li>{k}: <strong>{v ?? "-"}</strong></li>
@@ -144,8 +183,15 @@
       {/if}
 
       {#if rfidInfo}
-        <div>
-          Rfid info:
+        <button
+          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#rfidInfo">
+          Rfid info <MdIcon icon="expand_more" />
+        </button>
+
+        <div class="collapse" id="rfidInfo">
           <ul>
             {#each Object.entries(rfidInfo) as [k, v]}
               <li>{k}: <strong>{v ?? "-"}</strong></li>
@@ -155,8 +201,15 @@
       {/if}
 
       {#if $heartbeatData}
-        <div>
-          Heartbeat data:
+        <button
+          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#heartbeatData">
+          Heartbeat data <MdIcon icon="expand_more" />
+        </button>
+
+        <div class="collapse" id="heartbeatData">
           <ul>
             {#each Object.entries($heartbeatData) as [k, v]}
               <li>{k}: <strong>{v ?? "-"}</strong></li>
@@ -165,15 +218,35 @@
         </div>
       {/if}
 
-      <div>Tests</div>
+      <div class="input-group input-group-sm mt-1">
+        {#if fwProgress}
+          <span class="input-group-text">Uploading {fwProgress}</span>
+        {:else}
+          <button class="btn btn-sm btn-primary" on:click={upgradeFw} disabled={!!fwProgress}>Upgrade FW</button>
+          <span class="input-group-text">To version</span>
+          <input class="form-control" placeholder="x.x" type="text" size="6" bind:value={fwVersion} />
+        {/if}
+      </div>
 
-      <button class="btn btn-sm btn-primary" on:click={getRfidInfo}>Rfid</button>
-      <button class="btn btn-sm btn-primary" on:click={startHeartbeat}>Heartbeat on</button>
-      <button class="btn btn-sm btn-primary" on:click={stopHeartbeat}>Heartbeat off</button>
-      <button class="btn btn-sm btn-primary" on:click={soundOn}>Sound on</button>
-      <button class="btn btn-sm btn-primary" on:click={soundOff}>Sound off</button>
-      <button class="btn btn-sm btn-primary" on:click={fetchInfo}>Fetch info again</button>
-      <button class="btn btn-sm btn-primary" on:click={reset}>Reset</button>
+      <button
+        class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#tests">
+        Tests <MdIcon icon="expand_more" />
+      </button>
+
+      <div class="collapse" id="tests">
+        <div class="d-flex flex-wrap gap-1 mt-1">
+          <button class="btn btn-sm btn-primary" on:click={getRfidInfo}>Rfid</button>
+          <button class="btn btn-sm btn-primary" on:click={startHeartbeat}>Heartbeat on</button>
+          <button class="btn btn-sm btn-primary" on:click={stopHeartbeat}>Heartbeat off</button>
+          <button class="btn btn-sm btn-primary" on:click={soundOn}>Sound on</button>
+          <button class="btn btn-sm btn-primary" on:click={soundOff}>Sound off</button>
+          <button class="btn btn-sm btn-primary" on:click={fetchInfo}>Fetch info again</button>
+          <button class="btn btn-sm btn-primary" on:click={reset}>Reset</button>
+        </div>
+      </div>
     </div>
     <span class="input-group-text {$heartbeatFails > 0 ? 'text-warning' : ''}">
       {$printerMeta?.model ?? $connectedPrinterName}

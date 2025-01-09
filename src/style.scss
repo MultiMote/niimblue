@@ -11,6 +11,7 @@
 @import "bootstrap/scss/close";
 @import "bootstrap/scss/progress";
 @import "bootstrap/scss/alert";
+@import "bootstrap/scss/transitions";
 @import "font";
 
 body {
@@ -21,4 +22,10 @@ body {
   background: var(--bs-danger-bg-subtle);
   border: 1px solid var(--bs-danger-border-subtle);
   color: var(--bs-danger-text-emphasis);
+}
+
+.toastify.toast-info {
+  background: var(--bs-success-bg-subtle);
+  border: 1px solid var(--bs-success-border-subtle);
+  color: var(--bs-success-text-emphasis);
 }

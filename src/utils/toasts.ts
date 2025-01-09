@@ -13,6 +13,15 @@ export class Toasts {
     }).showToast();
   }
 
+  static message(text: string) {
+    Toastify({
+      text,
+      gravity: "bottom",
+      duration: 5000,
+      className: "toast-info",
+    }).showToast();
+  }
+
   static zodErrors(e: any, prefix: string) {
     if (e instanceof z.ZodError) {
       e.issues.forEach((i) => {
