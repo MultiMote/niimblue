@@ -11,7 +11,7 @@
   "dependencies": {
     "@byteowls/capacitor-filesharer": "^6.0.0",
     "@capacitor-community/bluetooth-le": "^6.0.2",
-    "@capacitor/android": "^6.1.2",
+    "@capacitor/android": "^6.2.0",
     "@capacitor/core": "^6.1.2",
     "@capacitor/splash-screen": "^6.0.2"
   },
