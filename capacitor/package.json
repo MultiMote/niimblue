@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "@^6.1.2"
+    "@capacitor/cli": "^6.1.2"
   },
   "author": "MultiMote",
   "license": "MIT"
