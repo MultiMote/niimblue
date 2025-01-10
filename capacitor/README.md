@@ -3,6 +3,7 @@
 Install dependencies
 
 ```bash
+yarn --cwd .. install
 yarn install
 ```
 
