@@ -44,6 +44,7 @@
   let printNow: boolean = false;
   let csvData: string = "";
   let csvEnabled: boolean = false;
+  let windowWidth: number = 0;
 
   const undo = new UndoRedo();
   let undoState: UndoState = { undoDisabled: false, redoDisabled: false };
@@ -359,11 +360,11 @@
   $: fabricCanvas?.setLabelProps(labelProps);
 </script>
 
-<svelte:window on:keydown={onKeyDown} on:paste={onPaste} />
+<svelte:window bind:innerWidth={windowWidth} on:keydown={onKeyDown} on:paste={onPaste} />
 
 <div class="image-editor">
   <div class="row mb-3">
-    <div class="col d-flex {labelProps.size.width < window.innerWidth ? 'justify-content-center' : ''}">
+    <div class="col d-flex {windowWidth === 0 || labelProps.size.width < windowWidth ? 'justify-content-center' : ''}">
       <div class="canvas-wrapper print-start-{labelProps.printDirection}">
         <canvas bind:this={htmlCanvas}></canvas>
       </div>
