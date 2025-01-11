@@ -19,6 +19,9 @@ const config: CapacitorConfig = {
       signingType: "apksigner",
     },
   },
+  ios: {
+    scheme: "NiimBlues",
+  },
 };
 
 export default config;

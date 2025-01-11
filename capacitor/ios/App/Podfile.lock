@@ -1,0 +1,40 @@
+PODS:
+  - ByteowlsCapacitorFilesharer (6.0.0):
+    - Capacitor
+  - Capacitor (6.2.0):
+    - CapacitorCordova
+  - CapacitorCommunityBluetoothLe (6.0.2):
+    - Capacitor
+  - CapacitorCordova (6.2.0)
+  - CapacitorSplashScreen (6.0.2):
+    - Capacitor
+
+DEPENDENCIES:
+  - "ByteowlsCapacitorFilesharer (from `../../node_modules/@byteowls/capacitor-filesharer`)"
+  - "Capacitor (from `../../node_modules/@capacitor/ios`)"
+  - "CapacitorCommunityBluetoothLe (from `../../node_modules/@capacitor-community/bluetooth-le`)"
+  - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
+  - "CapacitorSplashScreen (from `../../node_modules/@capacitor/splash-screen`)"
+
+EXTERNAL SOURCES:
+  ByteowlsCapacitorFilesharer:
+    :path: "../../node_modules/@byteowls/capacitor-filesharer"
+  Capacitor:
+    :path: "../../node_modules/@capacitor/ios"
+  CapacitorCommunityBluetoothLe:
+    :path: "../../node_modules/@capacitor-community/bluetooth-le"
+  CapacitorCordova:
+    :path: "../../node_modules/@capacitor/ios"
+  CapacitorSplashScreen:
+    :path: "../../node_modules/@capacitor/splash-screen"
+
+SPEC CHECKSUMS:
+  ByteowlsCapacitorFilesharer: ea14537059851aed44df8c52f0984f61cd34f53b
+  Capacitor: 1f3c7b9802d958cd8c4eb63895fff85dff2e1eea
+  CapacitorCommunityBluetoothLe: 2eeceb48d1a47cfc4018038675ec1568bdf23859
+  CapacitorCordova: b33e7f4aa4ed105dd43283acdd940964374a87d9
+  CapacitorSplashScreen: 250df9ef8014fac5c7c1fd231f0f8b1d8f0b5624
+
+PODFILE CHECKSUM: a9553b674dd6db547ffcf7cc3a41359b0393e5e4
+
+COCOAPODS: 1.16.2
