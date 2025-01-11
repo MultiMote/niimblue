@@ -363,7 +363,7 @@
 
 <div class="image-editor">
   <div class="row mb-3">
-    <div class="col d-flex justify-content-center">
+    <div class="col d-flex {labelProps.size.width < window.innerWidth ? 'justify-content-center' : ''}">
       <div class="canvas-wrapper print-start-{labelProps.printDirection}">
         <canvas bind:this={htmlCanvas}></canvas>
       </div>
