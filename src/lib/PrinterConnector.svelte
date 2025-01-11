@@ -17,6 +17,7 @@
     printerMeta,
     heartbeatFails,
     automation,
+    rfidInfo,
   } from "../stores";
   import type { ConnectionType } from "../types";
   import { tr } from "../utils/i18n";
@@ -28,7 +29,6 @@
   import { FileUtils } from "../utils/file_utils";
 
   let connectionType: ConnectionType = "bluetooth";
-  let rfidInfo: RfidInfo | undefined = undefined;
   let featureSupport: AvailableTransports = { webBluetooth: false, webSerial: false, capacitorBle: false };
   let fwVersion: string = "";
   let fwProgress: string = "";
@@ -52,7 +52,7 @@
     $printerClient.disconnect();
   };
   const getRfidInfo = async () => {
-    rfidInfo = await $printerClient.abstraction.rfidInfo();
+    $rfidInfo = await $printerClient.abstraction.rfidInfo();
   };
 
   const startHeartbeat = async () => {
@@ -104,7 +104,7 @@
     } catch (e) {
       $printerClient.startHeartbeat();
       $printerClient.off("firmwareprogress", listener);
-      
+
       Toasts.error(e);
     }
 
@@ -185,7 +185,7 @@
         </div>
       {/if}
 
-      {#if rfidInfo}
+      {#if $rfidInfo}
         <button
           class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
           type="button"
@@ -195,8 +195,10 @@
         </button>
 
         <div class="collapse" id="rfidInfo">
+          <button class="btn btn-outline-secondary btn-sm mt-1" on:click={getRfidInfo}>Update</button>
+
           <ul>
-            {#each Object.entries(rfidInfo) as [k, v]}
+            {#each Object.entries($rfidInfo) as [k, v]}
               <li>{k}: <strong>{v ?? "-"}</strong></li>
             {/each}
           </ul>
@@ -241,7 +243,6 @@
 
       <div class="collapse" id="tests">
         <div class="d-flex flex-wrap gap-1 mt-1">
-          <button class="btn btn-sm btn-primary" on:click={getRfidInfo}>Rfid</button>
           <button class="btn btn-sm btn-primary" on:click={startHeartbeat}>Heartbeat on</button>
           <button class="btn btn-sm btn-primary" on:click={stopHeartbeat}>Heartbeat off</button>
           <button class="btn btn-sm btn-primary" on:click={soundOn}>Sound on</button>

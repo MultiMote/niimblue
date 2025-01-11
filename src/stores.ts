@@ -12,6 +12,7 @@ import {
   type NiimbotAbstractClient,
   type PrinterInfo,
   type PrinterModelMeta,
+  type RfidInfo,
 } from "@mmote/niimbluelib";
 import { Toasts } from "./utils/toasts";
 import { tr } from "./utils/i18n";
@@ -25,6 +26,7 @@ export const connectedPrinterName = writable<string>("");
 export const printerClient = writable<NiimbotAbstractClient>();
 export const heartbeatData = writable<HeartbeatData>();
 export const printerInfo = writable<PrinterInfo>();
+export const rfidInfo = writable<RfidInfo | undefined>();
 export const printerMeta = writable<PrinterModelMeta | undefined>();
 export const heartbeatFails = writable<number>(0);
 export const automation = readable<AutomationProps | undefined>(
@@ -85,7 +87,12 @@ export const initClient = (connectionType: ConnectionType) => {
 
       newClient.on("heartbeat", (e) => {
         heartbeatFails.set(0);
-        heartbeatData.set(e.data);
+        heartbeatData.update((prev) => {
+          if (prev?.rfidReadState !== e.data?.rfidReadState) {
+            newClient.abstraction.rfidInfo().then(rfidInfo.set).catch(console.error);
+          }
+          return e.data;
+        });
       });
 
       newClient.on("heartbeatfailed", (e) => {
