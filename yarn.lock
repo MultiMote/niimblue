@@ -183,10 +183,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@mmote/niimbluelib@0.0.1-alpha.22":
-  version "0.0.1-alpha.22"
-  resolved "https://registry.yarnpkg.com/@mmote/niimbluelib/-/niimbluelib-0.0.1-alpha.22.tgz#34ee209616dcf3988a063eb154d83251315928d6"
-  integrity sha512-XsD9DyyD7RaNlZwqZinLopFy6knjov1JU4nnrA9iqJ4Tdv5sDu6WFHdUKR8Ip8+fkJ7sBF6UHi7y+Ucc4A5wIg==
+"@mmote/niimbluelib@0.0.1-alpha.23":
+  version "0.0.1-alpha.23"
+  resolved "https://registry.yarnpkg.com/@mmote/niimbluelib/-/niimbluelib-0.0.1-alpha.23.tgz#0a0779e53635dc1b71ceb38578f743bdab4e7434"
+  integrity sha512-jE8Gyfr/XUClztc5jALmFBNrzhVukXcm7tLGxwz5csJXxU8/rOHRvdhcip0T1H3+RQcuBqIbiKXEfZcAXYu4oQ==
   dependencies:
     "@capacitor-community/bluetooth-le" "^6.0.2"
     "@capacitor/core" "^6.0.0"
