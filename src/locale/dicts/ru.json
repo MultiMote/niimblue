@@ -40,6 +40,7 @@
     "params.csv.title": "Динамические данные (CSV)",
     "params.generic.center.horizontal": "Выровнять горизонтально",
     "params.generic.center.vertical": "Выровнять вертикально",
+    "params.generic.fit": "Растянуть под размер страницы",
     "params.label.apply": "Применить",
     "params.label.current": "Текущие параметры:",
     "params.label.direction.left": "Слева",

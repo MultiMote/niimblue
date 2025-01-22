@@ -40,6 +40,7 @@
     "params.csv.title": "Dynamic label data (CSV)",
     "params.generic.center.horizontal": "Center horizontally",
     "params.generic.center.vertical": "Center vertically",
+    "params.generic.fit": "Fit to page",
     "params.label.apply": "Apply",
     "params.label.current": "Current parameters:",
     "params.label.direction.left": "Left",
