@@ -7,12 +7,22 @@
   export let valueUpdated: () => void;
 
   const putToCenterV = () => {
-    selectedObject.canvas?.centerObjectV(selectedObject);
+    selectedObject.canvas!.centerObjectV(selectedObject);
     valueUpdated();
   };
 
   const putToCenterH = () => {
-    selectedObject.canvas?.centerObjectH(selectedObject);
+    selectedObject.canvas!.centerObjectH(selectedObject);
+    valueUpdated();
+  };
+
+  const fit = () => {
+    selectedObject.set({
+      left: 0,
+      top: 0,
+      scaleX: selectedObject.canvas!.width / selectedObject.width,
+      scaleY: selectedObject.canvas!.height / selectedObject.height,
+    });
     valueUpdated();
   };
 </script>
@@ -23,3 +33,8 @@
 <button class="btn btn-sm btn-secondary" on:click={putToCenterH} title={$tr("params.generic.center.horizontal")}>
   <MdIcon icon="horizontal_distribute" />
 </button>
+{#if selectedObject instanceof fabric.FabricImage}
+  <button class="btn btn-sm btn-secondary" on:click={fit} title={$tr("params.generic.fit")}>
+    <MdIcon icon="fit_screen" />
+  </button>
+{/if}
