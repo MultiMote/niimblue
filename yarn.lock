@@ -183,10 +183,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@mmote/niimbluelib@0.0.1-alpha.23":
-  version "0.0.1-alpha.23"
-  resolved "https://registry.yarnpkg.com/@mmote/niimbluelib/-/niimbluelib-0.0.1-alpha.23.tgz#0a0779e53635dc1b71ceb38578f743bdab4e7434"
-  integrity sha512-jE8Gyfr/XUClztc5jALmFBNrzhVukXcm7tLGxwz5csJXxU8/rOHRvdhcip0T1H3+RQcuBqIbiKXEfZcAXYu4oQ==
+"@mmote/niimbluelib@0.0.1-alpha.24":
+  version "0.0.1-alpha.24"
+  resolved "https://registry.yarnpkg.com/@mmote/niimbluelib/-/niimbluelib-0.0.1-alpha.24.tgz#182b694d372b3fc096f090b66fb04ea0ff65133b"
+  integrity sha512-oufKbVFXpHL1hzCLRSIySZnD69BIv9JMcp4qo3C/Li9AHkfvlGTPM5tmnk8cR0LQ47GwAp7tvcJHq3lzeV7Hsg==
   dependencies:
     "@capacitor-community/bluetooth-le" "^6.0.2"
     "@capacitor/core" "^6.0.0"
@@ -1277,10 +1277,10 @@ url-parse@^1.5.3:
     querystringify "^2.1.1"
     requires-port "^1.0.0"
 
-vite@5.4.8:
-  version "5.4.8"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-5.4.8.tgz#af548ce1c211b2785478d3ba3e8da51e39a287e8"
-  integrity sha512-FqrItQ4DT1NC4zCUqMB4c4AZORMKIa0m8/URVCZ77OZ/QSNeJ54bU1vrFADbDsuwfIPcgknRkmqakQcgnL4GiQ==
+vite@5.4.12:
+  version "5.4.12"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-5.4.12.tgz#627d12ff06de3942557dfe8632fd712a12a072c7"
+  integrity sha512-KwUaKB27TvWwDJr1GjjWthLMATbGEbeWYZIbGZ5qFIsgPP3vWzLu4cVooqhm5/Z2SPDUMjyPVjTztm5tYKwQxA==
   dependencies:
     esbuild "^0.21.3"
     postcss "^8.4.43"
