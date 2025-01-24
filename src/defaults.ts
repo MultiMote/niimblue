@@ -1,5 +1,5 @@
 import * as fabric from "fabric";
-import type { LabelPreset, LabelProps } from "./types";
+import type { AppConfig, LabelPreset, LabelProps } from "./types";
 
 /** Default presets for LabelPropsEditor */
 export const DEFAULT_LABEL_PRESETS: LabelPreset[] = [
@@ -57,3 +57,7 @@ export const THUMBNAIL_HEIGHT = 48;
 
 /** Generate thumbnail in jpeg format with this quality */
 export const THUMBNAIL_QUALITY = 0.7;
+
+export const APP_CONFIG_DEFAULTS: AppConfig = {
+  fitMode: "stretch"
+}

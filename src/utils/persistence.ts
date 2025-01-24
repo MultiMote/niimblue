@@ -14,6 +14,40 @@ import {
 } from "../types";
 import { z } from "zod";
 import { FileUtils } from "./file_utils";
+import { get, writable, type Updater, type Writable } from "svelte/store";
+
+/** Writable store, value is persisted to localStorage */
+export function writablePersisted<T>(key: string, schema: z.ZodType<T>, initialValue: T): Writable<T> {
+  const wr = writable<T>(initialValue);
+
+  console.log("read");
+
+  try {
+    const val = LocalStoragePersistence.loadAndValidateObject(key, schema);
+    if (val != null) {
+      wr.set(val);
+    } else {
+      wr.set(initialValue);
+    }
+  } catch (_e) {
+    wr.set(initialValue);
+  }
+
+  return {
+    subscribe: wr.subscribe,
+
+    set: (value: T) => {
+      LocalStoragePersistence.validateAndSaveObject(key, value, schema);
+      wr.set(value);
+    },
+
+    update: (updater: Updater<T>) => {
+      const newValue: T = updater(get(wr));
+      LocalStoragePersistence.validateAndSaveObject(key, newValue, schema);
+      wr.set(newValue);
+    },
+  };
+}
 
 export class LocalStoragePersistence {
   /** Result in kilobytes */

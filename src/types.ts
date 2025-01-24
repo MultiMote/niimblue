@@ -86,6 +86,11 @@ export const AutomationPropsSchema = z.object({
   startPrint: z.enum(["after_connect", "immediately"]).optional(),
 });
 
+export const AppConfigSchema = z.object({
+  /** Keep image aspect ration when using "fit" button */
+  fitMode: z.enum(["stretch", "ratio_min", "ratio_max"]).optional(),
+});
+
 export type LabelProps = z.infer<typeof LabelPropsSchema>;
 export type LabelPreset = z.infer<typeof LabelPresetSchema>;
 export type FabricJson = z.infer<typeof FabricJsonSchema>;
@@ -93,3 +98,4 @@ export type ExportedLabelTemplate = z.infer<typeof ExportedLabelTemplateSchema>;
 export type PreviewPropsOffset = z.infer<typeof PreviewPropsOffsetSchema>;
 export type PreviewProps = z.infer<typeof PreviewPropsSchema>;
 export type AutomationProps = z.infer<typeof AutomationPropsSchema>;
+export type AppConfig = z.infer<typeof AppConfigSchema>;
