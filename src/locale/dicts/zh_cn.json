@@ -122,5 +122,9 @@
     "preview.threshold": "阈值",
     "preview.title": "打印预览",
     "params.label.mirror": "镜像元素",
-    "preview.print.system": "使用系统打印接口打印"
+    "preview.print.system": "使用系统打印接口打印",
+    "params.generic.fit.mode.ratio_max": "裁切",
+    "params.generic.fit.mode.stretch": "拉伸",
+    "params.generic.fit.mode.ratio_min": "填充",
+    "params.generic.fit": "填充页面"
 }
