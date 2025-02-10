@@ -27,7 +27,7 @@ export class QRCode<
   extends fabric.FabricObject<Props, SProps, EventSpec>
   implements QRCodeProps
 {
-  static override type = QRCode.name;
+  static override type = "QRCode";
 
   /**
    * QRCode text
@@ -121,6 +121,6 @@ export class QRCode<
   }
 }
 
-fabric.classRegistry.setClass(QRCode, QRCode.name);
+fabric.classRegistry.setClass(QRCode, "QRCode");
 
 export default QRCode;

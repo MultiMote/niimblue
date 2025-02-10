@@ -35,7 +35,7 @@ export class Barcode<
   extends fabric.FabricObject<Props, SProps, EventSpec>
   implements BarcodeProps
 {
-  static override type = Barcode.name;
+  static override type = "Barcode";
 
   /**
    * Barcode text
@@ -245,6 +245,6 @@ export class Barcode<
   }
 }
 
-fabric.classRegistry.setClass(Barcode, Barcode.name);
+fabric.classRegistry.setClass(Barcode, "Barcode");
 
 export default Barcode;
