@@ -13,7 +13,16 @@ Project is deployed [here](https://niim.mmote.ru).
 
 ## Features
 
-You can see the list of implemented and planned features [on the Wiki](https://github.com/MultiMote/niimblue/wiki#features).
+Key features:
+
+* Privacy first! This application works completely offline and does not send any data (except for downloading application files and importing ZPL labels). Label data is stored in your browser.
+* Support for both Bluetooth and USB connections.
+* Rich label editor. Label saving, import/export.
+* Print preview. You can see how your label will look like after post-processing. Several post-processing algorithms are available.
+* Android App (Capacitor based).
+* Most complete implementation of [NIIMBOT protocol](https://multimote.github.io/niimbluelib/documents/NIIMBOT_printers_protocol.html).
+
+You can see the full list of implemented and planned features [on the Wiki](https://github.com/MultiMote/niimblue/wiki#features).
 
 List of supported models you can find in [niimluelib](https://github.com/MultiMote/niimbluelib/issues/1) repository.
 
