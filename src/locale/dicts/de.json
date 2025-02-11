@@ -121,5 +121,9 @@
     "preview.print": "Drucken",
     "preview.threshold": "Schwellenwert",
     "preview.title": "Druckvorschau",
-    "params.label.mirror": "Objektspiegelung"
+    "params.label.mirror": "Objektspiegelung",
+    "params.generic.fit.mode.stretch": "Strecken",
+    "params.generic.fit.mode.ratio_max": "Füllen",
+    "params.generic.fit.mode.ratio_min": "Anpassen",
+    "params.generic.fit": "An Seite anpassen"
 }
