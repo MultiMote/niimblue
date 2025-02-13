@@ -44,7 +44,7 @@
     "params.label.current": "Aktuelle Parameter:",
     "params.label.direction.left": "Links",
     "params.label.direction.top": "Oben",
-    "params.label.direction": "Drucken von",
+    "params.label.direction": "Druckausrichtung",
     "params.label.dpmm": "dpmm",
     "params.label.export": "Export",
     "params.label.head_density.help": "Kalkulation: DPI / 25.4",
