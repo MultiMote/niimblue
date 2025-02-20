@@ -4,7 +4,7 @@
 	"type": "module",
 	"version": "0.0.1",
 	"scripts": {
-		"dev-check": "yarn sv-check && yarn dev-open",
+		"dev-check": "npm run sv-check && npm run dev-open",
 		"dev": "vite --force",
 		"dev-open": "vite --force --open",
 		"build": "vite build",
@@ -37,15 +37,16 @@
 		"@types/node": "^20.14.8",
 		"@types/qrcode-svg": "^1.1.5",
 		"@types/toastify-js": "^1.12.3",
-		"sass": "^1.77.5",
+		"sass": "1.77.6",
 		"svelte": "^4.2.19",
 		"svelte-check": "^3.8.4",
 		"tslib": "^2.6.3",
 		"typescript": "^5.2.2",
 		"vite": "5.4.12"
 	},
-	"packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
-	"resolutions": {
-		"fabric/canvas": "npm:uninstall"
+	"overrides": {
+		"fabric": {
+			"canvas": "npm:uninstall"
+		}
 	}
 }

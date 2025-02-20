@@ -35,21 +35,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: yarn
-          cache-dependency-path: ./yarn.lock
+          cache: npm
+          cache-dependency-path: ./package-lock.json
 
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
 
       - name: Install dependencies
-        run: yarn install
+        run: npm install
 
       - name: Check code
-        run: yarn sv-check
+        run: npm run sv-check
 
       - name: Build
-        run: yarn vite build --base="${{ steps.pages.outputs.base_path || '/' }}"
+        run: npx vite build --base="${{ steps.pages.outputs.base_path || '/' }}"
         env:
           COMMIT_HASH: ${{github.sha}}
 

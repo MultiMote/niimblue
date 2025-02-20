@@ -3,14 +3,16 @@
 Install dependencies
 
 ```bash
-yarn --cwd .. install
-yarn install
+cd ..
+npm i
+cd capacitor
+npm i
 ```
 
 Build niimblue static files
 
 ```bash
-yarn build-www
+npm run build-www
 ```
 
 # Android
@@ -18,7 +20,7 @@ yarn build-www
 Run debug build on android device (adb)
 
 ```bash
-yarn run-android
+npm run run-android
 ```
 
 Or build release apk (`apksigner` should be in your PATH):
@@ -29,7 +31,7 @@ export KEYSTORE_ALIAS=your_alias_name
 export KEYSTORE_PASSWORD=pa$$word
 export KEYSTORE_ALIAS_PASSWORD=pa$$word
 
-yarn build-android
+npm run build-android
 ```
 
 To see console, go to `chrome:inspect/#devices` on desktop chrome browser and select niimblue on your device.
@@ -41,13 +43,13 @@ To get prebuilt apk, see the latest artifact in [build-android-app](https://gith
 Run debug build on iPhone Simulator
 
 ```bash
-yarn run-ios
+npm run run-ios
 ```
 
 Run on device,
 
 ```bash
-yarn build-ios
+npm run build-ios
 ```
 
 **iOS**: Unlike Android (and also Cordova), Capacitor lacks ability to pass `DEVELOPMENT_TEAM` as environment variable.

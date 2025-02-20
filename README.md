@@ -72,32 +72,30 @@ Skip steps you have done.
 
 2. Install [nodejs](https://nodejs.org)
 
-3. Install [yarn](https://yarnpkg.com)
-
-4. Clone repository
+3. Clone repository
 
     ```bash
     git clone https://github.com/MultiMote/niimblue.git
     ```
 
-5. Install dependencies
+4. Install dependencies
 
     ```bash
-    yarn install
+    npm i
     ```
 
-6. Run dev server
+5. Run dev server
 
     Check code and open browser:
 
     ```bash
-    yarn dev-check
+    npm run dev-check
     ```
 
     Or just run:
 
     ```bash
-    yarn dev
+    npm run dev
     ```
 
 Eslint not included. Install it with:

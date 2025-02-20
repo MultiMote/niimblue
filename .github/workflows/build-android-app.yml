@@ -28,15 +28,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Enable corepack
-        run: corepack enable
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: yarn
-          cache-dependency-path: ./yarn.lock
+          cache: npm
+          cache-dependency-path: ./package-lock.json
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -53,22 +50,25 @@ jobs:
       - name: Add build tools to PATH for apksigner
         run: echo "$ANDROID_HOME/build-tools/34.0.0" >> $GITHUB_PATH
 
-      - name: Install dependencies
-        run: yarn install
-
-      - name: Install capacitor dependencies
-        run: yarn --cwd capacitor install
-
-      - name: Build niimblue www
-        run: yarn --cwd capacitor build-www
-
       - name: Decode Keystore
         run: mkdir -p .keystore && echo $KEYSTORE_BASE_64 | base64 -d > .keystore/keystore.jks
         env:
           KEYSTORE_BASE_64: ${{ secrets.KEYSTORE_BASE_64 }}
 
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install capacitor dependencies
+        working-directory: ./capacitor
+        run: npm ci
+
+      - name: Build niimblue www
+        working-directory: ./capacitor
+        run: npm run build-www
+
       - name: Build and sign capacitor app
-        run: yarn --cwd capacitor build-android
+        working-directory: ./capacitor
+        run: npm run build-android
         env:
           KEYSTORE_PATH: ${{ github.workspace }}/.keystore/keystore.jks
           KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}

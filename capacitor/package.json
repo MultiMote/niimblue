@@ -4,7 +4,7 @@
   "description": "NiimBlue standalone app",
   "type": "module",
   "scripts": {
-    "build-www": "yarn --cwd .. vite build --outDir ./capacitor/www",
+    "build-www": "cd .. && vite build --outDir ./capacitor/www",
     "build-android": "cap sync && cap build android",
     "run-android": "cap sync && cap run android --device",
     "build-ios": "cap sync && cap open ios",
