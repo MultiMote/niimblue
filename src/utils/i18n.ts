@@ -6,6 +6,9 @@ import { languageNames, langPack } from "../locale";
  *  If language is not supported, "en" is returned. */
 const guessBrowserLanguage = (): SupportedLanguage => {
   switch (navigator.language) {
+    case "cs":
+    case "cs-CZ":
+      return "cs";
     case "de":
     case "de-AT":
     case "de-CH":
