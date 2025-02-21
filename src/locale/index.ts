@@ -1,3 +1,4 @@
+import lang_cs from "./dicts/cs.json";
 import lang_de from "./dicts/de.json";
 import lang_en from "./dicts/en.json";
 import lang_it from "./dicts/it.json";
@@ -10,7 +11,9 @@ export type TranslationDict = Record<TranslationKey, string>;
 export const langPack = {
   /** English (fallback) */
   en: lang_en,
-  /** German */
+  /** Czech */
+  cs: lang_cs as TranslationDict,
+  /** Italian */
   de: lang_de as TranslationDict,
   /** Italian */
   it: lang_it as TranslationDict,
