@@ -125,5 +125,6 @@
     "params.generic.fit.mode.stretch": "Strecken",
     "params.generic.fit.mode.ratio_max": "Füllen",
     "params.generic.fit.mode.ratio_min": "Anpassen",
-    "params.generic.fit": "An Seite anpassen"
+    "params.generic.fit": "An Seite anpassen",
+    "preview.print.system": "Drucken mit Betriebssystem Drucker"
 }
