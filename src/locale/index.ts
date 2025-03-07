@@ -3,6 +3,7 @@ import lang_de from "./dicts/de.json";
 import lang_en from "./dicts/en.json";
 import lang_it from "./dicts/it.json";
 import lang_ru from "./dicts/ru.json";
+import lang_pl from "./dicts/pl.json";
 import lang_zh_cn from "./dicts/zh_cn.json";
 
 export type TranslationKey = keyof typeof lang_en;
@@ -19,6 +20,8 @@ export const langPack = {
   it: lang_it as TranslationDict,
   /** Russian */
   ru: lang_ru as TranslationDict,
+  /** Polish */
+  pl: lang_pl as TranslationDict,
   /** Simplified Chinese */
   zh_cn: lang_zh_cn as TranslationDict,
 } as const;
