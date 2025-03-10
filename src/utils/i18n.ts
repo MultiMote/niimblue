@@ -23,6 +23,9 @@ const guessBrowserLanguage = (): SupportedLanguage => {
     case "ru":
     case "ru-RU":
       return "ru";
+    case "pl":
+    case "pl-PL":
+      return "pl";
     case "zh":
     case "zh-Hans":
     case "zh-CN":
