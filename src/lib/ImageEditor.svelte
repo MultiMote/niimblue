@@ -386,7 +386,7 @@
           class="btn btn-sm btn-secondary"
           on:click={clearCanvas}
           title={$tr("editor.clear")}>
-          <MdIcon icon="delete" />
+          <MdIcon icon="cancel_presentation" />
         </button>
 
         <SavedLabelsMenu canvas={fabricCanvas} onRequestLabelTemplate={exportCurrentLabel} {onLoadRequested} />
@@ -437,8 +437,6 @@
             <MdIcon icon="delete" />
           </button>
         {/if}
-
-
 
         {#if selectedCount > 0}
           <button class="btn btn-sm btn-secondary me-1" on:click={cloneSelected} title={$tr("editor.clone")}>
