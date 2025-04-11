@@ -5,6 +5,8 @@
     "connector.bluetooth": "Bluetooth",
     "connector.disconnect.heartbeat": "Disconnected (printer does not respond)",
     "connector.serial": "Serial (USB)",
+    "editor.clear": "Clear canvas",
+    "editor.clear.confirm": "Clear canvas contents?",
     "editor.clone": "Clone",
     "editor.default_text": "Text",
     "editor.delete": "Delete",

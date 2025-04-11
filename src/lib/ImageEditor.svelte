@@ -245,6 +245,14 @@
     }
   };
 
+  const clearCanvas = () => {
+    if (!confirm($tr("editor.clear.confirm"))) {
+      return;
+    }
+    undo.push(fabricCanvas, labelProps);
+    fabricCanvas.clear();
+  };
+
   onMount(() => {
     const csvSaved = LocalStoragePersistence.loadCsv();
     csvData = csvSaved.data;
@@ -375,6 +383,13 @@
     <div class="col d-flex justify-content-center">
       <div class="toolbar d-flex flex-wrap gap-1 justify-content-center align-items-center">
         <LabelPropsEditor {labelProps} onChange={onUpdateLabelProps} />
+
+        <button
+          class="btn btn-sm btn-secondary"
+          on:click={clearCanvas}
+          title={$tr("editor.clear")}>
+          <MdIcon icon="delete" />
+        </button>
 
         <SavedLabelsMenu canvas={fabricCanvas} onRequestLabelTemplate={exportCurrentLabel} {onLoadRequested} />
 

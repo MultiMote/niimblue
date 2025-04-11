@@ -5,6 +5,8 @@
     "connector.bluetooth": "Bluetooth",
     "connector.disconnect.heartbeat": "Отключено (принтер не отвечает)",
     "connector.serial": "Посл. порт (USB)",
+    "editor.clear": "Очистить холст",
+    "editor.clear.confirm": "Очистить содержимое холста?",
     "editor.clone": "Клонировать",
     "editor.default_text": "Текст",
     "editor.delete": "Удалить",
