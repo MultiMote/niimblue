@@ -74,9 +74,7 @@
   };
 
   const cloneSelected = () => {
-    if (selectedObject) {
-      ImageEditorUtils.cloneObject(fabricCanvas, selectedObject).then(() => undo.push(fabricCanvas, labelProps));
-    }
+    ImageEditorUtils.cloneSelection(fabricCanvas).then(() => undo.push(fabricCanvas, labelProps));
   };
 
   const moveSelected = (direction: MoveDirection, ctrl?: boolean) => {
@@ -440,10 +438,15 @@
           </button>
         {/if}
 
-        {#if selectedObject && selectedCount === 1}
+
+
+        {#if selectedCount > 0}
           <button class="btn btn-sm btn-secondary me-1" on:click={cloneSelected} title={$tr("editor.clone")}>
             <MdIcon icon="content_copy" />
           </button>
+        {/if}
+
+        {#if selectedObject && selectedCount === 1}
           <GenericObjectParamsControls {selectedObject} valueUpdated={controlValueUpdated} />
         {/if}
 
