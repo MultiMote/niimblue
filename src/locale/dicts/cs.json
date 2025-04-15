@@ -1,7 +1,7 @@
 {
     "lang.name": "Čeština",
     "browser_warning.lines.first": "Aj, váš prohlížeč nepodporuje bluetooth a sériovou komunikaci",
-    "browser_warning.lines.second": "I tak můžete upravovat štítky",
+    "browser_warning.lines.second": "I tak můžete upravovat štítky.",
     "connector.bluetooth": "Bluetooth",
     "connector.disconnect.heartbeat": "Odpojeno (tiskárna neodpovídá)",
     "connector.serial": "Sériové (USB)",
@@ -126,5 +126,7 @@
     "preview.print.system": "Vytisknout systémovou tiskárnou",
     "preview.print": "Tisknout",
     "preview.threshold": "Práh",
-    "preview.title": "Náhled"
+    "preview.title": "Náhled",
+    "editor.clear.confirm": "Opravdu vymazat obsah?",
+    "editor.clear": "Vymazat obsah"
 }
