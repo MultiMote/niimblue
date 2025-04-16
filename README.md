@@ -24,7 +24,7 @@ Key features:
 
 You can see the full list of implemented and planned features [on the Wiki](https://github.com/MultiMote/niimblue/wiki#features).
 
-List of supported models you can find in [niimluelib](https://github.com/MultiMote/niimbluelib/issues/1) repository.
+List of tested models you can find in [niimluelib](https://github.com/MultiMote/niimbluelib/issues/1) repository.
 
 Demonstration video:
 
