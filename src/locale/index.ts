@@ -5,6 +5,7 @@ import lang_it from "./dicts/it.json";
 import lang_ru from "./dicts/ru.json";
 import lang_pl from "./dicts/pl.json";
 import lang_zh_cn from "./dicts/zh_cn.json";
+import lang_fr from "./dicts/fr.json";
 
 export type TranslationKey = keyof typeof lang_en;
 export type TranslationDict = Record<TranslationKey, string>;
@@ -24,6 +25,8 @@ export const langPack = {
   pl: lang_pl as TranslationDict,
   /** Simplified Chinese */
   zh_cn: lang_zh_cn as TranslationDict,
+  /** French */
+  fr: lang_fr as TranslationDict
 } as const;
 
 export type SupportedLanguage = keyof typeof langPack;
@@ -31,6 +34,6 @@ export type SupportedLanguage = keyof typeof langPack;
 export const languageNames = Object.assign(
   {},
   ...Object.entries(langPack).map(([k, v]) => ({
-    [k]: v["lang.name"] ?? k,
+    [k]: v["lang.name"] ?? k
   }))
 ) as Record<SupportedLanguage, string>;
