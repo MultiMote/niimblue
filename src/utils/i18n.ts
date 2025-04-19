@@ -30,6 +30,9 @@ const guessBrowserLanguage = (): SupportedLanguage => {
     case "zh-Hans":
     case "zh-CN":
       return "zh_cn";
+    case "fr":
+      case "fr-FR":
+        return "fr";
     default:
       return "en";
   }
