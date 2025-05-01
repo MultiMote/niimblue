@@ -20,8 +20,6 @@ import { get, writable, type Updater, type Writable } from "svelte/store";
 export function writablePersisted<T>(key: string, schema: z.ZodType<T>, initialValue: T): Writable<T> {
   const wr = writable<T>(initialValue);
 
-  console.log("read");
-
   try {
     const val = LocalStoragePersistence.loadAndValidateObject(key, schema);
     if (val != null) {

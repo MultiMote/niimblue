@@ -1,0 +1,15 @@
+{
+  "name": "NiimBlue",
+  "short_name": "niimblue",
+  "description": "NIIMBOT custom web client/app. Design and print labels with NIIMBOT printers directly from your PC or mobile web browser!",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#212529",
+  "background_color": "#212529"
+}
