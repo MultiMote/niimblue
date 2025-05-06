@@ -126,5 +126,7 @@
     "params.generic.fit.mode.ratio_max": "裁切",
     "params.generic.fit.mode.stretch": "拉伸",
     "params.generic.fit.mode.ratio_min": "填充",
-    "params.generic.fit": "填充页面"
+    "params.generic.fit": "填充页面",
+    "editor.clear": "清除画布",
+    "editor.clear.confirm": "清除画布内容吗?"
 }
