@@ -10,6 +10,9 @@ Project is deployed [here](https://niim.mmote.ru).
 > If you have printing problems, try different print task versions in print preview dialog. Make if default by pressing "Lock" button.
 >
 > If you found version suitable for your model, please write [here](https://github.com/MultiMote/niimbluelib/issues/1).
+>
+> Also read [Frequently asked questions](https://github.com/MultiMote/niimblue/wiki/Frequently-asked-questions).
+
 
 ## Features
 
