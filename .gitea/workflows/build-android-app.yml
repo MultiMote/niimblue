@@ -1,26 +1,19 @@
-name: Build an android app
+name: Build and publish an android app
 
 on:
   # push:
   #   branches:
-  #     - capacitor
+  #     - gitea
 
-  # schedule:
-  #   # Two times per month
-  #   - cron: '0 0 1,15 * *'
+  schedule:
+    # Two times per month
+    - cron: '0 0 1,15 * *'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-env:
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-permissions:
-  # Release upload permission
-  contents: write
-
 jobs:
-  build-app:
+  build-android-app:
     runs-on: ubuntu-latest
     if: github.repository == 'MultiMote/niimblue'
 
@@ -48,7 +41,7 @@ jobs:
           log-accepted-android-sdk-licenses: false
 
       - name: Add build tools to PATH for apksigner
-        run: echo "$ANDROID_HOME/build-tools/34.0.0" >> $GITHUB_PATH
+        run: echo "$ANDROID_HOME/build-tools/34.0.0" >> $GITEA_PATH
 
       - name: Decode Keystore
         run: mkdir -p .keystore && echo $KEYSTORE_BASE_64 | base64 -d > .keystore/keystore.jks
@@ -70,19 +63,20 @@ jobs:
         working-directory: ./capacitor
         run: npm run build-android
         env:
-          KEYSTORE_PATH: ${{ github.workspace }}/.keystore/keystore.jks
+          KEYSTORE_PATH: ${{ gitea.workspace }}/.keystore/keystore.jks
           KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEYSTORE_ALIAS_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          APP_VERSION_CODE: ${{ github.run_number }}
+          APP_VERSION_CODE: ${{ 50 + gitea.run_number }}
 
-      - name: Upload apk to Artifacts
-        uses: actions/upload-artifact@v4
+      - name: Install GH CLI
+        uses: dev-hanz-ops/install-gh-cli-action@v0.2.1
         with:
-           name: app
-           path: ./capacitor/android/app/build/outputs/apk/release/app-release-signed.apk
+          gh-cli-version: 2.72.0
 
       - name: Update release
-        run: gh release upload snapshot ./capacitor/android/app/build/outputs/apk/release/app-release-signed.apk -R ${{github.repository}} --clobber
+        run: gh release upload snapshot ./capacitor/android/app/build/outputs/apk/release/app-release-signed.apk -R MultiMote/niimblue --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
 
 
