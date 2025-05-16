@@ -9,9 +9,8 @@ import {
 } from "../types";
 import { OBJECT_DEFAULTS, THUMBNAIL_HEIGHT, THUMBNAIL_QUALITY } from "../defaults";
 import { z } from "zod";
-import { FileSharer } from "@byteowls/capacitor-filesharer";
-import { Toasts } from "./toasts";
 import { CustomCanvas } from "../fabric-object/custom_canvas";
+import { Capacitor } from "@capacitor/core";
 
 export class FileUtils {
   static timestamp(): number {
@@ -29,6 +28,54 @@ export class FileUtils {
   static base64obj(obj: unknown): string {
     const json: string = JSON.stringify(obj);
     return this.base64str(json);
+  }
+
+  static async downloadBase64Web(filename: string, mime: string, base64Data: string) {
+    const byteChars = atob(base64Data);
+    const byteNumbers = new Array(byteChars.length);
+
+    for (let i = 0; i < byteChars.length; i++) {
+      byteNumbers[i] = byteChars.charCodeAt(i);
+    }
+
+    const arr = new Uint8Array(byteNumbers);
+    const blob = new Blob([arr], { type: mime });
+
+    const a = document.createElement("a");
+    a.download = filename;
+    a.href = URL.createObjectURL(blob);
+    a.click();
+
+    setTimeout(() => {
+      URL.revokeObjectURL(a.href);
+      a.remove();
+    }, 10_000);
+  }
+
+  static async downloadBase64Capacitor(filename: string, base64Data: string) {
+    const { Directory, Filesystem } = await import("@capacitor/filesystem");
+    const { Share } = await import("@capacitor/share");
+
+    const result = await Filesystem.writeFile({
+      data: base64Data,
+      path: filename,
+      directory: Directory.Cache,
+    });
+
+    await Share.share({
+      title: filename,
+      text: filename,
+      url: result.uri,
+    });
+  }
+
+  static async downloadBase64(filename: string, mime: string, base64Data: string) {
+    if (Capacitor.getPlatform() !== "web") {
+      this.downloadBase64Capacitor(filename, base64Data);
+      return;
+    }
+
+    this.downloadBase64Web(filename, mime, base64Data);
   }
 
   static makeExportedLabel(canvas: fabric.Canvas, labelProps: LabelProps): ExportedLabelTemplate {
@@ -54,14 +101,7 @@ export class FileUtils {
   static saveLabelAsJson(label: ExportedLabelTemplate) {
     const parsed = ExportedLabelTemplateSchema.parse(label);
     const timestamp = label.timestamp ?? this.timestamp();
-
-    FileSharer.share({
-      filename: `label_${timestamp}.json`,
-      contentType: "application/json",
-      base64Data: this.base64obj(parsed),
-    }).catch((e) => {
-      if (e.message !== "USER_CANCELLED") Toasts.error(e);
-    });
+    this.downloadBase64(`label_${timestamp}.json`, "application/json", this.base64obj(parsed));
   }
 
   /** Convert canvas to PNG and download it */
@@ -77,26 +117,13 @@ export class FileUtils {
       multiplier: 1,
     });
 
-    FileSharer.share({
-      filename: `label_${timestamp}.png`,
-      contentType: "image/png",
-      base64Data: url.split("base64,")[1],
-    }).catch((e) => {
-      if (e.message !== "USER_CANCELLED") Toasts.error(e);
-    });
+    this.downloadBase64(`label_${timestamp}.png`, "image/png", url.split("base64,")[1]);
   }
 
   /** Convert label template to JSON and download it */
   static saveLabelPresetsAsJson(presets: LabelPreset[]) {
     const parsed = z.array(LabelPresetSchema).parse(presets);
-
-    FileSharer.share({
-      filename: `presets_${this.timestamp()}.json`,
-      contentType: "application/json",
-      base64Data: this.base64obj(parsed),
-    }).catch((e) => {
-      if (e.message !== "USER_CANCELLED") Toasts.error(e);
-    });
+    this.downloadBase64(`presets_${this.timestamp()}.json`, "application/json", this.base64obj(parsed));
   }
 
   /**

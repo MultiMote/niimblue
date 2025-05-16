@@ -6,21 +6,22 @@
   "scripts": {
     "build-www": "cd .. && vite build --outDir ./capacitor/www",
     "build-android": "cap sync && cap build android",
-    "run-android": "cap sync && cap run android --device",
+    "run-android": "cap sync && cap run android",
     "build-ios": "cap sync && cap open ios",
     "run-ios": "cap sync && cap run ios"
   },
   "dependencies": {
-    "@byteowls/capacitor-filesharer": "^6.0.0",
-    "@capacitor-community/bluetooth-le": "^6.0.2",
-    "@capacitor/android": "^6.2.0",
-    "@capacitor/core": "^6.1.2",
-    "@capacitor/ios": "^6.2.0",
-    "@capacitor/splash-screen": "^6.0.2"
+    "@capacitor-community/bluetooth-le": "^7.1.0",
+    "@capacitor/android": "^7.2.0",
+    "@capacitor/core": "^7.2.0",
+    "@capacitor/filesystem": "^7.0.1",
+    "@capacitor/ios": "^7.2.0",
+    "@capacitor/share": "^7.0.1",
+    "@capacitor/splash-screen": "^7.0.1"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "^6.1.2"
+    "@capacitor/cli": "^7.2.0"
   },
   "author": "MultiMote",
   "license": "MIT"

@@ -20,6 +20,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           fabric: ["fabric"],
+          cap_ext: ["@capacitor/filesystem", "@capacitor/share"],
         },
         chunkFileNames: () => {
           return "assets/[name].[hash].js";

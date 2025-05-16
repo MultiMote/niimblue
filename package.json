@@ -15,10 +15,11 @@
 		"lint": "eslint ."
 	},
 	"dependencies": {
-		"@byteowls/capacitor-filesharer": "^6.0.0",
-		"@capacitor/core": "^6.1.2",
+		"@capacitor/core": "^7.2.0",
+		"@capacitor/filesystem": "^7.0.1",
+		"@capacitor/share": "^7.0.1",
 		"@fontsource-variable/noto-sans": "^5.0.5",
-		"@mmote/niimbluelib": "0.0.1-alpha.24",
+		"@mmote/niimbluelib": "0.0.1-alpha.25",
 		"@popperjs/core": "^2.11.8",
 		"bootstrap": "5.3.3",
 		"d3-dsv": "^3.0.1",
