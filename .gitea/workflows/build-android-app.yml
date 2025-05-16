@@ -60,6 +60,16 @@ jobs:
         working-directory: ./capacitor
         run: npm ci
 
+      - name: Gradle cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Build niimblue www
         working-directory: ./capacitor
         run: npm run build-www
