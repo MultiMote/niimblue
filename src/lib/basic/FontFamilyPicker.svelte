@@ -27,7 +27,8 @@
     try {
       let stored = LocalStoragePersistence.loadCachedFonts();
       if (stored.length > 0) {
-        fontCache.update(() => stored);
+        const uniqueFonts = new Set([OBJECT_DEFAULTS_TEXT.fontFamily, ...stored]);
+        fontCache.update(() => [...uniqueFonts].sort());
       }
     } catch (e) {
       Toasts.error(e);
@@ -39,17 +40,20 @@
   <span class="input-group-text" title={$tr("params.text.font_family")}>
     <MdIcon icon="text_format" />
   </span>
-  {#if fontQuerySupported}
+  {#if $fontCache.length > 1}
     <select class="form-select" {value} on:change={(e) => valueUpdated(e.currentTarget.value)}>
       {#each $fontCache as font}
         <option value={font} style="font-family: {font}">{font}</option>
       {/each}
     </select>
+  {:else}
+    <input type="text" class="form-control" {value} on:input={(e) => valueUpdated(e.currentTarget.value)} />
+  {/if}
+
+  {#if fontQuerySupported}
     <button class="btn btn-secondary" on:click={getSystemFonts} title={$tr("params.text.fetch_fonts")}>
       <MdIcon icon="refresh" />
     </button>
-  {:else}
-    <input type="text" class="form-control" {value} on:input={(e) => valueUpdated(e.currentTarget.value)} />
   {/if}
 </div>
 
