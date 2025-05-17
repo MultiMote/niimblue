@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { ManualChunkMeta } from "rollup";
 
 const getDate = (): string => {
   const date = new Date();
@@ -19,17 +20,22 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id: string) => {
-          if (id.includes("node_modules")){
+          if (id.endsWith(".css") || id.endsWith(".scss")) {
+            return "style";
+          }
+
+          if (id.includes("node_modules")) {
             if (id.includes("fabric")) {
-              return "lib.fabric";
+              return "lib.2.fabric";
             } else if (id.includes("@capacitor/filesystem") || id.includes("@capacitor/share")) {
-              return "lib.cap";
+              return "lib.2.cap";
             } else if (id.includes("zod")) {
-              return "lib.zod";
+              return "lib.2.zod";
             } else if (id.includes("@mmote/niimbluelib")) {
-              return "lib.niim";
+              return "lib.2.niim";
             }
-            return "lib.other";
+
+            return "lib.1.other";
           }
           return null;
         },
