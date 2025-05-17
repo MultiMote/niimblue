@@ -84,8 +84,11 @@ jobs:
           KEYSTORE_ALIAS_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           APP_VERSION_CODE: ${{ gitea.run_number }}
 
-      - name: Update release
-        run: gh release upload snapshot ./capacitor/android/app/build/outputs/apk/release/app-release-signed.apk -R MultiMote/niimblue --clobber
+      - name: Copy release apk
+        run: cp ./capacitor/android/app/build/outputs/apk/release/app-release-signed.apk $RUNNER_TEMP/niimblues.apk
+
+      - name: Update GitHub release
+        run: gh release upload snapshot $RUNNER_TEMP/niimblues.apk -R MultiMote/niimblue --clobber
         env:
           GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
 
