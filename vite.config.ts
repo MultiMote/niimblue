@@ -18,9 +18,20 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          fabric: ["fabric"],
-          cap_ext: ["@capacitor/filesystem", "@capacitor/share"],
+        manualChunks: (id: string) => {
+          if (id.includes("node_modules")){
+            if (id.includes("fabric")) {
+              return "lib.fabric";
+            } else if (id.includes("@capacitor/filesystem") || id.includes("@capacitor/share")) {
+              return "lib.cap";
+            } else if (id.includes("zod")) {
+              return "lib.zod";
+            } else if (id.includes("@mmote/niimbluelib")) {
+              return "lib.niim";
+            }
+            return "lib.other";
+          }
+          return null;
         },
         chunkFileNames: () => {
           return "assets/[name].[hash].js";
