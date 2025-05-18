@@ -64,6 +64,7 @@
     "params.label.shape": "Label shape",
     "params.label.size": "Size",
     "params.label.split": "Label split",
+    "params.label.split.count": "Parts",
     "params.label.tail.length": "Tail length",
     "params.label.tail.position": "Tail position",
     "params.label.mirror": "Object mirroring",

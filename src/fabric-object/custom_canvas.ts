@@ -3,6 +3,8 @@ import { DEFAULT_LABEL_PROPS } from "../defaults";
 import type { LabelProps } from "../types";
 
 type LabelBounds = { startX: number; startY: number; endX: number; endY: number; width: number; height: number };
+type FoldInfo = { axis: "vertical" | "horizontal" | "none"; points: number[] };
+type MirrorInfo = { pos: fabric.Point; flip: boolean };
 
 export class CustomCanvas extends fabric.Canvas {
   private labelProps: LabelProps = DEFAULT_LABEL_PROPS;
@@ -105,17 +107,32 @@ export class CustomCanvas extends fabric.Canvas {
   }
 
   /** Get fold line position for splitted labels */
-  getFoldLine(): { axis: "vertical" | "horizontal" | "none"; pos: number } {
-    const { startX, startY, endX, endY } = this.getLabelBounds();
+  getFoldInfo(): FoldInfo {
+    const bb = this.getLabelBounds();
+    const points: number[] = [];
+
+    if (this.labelProps.splitParts < 2) {
+      return { axis: "none", points };
+    }
 
     if (this.labelProps.split === "horizontal") {
-      const lineY = startY / 2 + endY / 2 - this.SEPARATOR_LINE_WIDTH / 2 + 1;
-      return { axis: "horizontal", pos: lineY };
+      const segmentHeight = bb.height / this.labelProps.splitParts;
+
+      for (let i = 1; i < this.labelProps.splitParts; i++) {
+        points.push(bb.startY + segmentHeight * i - this.SEPARATOR_LINE_WIDTH / 2 + 1);
+      }
+
+      return { axis: "horizontal", points };
     } else if (this.labelProps.split === "vertical") {
-      const lineX = startX / 2 + endX / 2 - this.SEPARATOR_LINE_WIDTH / 2 + 1;
-      return { axis: "vertical", pos: lineX };
+      const segmentWidth = bb.width / this.labelProps.splitParts;
+
+      for (let i = 1; i < this.labelProps.splitParts; i++) {
+        points.push(bb.startX + segmentWidth * i - this.SEPARATOR_LINE_WIDTH / 2 + 1);
+      }
+
+      return { axis: "vertical", points };
     }
-    return { axis: "none", pos: 0 };
+    return { axis: "none", points };
   }
 
   override _renderBackground(ctx: CanvasRenderingContext2D) {
@@ -143,7 +160,8 @@ export class CustomCanvas extends fabric.Canvas {
     }
 
     let roundRadius = this.ROUND_RADIUS;
-    const { startX, startY, endX, endY } = this.getLabelBounds();
+    const bb = this.getLabelBounds();
+    const fold = this.getFoldInfo();
 
     if (this.labelProps.shape !== "rounded_rect") {
       roundRadius = 0;
@@ -153,15 +171,25 @@ export class CustomCanvas extends fabric.Canvas {
     ctx.fillStyle = this.GRAY;
 
     ctx.beginPath();
-    if (this.labelProps.tailLength !== undefined) {
+    if (this.labelProps.tailLength !== undefined && this.labelProps.tailLength > 0) {
       if (this.labelProps.tailPos === "right") {
-        ctx.rect(endX - roundRadius, endY / 2 - this.TAIL_WIDTH / 2, this.width - endX + roundRadius, this.TAIL_WIDTH);
+        ctx.rect(
+          bb.endX - roundRadius,
+          bb.endY / 2 - this.TAIL_WIDTH / 2,
+          this.width - bb.endX + roundRadius,
+          this.TAIL_WIDTH
+        );
       } else if (this.labelProps.tailPos === "bottom") {
-        ctx.rect(endX / 2 - this.TAIL_WIDTH / 2, endY - roundRadius, this.TAIL_WIDTH, this.height - endY + roundRadius);
+        ctx.rect(
+          bb.endX / 2 - this.TAIL_WIDTH / 2,
+          bb.endY - roundRadius,
+          this.TAIL_WIDTH,
+          this.height - bb.endY + roundRadius
+        );
       } else if (this.labelProps.tailPos === "left") {
-        ctx.rect(0, endY / 2 - this.TAIL_WIDTH / 2, startX + roundRadius, this.TAIL_WIDTH);
+        ctx.rect(0, bb.endY / 2 - this.TAIL_WIDTH / 2, bb.startX + roundRadius, this.TAIL_WIDTH);
       } else if (this.labelProps.tailPos === "top") {
-        ctx.rect(endX / 2 - this.TAIL_WIDTH / 2, 0, this.TAIL_WIDTH, startY + roundRadius);
+        ctx.rect(bb.endX / 2 - this.TAIL_WIDTH / 2, 0, this.TAIL_WIDTH, bb.startY + roundRadius);
       }
     }
     ctx.fill();
@@ -170,19 +198,23 @@ export class CustomCanvas extends fabric.Canvas {
     ctx.fillStyle = "white";
 
     ctx.beginPath();
+
     if (this.labelProps.shape === "rounded_rect") {
       if (this.labelProps.split === "horizontal") {
-        ctx.roundRect(startX, startY, endX - startX, endY / 2 - startY / 2, roundRadius);
-        ctx.roundRect(startX, endY / 2 + startY / 2, endX - startX, endY / 2 - startY / 2, roundRadius);
+        const segmentHeight = bb.height / this.labelProps.splitParts;
+        ctx.roundRect(bb.startX, bb.startY, bb.width, segmentHeight, roundRadius); // First part
+        fold.points.forEach((y) => ctx.roundRect(bb.startX, y, bb.width, segmentHeight, roundRadius)); // Other parts
       } else if (this.labelProps.split === "vertical") {
-        ctx.roundRect(startX, startY, endX / 2 - startX / 2, endY - startY, roundRadius);
-        ctx.roundRect(endX / 2 + startX / 2, startY, endX / 2 - startX / 2, endY - startY, roundRadius);
+        const segmentWidth = bb.width / this.labelProps.splitParts;
+        ctx.roundRect(bb.startX, bb.startY, segmentWidth, bb.height, roundRadius); // First part
+        fold.points.forEach((x) => ctx.roundRect(x, bb.startY, segmentWidth, bb.height, roundRadius)); // Other parts
       } else {
         ctx.roundRect(0, 0, this.width, this.height, roundRadius);
       }
     } else {
-      ctx.rect(startX, startY, endX - startX, endY - startY);
+      ctx.rect(bb.startX, bb.startY, bb.width, bb.height);
     }
+
     ctx.fill();
 
     // Draw separator
@@ -192,14 +224,16 @@ export class CustomCanvas extends fabric.Canvas {
     ctx.setLineDash([8, 8]);
     ctx.beginPath();
 
-    const fold = this.getFoldLine();
-
     if (fold.axis === "horizontal") {
-      ctx.moveTo(startX + roundRadius, fold.pos);
-      ctx.lineTo(endX - roundRadius, fold.pos);
+      fold.points.forEach((x) => {
+        ctx.moveTo(bb.startX + roundRadius, x);
+        ctx.lineTo(bb.endX - roundRadius, x);
+      });
     } else if (fold.axis === "vertical") {
-      ctx.moveTo(fold.pos, startY + roundRadius);
-      ctx.lineTo(fold.pos, endY - roundRadius);
+      fold.points.forEach((y) => {
+        ctx.moveTo(y, bb.startY + roundRadius);
+        ctx.lineTo(y, bb.endY - roundRadius);
+      });
     }
 
     ctx.stroke();
@@ -216,64 +250,72 @@ export class CustomCanvas extends fabric.Canvas {
     ctx.save();
 
     objects.forEach((obj) => {
-      const info = this.getMirroredObjectCoords(obj);
-      if (info !== undefined) {
+      const infos = this.getMirroredObjectCoords(obj);
+      infos.forEach((info) => {
         const bbox = obj.getBoundingRect();
         ctx.fillStyle = this.MIRROR_GHOST_COLOR;
         ctx.fillRect(info.pos.x - bbox.width / 2, info.pos.y - bbox.height / 2, bbox.width, bbox.height);
         ctx.restore();
-      }
+      });
     });
     ctx.restore();
   }
 
   /**
-   * Return new object pos (origin is center) if object needs mirroring
+   * Return new object positions (origin is center) if object needs mirroring
    **/
-  getMirroredObjectCoords(obj: fabric.FabricObject): { pos: fabric.Point; flip: boolean } | undefined {
-    const fold = this.getFoldLine();
+  getMirroredObjectCoords(obj: fabric.FabricObject): MirrorInfo[] {
+    const fold = this.getFoldInfo();
+    const result: MirrorInfo[] = [];
 
     if (fold.axis === "none" || !(this.labelProps.mirror === "flip" || this.labelProps.mirror === "copy")) {
-      return undefined;
+      return result;
     }
 
-    let newObject = false;
-    let flip = false;
-    const pos = obj.getPointByOrigin("center", "center");
     const bounds = this.getLabelBounds();
 
     if (fold.axis === "vertical") {
-      newObject = true;
       if (this.labelProps.mirror === "copy") {
-        pos.setX(fold.pos + (pos.x - bounds.startX));
-      } else if (this.labelProps.mirror === "flip") {
-        flip = true;
-        pos.setX(fold.pos + (fold.pos - pos.x));
+        fold.points.forEach((x) => {
+          const pos = obj.getPointByOrigin("center", "center");
+          pos.setX(x + (pos.x - bounds.startX));
+          result.push({ pos, flip: false });
+        });
+      } else if (this.labelProps.mirror === "flip" && fold.points.length === 1) {
+        // Half split only supported
+        const axisX = fold.points[0];
+        const pos = obj.getPointByOrigin("center", "center");
+        pos.setX(axisX + (axisX - pos.x));
         pos.setY(bounds.startY + bounds.endY - pos.y);
+        result.push({ pos, flip: true });
       }
     } else if (fold.axis === "horizontal") {
-      newObject = true;
       if (this.labelProps.mirror === "copy") {
-        pos.setY(fold.pos + (pos.y - bounds.startY));
-      } else if (this.labelProps.mirror === "flip") {
-        flip = true;
-        pos.setY(fold.pos + (fold.pos - pos.y));
+        fold.points.forEach((y) => {
+          const pos = obj.getPointByOrigin("center", "center");
+          pos.setY(y + (pos.y - bounds.startY));
+          result.push({ pos, flip: false });
+        });
+      } else if (this.labelProps.mirror === "flip" && fold.points.length === 1) {
+        // Half split only supported
+        const axisY = fold.points[0];
+        const pos = obj.getPointByOrigin("center", "center");
+        pos.setY(axisY + (axisY - pos.y));
         pos.setX(bounds.startX + bounds.endX - pos.x);
+        result.push({ pos, flip: true });
       }
     }
 
-    if (!newObject) {
-      return undefined;
-    }
-
-    return { pos, flip };
+    return result;
   }
 
+  /** Clone mirrored objects and add them to canvas */
   async createMirroredObjects() {
     const objects = this.getObjects();
     for (const obj of objects) {
-      const info = this.getMirroredObjectCoords(obj);
-      if (info != undefined) {
+      const infos = this.getMirroredObjectCoords(obj);
+
+      for (const info of infos) {
         const newObj = await obj.clone();
         newObj.setPositionByOrigin(info.pos, "center", "center");
         if (info.flip) {

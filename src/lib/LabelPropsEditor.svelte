@@ -41,6 +41,7 @@
   let printDirection: PrintDirection = "left";
   let shape: LabelShape = "rect";
   let split: LabelSplit = "none";
+  let splitParts: number = 2;
   let tailLength: number = 0;
   let tailPos: TailPosition = "right";
   let mirror: MirrorType = "none";
@@ -77,6 +78,7 @@
       },
       shape,
       split,
+      splitParts,
       tailPos,
       tailLength: Math.floor(newTailLength),
       mirror,
@@ -95,6 +97,7 @@
     title = preset.title ?? "";
     shape = preset.shape ?? "rect";
     split = preset.split ?? "none";
+    splitParts = preset.splitParts ?? 2;
     tailPos = preset.tailPos ?? "right";
     tailLength = preset.tailLength ?? 0;
     mirror = preset.mirror ?? "none";
@@ -119,6 +122,7 @@
       title,
       shape,
       split,
+      splitParts,
       tailPos,
       tailLength,
       mirror,
@@ -182,6 +186,7 @@
     printDirection = labelProps.printDirection;
     shape = labelProps.shape ?? "rect";
     split = labelProps.split ?? "none";
+    splitParts = labelProps.splitParts ?? 2;
     tailPos = labelProps.tailPos ?? "right";
     tailLength = labelProps.tailLength ?? 0;
     mirror = labelProps.mirror ?? "none";
@@ -241,6 +246,7 @@
   $: checkError(labelProps);
   $: if (shape === "circle" && split !== "none") split = "none";
   $: if (split === "none") tailLength = 0;
+  $: if (mirror === "flip" && splitParts !== 2) mirror = "copy";
   $: if (tailLength < 0) tailLength = 0;
 </script>
 
@@ -349,6 +355,11 @@
               <div class="svg-icon"></div>
             </label>
           {/each}
+
+          {#if split !== "none"}
+            <span class="input-group-text">{$tr("params.label.split.count")}</span>
+            <input class="form-control w-100" type="number" min="1" bind:value={splitParts} />
+          {/if}
         </div>
       {/if}
 
@@ -389,7 +400,7 @@
 
         <div class="input-group flex-nowrap input-group-sm mb-2">
           <span class="input-group-text">{$tr("params.label.tail.length")}</span>
-          <input class="form-control" type="number" min="0" bind:value={tailLength} />
+          <input class="form-control" type="number" min="1" bind:value={tailLength} />
           <span class="input-group-text">
             {#if unit === "mm"}{$tr("params.label.mm")}{/if}
             {#if unit === "px"}{$tr("params.label.px")}{/if}
