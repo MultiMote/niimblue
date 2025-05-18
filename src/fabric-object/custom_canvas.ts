@@ -110,23 +110,24 @@ export class CustomCanvas extends fabric.Canvas {
   getFoldInfo(): FoldInfo {
     const bb = this.getLabelBounds();
     const points: number[] = [];
+    const splitParts = this.labelProps.splitParts ?? 2;
 
-    if (this.labelProps.splitParts < 2) {
+    if (splitParts < 2) {
       return { axis: "none", points };
     }
 
     if (this.labelProps.split === "horizontal") {
-      const segmentHeight = bb.height / this.labelProps.splitParts;
+      const segmentHeight = bb.height / splitParts;
 
-      for (let i = 1; i < this.labelProps.splitParts; i++) {
+      for (let i = 1; i < splitParts; i++) {
         points.push(bb.startY + segmentHeight * i - this.SEPARATOR_LINE_WIDTH / 2 + 1);
       }
 
       return { axis: "horizontal", points };
     } else if (this.labelProps.split === "vertical") {
-      const segmentWidth = bb.width / this.labelProps.splitParts;
+      const segmentWidth = bb.width / splitParts;
 
-      for (let i = 1; i < this.labelProps.splitParts; i++) {
+      for (let i = 1; i < splitParts; i++) {
         points.push(bb.startX + segmentWidth * i - this.SEPARATOR_LINE_WIDTH / 2 + 1);
       }
 
@@ -199,13 +200,15 @@ export class CustomCanvas extends fabric.Canvas {
 
     ctx.beginPath();
 
+    const splitParts = this.labelProps.splitParts ?? 2;
+
     if (this.labelProps.shape === "rounded_rect") {
       if (this.labelProps.split === "horizontal") {
-        const segmentHeight = bb.height / this.labelProps.splitParts;
+        const segmentHeight = bb.height / splitParts;
         ctx.roundRect(bb.startX, bb.startY, bb.width, segmentHeight, roundRadius); // First part
         fold.points.forEach((y) => ctx.roundRect(bb.startX, y, bb.width, segmentHeight, roundRadius)); // Other parts
       } else if (this.labelProps.split === "vertical") {
-        const segmentWidth = bb.width / this.labelProps.splitParts;
+        const segmentWidth = bb.width / splitParts;
         ctx.roundRect(bb.startX, bb.startY, segmentWidth, bb.height, roundRadius); // First part
         fold.points.forEach((x) => ctx.roundRect(x, bb.startY, segmentWidth, bb.height, roundRadius)); // Other parts
       } else {
