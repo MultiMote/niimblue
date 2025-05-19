@@ -64,7 +64,7 @@
     "params.label.shape": "Форма этикетки",
     "params.label.size": "Размер",
     "params.label.split": "Разделение этикетки",
-    "params.label.split.count": "Частей",
+    "params.label.split.count": "Частей для разделения",
     "params.label.tail.length": "Длина хвостовика",
     "params.label.tail.position": "Положение хвостовика",
     "params.label.warning.direction": "Рекомендуемое направление печати для вашего принтера:",

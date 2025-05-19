@@ -355,12 +355,14 @@
               <div class="svg-icon"></div>
             </label>
           {/each}
-
-          {#if split !== "none"}
-            <span class="input-group-text">{$tr("params.label.split.count")}</span>
-            <input class="form-control w-100" type="number" min="1" bind:value={splitParts} />
-          {/if}
         </div>
+
+        {#if split !== "none"}
+          <div class="input-group flex-nowrap input-group-sm mb-2">
+            <span class="input-group-text">{$tr("params.label.split.count")}</span>
+            <input class="form-control" type="number" min="1" bind:value={splitParts} />
+          </div>
+        {/if}
       {/if}
 
       {#if split !== "none"}
