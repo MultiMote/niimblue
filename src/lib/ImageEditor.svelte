@@ -131,7 +131,7 @@
     }
 
     // Del
-    if (key === "delete") {
+    if (key === "delete" || key === "backspace") {
       deleteSelected();
       return;
     }
