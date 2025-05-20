@@ -84,6 +84,8 @@
 
   const onKeyDown = (e: KeyboardEvent) => {
     const key: string = e.key.toLowerCase();
+    // windows and linux users are used to ctrl, mac users use cmd
+    const cmdOrCtrl = e.metaKey || e.ctrlKey;
 
     // Esc
     if (key === "escape") {
@@ -97,7 +99,7 @@
 
     // Arrows
     if (key.startsWith("arrow")) {
-      moveSelected(key.slice("arrow".length) as MoveDirection, e.ctrlKey);
+      moveSelected(key.slice("arrow".length) as MoveDirection, cmdOrCtrl);
       return;
     }
 
@@ -106,14 +108,14 @@
     }
 
     // Ctrl + D
-    if (e.ctrlKey && key === "d") {
+    if (cmdOrCtrl && key === "d") {
       e.preventDefault();
       cloneSelected();
       return;
     }
 
     // Ctrl + Y, Ctrl + Shift + Z
-    if ((e.ctrlKey && key === "y") || (e.ctrlKey && e.shiftKey && key === "z")) {
+    if ((cmdOrCtrl && key === "y") || (cmdOrCtrl && e.shiftKey && key === "z")) {
       e.preventDefault();
       if (!undoState.redoDisabled) {
         undo.redo();
@@ -122,7 +124,7 @@
     }
 
     // Ctrl + Z
-    if (e.ctrlKey && key === "z") {
+    if (cmdOrCtrl && key === "z") {
       e.preventDefault();
       if (!undoState.undoDisabled) {
         undo.undo();
@@ -131,7 +133,7 @@
     }
 
     // Del
-    if (key === "delete") {
+    if (key === "delete" || key === "backspace") {
       deleteSelected();
       return;
     }
