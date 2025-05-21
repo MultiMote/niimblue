@@ -15,7 +15,7 @@
   } from "../types";
   import { FileUtils } from "../utils/file_utils";
   import { tr } from "../utils/i18n";
-  import { ImageEditorObjectHelper } from "../utils/image_editor_object_helper";
+  import { LabelDesignerObjectHelper } from "../utils/label_desinder_object_helper";
   import { LocalStoragePersistence } from "../utils/persistence";
   import { Toasts } from "../utils/toasts";
   import { UndoRedo, type UndoState } from "../utils/undo_redo";
@@ -31,7 +31,7 @@
   import TextParamsPanel from "./TextParamsControls.svelte";
   import VariableInsertControl from "./VariableInsertControl.svelte";
   import { DEFAULT_LABEL_PROPS, GRID_SIZE } from "../defaults";
-  import { ImageEditorUtils } from "../utils/image_editor_utils";
+  import { LabelDesignerUtils } from "../utils/label_designer_utils";
   import SavedLabelsMenu from "./SavedLabelsMenu.svelte";
   import { CustomCanvas } from "../fabric-object/custom_canvas";
 
@@ -69,16 +69,16 @@
   };
 
   const deleteSelected = () => {
-    ImageEditorUtils.deleteSelection(fabricCanvas);
+    LabelDesignerUtils.deleteSelection(fabricCanvas);
     discardSelection();
   };
 
   const cloneSelected = () => {
-    ImageEditorUtils.cloneSelection(fabricCanvas).then(() => undo.push(fabricCanvas, labelProps));
+    LabelDesignerUtils.cloneSelection(fabricCanvas).then(() => undo.push(fabricCanvas, labelProps));
   };
 
   const moveSelected = (direction: MoveDirection, ctrl?: boolean) => {
-    ImageEditorUtils.moveSelection(fabricCanvas, direction, ctrl);
+    LabelDesignerUtils.moveSelection(fabricCanvas, direction, ctrl);
     undo.push(fabricCanvas, labelProps);
   };
 
@@ -93,7 +93,7 @@
       return;
     }
 
-    if (ImageEditorUtils.isAnyInputFocused(fabricCanvas)) {
+    if (LabelDesignerUtils.isAnyInputFocused(fabricCanvas)) {
       return;
     }
 
@@ -160,11 +160,11 @@
   };
 
   const zplImageReady = (img: Blob) => {
-    ImageEditorObjectHelper.addImageBlob(fabricCanvas, img).then(() => undo.push(fabricCanvas, labelProps));
+    LabelDesignerObjectHelper.addImageBlob(fabricCanvas, img).then(() => undo.push(fabricCanvas, labelProps));
   };
 
   const onObjectPicked = (objectType: OjectType) => {
-    const obj = ImageEditorObjectHelper.addObject(fabricCanvas, objectType);
+    const obj = LabelDesignerObjectHelper.addObject(fabricCanvas, objectType);
     if (obj !== undefined) {
       fabricCanvas.setActiveObject(obj);
       undo.push(fabricCanvas, labelProps);
@@ -173,7 +173,7 @@
 
   const onIconPicked = (i: MaterialIcon) => {
     // todo: icon is not vertically centered
-    ImageEditorObjectHelper.addStaticText(fabricCanvas, String.fromCodePoint(iconCodepoints[i]), {
+    LabelDesignerObjectHelper.addStaticText(fabricCanvas, String.fromCodePoint(iconCodepoints[i]), {
       fontFamily: "Material Icons",
       fontSize: 100,
     });
@@ -215,7 +215,7 @@
   };
 
   const onCsvPlaceholderPicked = (name: string) => {
-    const obj = ImageEditorObjectHelper.addText(fabricCanvas, `{${name}}`, {
+    const obj = LabelDesignerObjectHelper.addText(fabricCanvas, `{${name}}`, {
       textAlign: "left",
       originX: "left",
       originY: "top",
@@ -225,7 +225,7 @@
   };
 
   const onPaste = async (event: ClipboardEvent) => {
-    if (ImageEditorUtils.isAnyInputFocused(fabricCanvas)) {
+    if (LabelDesignerUtils.isAnyInputFocused(fabricCanvas)) {
       return;
     }
 
@@ -236,7 +236,7 @@
 
     if (event.clipboardData != null) {
       event.preventDefault();
-      const obj = await ImageEditorObjectHelper.addObjectFromClipboard(fabricCanvas, event.clipboardData);
+      const obj = await LabelDesignerObjectHelper.addObjectFromClipboard(fabricCanvas, event.clipboardData);
 
       if (obj !== undefined) {
         fabricCanvas.setActiveObject(obj);
@@ -277,7 +277,7 @@
       if (defaultTemplate !== null) {
         onLoadRequested(defaultTemplate);
       } else {
-        ImageEditorObjectHelper.addText(fabricCanvas, $tr("editor.default_text"));
+        LabelDesignerObjectHelper.addText(fabricCanvas, $tr("editor.default_text"));
       }
     } catch (e) {
       Toasts.error(e);
@@ -328,7 +328,7 @@
 
       if (dragEvt.dataTransfer?.files) {
         [...dragEvt.dataTransfer.files].forEach((file: File) => {
-          ImageEditorObjectHelper.addImageFile(fabricCanvas, file);
+          LabelDesignerObjectHelper.addImageFile(fabricCanvas, file);
           undo.push(fabricCanvas, labelProps);
         });
       }

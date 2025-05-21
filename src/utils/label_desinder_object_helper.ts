@@ -4,7 +4,7 @@ import Barcode from "../fabric-object/barcode";
 import { QRCode } from "../fabric-object/qrcode";
 import type { OjectType } from "../types";
 
-export class ImageEditorObjectHelper {
+export class LabelDesignerObjectHelper {
   static async addSvg(canvas: fabric.Canvas, svgCode: string): Promise<fabric.FabricObject | fabric.Group> {
     const { objects, options } = await fabric.loadSVGFromString(svgCode);
     const obj = fabric.util.groupSVGElements(
@@ -103,7 +103,7 @@ export class ImageEditorObjectHelper {
       if (item.type.indexOf("image") !== -1) {
         const file = item.getAsFile();
         if (file) {
-          return await ImageEditorObjectHelper.addImageFile(fabricCanvas, file);
+          return await LabelDesignerObjectHelper.addImageFile(fabricCanvas, file);
         }
       }
     }
@@ -111,7 +111,7 @@ export class ImageEditorObjectHelper {
     // paste text
     const text = data.getData("text");
     if (text) {
-      const obj = ImageEditorObjectHelper.addText(fabricCanvas, text);
+      const obj = LabelDesignerObjectHelper.addText(fabricCanvas, text);
       fabricCanvas.setActiveObject(obj);
       return obj;
     }

@@ -2,7 +2,7 @@ import * as fabric from "fabric";
 import { GRID_SIZE, OBJECT_DEFAULTS } from "../defaults";
 import type { MoveDirection } from "../types";
 
-export class ImageEditorUtils {
+export class LabelDesignerUtils {
   static async cloneSelection(canvas: fabric.Canvas): Promise<void> {
     const clonedList: fabric.FabricObject[] = [];
 
@@ -25,7 +25,7 @@ export class ImageEditorUtils {
       cloned.top += GRID_SIZE;
       cloned.left += GRID_SIZE;
       cloned.snapAngle = OBJECT_DEFAULTS.snapAngle;
-      
+
       clonedList.push(cloned);
     }
 
