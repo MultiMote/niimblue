@@ -298,7 +298,9 @@
         </select>
       </div>
 
-      <DpiSelector bind:value={dpmm}/>
+      {#if unit !== "px"}
+        <DpiSelector bind:value={dpmm} />
+      {/if}
 
       <div class="input-group flex-nowrap input-group-sm print-dir-switch mb-2" role="group">
         <span class="input-group-text w-100">{$tr("params.label.direction")}</span>
