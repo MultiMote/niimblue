@@ -3,7 +3,8 @@ import { DEFAULT_LABEL_PROPS } from "../defaults";
 import type { LabelProps } from "../types";
 
 type LabelBounds = { startX: number; startY: number; endX: number; endY: number; width: number; height: number };
-type FoldInfo = { axis: "vertical" | "horizontal" | "none"; points: number[] };
+type FoldSegment = { start: number; end: number };
+type FoldInfo = { axis: "vertical" | "horizontal" | "none"; points: number[]; segments: FoldSegment[] };
 type MirrorInfo = { pos: fabric.Point; flip: boolean };
 
 export class CustomCanvas extends fabric.Canvas {
@@ -110,30 +111,44 @@ export class CustomCanvas extends fabric.Canvas {
   getFoldInfo(): FoldInfo {
     const bb = this.getLabelBounds();
     const points: number[] = [];
+    const segments: FoldSegment[] = [];
     const splitParts = this.labelProps.splitParts ?? 2;
 
     if (splitParts < 2) {
-      return { axis: "none", points };
+      return { axis: "none", points, segments };
     }
 
     if (this.labelProps.split === "horizontal") {
       const segmentHeight = bb.height / splitParts;
+      let lastY: number = bb.startY;
 
       for (let i = 1; i < splitParts; i++) {
-        points.push(bb.startY + segmentHeight * i - this.SEPARATOR_LINE_WIDTH / 2 + 1);
+        const y = bb.startY + segmentHeight * i - this.SEPARATOR_LINE_WIDTH / 2 + 1;
+        points.push(y);
+        segments.push({ start: lastY, end: y });
+        lastY = y;
       }
 
-      return { axis: "horizontal", points };
+      segments.push({ start: lastY, end: bb.endY });
+
+      return { axis: "horizontal", points, segments };
     } else if (this.labelProps.split === "vertical") {
       const segmentWidth = bb.width / splitParts;
+      let lastX: number = bb.startY;
 
       for (let i = 1; i < splitParts; i++) {
-        points.push(bb.startX + segmentWidth * i - this.SEPARATOR_LINE_WIDTH / 2 + 1);
+        const x = bb.startX + segmentWidth * i - this.SEPARATOR_LINE_WIDTH / 2 + 1;
+        points.push(x);
+        segments.push({ start: lastX, end: x });
+        lastX = x;
       }
 
-      return { axis: "vertical", points };
+      segments.push({ start: lastX, end: bb.endX });
+
+      return { axis: "vertical", points, segments };
     }
-    return { axis: "none", points };
+
+    return { axis: "none", points, segments };
   }
 
   override _renderBackground(ctx: CanvasRenderingContext2D) {
@@ -335,15 +350,17 @@ export class CustomCanvas extends fabric.Canvas {
     if ((this.labelProps.split ?? "none") !== "none") {
       const pos = object.getPointByOrigin("center", "center");
       const bounds = this.getLabelBounds();
-      const centerX = bounds.startX + bounds.width / 2;
+      const fold = this.getFoldInfo();
+      let centerX = bounds.startX + bounds.width / 2;
 
-      if (this.labelProps.split === "horizontal") {
-        pos.setX(centerX);
-      } else if (pos.x < centerX) {
-        pos.setX(centerX - bounds.width / 4);
-      } else {
-        pos.setX(centerX + bounds.width / 4);
+      if (fold.axis !== "horizontal") {
+        fold.segments.forEach((seg) => {
+          if (pos.x >= seg.start && pos.x <= seg.end) {
+            centerX = seg.start + (seg.end - seg.start) / 2;
+          }
+        });
       }
+      pos.setX(centerX);
 
       object.setPositionByOrigin(pos, "center", "center");
       return;
@@ -357,16 +374,18 @@ export class CustomCanvas extends fabric.Canvas {
     if ((this.labelProps.split ?? "none") !== "none") {
       const pos = object.getPointByOrigin("center", "center");
       const bounds = this.getLabelBounds();
-      const centerY = bounds.startY + bounds.height / 2;
+      const fold = this.getFoldInfo();
+      let centerY = bounds.startY + bounds.height / 2;
 
-      if (this.labelProps.split === "vertical") {
-        pos.setY(centerY);
-      } else if (pos.y < centerY) {
-        pos.setY(centerY - bounds.height / 4);
-      } else {
-        pos.setY(centerY + bounds.height / 4);
+      if (fold.axis !== "vertical") {
+        fold.segments.forEach((seg) => {
+          if (pos.y >= seg.start && pos.y <= seg.end) {
+            centerY = seg.start + (seg.end - seg.start) / 2;
+          }
+        });
       }
 
+      pos.setY(centerY);
       object.setPositionByOrigin(pos, "center", "center");
       return;
     }
