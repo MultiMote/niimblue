@@ -134,7 +134,7 @@ export class CustomCanvas extends fabric.Canvas {
       return { axis: "horizontal", points, segments };
     } else if (this.labelProps.split === "vertical") {
       const segmentWidth = bb.width / splitParts;
-      let lastX: number = bb.startY;
+      let lastX: number = bb.startX;
 
       for (let i = 1; i < splitParts; i++) {
         const x = bb.startX + segmentWidth * i - this.SEPARATOR_LINE_WIDTH / 2 + 1;
