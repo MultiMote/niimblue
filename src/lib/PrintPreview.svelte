@@ -77,9 +77,8 @@
     for (let curPage = 0; curPage < pagesTotal; curPage++) {
       page = curPage;
       await generatePreviewData(page);
-      sources.push(previewCanvas.toDataURL("image/png"))
+      sources.push(previewCanvas.toDataURL("image/png"));
     }
-    
 
     FileUtils.printImageUrls(sources);
   };
@@ -89,57 +88,98 @@
     error = "";
     $printerClient.stopHeartbeat();
 
-    // do it in a stupid way (multi-page print not finished yet)
-    for (let curPage = 0; curPage < pagesTotal; curPage++) {
-      const printTask = $printerClient.abstraction.newPrintTask(printTaskName, {
-        totalPages: quantity,
-        density,
-        labelType,
-        statusPollIntervalMs: 100,
-        statusTimeoutMs: 8_000,
-      });
+    const printTask = $printerClient.abstraction.newPrintTask(printTaskName, {
+      totalPages: pagesTotal * quantity,
+      density,
+      labelType,
+      statusPollIntervalMs: 100,
+      statusTimeoutMs: 8_000,
+    });
 
-      page = curPage;
-      console.log("Printing page", page);
+    const listener = (e: PrintProgressEvent) => {
+      printProgress = Math.floor((e.page / quantity) * ((e.pagePrintProgress + e.pageFeedProgress) / 2));
+    };
 
-      await generatePreviewData(page);
-      const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, labelProps.printDirection);
+    $printerClient.on("printprogress", listener);
 
-      try {
-        await printTask.printInit();
-        await printTask.printPage(encoded, quantity);
-      } catch (e) {
-        error = `${e}`;
-        console.error(e);
-        return;
-      }
+    try {
+      await printTask.printInit();
 
       printState = "printing";
 
-      const listener = (e: PrintProgressEvent) => {
-        printProgress = Math.floor((e.page / quantity) * ((e.pagePrintProgress + e.pageFeedProgress) / 2));
-      };
-
-      $printerClient.on("printprogress", listener);
-
-      try {
-        await printTask.waitForFinished();
-      } catch (e) {
-        error = `${e}`;
-        console.error(e);
+      for (let curPage = 0; curPage < pagesTotal; curPage++) {
+        page = curPage;
+        await generatePreviewData(page);
+        const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, labelProps.printDirection);
+        await printTask.printPage(encoded, quantity);
+        await printTask.waitForFinished((curPage + 1) * quantity);
       }
 
-      $printerClient.off("printprogress", listener);
-
       await endPrint();
+    } catch (e) {
+      error = `${e}`;
+      console.error(e);
     }
 
+    $printerClient.off("printprogress", listener);
     printState = "idle";
     $printerClient.startHeartbeat();
 
     if (printNow && !error) {
       modal.hide();
     }
+
+    // do it in a stupid way (multi-page print not finished yet)
+    // for (let curPage = 0; curPage < pagesTotal; curPage++) {
+    //   const printTask = $printerClient.abstraction.newPrintTask(printTaskName, {
+    //     totalPages: quantity,
+    //     density,
+    //     labelType,
+    //     statusPollIntervalMs: 100,
+    //     statusTimeoutMs: 8_000,
+    //   });
+
+    //   page = curPage;
+    //   console.log("Printing page", page);
+
+    //   await generatePreviewData(page);
+    //   const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, labelProps.printDirection);
+
+    //   try {
+    //     await printTask.printInit();
+    //     await printTask.printPage(encoded, quantity);
+    //   } catch (e) {
+    //     error = `${e}`;
+    //     console.error(e);
+    //     return;
+    //   }
+
+    //   printState = "printing";
+
+    //   const listener = (e: PrintProgressEvent) => {
+    //     printProgress = Math.floor((e.page / quantity) * ((e.pagePrintProgress + e.pageFeedProgress) / 2));
+    //   };
+
+    //   $printerClient.on("printprogress", listener);
+
+    //   try {
+    //     await printTask.waitForFinished();
+    //   } catch (e) {
+    //     error = `${e}`;
+    //     console.error(e);
+    //   }
+
+    //   $printerClient.off("printprogress", listener);
+
+    //   await endPrint();
+    // }
+
+    // printState = "idle";
+    // $printerClient.startHeartbeat();
+
+    // if (printNow && !error) {
+    //   modal.hide();
+    // }
   };
 
   const updatePreview = () => {
@@ -505,7 +545,11 @@
           </button>
         {/if}
 
-        <button type="button" class="btn btn-secondary" title={$tr("preview.print.system")} on:click={onPrintOnSystemPrinter}>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          title={$tr("preview.print.system")}
+          on:click={onPrintOnSystemPrinter}>
           <MdIcon icon="print" />
         </button>
 
@@ -516,7 +560,6 @@
             <MdIcon icon="print" /> {$tr("preview.print")}
           {/if}
         </button>
-
       </div>
     </div>
   </div>
