@@ -20,6 +20,7 @@
   import { Toasts } from "../utils/toasts";
   import { FileUtils } from "../utils/file_utils";
   import { z } from "zod";
+  import DpiSelector from "./basic/DpiSelector.svelte";
 
   export let labelProps: LabelProps;
   export let onChange: (newProps: LabelProps) => void;
@@ -297,13 +298,7 @@
         </select>
       </div>
 
-      <div class="input-group flex-nowrap input-group-sm mb-2">
-        <span class="input-group-text">{$tr("params.label.head_density")}</span>
-        <input class="form-control" type="number" min="1" bind:value={dpmm} />
-        <span class="input-group-text cursor-help" title={$tr("params.label.head_density.help")}>
-          {$tr("params.label.dpmm")}
-        </span>
-      </div>
+      <DpiSelector bind:value={dpmm}/>
 
       <div class="input-group flex-nowrap input-group-sm print-dir-switch mb-2" role="group">
         <span class="input-group-text w-100">{$tr("params.label.direction")}</span>
