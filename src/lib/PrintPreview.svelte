@@ -51,6 +51,7 @@
   let pagesTotal: number = 1;
   let offset: PreviewPropsOffset = { x: 0, y: 0, offsetType: "inner" };
   let offsetWarning: string = "";
+  let oldPrintLogic = false;
 
   let savedProps = {} as PreviewProps;
 
@@ -86,100 +87,102 @@
   const onPrint = async () => {
     printState = "sending";
     error = "";
-    $printerClient.stopHeartbeat();
 
-    const printTask = $printerClient.abstraction.newPrintTask(printTaskName, {
-      totalPages: pagesTotal * quantity,
-      density,
-      labelType,
-      statusPollIntervalMs: 100,
-      statusTimeoutMs: 8_000,
-    });
-
-    const listener = (e: PrintProgressEvent) => {
-      printProgress = Math.floor((e.page / quantity) * ((e.pagePrintProgress + e.pageFeedProgress) / 2));
-    };
-
-    $printerClient.on("printprogress", listener);
-
-    try {
-      await printTask.printInit();
-
-      printState = "printing";
-
+    if (oldPrintLogic) {
+      // do it in a stupid way (multi-page print not finished yet)
       for (let curPage = 0; curPage < pagesTotal; curPage++) {
+        $printerClient.stopHeartbeat();
+
+        const printTask = $printerClient.abstraction.newPrintTask(printTaskName, {
+          totalPages: quantity,
+          density,
+          labelType,
+          statusPollIntervalMs: 100,
+          statusTimeoutMs: 8_000,
+        });
+
         page = curPage;
+        console.log("Printing page", page);
+
         await generatePreviewData(page);
         const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, labelProps.printDirection);
-        await printTask.printPage(encoded, quantity);
-        await printTask.waitForFinished((curPage + 1) * quantity);
+
+        try {
+          await printTask.printInit();
+          await printTask.printPage(encoded, quantity);
+        } catch (e) {
+          error = `${e}`;
+          console.error(e);
+          return;
+        }
+
+        printState = "printing";
+
+        const listener = (e: PrintProgressEvent) => {
+          printProgress = Math.floor((e.page / quantity) * ((e.pagePrintProgress + e.pageFeedProgress) / 2));
+        };
+
+        $printerClient.on("printprogress", listener);
+
+        try {
+          await printTask.waitForFinished();
+        } catch (e) {
+          error = `${e}`;
+          console.error(e);
+        }
+
+        $printerClient.off("printprogress", listener);
+        await endPrint();
       }
 
-      await endPrint();
-    } catch (e) {
-      error = `${e}`;
-      console.error(e);
+      printState = "idle";
+      $printerClient.startHeartbeat();
+
+      if (printNow && !error) {
+        modal.hide();
+      }
+    } else {
+      const printTask = $printerClient.abstraction.newPrintTask(printTaskName, {
+        totalPages: pagesTotal * quantity,
+        density,
+        labelType,
+        statusPollIntervalMs: 100,
+        statusTimeoutMs: 8_000,
+      });
+
+      const listener = (e: PrintProgressEvent) => {
+        printProgress = Math.floor((e.page / quantity) * ((e.pagePrintProgress + e.pageFeedProgress) / 2));
+      };
+
+      $printerClient.on("printprogress", listener);
+
+      try {
+        await printTask.printInit();
+
+        printState = "printing";
+
+        for (let curPage = 0; curPage < pagesTotal; curPage++) {
+          page = curPage;
+          await generatePreviewData(page);
+          const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, labelProps.printDirection);
+          await printTask.printPage(encoded, quantity);
+          await printTask.waitForFinished((curPage + 1) * quantity);
+        }
+
+        await endPrint();
+      } catch (e) {
+        error = `${e}`;
+        console.error(e);
+      }
+
+      $printerClient.off("printprogress", listener);
+      printState = "idle";
+      $printerClient.startHeartbeat();
+
+      if (printNow && !error) {
+        modal.hide();
+      }
     }
-
-    $printerClient.off("printprogress", listener);
-    printState = "idle";
-    $printerClient.startHeartbeat();
-
-    if (printNow && !error) {
-      modal.hide();
-    }
-
-    // do it in a stupid way (multi-page print not finished yet)
-    // for (let curPage = 0; curPage < pagesTotal; curPage++) {
-    //   const printTask = $printerClient.abstraction.newPrintTask(printTaskName, {
-    //     totalPages: quantity,
-    //     density,
-    //     labelType,
-    //     statusPollIntervalMs: 100,
-    //     statusTimeoutMs: 8_000,
-    //   });
-
-    //   page = curPage;
-    //   console.log("Printing page", page);
-
-    //   await generatePreviewData(page);
-    //   const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, labelProps.printDirection);
-
-    //   try {
-    //     await printTask.printInit();
-    //     await printTask.printPage(encoded, quantity);
-    //   } catch (e) {
-    //     error = `${e}`;
-    //     console.error(e);
-    //     return;
-    //   }
-
-    //   printState = "printing";
-
-    //   const listener = (e: PrintProgressEvent) => {
-    //     printProgress = Math.floor((e.page / quantity) * ((e.pagePrintProgress + e.pageFeedProgress) / 2));
-    //   };
-
-    //   $printerClient.on("printprogress", listener);
-
-    //   try {
-    //     await printTask.waitForFinished();
-    //   } catch (e) {
-    //     error = `${e}`;
-    //     console.error(e);
-    //   }
-
-    //   $printerClient.off("printprogress", listener);
-
-    //   await endPrint();
-    // }
-
-    // printState = "idle";
-    // $printerClient.startHeartbeat();
-
-    // if (printNow && !error) {
-    //   modal.hide();
-    // }
   };
 
   const updatePreview = () => {
@@ -507,6 +510,13 @@
             value={printTaskName}
             savedValue={savedProps.printTaskName}
             onClick={toggleSavedProp} />
+        </div>
+
+        <div class="input-group input-group-sm">
+          <span class="input-group-text">Dumb print logic</span>
+          <span class="input-group-text">
+            <input type="checkbox" bind:checked={oldPrintLogic} />
+          </span>
         </div>
 
         <div class="input-group input-group-sm">
