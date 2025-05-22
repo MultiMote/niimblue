@@ -79,7 +79,7 @@
       await generatePreviewData(page);
       sources.push(previewCanvas.toDataURL("image/png"))
     }
-    
+
 
     FileUtils.printImageUrls(sources);
   };
@@ -87,10 +87,11 @@
   const onPrint = async () => {
     printState = "sending";
     error = "";
-    $printerClient.stopHeartbeat();
 
     // do it in a stupid way (multi-page print not finished yet)
     for (let curPage = 0; curPage < pagesTotal; curPage++) {
+      $printerClient.stopHeartbeat();
+      
       const printTask = $printerClient.abstraction.newPrintTask(printTaskName, {
         totalPages: quantity,
         density,
