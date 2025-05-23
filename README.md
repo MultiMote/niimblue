@@ -1,10 +1,10 @@
 # NiimBlue
 
-Niimbot printers webui. Design and print labels right from your browser.
+NIIMBOT printers webui. Design and print labels right from your browser.
 
 Uses [NiimBlueLib](https://github.com/MultiMote/niimbluelib) for communication.
 
-Project is deployed [here](https://niim.mmote.ru).
+Project is deployed here: [niim.blue](https://niim.blue)
 
 > [!NOTE]
 > If you have printing problems, try different print task versions in print preview dialog. Make if default by pressing "Lock" button.
@@ -45,7 +45,7 @@ In some systems you need to enable Chrome `Experimental Web Platform Features` (
 
 I only have D110 and B1 printers. If you own other models, please write a comment [here](https://github.com/MultiMote/niimbluelib/issues/1) describing your model working or not.
 
-Bluetooth dumps are MUCH appreciated (search how to enable **Bluetooth HCI Snoop Log** for your device, print any label with **Niimbot** app then run `adb bugreport filename`, you should find **btsnoop_hci.log** in the archive).
+Bluetooth dumps are MUCH appreciated. [How to make it](https://github.com/MultiMote/niimblue/wiki/Making-packet-capture).
 
 ## Images
 
