@@ -168,7 +168,7 @@ export class LabelDesignerObjectHelper {
   static addRect(canvas: fabric.Canvas): fabric.Rect {
     const obj = new fabric.Rect({
       ...OBJECT_SIZE_DEFAULTS,
-      ...OBJECT_DEFAULTS_VECTOR,
+      ...OBJECT_DEFAULTS_VECTOR
     });
     canvas.add(obj);
     canvas.centerObjectV(obj);

@@ -102,6 +102,8 @@
     "params.variables.insert.datetime": "Дата и время",
     "params.variables.insert.time": "Время",
     "params.variables.insert": "Вставить переменную",
+    "params.vector.round_radius": "Радиус скругления",
+    "params.vector.stroke_width": "Толщина обводки",
     "preview.close": "Закрыть",
     "preview.copies": "Копии",
     "preview.density": "Плотность",

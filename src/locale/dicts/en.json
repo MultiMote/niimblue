@@ -103,6 +103,8 @@
     "params.variables.insert.datetime": "Datetime",
     "params.variables.insert.time": "Time",
     "params.variables.insert": "Insert variable",
+    "params.vector.round_radius": "Round radius",
+    "params.vector.stroke_width": "Stroke width",
     "preview.close": "Close",
     "preview.copies": "Copies",
     "preview.density": "Density",

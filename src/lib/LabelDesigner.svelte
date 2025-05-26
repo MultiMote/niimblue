@@ -28,12 +28,13 @@
   import ObjectPicker from "./ObjectPicker.svelte";
   import PrintPreview from "./PrintPreview.svelte";
   import QrCodeParamsPanel from "./QRCodeParamsControls.svelte";
-  import TextParamsPanel from "./TextParamsControls.svelte";
+  import TextParamsControls from "./TextParamsControls.svelte";
   import VariableInsertControl from "./VariableInsertControl.svelte";
   import { DEFAULT_LABEL_PROPS, GRID_SIZE } from "../defaults";
   import { LabelDesignerUtils } from "../utils/label_designer_utils";
   import SavedLabelsMenu from "./SavedLabelsMenu.svelte";
   import { CustomCanvas } from "../fabric-object/custom_canvas";
+  import VectorParamsControls from "./VectorParamsControls.svelte";
 
   let htmlCanvas: HTMLCanvasElement;
   let fabricCanvas: CustomCanvas;
@@ -335,7 +336,13 @@
     });
 
     fabricCanvas.on("object:scaling", (e): void => {
-      if (e.target && e.target instanceof Barcode && e.target.width !== undefined && e.target.height !== undefined) {
+      if (!e.target) {
+        return;
+      }
+
+      const isNotScalable = e.target instanceof Barcode || e.target instanceof fabric.Rect;
+
+      if (isNotScalable && e.target.width !== undefined && e.target.height !== undefined) {
         e.target.set({
           width: Math.round(e.target.width * (e.target.scaleX ?? 1)),
           height: Math.round(e.target.height * (e.target.scaleY ?? 1)),
@@ -384,10 +391,7 @@
       <div class="toolbar d-flex flex-wrap gap-1 justify-content-center align-items-center">
         <LabelPropsEditor {labelProps} onChange={onUpdateLabelProps} />
 
-        <button
-          class="btn btn-sm btn-secondary"
-          on:click={clearCanvas}
-          title={$tr("editor.clear")}>
+        <button class="btn btn-sm btn-secondary" on:click={clearCanvas} title={$tr("editor.clear")}>
           <MdIcon icon="cancel_presentation" />
         </button>
 
@@ -450,8 +454,12 @@
           <GenericObjectParamsControls {selectedObject} valueUpdated={controlValueUpdated} />
         {/if}
 
+        {#if selectedObject}
+          <VectorParamsControls {selectedObject} valueUpdated={controlValueUpdated} />
+        {/if}
+
         {#if selectedObject instanceof fabric.IText}
-          <TextParamsPanel {selectedObject} valueUpdated={controlValueUpdated} />
+          <TextParamsControls {selectedObject} valueUpdated={controlValueUpdated} />
         {/if}
         {#if selectedObject instanceof QRCode}
           <QrCodeParamsPanel {selectedObject} valueUpdated={controlValueUpdated} />
