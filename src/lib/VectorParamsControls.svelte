@@ -16,9 +16,12 @@
   };
 
   const strokeWidthChanged = (value: number) => {
-    selectedObject!.set({
-      strokeWidth: value,
-    });
+    selectedObject!.set({ strokeWidth: value });
+    valueUpdated();
+  };
+
+  const fillChanged = (value: string) => {
+    selectedObject!.set({ fill: value });
     valueUpdated();
   };
 </script>
@@ -52,8 +55,27 @@
   </div>
 {/if}
 
+{#if selectedObject instanceof fabric.Rect || selectedObject instanceof fabric.Circle}
+  <div class="input-group input-group-sm flex-nowrap fill">
+    <span class="input-group-text" title={$tr("params.vector.fill")}>
+      <MdIcon icon="format_color_fill" />
+    </span>
+    <select
+      class="form-select"
+      value={selectedObject.fill}
+      on:change={(e) => fillChanged(e.currentTarget.value)}>
+      <option value="transparent">{$tr("params.vector.fill.transparent")}</option>
+      <option value="white">{$tr("params.vector.fill.white")}</option>
+      <option value="black">{$tr("params.vector.fill.black")}</option>
+    </select>
+  </div>
+{/if}
+
 <style>
   .input-group {
     width: 7em;
+  }
+  .input-group.fill {
+    width: 12em;
   }
 </style>
