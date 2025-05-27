@@ -23,7 +23,7 @@ Key features:
 * Rich label editor. Label saving, import/export.
 * Print preview. You can see how your label will look like after post-processing. Several post-processing algorithms are available.
 * Android App (Capacitor based).
-* Most complete implementation of [NIIMBOT protocol](https://multimote.github.io/niimbluelib/documents/NIIMBOT_printers_protocol.html).
+* Most complete implementation of [NIIMBOT protocol](https://niim-docs.pages.dev/documents/NIIMBOT_printers_protocol.html).
 
 You can see the full list of implemented and planned features [on the Wiki](https://github.com/MultiMote/niimblue/wiki#features).
 
