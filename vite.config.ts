@@ -1,6 +1,5 @@
 import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
-import { ManualChunkMeta } from "rollup";
 
 const getDate = (): string => {
   const date = new Date();
@@ -15,6 +14,9 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
     __APP_COMMIT__: JSON.stringify(process.env.COMMIT_HASH),
     __BUILD_DATE__: JSON.stringify(getDate()),
+  },
+  optimizeDeps: {
+    include: ["@mmote/niimbluelib"], // Fix browser error when using `npm link @mmote/niimbluelib`
   },
   build: {
     rollupOptions: {
