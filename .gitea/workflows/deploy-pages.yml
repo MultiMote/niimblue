@@ -42,12 +42,12 @@ jobs:
           echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
           <urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">
             <url>
-              <loc>$PAGE_URL</loc>
+              <loc>$DEPLOY_URL</loc>
               <lastmod>$LAST_MODIFIED</lastmod>
             </url>
           </urlset>" > ./dist/sitemap.xml
         env:
-          PAGE_URL: ${{ steps.pages.outputs.origin }}
+          DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
           LAST_MODIFIED: ${{ gitea.event.repository.updated_at }}
 
       - name: Deploy to Cloudflare Pages
