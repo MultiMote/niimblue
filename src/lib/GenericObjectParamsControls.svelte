@@ -17,6 +17,14 @@
     valueUpdated();
   };
 
+  const bringTo = (to: "top" | "bottom") => {
+    if (to === "top") {
+      selectedObject.canvas?.bringObjectToFront(selectedObject);
+    } else if (to === "bottom") {
+      selectedObject.canvas?.sendObjectToBack(selectedObject);
+    }
+  };
+
   const fit = () => {
     const imageRatio = selectedObject.width / selectedObject.height;
     const canvasRatio = selectedObject.canvas!.width / selectedObject.canvas!.height;
@@ -58,6 +66,25 @@
 <button class="btn btn-sm btn-secondary" on:click={putToCenterH} title={$tr("params.generic.center.horizontal")}>
   <MdIcon icon="horizontal_distribute" />
 </button>
+
+<div class="dropdown">
+  <button
+    class="btn btn-sm btn-secondary dropdown-toggle"
+    type="button"
+    data-bs-toggle="dropdown"
+    title={$tr("params.generic.arrange")}>
+    <MdIcon icon="segment" />
+  </button>
+  <div class="dropdown-menu arrangement p-2">
+    <button class="btn btn-sm" on:click={() => bringTo("top")}>
+      {$tr("params.generic.arrange.top")}
+    </button>
+    <button class="btn btn-sm" on:click={() => bringTo("bottom")}>
+      {$tr("params.generic.arrange.bottom")}
+    </button>
+  </div>
+</div>
+
 {#if selectedObject instanceof fabric.FabricImage}
   <div class="btn-group btn-group-sm">
     <button type="button" class="btn btn-secondary" on:click={fit} title={$tr("params.generic.fit")}>
@@ -74,3 +101,9 @@
     </div>
   </div>
 {/if}
+
+<style>
+  .dropdown-menu.arrangement {
+    text-align: center;
+  }
+</style>
