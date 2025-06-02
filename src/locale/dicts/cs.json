@@ -128,5 +128,15 @@
     "preview.threshold": "Práh",
     "preview.title": "Náhled",
     "editor.clear.confirm": "Opravdu vymazat obsah?",
-    "editor.clear": "Vymazat obsah"
+    "editor.clear": "Vymazat obsah",
+    "params.vector.round_radius": "Poloměr zaoblení",
+    "params.vector.stroke_width": "Tloušťka tahu",
+    "params.label.split.count": "Rozdělit části",
+    "params.vector.fill": "Výplň",
+    "params.vector.fill.transparent": "průhledná",
+    "params.vector.fill.white": "bílá",
+    "params.vector.fill.black": "černá",
+    "params.generic.arrange": "Uspořádat",
+    "params.generic.arrange.top": "Přesunout do popředí",
+    "params.generic.arrange.bottom": "Přesunout do pozadí"
 }
