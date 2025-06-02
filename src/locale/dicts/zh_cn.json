@@ -128,5 +128,15 @@
     "params.generic.fit.mode.ratio_min": "填充",
     "params.generic.fit": "填充页面",
     "editor.clear": "清除画布",
-    "editor.clear.confirm": "清除画布内容吗?"
+    "editor.clear.confirm": "清除画布内容吗?",
+    "params.label.split.count": "分割份数",
+    "params.vector.round_radius": "圆角半径",
+    "params.vector.stroke_width": "笔刷宽度",
+    "params.vector.fill": "填充",
+    "params.vector.fill.transparent": "透明",
+    "params.vector.fill.white": "白色",
+    "params.vector.fill.black": "黑色",
+    "params.generic.arrange": "层级",
+    "params.generic.arrange.bottom": "置为底层",
+    "params.generic.arrange.top": "移到最前"
 }
