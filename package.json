@@ -4,7 +4,8 @@
 	"type": "module",
 	"version": "0.0.1",
 	"scripts": {
-		"dev-check": "npm run sv-check && npm run dev-open",
+		"dev-check": "npm run sv-check && npm run dev",
+		"dev-check-open": "npm run sv-check && npm run dev-open",
 		"dev": "vite --force",
 		"dev-open": "vite --force --open",
 		"build": "vite build",

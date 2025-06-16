@@ -91,7 +91,7 @@
     // do it in a stupid way (multi-page print not finished yet)
     for (let curPage = 0; curPage < pagesTotal; curPage++) {
       $printerClient.stopHeartbeat();
-      
+
       const printTask = $printerClient.abstraction.newPrintTask(printTaskName, {
         totalPages: quantity,
         density,
@@ -104,9 +104,9 @@
       console.log("Printing page", page);
 
       await generatePreviewData(page);
-      const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, labelProps.printDirection);
 
       try {
+        const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, labelProps.printDirection);
         await printTask.printInit();
         await printTask.printPage(encoded, quantity);
       } catch (e) {
