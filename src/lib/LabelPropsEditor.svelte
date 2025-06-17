@@ -64,11 +64,13 @@
     newWidth = newWidth < dpmm ? dpmm : newWidth;
     newHeight = newHeight < dpmm ? dpmm : newHeight;
 
-    // width must me multiple of dpmm
+    // width must me multiple of dpmm and 8
     if (printDirection === "left") {
       newHeight -= newHeight % dpmm;
+      newHeight -= newHeight % 8;
     } else {
       newWidth -= newWidth % dpmm;
+      newWidth -= newWidth % 8;
     }
 
     onChange({
@@ -160,9 +162,8 @@
   const checkError = (props: LabelProps) => {
     error = "";
 
+    const headSize = props.printDirection == "left" ? props.size.height : props.size.width;
     if ($printerMeta !== undefined) {
-      const headSize = props.printDirection == "left" ? props.size.height : props.size.width;
-
       if (headSize > $printerMeta.printheadPixels) {
         error += $tr("params.label.warning.width") + " ";
         error += `(${headSize} > ${$printerMeta.printheadPixels})`;
@@ -177,6 +178,10 @@
           error += $tr("params.label.direction.top");
         }
       }
+    }
+
+    if (headSize % 8 !== 0) {
+      error += $tr("params.label.warning.div8");;
     }
   };
 
@@ -289,9 +294,9 @@
 
       <div class="input-group flex-nowrap input-group-sm mb-2">
         <span class="input-group-text">{$tr("params.label.size")}</span>
-        <input class="form-control" type="number" min="1" step={dpmm} bind:value={width} />
+        <input class="form-control" type="number" min="1" step={unit === "px" ? 8 : 1} bind:value={width} />
         <button class="btn btn-sm btn-secondary" on:click={onFlip}><MdIcon icon="swap_horiz" /></button>
-        <input class="form-control" type="number" min="1" step={dpmm} bind:value={height} />
+        <input class="form-control" type="number" min="1" step={unit === "px" ? 8 : 1} bind:value={height} />
         <select class="form-select" bind:value={unit} on:change={onUnitChange}>
           <option value="mm"> {$tr("params.label.mm")}</option>
           <option value="px"> {$tr("params.label.px")}</option>

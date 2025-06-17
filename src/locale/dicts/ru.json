@@ -73,6 +73,7 @@
     "params.label.warning.direction": "Рекомендуемое направление печати для вашего принтера:",
     "params.label.warning.import": "Все сохранённые шаблоны будут перезаписаны",
     "params.label.warning.width": "Ширина этикетки слишком велика для принтера:",
+    "params.label.warning.div8": "Ширина этикетки в пикселях должна нацело делиться на 8",
     "params.qrcode.ecl": "Уровень коррекции ошибок",
     "params.saved_labels.kb_used": "кБ использовано",
     "params.saved_labels.label_title.placeholder": "(необязательно)",

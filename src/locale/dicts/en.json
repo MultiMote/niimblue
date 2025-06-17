@@ -74,6 +74,7 @@
     "params.label.warning.direction": "Recommended direction for your printer:",
     "params.label.warning.import": "All saved templates will be overwritten",
     "params.label.warning.width": "Label width is too big for your printer:",
+    "params.label.warning.div8": "Label width in pixels must be evenly divisible by 8",
     "params.qrcode.ecl": "Error Correction Level",
     "params.saved_labels.kb_used": "kB used",
     "params.saved_labels.label_title.placeholder": "(optional)",
