@@ -18,6 +18,9 @@ export default defineConfig({
   optimizeDeps: {
     include: ["@mmote/niimbluelib"], // Fix browser error when using `npm link @mmote/niimbluelib`
   },
+  resolve: {
+    preserveSymlinks: true, // Fix build error when using `npm link @mmote/niimbluelib`
+  },
   build: {
     rollupOptions: {
       output: {
