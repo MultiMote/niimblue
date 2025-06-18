@@ -64,12 +64,10 @@
     newWidth = newWidth < dpmm ? dpmm : newWidth;
     newHeight = newHeight < dpmm ? dpmm : newHeight;
 
-    // width must me multiple of dpmm and 8
+    // width must me multiple of 8
     if (printDirection === "left") {
-      newHeight -= newHeight % dpmm;
       newHeight -= newHeight % 8;
     } else {
-      newWidth -= newWidth % dpmm;
       newWidth -= newWidth % 8;
     }
 
