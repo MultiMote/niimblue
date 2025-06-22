@@ -49,6 +49,7 @@
     "params.generic.fit.mode.stretch": "Растянуть",
     "params.generic.fit.mode.ratio_min": "Подогнать",
     "params.generic.fit.mode.ratio_max": "Заполнить",
+    "params.generic.position": "Расположение",
     "params.label.apply": "Применить",
     "params.label.current": "Текущие параметры:",
     "params.label.direction.left": "Слева",

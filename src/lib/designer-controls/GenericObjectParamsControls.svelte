@@ -3,6 +3,7 @@
   import { tr } from "../../utils/i18n";
   import MdIcon from "../basic/MdIcon.svelte";
   import { appConfig } from "../../stores";
+  import ObjectPositionControls from "./ObjectPositionControls.svelte";
 
   export let selectedObject: fabric.FabricObject;
   export let valueUpdated: () => void;
@@ -66,6 +67,8 @@
 <button class="btn btn-sm btn-secondary" on:click={putToCenterH} title={$tr("params.generic.center.horizontal")}>
   <MdIcon icon="horizontal_distribute" />
 </button>
+
+<ObjectPositionControls {selectedObject} />
 
 <div class="dropdown">
   <button

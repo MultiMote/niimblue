@@ -49,6 +49,7 @@
     "params.generic.fit.mode.stretch": "Stretch",
     "params.generic.fit.mode.ratio_min": "Fit",
     "params.generic.fit.mode.ratio_max": "Fill",
+    "params.generic.position": "Position",
     "params.label.apply": "Apply",
     "params.label.current": "Current parameters:",
     "params.label.direction.left": "Left",
