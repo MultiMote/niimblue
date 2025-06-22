@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { tr } from "../utils/i18n";
-  import { iconCodepoints, type MaterialIcon } from "../mdi_icons";
-  import MdIcon from "./basic/MdIcon.svelte";
+  import { tr } from "../../utils/i18n";
+  import { iconCodepoints, type MaterialIcon } from "../../mdi_icons";
+  import MdIcon from "../basic/MdIcon.svelte";
 
   export let onSubmit: (i: MaterialIcon) => void;
 

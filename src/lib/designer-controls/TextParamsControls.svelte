@@ -1,8 +1,8 @@
 <script lang="ts">
   import * as fabric from "fabric";
-  import { tr } from "../utils/i18n";
-  import MdIcon from "./basic/MdIcon.svelte";
-  import FontFamilyPicker from "./basic/FontFamilyPicker.svelte";
+  import { tr } from "../../utils/i18n";
+  import MdIcon from "../basic/MdIcon.svelte";
+  import FontFamilyPicker from "./FontFamilyPicker.svelte";
 
   export let selectedObject: fabric.FabricObject;
   export let valueUpdated: () => void;

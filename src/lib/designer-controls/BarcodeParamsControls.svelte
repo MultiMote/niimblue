@@ -1,8 +1,8 @@
 <script lang="ts">
   import * as fabric from "fabric";
-  import { Barcode } from "../fabric-object/barcode";
-  import { tr } from "../utils/i18n";
-  import MdIcon from "./basic/MdIcon.svelte";
+  import { Barcode } from "../../fabric-object/barcode";
+  import { tr } from "../../utils/i18n";
+  import MdIcon from "../basic/MdIcon.svelte";
 
   export let selectedObject: fabric.FabricObject | undefined;
   export let valueUpdated: () => void;

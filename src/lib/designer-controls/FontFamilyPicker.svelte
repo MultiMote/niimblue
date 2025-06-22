@@ -3,7 +3,7 @@
   import { OBJECT_DEFAULTS_TEXT } from "../../defaults";
   import { tr } from "../../utils/i18n";
   import { Toasts } from "../../utils/toasts";
-  import MdIcon from "./MdIcon.svelte";
+  import MdIcon from "../basic/MdIcon.svelte";
   import { LocalStoragePersistence } from "../../utils/persistence";
   import { fontCache } from "../../stores";
 

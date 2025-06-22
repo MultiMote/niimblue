@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { type LabelProps, type OjectType } from "../types";
-  import { tr } from "../utils/i18n";
-  import MdIcon from "./basic/MdIcon.svelte";
+  import { type LabelProps, type OjectType } from "../../types";
+  import { tr } from "../../utils/i18n";
+  import MdIcon from "../basic/MdIcon.svelte";
   import ZplImportButton from "./ZplImportButton.svelte";
 
   export let onSubmit: (i: OjectType) => void;
