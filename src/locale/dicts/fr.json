@@ -92,7 +92,6 @@
     "params.text.font_size.down": "Réduire la taille de la police",
     "params.text.font_size.up": "Augmenter la taille de la police",
     "params.text.font_size": "Taille de la police",
-    "params.text.invert_colors": "Inverser les couleurs",
     "params.text.line_height": "Hauteur de ligne",
     "params.text.vorigin.bottom": "Bas",
     "params.text.vorigin.center": "Centre",

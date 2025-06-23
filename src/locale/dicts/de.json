@@ -85,7 +85,6 @@
     "params.text.font_size.down": "Schriftgröße verringern",
     "params.text.font_size.up": "Schriftgröße erhöhen",
     "params.text.font_size": "Schriftgröße",
-    "params.text.invert_colors": "Farben umkehren",
     "params.text.line_height": "Linienhöhe",
     "params.text.vorigin.bottom": "Unten",
     "params.text.vorigin.center": "Zentriert",

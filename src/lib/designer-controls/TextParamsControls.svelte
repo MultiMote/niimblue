@@ -34,21 +34,6 @@
     valueUpdated();
   };
 
-  const toggleInvertColors = () => {
-    if (selectedText!.backgroundColor === "black") {
-      selectedText!.set({
-        backgroundColor: "transparent",
-        fill: "black",
-      });
-    } else {
-      selectedText!.set({
-        backgroundColor: "black",
-        fill: "white",
-      });
-    }
-    valueUpdated();
-  };
-
   const updateFontFamily = (v: string) => {
     selectedText!.set({ fontFamily: v });
     valueUpdated();
@@ -75,6 +60,16 @@
   const fontSizeChange = (v: number) => {
     v = isNaN(v) ? 1 : Math.min(Math.max(v, sizeMin), sizeMax);
     selectedText?.set({ fontSize: v });
+    valueUpdated();
+  };
+
+  const fillChanged = (value: string) => {
+    selectedObject!.set({ fill: value });
+    valueUpdated();
+  };
+
+  const backgroundColorChanged = (value: string) => {
+    selectedObject!.set({ backgroundColor: value });
     valueUpdated();
   };
 
@@ -143,12 +138,36 @@
     <MdIcon icon="format_bold" />
   </button>
 
-  <button
-    class="btn btn-sm {selectedText.backgroundColor === 'black' ? 'btn-secondary' : ''}"
-    title={$tr("params.text.invert_colors")}
-    on:click={toggleInvertColors}>
-    <MdIcon icon="invert_colors" />
-  </button>
+  <div class="dropdown">
+    <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" title={$tr("params.color")}>
+      <MdIcon icon="format_color_fill" />
+    </button>
+
+    <div class="dropdown-menu arrangement p-2">
+      <div class="input-group input-group-sm flex-nowrap color pb-2">
+        <span class="input-group-text">
+          <MdIcon icon="format_color_text" />
+        </span>
+        <select class="form-select" value={selectedObject.fill} on:change={(e) => fillChanged(e.currentTarget.value)}>
+          <option value="white">{$tr("params.color.white")}</option>
+          <option value="black">{$tr("params.color.black")}</option>
+        </select>
+      </div>
+      <div class="input-group input-group-sm flex-nowrap color pb-2">
+        <span class="input-group-text">
+          <MdIcon icon="format_color_fill" />
+        </span>
+        <select
+          class="form-select"
+          value={selectedObject.backgroundColor || "transparent"}
+          on:change={(e) => backgroundColorChanged(e.currentTarget.value)}>
+          <option value="white">{$tr("params.color.white")}</option>
+          <option value="black">{$tr("params.color.black")}</option>
+          <option value="transparent">{$tr("params.color.transparent")}</option>
+        </select>
+      </div>
+    </div>
+  </div>
 
   <div class="input-group flex-nowrap input-group-sm font-size">
     <span class="input-group-text" title={$tr("params.text.font_size")}><MdIcon icon="format_size" /></span>
@@ -194,6 +213,9 @@
     width: 7em;
   }
   .font-size {
+    width: 12em;
+  }
+  .input-group.color {
     width: 12em;
   }
 </style>

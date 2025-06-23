@@ -64,9 +64,9 @@
       class="form-select"
       value={selectedObject.fill}
       on:change={(e) => fillChanged(e.currentTarget.value)}>
-      <option value="transparent">{$tr("params.vector.fill.transparent")}</option>
-      <option value="white">{$tr("params.vector.fill.white")}</option>
-      <option value="black">{$tr("params.vector.fill.black")}</option>
+      <option value="transparent">{$tr("params.color.transparent")}</option>
+      <option value="white">{$tr("params.color.white")}</option>
+      <option value="black">{$tr("params.color.black")}</option>
     </select>
   </div>
 {/if}
