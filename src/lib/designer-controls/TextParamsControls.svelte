@@ -34,6 +34,15 @@
     valueUpdated();
   };
 
+  const toggleItalic = () => {
+    if (selectedText!.fontStyle === "italic") {
+      selectedText!.fontStyle = "normal";
+    } else {
+      selectedText!.fontStyle = "italic";
+    }
+    valueUpdated();
+  };
+
   const updateFontFamily = (v: string) => {
     selectedText!.set({ fontFamily: v });
     valueUpdated();
@@ -136,6 +145,13 @@
     title={$tr("params.text.bold")}
     on:click={toggleBold}>
     <MdIcon icon="format_bold" />
+  </button>
+
+  <button
+    class="btn btn-sm {selectedText.fontStyle === 'italic' ? 'btn-secondary' : ''}"
+    title={$tr("params.text.italic")}
+    on:click={toggleItalic}>
+    <MdIcon icon="format_italic" />
   </button>
 
   <div class="dropdown">

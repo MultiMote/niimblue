@@ -97,6 +97,7 @@
     "params.text.font_size.down": "Уменьшить размер шрифта",
     "params.text.font_size.up": "Увеличить размер шрифта",
     "params.text.font_size": "Размер шрифта",
+    "params.text.italic": "Курсив",
     "params.text.line_height": "Межстрочный интервал",
     "params.text.vorigin.bottom": "Снизу",
     "params.text.vorigin.center": "По центру",

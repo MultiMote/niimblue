@@ -98,6 +98,7 @@
     "params.text.font_size.down": "Decrease font size",
     "params.text.font_size.up": "Increase font size",
     "params.text.font_size": "Font size",
+    "params.text.italic": "Italic",
     "params.text.line_height": "Line height",
     "params.text.vorigin.bottom": "Bottom",
     "params.text.vorigin.center": "Center",
