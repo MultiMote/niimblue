@@ -442,7 +442,7 @@
   }
 
   .tail-pos-switch .svg-icon {
-    background-image: url("./assets/tail-pos.svg");
+    background-image: url("../assets/tail-pos.svg");
   }
   .tail-pos-switch label[for="tail-bottom"] .svg-icon {
     transform: rotate(90deg);
@@ -457,40 +457,40 @@
     transform: rotate(270deg);
   }
   .print-dir-switch .svg-icon {
-    background-image: url("./assets/print-dir.svg");
+    background-image: url("../assets/print-dir.svg");
   }
   .print-dir-switch label[for="print-dir-top"] .svg-icon {
     transform: rotate(90deg);
   }
 
   .label-shape-switch label[for="label-shape-rect"] .svg-icon {
-    background-image: url("./assets/shape-rect.svg");
+    background-image: url("../assets/shape-rect.svg");
   }
   .label-shape-switch label[for="label-shape-rounded_rect"] .svg-icon {
-    background-image: url("./assets/shape-rrect.svg");
+    background-image: url("../assets/shape-rrect.svg");
   }
   .label-shape-switch label[for="label-shape-circle"] .svg-icon {
-    background-image: url("./assets/shape-circle.svg");
+    background-image: url("../assets/shape-circle.svg");
   }
 
   .label-split-switch label[for="label-split-none"] .svg-icon {
-    background-image: url("./assets/shape-rrect.svg");
+    background-image: url("../assets/shape-rrect.svg");
   }
   .label-split-switch label[for="label-split-vertical"] .svg-icon {
-    background-image: url("./assets/split-vertical.svg");
+    background-image: url("../assets/split-vertical.svg");
     transform: rotate(90deg);
   }
   .label-split-switch label[for="label-split-horizontal"] .svg-icon {
-    background-image: url("./assets/split-vertical.svg");
+    background-image: url("../assets/split-vertical.svg");
   }
 
   .mirror-switch label[for="mirror-none"] .svg-icon {
-    background-image: url("./assets/mirror-none.svg");
+    background-image: url("../assets/mirror-none.svg");
   }
   .mirror-switch label[for="mirror-copy"] .svg-icon {
-    background-image: url("./assets/mirror-copy.svg");
+    background-image: url("../assets/mirror-copy.svg");
   }
   .mirror-switch label[for="mirror-flip"] .svg-icon {
-    background-image: url("./assets/mirror-flip.svg");
+    background-image: url("../assets/mirror-flip.svg");
   }
 </style>
