@@ -137,5 +137,9 @@
     "params.color.black": "černá",
     "params.generic.arrange": "Uspořádat",
     "params.generic.arrange.top": "Přesunout do popředí",
-    "params.generic.arrange.bottom": "Přesunout do pozadí"
+    "params.generic.arrange.bottom": "Přesunout do pozadí",
+    "params.color": "Barva",
+    "params.label.warning.div8": "Šířka štítku musí být dělitelná 8",
+    "params.text.italic": "Kurzíva",
+    "params.generic.position": "Pozice"
 }
