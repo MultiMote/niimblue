@@ -34,7 +34,7 @@ export class LabelDesignerObjectHelper {
           console.error(readerEvt);
           reject(new Error("File read error"));
         };
-      } else if (file.type === "image/png" || file.type === "image/jpeg") {
+      } else if (file.type === "image/png" || file.type === "image/jpeg" || file.type === "image/bmp") {
         reader.readAsDataURL(file);
         reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
           if (readerEvt?.target?.result) {
