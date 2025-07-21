@@ -76,6 +76,13 @@
     selectedObject!.set({ fill: value });
     valueUpdated();
   };
+  const splitChanged = (value: string) => {
+
+    if(selectedObject instanceof fabric.Textbox) {
+      selectedObject!.set({ splitByGrapheme: value === "grapheme" });
+      valueUpdated();
+    }
+  };
 
   const backgroundColorChanged = (value: string) => {
     selectedObject!.set({ backgroundColor: value });
@@ -185,6 +192,24 @@
     </div>
   </div>
 
+  {#if selectedText instanceof fabric.Textbox }
+    <div class="dropdown">
+      <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" title={$tr("params.params.text.split")}>
+        <MdIcon icon="wrap_text" />
+      </button>
+
+      <div class="dropdown-menu arrangement p-2">
+        <div class="input-group input-group-sm flex-nowrap split pb-2">
+          <select class="form-select" value={selectedText.splitByGrapheme ? "grapheme" : "space"} on:change={(e) => splitChanged(e.currentTarget.value)}>
+            <option value="space">{$tr("params.params.text.split.spaces")}</option>
+            <option value="grapheme">{$tr("params.params.text.split.grapheme")}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  {/if}
+
+
   <div class="input-group flex-nowrap input-group-sm font-size">
     <span class="input-group-text" title={$tr("params.text.font_size")}><MdIcon icon="format_size" /></span>
     <input
@@ -233,5 +258,8 @@
   }
   .input-group.color {
     width: 12em;
+  }
+  .input-group.split {
+    width: 14em;
   }
 </style>
