@@ -115,7 +115,7 @@ npm install --no-save --no-package-lock eslint@9.x globals @types/eslint @eslint
 
 |  Links |    |
 |--------| -- |
-| [<img src="https://raw.githubusercontent.com/tandpfun/skill-icons/65dea6c4eaca7da319e552c09f4cf5a9a8dab2c8/icons/Discord.svg" width="48">](https://discord.gg/jXPAfZVd8a) | Discord (dev news, troubleshooting and other) |
 | [<img src="https://github.com/user-attachments/assets/6b71007d-d4c4-41b2-be4a-64614f6ce250" width="48">](https://boosty.to/multimote) | Boosty (support project) |
-
+| [<img src="https://raw.githubusercontent.com/tandpfun/skill-icons/65dea6c4eaca7da319e552c09f4cf5a9a8dab2c8/icons/Discord.svg" width="48">](https://discord.gg/jXPAfZVd8a) | Discord (dev news, troubleshooting and other, en) |
+| [<img src="https://github.com/user-attachments/assets/4d9f6e59-d751-40a4-ad6a-74a7541ff4cc" width="48">](https://t.me/niimblue) | Telegram (ru/en discussion) |
 
