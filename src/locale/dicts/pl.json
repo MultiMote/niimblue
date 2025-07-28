@@ -125,5 +125,7 @@
     "preview.print.system": "Drukuj za pomocą systemowej drukarki",
     "preview.print": "Drukuj",
     "preview.threshold": "Próg",
-    "preview.title": "Podgląd druku"
+    "preview.title": "Podgląd druku",
+    "editor.clear": "Wyczyść etykietę",
+    "editor.clear.confirm": "Wyczyścić zawartość etykiety?"
 }
