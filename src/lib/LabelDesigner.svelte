@@ -340,7 +340,7 @@
         return;
       }
 
-      const isNotScalable = e.target instanceof Barcode || e.target instanceof fabric.Rect;
+      const isNotScalable = e.target instanceof Barcode || e.target instanceof fabric.Rect || e.target instanceof QRCode;
 
       if (isNotScalable && e.target.width !== undefined && e.target.height !== undefined) {
         e.target.set({
@@ -349,6 +349,13 @@
           scaleX: 1,
           scaleY: 1,
         });
+
+        if (e.target instanceof QRCode) {
+          e.target.set({
+            width: e.target.width + e.target.width % 2,
+            height: e.target.height + e.target.height % 2,
+          });
+        }
       }
     });
 
