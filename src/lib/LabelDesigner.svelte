@@ -35,6 +35,7 @@
   import SavedLabelsMenu from "./designer-controls/SavedLabelsMenu.svelte";
   import { CustomCanvas } from "../fabric-object/custom_canvas";
   import VectorParamsControls from "./designer-controls/VectorParamsControls.svelte";
+  import { fixFabricObjectScale } from "../utils/canvas_utils";
 
   let htmlCanvas: HTMLCanvasElement;
   let fabricCanvas: CustomCanvas;
@@ -340,26 +341,7 @@
         return;
       }
 
-      const isNotScalable = e.target instanceof Barcode || e.target instanceof fabric.Rect || e.target instanceof QRCode;
-
-      if (isNotScalable) {
-        e.target.set({
-          width: Math.round(e.target.width * (e.target.scaleX ?? 1)),
-          height: Math.round(e.target.height * (e.target.scaleY ?? 1)),
-          scaleX: 1,
-          scaleY: 1,
-        });
-
-        // todo: move to QRCode maybe
-        if (e.target instanceof QRCode) {
-          const qrMin = 42;
-          const size = Math.max(e.target.width + (e.target.width % 2), qrMin);
-          e.target.set({
-            width: size,
-            height: size,
-          });
-        }
-      }
+      fixFabricObjectScale(e.target);
     });
 
     if ($automation !== undefined) {
