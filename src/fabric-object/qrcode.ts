@@ -87,18 +87,11 @@ export class QRCode<
     qr.addData(this.text);
     qr.make();
 
-    let scale = 1;
-
-    // fixme: do math instead of loop
-    while (scale * qr.getModuleCount() < this.width) {
-      scale++;
-    }
-    scale--;
-
-    let qrWidth = scale * qr.getModuleCount();
+    let qrScale = Math.floor(this.width / qr.getModuleCount());
+    let qrWidth = qrScale * qr.getModuleCount();
     qrWidth -= qrWidth % 2; // avoid half-pixel rendering
 
-    if (scale < 1 || qrWidth > this.width) {
+    if (qrScale < 1 || qrWidth > this.width) {
       this.renderError(ctx);
       super._render(ctx);
       return;
@@ -107,7 +100,7 @@ export class QRCode<
     ctx.save();
     ctx.translate(-qrWidth / 2, -qrWidth / 2); // make top-left origin
     ctx.translate(-0.5, -0.5); // blurry rendering fix
-    qr.renderTo2dContext(ctx, scale);
+    qr.renderTo2dContext(ctx, qrScale);
     ctx.restore();
 
     super._render(ctx);
