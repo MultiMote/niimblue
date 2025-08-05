@@ -47,6 +47,7 @@ export class QRCode<
     super();
     Object.assign(this, qrCodeDefaultValues);
     this.setOptions(options);
+    this.lockScalingFlip = true;
     this.setControlsVisibility({
       ml: false,
       mt: false,

@@ -342,7 +342,7 @@
 
       const isNotScalable = e.target instanceof Barcode || e.target instanceof fabric.Rect || e.target instanceof QRCode;
 
-      if (isNotScalable && e.target.width !== undefined && e.target.height !== undefined) {
+      if (isNotScalable) {
         e.target.set({
           width: Math.round(e.target.width * (e.target.scaleX ?? 1)),
           height: Math.round(e.target.height * (e.target.scaleY ?? 1)),
@@ -350,10 +350,13 @@
           scaleY: 1,
         });
 
+        // todo: move to QRCode maybe
         if (e.target instanceof QRCode) {
+          const qrMin = 42;
+          const size = Math.max(e.target.width + (e.target.width % 2), qrMin);
           e.target.set({
-            width: e.target.width + e.target.width % 2,
-            height: e.target.height + e.target.height % 2,
+            width: size,
+            height: size,
           });
         }
       }
