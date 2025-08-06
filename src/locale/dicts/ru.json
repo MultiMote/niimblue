@@ -76,6 +76,7 @@
     "params.label.warning.width": "Ширина этикетки слишком велика для принтера:",
     "params.label.warning.div8": "Ширина этикетки в пикселях должна нацело делиться на 8",
     "params.qrcode.ecl": "Уровень коррекции ошибок",
+    "params.qrcode.mode": "Режим",
     "params.saved_labels.kb_used": "кБ использовано",
     "params.saved_labels.label_title.placeholder": "(необязательно)",
     "params.saved_labels.label_title": "Название",
