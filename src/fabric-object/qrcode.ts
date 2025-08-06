@@ -1,6 +1,6 @@
 import QRCodeFactory from "qrcode-generator";
 import * as fabric from "fabric";
-import { OBJECT_SIZE_DEFAULTS } from "../defaults";
+import { OBJECT_DEFAULTS_TEXT, OBJECT_SIZE_DEFAULTS } from "../defaults";
 export type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
 
 export const qrCodeDefaultValues: Partial<fabric.TClassProperties<QRCode>> = {
@@ -70,9 +70,17 @@ export class QRCode<
 
   renderError(ctx: CanvasRenderingContext2D): void {
     ctx.save();
+    ctx.fillStyle = "black"
     ctx.translate(-this.width / 2, -this.height / 2); // make top-left origin
     ctx.translate(-0.5, -0.5); // blurry rendering fix
     ctx.fillRect(0, 0, this.width + 1, this.height + 1);
+    ctx.restore();
+
+    ctx.save();
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.font = `16px ${OBJECT_DEFAULTS_TEXT.fontFamily}`;
+    ctx.fillText("ERR", 0, 0);
     ctx.restore();
   }
 
@@ -86,7 +94,15 @@ export class QRCode<
     const typeNumber = 0; // auto
     const qr = QRCodeFactory(typeNumber, this.ecl);
     qr.addData(this.text);
-    qr.make();
+
+    try {
+      qr.make();
+    } catch (e) {
+      console.error(e);
+      this.renderError(ctx);
+      super._render(ctx);
+      return;
+    }
 
     let qrScale = Math.floor(this.width / qr.getModuleCount());
     let qrWidth = qrScale * qr.getModuleCount();
