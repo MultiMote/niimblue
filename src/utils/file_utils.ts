@@ -11,6 +11,7 @@ import { OBJECT_DEFAULTS, THUMBNAIL_HEIGHT, THUMBNAIL_QUALITY } from "../default
 import { z } from "zod";
 import { CustomCanvas } from "../fabric-object/custom_canvas";
 import { Capacitor } from "@capacitor/core";
+import { fixFabricObjectScale } from "./canvas_utils";
 
 export class FileUtils {
   static timestamp(): number {
@@ -204,7 +205,10 @@ export class FileUtils {
 
   static async loadCanvasState(canvas: fabric.Canvas, state: FabricJson): Promise<void> {
     await canvas.loadFromJSON(state, (_, obj) => {
-      if ("set" in obj) obj.set({ snapAngle: OBJECT_DEFAULTS.snapAngle });
+      if (obj instanceof fabric.FabricObject) {
+        obj.set({ snapAngle: OBJECT_DEFAULTS.snapAngle });
+        fixFabricObjectScale(obj);
+      }
     });
     if (canvas instanceof CustomCanvas) {
       canvas.virtualZoom(canvas.getVirtualZoom());

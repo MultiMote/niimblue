@@ -1,23 +1,27 @@
-import QRCodeSVG from "qrcode-svg";
+import QRCodeFactory from "qrcode-generator";
 import * as fabric from "fabric";
-import { OBJECT_SIZE_DEFAULTS } from "../defaults";
+import { OBJECT_DEFAULTS_TEXT, OBJECT_SIZE_DEFAULTS } from "../defaults";
+
 export type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
+export type Mode = "Numeric" | "Alphanumeric" | "Byte" /* Default */ | "Kanji";
 
 export const qrCodeDefaultValues: Partial<fabric.TClassProperties<QRCode>> = {
   text: "Text",
   ecl: "M",
   stroke: "#000000",
   fill: "#ffffff",
+  mode: "Byte",
   ...OBJECT_SIZE_DEFAULTS,
 };
 
 interface UniqueQRCodeProps {
   text: string;
   ecl: ErrorCorrectionLevel;
+  mode: Mode;
 }
 export interface QRCodeProps extends fabric.FabricObjectProps, UniqueQRCodeProps {}
 export interface SerializedQRCodeProps extends fabric.SerializedObjectProps, UniqueQRCodeProps {}
-const QRCODE_PROPS = ["text", "ecl", "size"] as const;
+const QRCODE_PROPS = ["text", "ecl", "size", "mode"] as const;
 
 export class QRCode<
     Props extends fabric.TOptions<QRCodeProps> = Partial<QRCodeProps>,
@@ -27,7 +31,7 @@ export class QRCode<
   extends fabric.FabricObject<Props, SProps, EventSpec>
   implements QRCodeProps
 {
-  static override type = "QRCode";
+  static override readonly type = "QRCode";
 
   /**
    * QRCode text
@@ -43,74 +47,88 @@ export class QRCode<
    */
   declare ecl: ErrorCorrectionLevel;
 
-  private _paths: fabric.util.TSimplePathData = [];
+  /**
+   * Mode
+   * @type Mode
+   * @default "M"
+   */
+  declare mode: Mode;
 
   constructor(options?: Props) {
     super();
     Object.assign(this, qrCodeDefaultValues);
     this.setOptions(options);
+    this.lockScalingFlip = true;
     this.setControlsVisibility({
       ml: false,
       mt: false,
       mr: false,
       mb: false,
+      tl: false,
+      tr: false,
+      bl: false,
     });
-    this._createPathData();
-  }
-
-  _createPathData() {
-    const qr = new QRCodeSVG({
-      content: this.text,
-      padding: 0,
-      width: this.width,
-      height: this.height,
-      color: this.stroke!.toString(),
-      background: this.fill!.toString(),
-      ecl: this.ecl,
-      join: true,
-    });
-    const svg = qr.svg();
-    const match = /<path[^>]*?d=(["'])?((?:.(?!\1|>))*.?)\1?/.exec(svg);
-    const path_str = match ? match[2] : "";
-    this._paths = fabric.util.makePathSimpler(fabric.util.parsePath(path_str));
   }
 
   override _set(key: string, value: any): this {
     super._set(key, value);
     if (key === "text" || key === "ecl") {
-      this._createPathData();
       this.dirty = true;
     }
+
     return this;
   }
 
+  renderError(ctx: CanvasRenderingContext2D): void {
+    ctx.save();
+    ctx.fillStyle = "black"
+    ctx.translate(-this.width / 2, -this.height / 2); // make top-left origin
+    ctx.translate(-0.5, -0.5); // blurry rendering fix
+    ctx.fillRect(0, 0, this.width + 1, this.height + 1);
+    ctx.restore();
+
+    ctx.save();
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.font = `16px ${OBJECT_DEFAULTS_TEXT.fontFamily}`;
+    ctx.fillText("ERR", 0, 0);
+    ctx.restore();
+  }
+
   override _render(ctx: CanvasRenderingContext2D): void {
-    if (this._paths.length === 0) {
+    if (!this.text) {
+      this.renderError(ctx);
       super._render(ctx);
       return;
     }
 
-    const w2 = this.width / 2;
-    const h2 = this.height / 2;
+    const typeNumber = 0; // auto
+    const qr = QRCodeFactory(typeNumber, this.ecl);
 
-    ctx.beginPath();
-    for (const path of this._paths) {
-      const [action, x, y] = path;
-
-      if (action === "M") {
-        ctx.moveTo(x - w2, y - h2);
-      } else if (action === "L") {
-        ctx.lineTo(x - w2, y - h2);
-      } else if (action === "C") {
-        ctx.closePath();
-        ctx.beginPath();
-      }
+    try {
+      qr.addData(this.text, this.mode);
+      qr.make();
+    } catch (e) {
+      console.error(e);
+      this.renderError(ctx);
+      super._render(ctx);
+      return;
     }
-    ctx.closePath();
+
+    let qrScale = Math.floor(this.width / qr.getModuleCount());
+    let qrWidth = qrScale * qr.getModuleCount();
+    qrWidth -= qrWidth % 2; // avoid half-pixel rendering
+
+    if (qrScale < 1 || qrWidth > this.width) {
+      this.renderError(ctx);
+      super._render(ctx);
+      return;
+    }
 
     ctx.save();
-    ctx.fillStyle = this.stroke as string;
-    ctx.fill();
+    ctx.translate(-qrWidth / 2, -qrWidth / 2); // make top-left origin
+    ctx.translate(-0.5, -0.5); // blurry rendering fix
+    qr.renderTo2dContext(ctx, qrScale);
     ctx.restore();
 
     super._render(ctx);

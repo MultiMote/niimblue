@@ -35,6 +35,7 @@
   import SavedLabelsMenu from "./designer-controls/SavedLabelsMenu.svelte";
   import { CustomCanvas } from "../fabric-object/custom_canvas";
   import VectorParamsControls from "./designer-controls/VectorParamsControls.svelte";
+  import { fixFabricObjectScale } from "../utils/canvas_utils";
 
   let htmlCanvas: HTMLCanvasElement;
   let fabricCanvas: CustomCanvas;
@@ -340,16 +341,7 @@
         return;
       }
 
-      const isNotScalable = e.target instanceof Barcode || e.target instanceof fabric.Rect;
-
-      if (isNotScalable && e.target.width !== undefined && e.target.height !== undefined) {
-        e.target.set({
-          width: Math.round(e.target.width * (e.target.scaleX ?? 1)),
-          height: Math.round(e.target.height * (e.target.scaleY ?? 1)),
-          scaleX: 1,
-          scaleY: 1,
-        });
-      }
+      fixFabricObjectScale(e.target);
     });
 
     if ($automation !== undefined) {
