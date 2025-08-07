@@ -143,7 +143,16 @@ export class QRCode<
     ctx.save();
     ctx.translate(-qrWidth / 2, -qrWidth / 2); // make top-left origin
     ctx.translate(-0.5, -0.5); // blurry rendering fix
-    qr.renderTo2dContext(ctx, qrScale);
+
+    // qr.renderTo2dContext() axis flipped so rendering manually
+    const length = qr.getModuleCount();
+    for (let row = 0; row < length; row++) {
+      for (let col = 0; col < length; col++) {
+        ctx.fillStyle = qr.isDark(row, col) ? "black" : "white";
+        ctx.fillRect(col * qrScale, row * qrScale, qrScale, qrScale);
+      }
+    }
+
     ctx.restore();
 
     super._render(ctx);
