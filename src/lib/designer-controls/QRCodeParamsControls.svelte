@@ -50,6 +50,24 @@
     </select>
   </div>
 
+  <div class="input-group input-group-sm flex-nowrap">
+    <span class="input-group-text" title={$tr("params.qrcode.version")}>
+      <MdIcon icon="123" />
+    </span>
+    <select
+      class="form-select"
+      value={selectedQRCode.qrVersion}
+      on:change={(e) => {
+        selectedQRCode?.set("qrVersion", parseInt(e.currentTarget.value));
+        valueUpdated();
+      }}>
+      <option value={0}>Auto</option>
+      {#each { length: 40 } as _, i}
+        <option value={i + 1}>{i + 1}</option>
+      {/each}
+    </select>
+  </div>
+
   <textarea
     class="qrcode-content form-control"
     value={selectedQRCode.text}

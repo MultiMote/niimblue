@@ -4,6 +4,13 @@ import { OBJECT_DEFAULTS_TEXT, OBJECT_SIZE_DEFAULTS } from "../defaults";
 
 export type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
 export type Mode = "Numeric" | "Alphanumeric" | "Byte" /* Default */ | "Kanji";
+export type QrVersion =
+  | 0 // Automatic
+  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20
+  | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30
+  | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40
+  ;
 
 export const qrCodeDefaultValues: Partial<fabric.TClassProperties<QRCode>> = {
   text: "Text",
@@ -11,6 +18,7 @@ export const qrCodeDefaultValues: Partial<fabric.TClassProperties<QRCode>> = {
   stroke: "#000000",
   fill: "#ffffff",
   mode: "Byte",
+  qrVersion: 0,
   ...OBJECT_SIZE_DEFAULTS,
 };
 
@@ -18,10 +26,11 @@ interface UniqueQRCodeProps {
   text: string;
   ecl: ErrorCorrectionLevel;
   mode: Mode;
+  qrVersion: QrVersion;
 }
 export interface QRCodeProps extends fabric.FabricObjectProps, UniqueQRCodeProps {}
 export interface SerializedQRCodeProps extends fabric.SerializedObjectProps, UniqueQRCodeProps {}
-const QRCODE_PROPS = ["text", "ecl", "size", "mode"] as const;
+const QRCODE_PROPS = ["text", "ecl", "size", "mode", "qrVersion"] as const;
 
 export class QRCode<
     Props extends fabric.TOptions<QRCodeProps> = Partial<QRCodeProps>,
@@ -53,6 +62,13 @@ export class QRCode<
    * @default "M"
    */
   declare mode: Mode;
+
+  /**
+   * Version
+   * @type Mode
+   * @default "M"
+   */
+  declare qrVersion: QrVersion;
 
   constructor(options?: Props) {
     super();
@@ -102,8 +118,7 @@ export class QRCode<
       return;
     }
 
-    const typeNumber = 0; // auto
-    const qr = QRCodeFactory(typeNumber, this.ecl);
+    const qr = QRCodeFactory(this.qrVersion, this.ecl);
 
     try {
       qr.addData(this.text, this.mode);
