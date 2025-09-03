@@ -11,6 +11,7 @@
     printTaskNames,
     type PrintProgressEvent,
     type PrintTaskName,
+    AbstractPrintTask,
   } from "@mmote/niimbluelib";
   import type { LabelProps, PostProcessType, FabricJson, PreviewProps, PreviewPropsOffset } from "../types";
   import ParamLockButton from "./basic/ParamLockButton.svelte";
@@ -51,6 +52,7 @@
   let pagesTotal: number = 1;
   let offset: PreviewPropsOffset = { x: 0, y: 0, offsetType: "inner" };
   let offsetWarning: string = "";
+  let currentPrintTask: AbstractPrintTask | undefined;
 
   let savedProps = {} as PreviewProps;
 
@@ -64,6 +66,14 @@
 
     if (!$disconnected && printState !== "idle") {
       await $printerClient.abstraction.printEnd();
+
+      if (currentPrintTask !== undefined){
+        await currentPrintTask.printEnd();
+      } else {
+        console.warn("Print task undefined, falling back to PrintEnd command");
+        await $printerClient.abstraction.printEnd();
+      }
+
       $printerClient.startHeartbeat();
     }
 
@@ -92,7 +102,7 @@
     for (let curPage = 0; curPage < pagesTotal; curPage++) {
       $printerClient.stopHeartbeat();
 
-      const printTask = $printerClient.abstraction.newPrintTask(printTaskName, {
+      currentPrintTask = $printerClient.abstraction.newPrintTask(printTaskName, {
         totalPages: quantity,
         density,
         labelType,
@@ -107,8 +117,8 @@
 
       try {
         const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, labelProps.printDirection);
-        await printTask.printInit();
-        await printTask.printPage(encoded, quantity);
+        await currentPrintTask.printInit();
+        await currentPrintTask.printPage(encoded, quantity);
       } catch (e) {
         error = `${e}`;
         console.error(e);
@@ -124,7 +134,7 @@
       $printerClient.on("printprogress", listener);
 
       try {
-        await printTask.waitForFinished();
+        await currentPrintTask.waitForFinished();
       } catch (e) {
         error = `${e}`;
         console.error(e);
