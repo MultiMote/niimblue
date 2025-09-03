@@ -3,8 +3,12 @@ import type { AppConfig, LabelPreset, LabelProps } from "./types";
 
 /** Default presets for LabelPropsEditor */
 export const DEFAULT_LABEL_PRESETS: LabelPreset[] = [
-  { width: 30, height: 12, unit: "mm", dpmm: 8, printDirection: "left", shape: "rect" },
+  // 203dpi
+  { width: 40, height: 12, unit: "mm", dpmm: 8, printDirection: "left", shape: "rect" },
   { width: 50, height: 30, unit: "mm", dpmm: 8, printDirection: "top", shape: "rect" },
+  // 300dpi
+  { width: 40, height: 12, unit: "mm", dpmm: 11.81, printDirection: "left", shape: "rect", title: "40x12mm 300dpi" },
+  { width: 50, height: 30, unit: "mm", dpmm: 11.81, printDirection: "top", shape: "rect", title: "50x30mm 300dpi" },
 ];
 
 /** Default canvas dimensions */
