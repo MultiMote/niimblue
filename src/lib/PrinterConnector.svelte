@@ -31,7 +31,10 @@
   let connectionType: ConnectionType = "bluetooth";
   let featureSupport: AvailableTransports = { webBluetooth: false, webSerial: false, capacitorBle: false };
   let fwVersion: string = "";
+  let fwVersionValid: boolean = false;
   let fwProgress: string = "";
+
+  $: fwVersionValid = /^\d+\.\d+$/.test(fwVersion);
 
   const onConnectClicked = async () => {
     initClient(connectionType);
@@ -227,9 +230,9 @@
         {#if fwProgress}
           <span class="input-group-text">Uploading {fwProgress}</span>
         {:else}
-          <button class="btn btn-sm btn-primary" on:click={upgradeFw} disabled={!!fwProgress}>Upgrade FW</button>
-          <span class="input-group-text">To version</span>
-          <input class="form-control" placeholder="x.x" type="text" size="6" bind:value={fwVersion} />
+          <span class="input-group-text">Upgrade FW to</span>
+          <input class="form-control" placeholder="version (x.x)" type="text" size="6" bind:value={fwVersion} />
+          <button class="btn btn-sm btn-primary" on:click={upgradeFw} disabled={!!fwProgress || !fwVersionValid}>Browse</button>
         {/if}
       </div>
 
