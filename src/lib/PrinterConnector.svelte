@@ -1,11 +1,9 @@
 <script lang="ts">
   import {
-    FirmwareProgressEvent,
     NiimbotCapacitorBleClient,
     SoundSettingsItemType,
     Utils,
     type AvailableTransports,
-    type RfidInfo,
   } from "@mmote/niimbluelib";
   import {
     printerClient,
@@ -212,15 +210,25 @@
         </div>
       </div>
     </div>
-    <span class="input-group-text {$heartbeatFails > 0 ? 'text-warning' : ''}">
-      {$printerMeta?.model ?? $connectedPrinterName}
-      {#if $heartbeatData}
-        <MdIcon icon={batteryIcon($heartbeatData.powerLevel)} class="r-90"></MdIcon>
+    <span class="input-group-text">
+      {#if connectionType === "serial"}
+        <MdIcon icon="usb" />
+      {:else}
+        <MdIcon icon="bluetooth" />
       {/if}
     </span>
+    <span class="input-group-text {$heartbeatFails > 0 ? 'text-warning' : ''}">
+      {$printerMeta?.model ?? $connectedPrinterName}
+    </span>
+    {#if $heartbeatData}
+      <span class="input-group-text">
+        <MdIcon icon={batteryIcon($heartbeatData.powerLevel)} class="r-90"></MdIcon>
+      </span>
+    {/if}
   {:else}
     {#if featureSupport.webBluetooth}
       <button
+        disabled={$connectionState === "connecting"}
         class="btn text-nowrap {connectionType === 'bluetooth' ? 'btn-light' : 'btn-outline-secondary'}"
         on:click={() => switchConnectionType("bluetooth")}>
         <MdIcon icon="bluetooth" />
@@ -229,6 +237,7 @@
     {/if}
     {#if featureSupport.webSerial}
       <button
+        disabled={$connectionState === "connecting"}
         class="btn text-nowrap {connectionType === 'serial' ? 'btn-light' : 'btn-outline-secondary'}"
         on:click={() => switchConnectionType((connectionType = "serial"))}>
         <MdIcon icon="usb" />
@@ -237,6 +246,7 @@
     {/if}
     {#if featureSupport.capacitorBle}
       <button
+        disabled={$connectionState === "connecting"}
         class="btn text-nowrap {connectionType === 'capacitor-ble' ? 'btn-light' : 'btn-outline-secondary'}"
         on:click={() => switchConnectionType((connectionType = "capacitor-ble"))}>
         <MdIcon icon="usb" />
