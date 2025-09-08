@@ -26,15 +26,11 @@
   import { onMount } from "svelte";
   import { LocalStoragePersistence } from "../utils/persistence";
   import type { MaterialIcon } from "material-icons";
-  import { FileUtils } from "../utils/file_utils";
+  import FirmwareUpdater from "./basic/FirmwareUpdater.svelte";
 
   let connectionType: ConnectionType = "bluetooth";
   let featureSupport: AvailableTransports = { webBluetooth: false, webSerial: false, capacitorBle: false };
-  let fwVersion: string = "";
-  let fwVersionValid: boolean = false;
-  let fwProgress: string = "";
 
-  $: fwVersionValid = /^\d+\.\d+$/.test(fwVersion);
 
   const onConnectClicked = async () => {
     initClient(connectionType);
@@ -81,37 +77,6 @@
 
   const reset = async () => {
     await $printerClient.abstraction.printerReset();
-  };
-
-  const upgradeFw = async () => {
-    if (!confirm("Flashing wrong firmware can make your printer dead. Are you sure?")) {
-      return;
-    }
-
-    const data = await FileUtils.pickAndReadBinaryFile("bin");
-
-    const listener = (e: FirmwareProgressEvent) => {
-      fwProgress = `${e.currentChunk}/${e.totalChunks}`;
-    };
-
-    $printerClient.stopHeartbeat();
-
-    try {
-      $printerClient.on("firmwareprogress", listener);
-      fwProgress = "...";
-      await $printerClient.abstraction.firmwareUpgrade(data, fwVersion);
-      $printerClient.off("firmwareprogress", listener);
-      await $printerClient.disconnect();
-
-      Toasts.message("Flashing is finished, the printer will shut down now");
-    } catch (e) {
-      $printerClient.startHeartbeat();
-      $printerClient.off("firmwareprogress", listener);
-
-      Toasts.error(e);
-    }
-
-    fwProgress = "";
   };
 
   const switchConnectionType = (c: ConnectionType) => {
@@ -226,15 +191,7 @@
         </div>
       {/if}
 
-      <div class="input-group input-group-sm mt-1">
-        {#if fwProgress}
-          <span class="input-group-text">Uploading {fwProgress}</span>
-        {:else}
-          <span class="input-group-text">Upgrade FW to</span>
-          <input class="form-control" placeholder="version (x.x)" type="text" size="6" bind:value={fwVersion} />
-          <button class="btn btn-sm btn-primary" on:click={upgradeFw} disabled={!!fwProgress || !fwVersionValid}>Browse</button>
-        {/if}
-      </div>
+      <FirmwareUpdater/>
 
       <button
         class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
