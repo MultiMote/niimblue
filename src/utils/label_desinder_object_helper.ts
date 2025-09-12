@@ -3,6 +3,7 @@ import { OBJECT_DEFAULTS, OBJECT_DEFAULTS_TEXT, OBJECT_DEFAULTS_VECTOR, OBJECT_S
 import Barcode from "../fabric-object/barcode";
 import { QRCode } from "../fabric-object/qrcode";
 import type { OjectType } from "../types";
+import { Toasts } from "./toasts";
 
 export class LabelDesignerObjectHelper {
   static async addSvg(canvas: fabric.Canvas, svgCode: string): Promise<fabric.FabricObject | fabric.Group> {
@@ -51,6 +52,8 @@ export class LabelDesignerObjectHelper {
           console.error(readerEvt);
           reject(new Error("File read error"));
         };
+      } else {
+        reject(new Error("Unsupported image"));
       }
     });
   }
@@ -64,7 +67,8 @@ export class LabelDesignerObjectHelper {
       input.onchange = (e: Event) => {
         const target = e.target as HTMLInputElement;
         if (target.files !== null) {
-          this.addImageFile(fabricCanvas, target.files[0]).then(resolve);
+          // fixme: catch error in other place
+          this.addImageFile(fabricCanvas, target.files[0]).then(resolve).catch(Toasts.error);
         }
       };
 

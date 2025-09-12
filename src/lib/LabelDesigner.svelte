@@ -324,15 +324,28 @@
       selectedCount = 0;
     });
 
-    fabricCanvas.on("drop", (e): void => {
+    fabricCanvas.on("dragover", (e): void => {
+      e.e.preventDefault();
+    });
+
+    fabricCanvas.on("drop:after", async (e): Promise<void> => {
       const dragEvt = e.e as DragEvent;
       dragEvt.preventDefault();
 
+      let dropped = false;
+
       if (dragEvt.dataTransfer?.files) {
-        [...dragEvt.dataTransfer.files].forEach((file: File) => {
-          LabelDesignerObjectHelper.addImageFile(fabricCanvas, file);
+        for (const file of dragEvt.dataTransfer.files) {
+          try {
+            await LabelDesignerObjectHelper.addImageFile(fabricCanvas, file).catch();
+          } catch (e) {
+            Toasts.error(e);
+          }
+        }
+
+        if (dropped) {
           undo.push(fabricCanvas, labelProps);
-        });
+        }
       }
     });
 
