@@ -337,7 +337,8 @@
       if (dragEvt.dataTransfer?.files) {
         for (const file of dragEvt.dataTransfer.files) {
           try {
-            await LabelDesignerObjectHelper.addImageFile(fabricCanvas, file).catch();
+            await LabelDesignerObjectHelper.addImageFile(fabricCanvas, file);
+            dropped = true;
           } catch (e) {
             Toasts.error(e);
           }
