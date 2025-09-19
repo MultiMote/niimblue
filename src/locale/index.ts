@@ -6,6 +6,7 @@ import lang_ru from "./dicts/ru.json";
 import lang_pl from "./dicts/pl.json";
 import lang_zh_cn from "./dicts/zh_cn.json";
 import lang_fr from "./dicts/fr.json";
+import lang_pt_br from "./dicts/pt_BR.json";
 
 export type TranslationKey = keyof typeof lang_en;
 export type TranslationDict = Record<TranslationKey, string>;
@@ -26,7 +27,9 @@ export const langPack = {
   /** Simplified Chinese */
   zh_cn: lang_zh_cn as TranslationDict,
   /** French */
-  fr: lang_fr as TranslationDict
+  fr: lang_fr as TranslationDict,
+  /** Portuguese (Brazil) */
+  pt_br: lang_pt_br as TranslationDict
 } as const;
 
 export type SupportedLanguage = keyof typeof langPack;
