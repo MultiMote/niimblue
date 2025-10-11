@@ -137,5 +137,15 @@
     "params.color.black": "黑色",
     "params.generic.arrange": "层级",
     "params.generic.arrange.bottom": "置为底层",
-    "params.generic.arrange.top": "移到最前"
+    "params.generic.arrange.top": "移到最前",
+    "browser_warning.fingerprinting": "检测到浏览器正在处理画布以防止指纹识别。需要禁用此保护功能，不然打印出来的标签会出现瑕疵。",
+    "params.color": "颜色",
+    "params.text.italic": "斜体",
+    "params.qrcode.version": "版本",
+    "params.label.warning.div8": "标签宽度（以像素为单位）必须能被8整除",
+    "params.params.text.split": "文字分割（换行）",
+    "params.params.text.split.spaces": "空格",
+    "params.params.text.split.grapheme": "按字",
+    "params.qrcode.mode": "模式",
+    "params.generic.position": "位置"
 }
