@@ -5,6 +5,7 @@ import lang_it from "./dicts/it.json";
 import lang_ru from "./dicts/ru.json";
 import lang_pl from "./dicts/pl.json";
 import lang_zh_cn from "./dicts/zh_cn.json";
+import lang_zh_tw from "./dicts/zh_tw.json";
 import lang_fr from "./dicts/fr.json";
 import lang_pt_br from "./dicts/pt_BR.json";
 
@@ -26,6 +27,8 @@ export const langPack = {
   pl: lang_pl as TranslationDict,
   /** Simplified Chinese */
   zh_cn: lang_zh_cn as TranslationDict,
+  /** Traditional Chinese */
+  zh_tw: lang_zh_tw as TranslationDict,
   /** French */
   fr: lang_fr as TranslationDict,
   /** Portuguese (Brazil) */
