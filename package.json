@@ -20,6 +20,7 @@
 		"@capacitor/filesystem": "^7.0.1",
 		"@capacitor/share": "^7.0.1",
 		"@fontsource-variable/noto-sans": "^5.0.5",
+		"@formatjs/intl-localematcher": "^0.6.2",
 		"@mmote/niimbluelib": "0.0.1-alpha.29",
 		"@popperjs/core": "^2.11.8",
 		"bootstrap": "5.3.3",

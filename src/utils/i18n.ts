@@ -1,45 +1,21 @@
 import { derived, writable } from "svelte/store";
 import type { TranslationKey, SupportedLanguage } from "../locale";
 import { languageNames, langPack } from "../locale";
+import { match as langMatch } from "@formatjs/intl-localematcher";
 
 /** Check browser language and return supported language code.
  *  If language is not supported, "en" is returned. */
 const guessBrowserLanguage = (): SupportedLanguage => {
-  switch (navigator.language) {
-    case "cs":
-    case "cs-CZ":
-      return "cs";
-    case "de":
-    case "de-AT":
-    case "de-CH":
-    case "de-DE":
-    case "de-LI":
-    case "de-LU":
-      return "de";
-    case "it":
-    case "it-CH":
-    case "it-IT":
-      return "it";
-    case "ru":
-    case "ru-RU":
-      return "ru";
-    case "pl":
-    case "pl-PL":
-      return "pl";
-    case "zh":
-    case "zh-Hans":
-    case "zh-CN":
-      return "zh_cn";
-    case "zh-TW":
-    case "zh-Hant":
-    case "zh-HK":
-    case "zh-MO":
-      return "zh_tw";
-    case "fr":
-      case "fr-FR":
-        return "fr";
-    default:
-      return "en";
+  const fallback: SupportedLanguage = "en";
+  const browserLang = navigator.language;
+  const supportedLangs = Object.keys(langPack).map(e => e.replaceAll("_", "-"));
+
+  try {
+    const nearestLang = langMatch([browserLang], supportedLangs, fallback);
+    return nearestLang.replaceAll("-", "_") as SupportedLanguage;
+  } catch (e) {
+    console.warn("Unable to detect language:", e);
+    return fallback;
   }
 };
 
