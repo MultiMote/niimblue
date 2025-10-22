@@ -201,6 +201,7 @@
     if (selectedObject) {
       selectedObject.setCoords();
       selectedObject.dirty = true;
+      undo.push(fabricCanvas, labelProps);
     }
     fabricCanvas.requestRenderAll();
     selectedObject = selectedObject;
