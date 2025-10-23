@@ -125,5 +125,22 @@
     "params.generic.fit.mode.ratio_max": "Füllen",
     "params.generic.fit.mode.ratio_min": "Anpassen",
     "params.generic.fit": "An Seite anpassen",
-    "preview.print.system": "Drucken mit Betriebssystem Drucker"
+    "preview.print.system": "Drucken mit Betriebssystem Drucker",
+    "params.color": "Farbe",
+    "params.color.transparent": "transparent",
+    "params.color.white": "weiß",
+    "params.qrcode.version": "Version",
+    "params.color.black": "schwarz",
+    "params.label.warning.div8": "Etikettenbreite in Pixeln muss ein Vielfaches von 8 sein",
+    "params.text.italic": "Kursiv",
+    "params.params.text.split.spaces": "Leerzeichen",
+    "params.vector.fill": "Füllung",
+    "params.generic.position": "Position",
+    "params.qrcode.mode": "Modus",
+    "browser_warning.fingerprinting": "Oh nein! Sieht aus, als würde Dein Browser das Canvas-Element verzerren, um Dich vor Fingerprinting zu schützen. Bitte deaktiviere diesen Schutz, da er zu Artefakten auf den Etiketten führen kann.",
+    "editor.clear": "Arbeitsbereich zurücksetzen",
+    "editor.clear.confirm": "Inhalte des Arbeitsbereichs löschen?",
+    "params.generic.arrange": "Ausrichten",
+    "params.generic.arrange.top": "Nach vorne verschieben",
+    "params.generic.arrange.bottom": "In den Hintergrund verschieben"
 }
