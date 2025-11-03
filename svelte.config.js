@@ -1,7 +1,19 @@
-import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
+import { execSync } from "node:child_process";
+import adapter from "@sveltejs/adapter-auto";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 
-export default {
-  // Consult https://svelte.dev/docs#compile-time-svelte-preprocess
-  // for more information about preprocessors
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
   preprocess: vitePreprocess(),
-}
+  kit: {
+    adapter: adapter(),
+    version: {
+      name: execSync("git rev-parse HEAD").toString().trim().substring(0, 7),
+    },
+    alias: {
+      $: "src",
+    },
+  },
+};
+
+export default config;
