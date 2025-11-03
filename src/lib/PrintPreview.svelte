@@ -24,37 +24,48 @@
   import { CustomCanvas } from "../fabric-object/custom_canvas";
   import { FileUtils } from "../utils/file_utils";
 
-  export let onClosed: () => void;
-  export let labelProps: LabelProps;
-  export let canvasCallback: () => FabricJson;
-  export let printNow: boolean = false;
-  export let csvData: string;
-  export let csvEnabled: boolean;
+  interface Props {
+    onClosed: () => void;
+    labelProps: LabelProps;
+    canvasCallback: () => FabricJson;
+    printNow?: boolean;
+    csvData: string;
+    csvEnabled: boolean;
+  }
 
-  let modalElement: HTMLElement;
-  let previewCanvas: HTMLCanvasElement;
-  let printState: "idle" | "sending" | "printing" = "idle";
+  let {
+    onClosed,
+    labelProps,
+    canvasCallback,
+    printNow = false,
+    csvData,
+    csvEnabled
+  }: Props = $props();
+
+  let modalElement: HTMLElement = $state();
+  let previewCanvas: HTMLCanvasElement = $state();
+  let printState: "idle" | "sending" | "printing" = $state("idle");
   let modal: Modal;
-  let printProgress: number = 0; // todo: more progress data
-  let density: number = $printerMeta?.densityDefault ?? 3;
-  let quantity: number = 1;
-  let postProcessType: PostProcessType;
-  let thresholdValue: number = 140;
+  let printProgress: number = $state(0); // todo: more progress data
+  let density: number = $state($printerMeta?.densityDefault ?? 3);
+  let quantity: number = $state(1);
+  let postProcessType: PostProcessType = $state();
+  let thresholdValue: number = $state(140);
   let originalImage: ImageData;
   let previewContext: CanvasRenderingContext2D;
-  let printTaskName: PrintTaskName = "D110";
-  let labelType: LabelType = LabelType.WithGaps;
+  let printTaskName: PrintTaskName = $state("D110");
+  let labelType: LabelType = $state(LabelType.WithGaps);
   let statusTimer: NodeJS.Timeout | undefined = undefined;
-  let error: string = "";
+  let error: string = $state("");
   let detectedPrintTaskName: PrintTaskName | undefined = $printerClient?.getPrintTaskType();
   let csvParsed: DSVRowArray<string>;
-  let page: number = 0;
-  let pagesTotal: number = 1;
-  let offset: PreviewPropsOffset = { x: 0, y: 0, offsetType: "inner" };
-  let offsetWarning: string = "";
+  let page: number = $state(0);
+  let pagesTotal: number = $state(1);
+  let offset: PreviewPropsOffset = $state({ x: 0, y: 0, offsetType: "inner" });
+  let offsetWarning: string = $state("");
   let currentPrintTask: AbstractPrintTask | undefined;
 
-  let savedProps = {} as PreviewProps;
+  let savedProps = $state({} as PreviewProps);
 
   const disconnected = derived(connectionState, ($connectionState) => $connectionState !== "connected");
 
@@ -341,7 +352,7 @@
       <div class="modal-body text-center">
         <div class="d-flex justify-content-center">
           {#if pagesTotal > 1}
-            <button disabled={printState !== "idle"} class="btn w-100 fs-1" on:click={pageDown}>
+            <button disabled={printState !== "idle"} class="btn w-100 fs-1" onclick={pageDown}>
               <MdIcon icon="chevron_left" />
             </button>
           {/if}
@@ -349,7 +360,7 @@
           <canvas class="print-start-{labelProps.printDirection}" bind:this={previewCanvas}></canvas>
 
           {#if pagesTotal > 1}
-            <button disabled={printState !== "idle"} class="btn w-100 fs-1" on:click={pageUp}>
+            <button disabled={printState !== "idle"} class="btn w-100 fs-1" onclick={pageUp}>
               <MdIcon icon="chevron_right" />
             </button>
           {/if}
@@ -380,7 +391,7 @@
           <select
             class="form-select"
             bind:value={postProcessType}
-            on:change={() => updateSavedProp("postProcess", postProcessType, true)}>
+            onchange={() => updateSavedProp("postProcess", postProcessType, true)}>
             <option value="threshold">{$tr("preview.postprocess.threshold")}</option>
             <option value="dither">{$tr("preview.postprocess.atkinson")}</option>
           </select>
@@ -402,7 +413,7 @@
             min="1"
             max="255"
             bind:value={thresholdValue}
-            on:change={() => updateSavedProp("threshold", thresholdValue, true)} />
+            onchange={() => updateSavedProp("threshold", thresholdValue, true)} />
           <span class="input-group-text">{thresholdValue}</span>
 
           <ParamLockButton
@@ -419,7 +430,7 @@
             type="number"
             min="1"
             bind:value={quantity}
-            on:change={() => updateSavedProp("quantity", quantity)} />
+            onchange={() => updateSavedProp("quantity", quantity)} />
           <ParamLockButton
             propName="quantity"
             value={quantity}
@@ -435,13 +446,13 @@
             min={$printerMeta?.densityMin ?? 1}
             max={$printerMeta?.densityMax ?? 20}
             bind:value={density}
-            on:change={() => updateSavedProp("density", density)} />
+            onchange={() => updateSavedProp("density", density)} />
           <ParamLockButton propName="density" value={density} savedValue={savedProps.density} onClick={toggleSavedProp} />
         </div>
 
         <div class="input-group input-group-sm">
           <span class="input-group-text">{$tr("preview.label_type")}</span>
-          <select class="form-select" bind:value={labelType} on:change={() => updateSavedProp("labelType", labelType)}>
+          <select class="form-select" bind:value={labelType} onchange={() => updateSavedProp("labelType", labelType)}>
             {#each Object.values(LabelType) as lt}
               {#if typeof lt !== "string"}
                 <option value={lt}>
@@ -464,7 +475,7 @@
           <select
             class="form-select"
             bind:value={printTaskName}
-            on:change={() => updateSavedProp("printTaskName", printTaskName)}>
+            onchange={() => updateSavedProp("printTaskName", printTaskName)}>
             {#each printTaskNames as name}
               <option value={name}>
                 {#if detectedPrintTaskName === name}✔{/if}
@@ -490,17 +501,17 @@
             class="form-control"
             type="number"
             bind:value={offset.x}
-            on:change={() => updateSavedProp("offset", offset, true)} />
+            onchange={() => updateSavedProp("offset", offset, true)} />
           <span class="input-group-text"><MdIcon icon="unfold_more" /></span>
           <input
             class="form-control"
             type="number"
             bind:value={offset.y}
-            on:change={() => updateSavedProp("offset", offset, true)} />
+            onchange={() => updateSavedProp("offset", offset, true)} />
           <select
             class="form-select"
             bind:value={offset.offsetType}
-            on:change={() => updateSavedProp("offset", offset, true)}>
+            onchange={() => updateSavedProp("offset", offset, true)}>
             <option value="inner">{$tr("preview.offset.inner")}</option>
             <option value="outer">{$tr("preview.offset.outer")}</option>
           </select>
@@ -511,16 +522,16 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{$tr("preview.close")}</button>
 
         {#if printState !== "idle"}
-          <button type="button" class="btn btn-primary" disabled={$disconnected} on:click={endPrint}>
+          <button type="button" class="btn btn-primary" disabled={$disconnected} onclick={endPrint}>
             {$tr("preview.print.cancel")}
           </button>
         {/if}
 
-        <button type="button" class="btn btn-secondary" title={$tr("preview.print.system")} on:click={onPrintOnSystemPrinter}>
+        <button type="button" class="btn btn-secondary" title={$tr("preview.print.system")} onclick={onPrintOnSystemPrinter}>
           <MdIcon icon="print" />
         </button>
 
-        <button type="button" class="btn btn-primary" disabled={$disconnected || printState !== "idle"} on:click={onPrint}>
+        <button type="button" class="btn btn-primary" disabled={$disconnected || printState !== "idle"} onclick={onPrint}>
           {#if $disconnected}
             {$tr("preview.not_connected")}
           {:else}

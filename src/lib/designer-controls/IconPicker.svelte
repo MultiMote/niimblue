@@ -4,11 +4,15 @@
   import { iconCodepoints, type MaterialIcon } from "../../mdi_icons";
   import MdIcon from "../basic/MdIcon.svelte";
 
-  export let onSubmit: (i: MaterialIcon) => void;
+  interface Props {
+    onSubmit: (i: MaterialIcon) => void;
+  }
 
-  let iconNames: MaterialIcon[] = [];
-  let search: string = "";
-  let dropdown: Element;
+  let { onSubmit }: Props = $props();
+
+  let iconNames: MaterialIcon[] = $state([]);
+  let search: string = $state("");
+  let dropdown: Element = $state();
 
   const onShow = () => {
     if (iconNames.length === 0) {
@@ -38,7 +42,7 @@
       <div class="icons">
         {#each iconNames as name}
           {#if !search || name.includes(search.toLowerCase())}
-            <button class="btn me-1" title={name} on:click={() => onSubmit(name)}>
+            <button class="btn me-1" title={name} onclick={() => onSubmit(name)}>
               <MdIcon icon={name} />
             </button>
           {/if}

@@ -4,13 +4,15 @@
   import MdIcon from "../basic/MdIcon.svelte";
   import * as fabric from "fabric";
 
-  export let selectedObject: fabric.FabricObject | undefined;
-  export let valueUpdated: () => void;
-  let selectedQRCode: QRCode | undefined;
-
-  $: {
-    selectedQRCode = selectedObject instanceof QRCode ? (selectedObject as QRCode) : undefined;
+  interface Props {
+    selectedObject: fabric.FabricObject | undefined;
+    valueUpdated: () => void;
   }
+
+  let { selectedObject, valueUpdated }: Props = $props();
+  let selectedQRCode: QRCode | undefined = $derived(selectedObject instanceof QRCode ? (selectedObject as QRCode) : undefined);
+
+  
 </script>
 
 {#if selectedQRCode}
@@ -21,7 +23,7 @@
     <select
       class="form-select"
       value={selectedQRCode.ecl}
-      on:change={(e) => {
+      onchange={(e) => {
         selectedQRCode?.set("ecl", e.currentTarget.value);
         valueUpdated();
       }}>
@@ -39,7 +41,7 @@
     <select
       class="form-select"
       value={selectedQRCode.mode}
-      on:change={(e) => {
+      onchange={(e) => {
         selectedQRCode?.set("mode", e.currentTarget.value);
         valueUpdated();
       }}>
@@ -57,7 +59,7 @@
     <select
       class="form-select"
       value={selectedQRCode.qrVersion}
-      on:change={(e) => {
+      onchange={(e) => {
         selectedQRCode?.set("qrVersion", parseInt(e.currentTarget.value));
         valueUpdated();
       }}>
@@ -71,10 +73,10 @@
   <textarea
     class="qrcode-content form-control"
     value={selectedQRCode.text}
-    on:input={(e) => {
+    oninput={(e) => {
       selectedQRCode?.set("text", e.currentTarget.value);
       valueUpdated();
-    }} />
+    }}></textarea>
 {/if}
 
 <style>

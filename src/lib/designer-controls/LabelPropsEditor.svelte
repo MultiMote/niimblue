@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import {
     LabelPresetSchema,
     type LabelPreset,
@@ -22,8 +24,12 @@
   import { z } from "zod";
   import DpiSelector from "./DpiSelector.svelte";
 
-  export let labelProps: LabelProps;
-  export let onChange: (newProps: LabelProps) => void;
+  interface Props {
+    labelProps: LabelProps;
+    onChange: (newProps: LabelProps) => void;
+  }
+
+  let { labelProps, onChange }: Props = $props();
 
   const tailPositions: TailPosition[] = ["right", "bottom", "left", "top"];
   const printDirections: PrintDirection[] = ["left", "top"];
@@ -31,22 +37,22 @@
   const labelSplits: LabelSplit[] = ["none", "vertical", "horizontal"];
   const mirrorTypes: MirrorType[] = ["none", "flip", "copy"];
 
-  let labelPresets: LabelPreset[] = DEFAULT_LABEL_PRESETS;
+  let labelPresets: LabelPreset[] = $state(DEFAULT_LABEL_PRESETS);
 
-  let title: string | undefined = "";
+  let title: string | undefined = $state("");
   let prevUnit: LabelUnit = "mm";
-  let unit: LabelUnit = "mm";
-  let dpmm = 8;
-  let width = 0;
-  let height = 0;
-  let printDirection: PrintDirection = "left";
-  let shape: LabelShape = "rect";
-  let split: LabelSplit = "none";
-  let splitParts: number = 2;
-  let tailLength: number = 0;
-  let tailPos: TailPosition = "right";
-  let mirror: MirrorType = "none";
-  let error: string = "";
+  let unit: LabelUnit = $state("mm");
+  let dpmm = $state(8);
+  let width = $state(0);
+  let height = $state(0);
+  let printDirection: PrintDirection = $state("left");
+  let shape: LabelShape = $state("rect");
+  let split: LabelSplit = $state("none");
+  let splitParts: number = $state(2);
+  let tailLength: number = $state(0);
+  let tailPos: TailPosition = $state("right");
+  let mirror: MirrorType = $state("none");
+  let error: string = $state("");
 
   const onApply = () => {
     let newWidth = width;
@@ -247,11 +253,21 @@
     tick().then(() => fillWithCurrentParams());
   });
 
-  $: checkError(labelProps);
-  $: if (shape === "circle" && split !== "none") split = "none";
-  $: if (split === "none") tailLength = 0;
-  $: if (mirror === "flip" && splitParts !== 2) mirror = "copy";
-  $: if (tailLength < 0) tailLength = 0;
+  run(() => {
+    checkError(labelProps);
+  });
+  run(() => {
+    if (shape === "circle" && split !== "none") split = "none";
+  });
+  run(() => {
+    if (split === "none") tailLength = 0;
+  });
+  run(() => {
+    if (mirror === "flip" && splitParts !== 2) mirror = "copy";
+  });
+  run(() => {
+    if (tailLength < 0) tailLength = 0;
+  });
 </script>
 
 <div class="dropdown">
@@ -263,11 +279,11 @@
 
     <div class="px-3">
       <div class="p-1">
-        <button class="btn btn-sm btn-outline-secondary" on:click={onImportClicked}>
+        <button class="btn btn-sm btn-outline-secondary" onclick={onImportClicked}>
           <MdIcon icon="data_object" />
           {$tr("params.label.import")}
         </button>
-        <button class="btn btn-sm btn-outline-secondary" on:click={onExportClicked}>
+        <button class="btn btn-sm btn-outline-secondary" onclick={onExportClicked}>
           <MdIcon icon="data_object" />
           {$tr("params.label.export")}
         </button>
@@ -281,7 +297,7 @@
         {:else if labelProps.printDirection === "left"}
           ({$tr("params.label.direction")} {$tr("params.label.direction.left")})
         {/if}
-        <button class="btn btn-sm" on:click={fillWithCurrentParams}><MdIcon icon="arrow_downward" /></button>
+        <button class="btn btn-sm" onclick={fillWithCurrentParams}><MdIcon icon="arrow_downward" /></button>
       </div>
 
       <LabelPresetsBrowser
@@ -293,9 +309,9 @@
       <div class="input-group flex-nowrap input-group-sm mb-2">
         <span class="input-group-text">{$tr("params.label.size")}</span>
         <input class="form-control" type="number" min="1" step={unit === "px" ? 8 : 1} bind:value={width} />
-        <button class="btn btn-sm btn-secondary" on:click={onFlip}><MdIcon icon="swap_horiz" /></button>
+        <button class="btn btn-sm btn-secondary" onclick={onFlip}><MdIcon icon="swap_horiz" /></button>
         <input class="form-control" type="number" min="1" step={unit === "px" ? 8 : 1} bind:value={height} />
-        <select class="form-select" bind:value={unit} on:change={onUnitChange}>
+        <select class="form-select" bind:value={unit} onchange={onUnitChange}>
           <option value="mm"> {$tr("params.label.mm")}</option>
           <option value="px"> {$tr("params.label.px")}</option>
         </select>
@@ -416,10 +432,10 @@
       </div>
 
       <div class="text-end">
-        <button class="btn btn-sm btn-secondary" on:click={onLabelPresetAdd}>
+        <button class="btn btn-sm btn-secondary" onclick={onLabelPresetAdd}>
           {$tr("params.label.save_template")}
         </button>
-        <button class="btn btn-sm btn-primary" on:click={onApply}>{$tr("params.label.apply")}</button>
+        <button class="btn btn-sm btn-primary" onclick={onApply}>{$tr("params.label.apply")}</button>
       </div>
     </div>
   </div>

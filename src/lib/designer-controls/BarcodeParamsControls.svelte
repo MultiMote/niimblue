@@ -4,13 +4,15 @@
   import { tr } from "../../utils/i18n";
   import MdIcon from "../basic/MdIcon.svelte";
 
-  export let selectedObject: fabric.FabricObject | undefined;
-  export let valueUpdated: () => void;
-  let selectedBarcode: Barcode | undefined;
-
-  $: {
-    selectedBarcode = selectedObject instanceof Barcode ? (selectedObject as Barcode) : undefined;
+  interface Props {
+    selectedObject: fabric.FabricObject | undefined;
+    valueUpdated: () => void;
   }
+
+  let { selectedObject, valueUpdated }: Props = $props();
+  let selectedBarcode: Barcode | undefined = $derived(selectedObject instanceof Barcode ? (selectedObject as Barcode) : undefined);
+
+  
 </script>
 
 {#if selectedBarcode}
@@ -19,7 +21,7 @@
     <select
       class="form-select"
       value={selectedBarcode.encoding}
-      on:change={(e) => {
+      onchange={(e) => {
         selectedBarcode?.set("encoding", e.currentTarget.value ?? "EAN13");
         valueUpdated();
       }}>
@@ -37,7 +39,7 @@
       type="number"
       min="1"
       value={selectedBarcode.scaleFactor}
-      on:input={(e) => {
+      oninput={(e) => {
         selectedBarcode?.set("scaleFactor", e.currentTarget.valueAsNumber ?? 1);
         valueUpdated();
       }} />
@@ -46,7 +48,7 @@
   <button
     class="btn btn-sm {selectedBarcode.printText ? 'btn-secondary' : ''}"
     title={$tr("params.barcode.enable_caption")}
-    on:click={() => {
+    onclick={() => {
       selectedBarcode?.set("printText", !selectedBarcode.printText);
       valueUpdated();
     }}>
@@ -62,7 +64,7 @@
       type="number"
       min="1"
       value={selectedBarcode.fontSize}
-      on:input={(e) => {
+      oninput={(e) => {
         selectedBarcode?.set("fontSize", e.currentTarget.valueAsNumber ?? 12);
         valueUpdated();
       }} />
@@ -75,7 +77,7 @@
         class="barcode-content form-control"
         maxlength="12"
         value={selectedBarcode.text}
-        on:input={(e) => {
+        oninput={(e) => {
           selectedBarcode?.set("text", e.currentTarget.value);
           valueUpdated();
         }} />
@@ -84,10 +86,10 @@
     <textarea
       class="barcode-content form-control"
       value={selectedBarcode.text}
-      on:input={(e) => {
+      oninput={(e) => {
         selectedBarcode?.set("text", e.currentTarget.value);
         valueUpdated();
-      }} />
+      }}></textarea>
   {/if}
 {/if}
 

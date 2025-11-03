@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: can't migrate `let state: "idle" | "processing" | "error" = "idle";` to `$state` because there's a variable named state.
+     Rename the variable and try again or migrate by hand. -->
 <script lang="ts">
   import type { LabelProps } from "../../types";
   import { FileUtils } from "../../utils/file_utils";

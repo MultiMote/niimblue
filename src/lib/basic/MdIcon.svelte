@@ -1,9 +1,14 @@
 <script lang="ts">
   import { iconCodepoints, type MaterialIcon } from "../../mdi_icons";
-  export let icon: MaterialIcon;
+  interface Props {
+    icon: MaterialIcon;
+    [key: string]: any
+  }
+
+  let { icon, ...rest }: Props = $props();
 </script>
 
-<span class="mdi {$$restProps.class || ''}">
+<span class="mdi {rest.class || ''}">
   {String.fromCodePoint(iconCodepoints[icon])}
 </span>
 

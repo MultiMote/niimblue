@@ -1,16 +1,20 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import type { FirmwareProgressEvent } from "@mmote/niimbluelib";
   import { printerClient } from "../../stores";
   import { Toasts } from "../../utils/toasts";
   import { FileUtils } from "../../utils/file_utils";
 
-  let fwVersion: string = "";
-  let fwVersionValid: boolean = false;
-  let fwProgress: string = "";
-  let fwData: Uint8Array | undefined;
-  let fwName: string = "";
+  let fwVersion: string = $state("");
+  let fwVersionValid: boolean = $state(false);
+  let fwProgress: string = $state("");
+  let fwData: Uint8Array | undefined = $state();
+  let fwName: string = $state("");
 
-  $: fwVersionValid = /^\d+\.\d+$/.test(fwVersion);
+  run(() => {
+    fwVersionValid = /^\d+\.\d+$/.test(fwVersion);
+  });
 
   const browseFw = async () => {
     const file = await FileUtils.pickAndReadBinaryFile("bin");
@@ -74,7 +78,7 @@
       <span class="input-group-text">Uploading {fwProgress}</span>
     {:else}
       <span class="input-group-text">To</span>
-      <button class="btn btn-sm btn-secondary" title={fwName} on:click={browseFw} disabled={!!fwProgress}>
+      <button class="btn btn-sm btn-secondary" title={fwName} onclick={browseFw} disabled={!!fwProgress}>
         {fwName.length > 0 ? fwName.slice(0, 8) + "..." : "Browse..."}
       </button>
       <span class="input-group-text">ver.</span>
@@ -82,7 +86,7 @@
 
       <button
         class="btn btn-sm btn-danger"
-        on:click={upgradeFw}
+        onclick={upgradeFw}
         disabled={!!fwProgress || !fwVersionValid || fwData === undefined}>Burn</button>
     {/if}
   </div>

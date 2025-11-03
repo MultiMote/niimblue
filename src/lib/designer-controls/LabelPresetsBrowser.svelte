@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Cannot split a chunk that has already been edited (39:22 – "on:click={() => onItemSelected(idx)}") -->
 <script lang="ts">
   import type { LabelPreset } from "../../types";
   import { tr } from "../../utils/i18n";

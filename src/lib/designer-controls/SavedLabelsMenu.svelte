@@ -10,16 +10,20 @@
   import { FileUtils } from "../../utils/file_utils";
   import * as fabric from "fabric";
 
-  export let onRequestLabelTemplate: () => ExportedLabelTemplate;
-  export let onLoadRequested: (label: ExportedLabelTemplate) => void;
-  export let canvas: fabric.Canvas;
+  interface Props {
+    onRequestLabelTemplate: () => ExportedLabelTemplate;
+    onLoadRequested: (label: ExportedLabelTemplate) => void;
+    canvas: fabric.Canvas;
+  }
 
-  let dropdownRef: Element;
-  let savedLabels: ExportedLabelTemplate[] = [];
-  let selectedIndex: number = -1;
-  let title: string = "";
-  let usedSpace: number = 0;
-  let customDefaultTemplate: boolean = LocalStoragePersistence.hasCustomDefaultTemplate();
+  let { onRequestLabelTemplate, onLoadRequested, canvas }: Props = $props();
+
+  let dropdownRef: Element = $state();
+  let savedLabels: ExportedLabelTemplate[] = $state([]);
+  let selectedIndex: number = $state(-1);
+  let title: string = $state("");
+  let usedSpace: number = $state(0);
+  let customDefaultTemplate: boolean = $state(LocalStoragePersistence.hasCustomDefaultTemplate());
 
   const calcUsedSpace = () => {
     usedSpace = LocalStoragePersistence.usedSpace();
@@ -164,12 +168,12 @@
 
     <div class="px-3">
       <div class="p-1">
-        <button class="btn btn-sm btn-outline-secondary" on:click={onImportClicked}>
+        <button class="btn btn-sm btn-outline-secondary" onclick={onImportClicked}>
           <MdIcon icon="data_object" />
           {$tr("params.saved_labels.load.json")}
         </button>
         <div class="btn-group btn-group-sm">
-          <button class="btn btn-outline-secondary" on:click={onExportClicked}>
+          <button class="btn btn-outline-secondary" onclick={onExportClicked}>
             <MdIcon icon="data_object" />
             {$tr("params.saved_labels.save.json")}
           </button>
@@ -180,7 +184,7 @@
           </button>
           <ul class="dropdown-menu">
             <li>
-              <button class="dropdown-item" on:click={onExportPngClicked}>PNG</button>
+              <button class="dropdown-item" onclick={onExportPngClicked}>PNG</button>
             </li>
           </ul>
         </div>
@@ -205,28 +209,28 @@
 
       <div class="d-flex gap-1 flex-wrap justify-content-end">
         <div class="btn-group btn-group-sm make-default">
-          <button class="btn text-secondary" on:click={onMakeDefaultClicked}>
+          <button class="btn text-secondary" onclick={onMakeDefaultClicked}>
             {$tr("params.saved_labels.make_default")}
           </button>
           {#if customDefaultTemplate}
-            <button class="btn text-secondary" on:click={onRemoveDefaultClicked}>
+            <button class="btn text-secondary" onclick={onRemoveDefaultClicked}>
               <MdIcon icon="close" />
             </button>
           {/if}
         </div>
 
-        <button class="btn btn-sm btn-secondary" on:click={onSaveClicked}>
+        <button class="btn btn-sm btn-secondary" onclick={onSaveClicked}>
           <MdIcon icon="save" />
           {$tr("params.saved_labels.save.browser")}
         </button>
 
         {#if selectedIndex !== -1}
-          <button class="btn btn-sm btn-secondary" on:click={onSaveReplaceClicked}>
+          <button class="btn btn-sm btn-secondary" onclick={onSaveReplaceClicked}>
             <MdIcon icon="edit_note" />
             {$tr("params.saved_labels.save.browser.replace")}
           </button>
 
-          <button class="btn btn-sm btn-primary" on:click={onLoadClicked}>
+          <button class="btn btn-sm btn-primary" onclick={onLoadClicked}>
             <MdIcon icon="folder" />
             {$tr("params.saved_labels.load.browser")}
           </button>

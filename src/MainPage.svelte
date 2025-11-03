@@ -32,7 +32,7 @@
   </div>
 </div>
 
-<!-- svelte-ignore missing-declaration -->
+<!-- svelte-ignore missing_declaration -->
 <div class="footer text-end text-secondary p-3">
   <div>
     <select class="form-select form-select-sm text-secondary d-inline-block w-auto" bind:value={$locale}>
