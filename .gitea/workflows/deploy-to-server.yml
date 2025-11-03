@@ -1,4 +1,4 @@
-name: Deploy project
+name: Deploy to server
 
 on:
   # Runs on pushes targeting the default branch
@@ -11,7 +11,7 @@ on:
 
 jobs:
   deploy:
-    name: Build
+    name: Deploy
     runs-on: ubuntu-latest
     if: gitea.repository == 'MultiMote/niimblue'
 
@@ -26,8 +26,18 @@ jobs:
           cache: npm
           cache-dependency-path: ./package-lock.json
 
+      - name: Setup rsync
+        run: sudo apt-get update && sudo apt-get install -y rsync
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H -p ${{ secrets.SSH_PORT || 22 }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Check code
         run: npm run sv-check
@@ -50,9 +60,8 @@ jobs:
           DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
           LAST_MODIFIED: ${{ gitea.event.repository.updated_at }}
 
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=niimblue-cf
+      - name: Deploy with Rsync
+        run: |
+          rsync -avz --delete \
+                -e "ssh -p ${{ secrets.SSH_PORT || 22 }}" \
+                ./dist/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}
