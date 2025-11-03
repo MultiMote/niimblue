@@ -6,11 +6,46 @@ export type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
 export type Mode = "Numeric" | "Alphanumeric" | "Byte" /* Default */ | "Kanji";
 export type QrVersion =
   | 0 // Automatic
-  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
-  | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20
-  | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30
-  | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40
-  ;
+  | 1
+  | 2
+  | 3
+  | 4
+  | 5
+  | 6
+  | 7
+  | 8
+  | 9
+  | 10
+  | 11
+  | 12
+  | 13
+  | 14
+  | 15
+  | 16
+  | 17
+  | 18
+  | 19
+  | 20
+  | 21
+  | 22
+  | 23
+  | 24
+  | 25
+  | 26
+  | 27
+  | 28
+  | 29
+  | 30
+  | 31
+  | 32
+  | 33
+  | 34
+  | 35
+  | 36
+  | 37
+  | 38
+  | 39
+  | 40;
 
 export const qrCodeDefaultValues: Partial<fabric.TClassProperties<QRCode>> = {
   text: "Text",
@@ -35,7 +70,7 @@ const QRCODE_PROPS = ["text", "ecl", "size", "mode", "qrVersion"] as const;
 export class QRCode<
     Props extends fabric.TOptions<QRCodeProps> = Partial<QRCodeProps>,
     SProps extends SerializedQRCodeProps = SerializedQRCodeProps,
-    EventSpec extends fabric.ObjectEvents = fabric.ObjectEvents
+    EventSpec extends fabric.ObjectEvents = fabric.ObjectEvents,
   >
   extends fabric.FabricObject<Props, SProps, EventSpec>
   implements QRCodeProps
@@ -97,7 +132,7 @@ export class QRCode<
 
   renderError(ctx: CanvasRenderingContext2D): void {
     ctx.save();
-    ctx.fillStyle = "black"
+    ctx.fillStyle = "black";
     ctx.translate(-this.width / 2, -this.height / 2); // make top-left origin
     ctx.translate(-0.5, -0.5); // blurry rendering fix
     ctx.fillRect(0, 0, this.width + 1, this.height + 1);

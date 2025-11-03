@@ -32,7 +32,7 @@ export const langPack = {
   /** French */
   fr: lang_fr as TranslationDict,
   /** Portuguese (Brazil) */
-  pt_br: lang_pt_br as TranslationDict
+  pt_br: lang_pt_br as TranslationDict,
 } as const;
 
 export type SupportedLanguage = keyof typeof langPack;
@@ -40,6 +40,6 @@ export type SupportedLanguage = keyof typeof langPack;
 export const languageNames = Object.assign(
   {},
   ...Object.entries(langPack).map(([k, v]) => ({
-    [k]: v["lang.name"] ?? k
-  }))
+    [k]: v["lang.name"] ?? k,
+  })),
 ) as Record<SupportedLanguage, string>;

@@ -10,7 +10,7 @@ export class LabelDesignerObjectHelper {
     const { objects, options } = await fabric.loadSVGFromString(svgCode);
     const obj = fabric.util.groupSVGElements(
       objects.filter((o) => o !== null),
-      options
+      options,
     );
     obj.scaleToWidth(OBJECT_SIZE_DEFAULTS.width);
     obj.scaleToHeight(OBJECT_SIZE_DEFAULTS.height);
@@ -100,7 +100,7 @@ export class LabelDesignerObjectHelper {
 
   static async addObjectFromClipboard(
     fabricCanvas: fabric.Canvas,
-    data: DataTransfer
+    data: DataTransfer,
   ): Promise<fabric.FabricObject | undefined> {
     // paste image
     for (const item of data.items) {
@@ -144,7 +144,7 @@ export class LabelDesignerObjectHelper {
   static addHLine(canvas: fabric.Canvas): fabric.Line {
     const obj = new fabric.Line(
       [OBJECT_DEFAULTS.left, OBJECT_DEFAULTS.top, OBJECT_DEFAULTS.left + OBJECT_SIZE_DEFAULTS.width, OBJECT_DEFAULTS.top],
-      { ...OBJECT_DEFAULTS_VECTOR }
+      { ...OBJECT_DEFAULTS_VECTOR },
     );
     obj.setControlsVisibility({
       tl: false,
@@ -172,7 +172,7 @@ export class LabelDesignerObjectHelper {
   static addRect(canvas: fabric.Canvas): fabric.Rect {
     const obj = new fabric.Rect({
       ...OBJECT_SIZE_DEFAULTS,
-      ...OBJECT_DEFAULTS_VECTOR
+      ...OBJECT_DEFAULTS_VECTOR,
     });
     canvas.add(obj);
     canvas.centerObjectV(obj);

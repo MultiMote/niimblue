@@ -10,9 +10,9 @@
   }
 
   let { selectedObject, valueUpdated }: Props = $props();
-  let selectedQRCode: QRCode | undefined = $derived(selectedObject instanceof QRCode ? (selectedObject as QRCode) : undefined);
-
-  
+  let selectedQRCode: QRCode | undefined = $derived(
+    selectedObject instanceof QRCode ? (selectedObject as QRCode) : undefined,
+  );
 </script>
 
 {#if selectedQRCode}

@@ -2,9 +2,20 @@ import * as fabric from "fabric";
 import { DEFAULT_LABEL_PROPS } from "../defaults";
 import type { LabelProps } from "../types";
 
-type LabelBounds = { startX: number; startY: number; endX: number; endY: number; width: number; height: number };
+type LabelBounds = {
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+  width: number;
+  height: number;
+};
 type FoldSegment = { start: number; end: number };
-type FoldInfo = { axis: "vertical" | "horizontal" | "none"; points: number[]; segments: FoldSegment[] };
+type FoldInfo = {
+  axis: "vertical" | "horizontal" | "none";
+  points: number[];
+  segments: FoldSegment[];
+};
 type MirrorInfo = { pos: fabric.Point; flip: boolean };
 
 export class CustomCanvas extends fabric.Canvas {
@@ -51,7 +62,7 @@ export class CustomCanvas extends fabric.Canvas {
         width: this.virtualZoomRatio * this.getWidth() + "px",
         height: this.virtualZoomRatio * this.getHeight() + "px",
       },
-      { cssOnly: true }
+      { cssOnly: true },
     );
   }
 
@@ -193,14 +204,14 @@ export class CustomCanvas extends fabric.Canvas {
           bb.endX - roundRadius,
           bb.endY / 2 - this.TAIL_WIDTH / 2,
           this.width - bb.endX + roundRadius,
-          this.TAIL_WIDTH
+          this.TAIL_WIDTH,
         );
       } else if (this.labelProps.tailPos === "bottom") {
         ctx.rect(
           bb.endX / 2 - this.TAIL_WIDTH / 2,
           bb.endY - roundRadius,
           this.TAIL_WIDTH,
-          this.height - bb.endY + roundRadius
+          this.height - bb.endY + roundRadius,
         );
       } else if (this.labelProps.tailPos === "left") {
         ctx.rect(0, bb.endY / 2 - this.TAIL_WIDTH / 2, bb.startX + roundRadius, this.TAIL_WIDTH);

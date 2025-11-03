@@ -8,7 +8,7 @@ import { match as langMatch } from "@formatjs/intl-localematcher";
 const guessBrowserLanguage = (): SupportedLanguage => {
   const fallback: SupportedLanguage = "en";
   const browserLang = navigator.language;
-  const supportedLangs = Object.keys(langPack).map(e => e.replaceAll("_", "-"));
+  const supportedLangs = Object.keys(langPack).map((e) => e.replaceAll("_", "-"));
 
   try {
     const nearestLang = langMatch([browserLang], supportedLangs, fallback);
@@ -20,7 +20,7 @@ const guessBrowserLanguage = (): SupportedLanguage => {
 };
 
 export const locale = writable<SupportedLanguage>(
-  (localStorage.getItem("locale") as SupportedLanguage) ?? guessBrowserLanguage()
+  (localStorage.getItem("locale") as SupportedLanguage) ?? guessBrowserLanguage(),
 );
 
 locale.subscribe((value: SupportedLanguage) => localStorage.setItem("locale", value));

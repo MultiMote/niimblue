@@ -1,5 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: `<button>` cannot be a descendant of `<button>`. The browser will 'repair' the HTML (by moving, removing, or inserting elements) which breaks Svelte's assumptions about the structure of your components.
-https://svelte.dev/e/node_invalid_placement -->
 <script lang="ts">
   import type { ExportedLabelTemplate, LabelProps } from "../../types";
   import { tr } from "../../utils/i18n";
@@ -44,19 +42,21 @@ https://svelte.dev/e/node_invalid_placement -->
 </script>
 
 <div class="labels-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {$$props.class}">
-  {#each labels as item, idx}
-    <button
+  {#each labels as item, idx (item.title)}
+    <div
+      tabindex="0"
       class="btn p-0 card-wrapper d-flex justify-content-center align-items-center {selectedIndex === idx
         ? 'border-primary'
         : ''}"
-      on:click={() => onItemClicked(idx)}>
+      onclick={() => onItemClicked(idx)}
+      role="button">
       <div
         class="card print-start-{item.label.printDirection} d-flex justify-content-center align-items-center"
         style="width: {scaleDimensions(item.label).width}%; height: {scaleDimensions(item.label).height}%;">
         <div class="buttons d-flex">
           <button
             class="btn text-primary-emphasis"
-            on:click={(e) => exportRequested(e, idx)}
+            onclick={(e) => exportRequested(e, idx)}
             title={$tr("params.saved_labels.save.json")}>
             <MdIcon icon="download" />
           </button>
@@ -85,7 +85,7 @@ https://svelte.dev/e/node_invalid_placement -->
           </span>
         {/if}
       </div>
-    </button>
+    </div>
   {/each}
 </div>
 
