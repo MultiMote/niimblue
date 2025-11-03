@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { iconCodepoints, type MaterialIcon } from "../../mdi_icons";
+  import { iconCodepoints, type MaterialIcon } from "$styles/mdi_icons";
   interface Props {
     icon: MaterialIcon;
-    [key: string]: any
+    [key: string]: any;
   }
 
   let { icon, ...rest }: Props = $props();

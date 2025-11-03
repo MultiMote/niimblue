@@ -1,9 +1,12 @@
 <script lang="ts">
   import { Utils } from "@mmote/niimbluelib";
-  import BrowserWarning from "./lib/basic/BrowserWarning.svelte";
-  import LabelDesigner from "./lib/LabelDesigner.svelte";
-  import PrinterConnector from "./lib/PrinterConnector.svelte";
-  import { locale, locales, tr } from "./utils/i18n";
+  import BrowserWarning from "$components/basic/BrowserWarning.svelte";
+  import LabelDesigner from "$components/LabelDesigner.svelte";
+  import PrinterConnector from "$components/PrinterConnector.svelte";
+  import { locale, locales, tr } from "$utils/i18n";
+
+  const appCommit = __APP_COMMIT__;
+  const buildDate = __BUILD_DATE__;
 
   let isStandalone = Utils.getAvailableTransports().capacitorBle;
 </script>
@@ -32,23 +35,22 @@
   </div>
 </div>
 
-<!-- svelte-ignore missing_declaration -->
 <div class="footer text-end text-secondary p-3">
   <div>
     <select class="form-select form-select-sm text-secondary d-inline-block w-auto" bind:value={$locale}>
-      {#each Object.entries(locales) as [key, name]}
+      {#each Object.entries(locales) as [key, name] (key)}
         <option value={key}>{name}</option>
       {/each}
     </select>
   </div>
   <div>
-    {#if __APP_COMMIT__}
-      <a class="text-secondary" href="https://github.com/MultiMote/niimblue/commit/{__APP_COMMIT__}">
-        {__APP_COMMIT__.slice(0, 6)}
+    {#if appCommit}
+      <a class="text-secondary" href="https://github.com/MultiMote/niimblue/commit/{appCommit}">
+        {appCommit.slice(0, 6)}
       </a>
     {/if}
     {$tr("main.built")}
-    {__BUILD_DATE__}
+    {buildDate}
   </div>
   <div>
     <a class="text-secondary" href="https://github.com/MultiMote/niimblue">{$tr("main.code")}</a>

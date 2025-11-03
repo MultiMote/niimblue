@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
-import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { execSync } from "node:child_process";
+import { sveltekit } from "@sveltejs/kit/vite";
 
 const getDate = (): string => {
   const date = new Date();
@@ -9,10 +10,12 @@ const getDate = (): string => {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [svelte()],
+  plugins: [sveltekit()],
   define: {
     __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
-    __APP_COMMIT__: JSON.stringify(process.env.COMMIT_HASH),
+    __APP_COMMIT__: JSON.stringify(
+      execSync("git rev-parse HEAD").toString().trim().substring(0, 7),
+    ),
     __BUILD_DATE__: JSON.stringify(getDate()),
   },
   optimizeDeps: {
@@ -32,7 +35,10 @@ export default defineConfig({
           if (id.includes("node_modules")) {
             if (id.includes("fabric")) {
               return "lib.2.fabric";
-            } else if (id.includes("@capacitor/filesystem") || id.includes("@capacitor/share")) {
+            } else if (
+              id.includes("@capacitor/filesystem") ||
+              id.includes("@capacitor/share")
+            ) {
               return "lib.2.cap";
             } else if (id.includes("zod")) {
               return "lib.2.zod";

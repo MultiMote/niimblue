@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
+  import { run } from "svelte/legacy";
 
   import Dropdown from "bootstrap/js/dist/dropdown";
   import * as fabric from "fabric";
   import { onDestroy, onMount, tick } from "svelte";
   import { Barcode } from "../fabric-object/barcode";
   import { QRCode } from "../fabric-object/qrcode";
-  import { iconCodepoints, type MaterialIcon } from "../mdi_icons";
-  import { automation, connectionState } from "../stores";
+  import { iconCodepoints, type MaterialIcon } from "$styles/mdi_icons";
+  import { automation, connectionState } from "$/stores";
   import {
     type ExportedLabelTemplate,
     type FabricJson,

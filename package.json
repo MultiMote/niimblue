@@ -6,16 +6,19 @@
 	"scripts": {
 		"dev-check": "npm run sv-check && npm run dev",
 		"dev-check-open": "npm run sv-check && npm run dev-open",
-		"dev": "vite --force",
-		"dev-open": "vite --force --open",
+		"dev": "vite",
+		"dev-open": "vite --open",
+		"build:android": "run-s build:app cap-run:android",
+		"cap-run:android": "cap sync android && cap open android",
 		"build": "vite build",
 		"build-rel": "vite build --base=./",
 		"preview": "vite preview",
 		"sv-check": "svelte-check --tsconfig ./tsconfig.json",
-		"gen-mdi-list": "node gen-mdi-list.mjs > src/mdi_icons.ts",
+		"gen-mdi-list": "node gen-mdi-list.mjs > src/styles/mdi_icons.ts",
 		"lint": "eslint ."
 	},
 	"dependencies": {
+		"@capacitor/cli": "^7.4.4",
 		"@capacitor/core": "^7.4.4",
 		"@capacitor/filesystem": "^7.1.4",
 		"@capacitor/share": "^7.0.2",
@@ -35,6 +38,7 @@
 	"devDependencies": {
 		"@eslint/js": "^9.39.0",
 		"@sveltejs/adapter-auto": "^7.0.0",
+		"@sveltejs/adapter-static": "^3.0.10",
 		"@sveltejs/kit": "^2.48.4",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@tsconfig/svelte": "^5.0.5",
