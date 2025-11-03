@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Cannot split a chunk that has already been edited (39:22 – "on:click={() => onItemSelected(idx)}") -->
 <script lang="ts">
   import type { LabelPreset } from "../../types";
   import { tr } from "../../utils/i18n";
@@ -35,23 +34,26 @@
 </script>
 
 <div class="preset-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {$$props.class}">
-  {#each presets as item, idx}
-    <button
+  {#each presets as item, idx (item)}
+    <div
+      role="button"
       class="btn p-0 card-wrapper d-flex justify-content-center align-items-center"
-      on:click={() => onItemSelected(idx)}>
+      tabindex="0"
+      onkeydown={() => onItemSelected(idx)}
+      onclick={() => onItemSelected(idx)}>
       <div
         class="card print-start-{item.printDirection} d-flex justify-content-center align-items-center"
         style="width: {scaleDimensions(item).width}%; height: {scaleDimensions(item).height}%;">
         <div class="remove d-flex">
           {#if deleteIndex === idx}
-            <button class="remove btn text-danger-emphasis" on:click={(e) => deleteConfirmed(e, idx)}>
+            <button class="remove btn text-danger-emphasis" onclick={(e) => deleteConfirmed(e, idx)}>
               <MdIcon icon="delete" />
             </button>
-            <button class="remove btn text-success" on:click={(e) => deleteRejected(e)}>
+            <button class="remove btn text-success" onclick={(e) => deleteRejected(e)}>
               <MdIcon icon="close" />
             </button>
           {:else}
-            <button class="remove btn text-danger-emphasis" on:click={(e) => deleteRequested(e, idx)}>
+            <button class="remove btn text-danger-emphasis" onclick={(e) => deleteRequested(e, idx)}>
               <MdIcon icon="delete" />
             </button>
           {/if}
@@ -67,7 +69,7 @@
           {/if}
         </span>
       </div>
-    </button>
+    </div>
   {/each}
 </div>
 

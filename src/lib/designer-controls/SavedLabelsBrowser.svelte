@@ -48,6 +48,7 @@
       class="btn p-0 card-wrapper d-flex justify-content-center align-items-center {selectedIndex === idx
         ? 'border-primary'
         : ''}"
+      onkeydown={() => onItemClicked(idx)}
       onclick={() => onItemClicked(idx)}
       role="button">
       <div
@@ -62,14 +63,14 @@
           </button>
 
           {#if deleteIndex === idx}
-            <button class="remove btn text-danger-emphasis" on:click={(e) => deleteConfirmed(e, idx)}>
+            <button class="remove btn text-danger-emphasis" onclick={(e) => deleteConfirmed(e, idx)}>
               <MdIcon icon="delete" />
             </button>
-            <button class="remove btn text-success" on:click={(e) => deleteRejected(e)}>
+            <button class="remove btn text-success" onclick={(e) => deleteRejected(e)}>
               <MdIcon icon="close" />
             </button>
           {:else}
-            <button class="remove btn text-danger-emphasis" on:click={(e) => deleteRequested(e, idx)}>
+            <button class="remove btn text-danger-emphasis" onclick={(e) => deleteRequested(e, idx)}>
               <MdIcon icon="delete" />
             </button>
           {/if}

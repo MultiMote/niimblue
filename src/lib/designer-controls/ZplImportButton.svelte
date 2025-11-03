@@ -1,5 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: can't migrate `let state: "idle" | "processing" | "error" = "idle";` to `$state` because there's a variable named state.
-     Rename the variable and try again or migrate by hand. -->
 <script lang="ts">
   import type { LabelProps } from "../../types";
   import { FileUtils } from "../../utils/file_utils";
@@ -8,7 +6,7 @@
   export let text: string;
   export let labelProps: LabelProps;
   export let onImageReady: (img: Blob) => void;
-  let state: "idle" | "processing" | "error" = "idle";
+  let importState: "idle" | "processing" | "error" = "idle";
 
   const onImportClicked = async () => {
     const mmToInchCoeff = 25.4;
@@ -18,7 +16,7 @@
 
     const contents = await FileUtils.pickAndReadTextFile("zpl");
 
-    state = "processing";
+    importState = "processing";
 
     try {
       const response = await fetch(
@@ -36,23 +34,23 @@
       if (response.ok) {
         const img = await response.blob();
         onImageReady(img);
-        state = "idle";
+        importState = "idle";
       } else {
-        state = "error";
+        importState = "error";
       }
     } catch (e) {
-      state = "error";
+      importState = "error";
       console.error(e);
     }
   };
 </script>
 
-<button class="btn btn-sm" on:click={onImportClicked}>
+<button class="btn btn-sm" onclick={onImportClicked}>
   <MdIcon icon="receipt_long" />
   {text}
-  {#if state === "processing"}
+  {#if importState === "processing"}
     <MdIcon icon="hourglass_top" />
-  {:else if state === "error"}
+  {:else if importState === "error"}
     <MdIcon icon="warning" class="text-warning" />
   {/if}
 </button>
