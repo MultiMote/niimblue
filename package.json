@@ -8,7 +8,7 @@
 		"dev-check-open": "npm run sv-check && npm run dev-open",
 		"dev": "vite",
 		"dev-open": "vite --open",
-		"build:android": "run-s build:app cap-run:android",
+		"build:android": "npm run build && npm run cap-run:android",
 		"cap-run:android": "cap sync android && cap open android",
 		"build": "vite build",
 		"build-rel": "vite build --base=./",

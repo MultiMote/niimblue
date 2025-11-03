@@ -5,3 +5,4 @@ import "bootstrap/js/dist/dropdown";
 import "bootstrap/js/dist/collapse";
 
 export const ssr = false;
+export const prerender = true;
