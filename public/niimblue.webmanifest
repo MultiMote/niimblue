@@ -6,6 +6,10 @@
     {
       "src": "favicon.svg",
       "sizes": "any"
+    },
+    {
+      "src": "favicon-512.png",
+      "sizes": "512x512"
     }
   ],
   "start_url": "/",
