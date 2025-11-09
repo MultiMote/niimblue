@@ -1,6 +1,9 @@
 import { defineConfig } from "vite";
-import { execSync } from "node:child_process";
-import { sveltekit } from "@sveltejs/kit/vite";
+import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const getDate = (): string => {
   const date = new Date();
@@ -10,12 +13,10 @@ const getDate = (): string => {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [sveltekit()],
+  plugins: [svelte()],
   define: {
     __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
-    __APP_COMMIT__: JSON.stringify(
-      execSync("git rev-parse HEAD").toString().trim().substring(0, 7),
-    ),
+    __APP_COMMIT__: JSON.stringify(process.env.COMMIT_HASH),
     __BUILD_DATE__: JSON.stringify(getDate()),
   },
   optimizeDeps: {
@@ -23,6 +24,13 @@ export default defineConfig({
   },
   resolve: {
     preserveSymlinks: true, // Fix build error when using `npm link @mmote/niimbluelib`
+    alias: {
+      $: resolve(__dirname, "./src"),
+      $utils: resolve(__dirname, "./src/utils"),
+      $routes: resolve(__dirname, "./src/routes"),
+      $styles: resolve(__dirname, "src/styles"),
+      $components: resolve(__dirname, "src/components"),
+    },
   },
   build: {
     rollupOptions: {

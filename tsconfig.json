@@ -15,7 +15,15 @@
     "forceConsistentCasingInFileNames": true,
     "useUnknownInCatchVariables": true,
     "module": "NodeNext",
-    "lib": ["dom", "dom.iterable", "es2022", "webworker"]
+    "lib": ["dom", "dom.iterable", "es2022", "webworker"],
+    "baseUrl": "./",
+    "paths": {
+      "$/*": ["src/*"],
+      "$utils/*": ["src/utils/*"],
+      "$routes/*": ["src/routes/*"],
+      "$styles/*": ["src/styles/*"],
+      "$components/*": ["src/components/*"]
+    }
   },
   "include": [
     ".svelte-kit/ambient.d.ts",
