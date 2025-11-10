@@ -3,10 +3,14 @@
   import { FileUtils } from "../../utils/file_utils";
   import MdIcon from "../basic/MdIcon.svelte";
 
-  export let text: string;
-  export let labelProps: LabelProps;
-  export let onImageReady: (img: Blob) => void;
-  let importState: "idle" | "processing" | "error" = "idle";
+  interface Props {
+    text: string;
+    labelProps: LabelProps;
+    onImageReady: (img: Blob) => void;
+  }
+
+  let { text, labelProps, onImageReady }: Props = $props();
+  let importState: "idle" | "processing" | "error" = $state("idle");
 
   const onImportClicked = async () => {
     const mmToInchCoeff = 25.4;

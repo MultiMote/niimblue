@@ -3,10 +3,15 @@
   import { tr } from "../../utils/i18n";
   import MdIcon from "../basic/MdIcon.svelte";
 
-  export let onItemSelected: (index: number) => void;
-  export let onItemDelete: (index: number) => void;
-  export let presets: LabelPreset[];
-  let deleteIndex: number = -1;
+  interface Props {
+    onItemSelected: (index: number) => void;
+    onItemDelete: (index: number) => void;
+    presets: LabelPreset[];
+    [key: string]: any
+  }
+
+  let { ...props }: Props = $props();
+  let deleteIndex: number = $state(-1);
 
   const scaleDimensions = (preset: LabelPreset): { width: number; height: number } => {
     const scaleFactor = Math.min(100 / preset.width, 100 / preset.height);
@@ -19,7 +24,7 @@
   const deleteConfirmed = (e: MouseEvent, idx: number) => {
     e.stopPropagation();
     deleteIndex = -1;
-    onItemDelete(idx);
+    props.onItemDelete(idx);
   };
 
   const deleteRejected = (e: MouseEvent) => {
@@ -33,14 +38,14 @@
   };
 </script>
 
-<div class="preset-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {$$props.class}">
-  {#each presets as item, idx (item)}
+<div class="preset-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {props.class}">
+  {#each props.presets as item, idx (item)}
     <div
       role="button"
       class="btn p-0 card-wrapper d-flex justify-content-center align-items-center"
       tabindex="0"
-      onkeydown={() => onItemSelected(idx)}
-      onclick={() => onItemSelected(idx)}>
+      onkeydown={() => props.onItemSelected(idx)}
+      onclick={() => props.onItemSelected(idx)}>
       <div
         class="card print-start-{item.printDirection} d-flex justify-content-center align-items-center"
         style="width: {scaleDimensions(item).width}%; height: {scaleDimensions(item).height}%;">
