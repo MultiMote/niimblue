@@ -55,3 +55,20 @@ export const atkinson = (image: ImageData, threshold: number): ImageData => {
 
   return image;
 };
+
+
+/**
+ * Invert image
+ *
+ * @param  {object}   image         The imageData of a Canvas 2d context
+ * @return {object}                 The resulting imageData
+ *
+ */
+export const invert = (image: ImageData): ImageData => {
+  for (let i = 0; i < image.data.length; i += 4) {
+    const black = (image.data[i] + image.data[i + 1] + image.data[i + 2]) === 0;
+    image.data.fill(black ? 255 : 0, i, i + 3);
+  }
+
+  return image;
+};

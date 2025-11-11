@@ -3,7 +3,7 @@
   import { derived } from "svelte/store";
   import Modal from "bootstrap/js/dist/modal";
   import { connectionState, printerClient, printerMeta } from "../stores";
-  import { copyImageData, threshold, atkinson } from "../utils/post_process";
+  import { copyImageData, threshold, atkinson, invert } from "../utils/post_process";
   import {
     type EncodedImage,
     ImageEncoder,
@@ -39,6 +39,7 @@
   let density: number = $printerMeta?.densityDefault ?? 3;
   let quantity: number = 1;
   let postProcessType: PostProcessType;
+  let postProcessInvert: boolean = false;
   let thresholdValue: number = 140;
   let originalImage: ImageData;
   let previewContext: CanvasRenderingContext2D;
@@ -67,7 +68,7 @@
     if (!$disconnected && printState !== "idle") {
       await $printerClient.abstraction.printEnd();
 
-      if (currentPrintTask !== undefined){
+      if (currentPrintTask !== undefined) {
         await currentPrintTask.printEnd();
       } else {
         console.warn("Print task undefined, falling back to PrintEnd command");
@@ -87,9 +88,8 @@
     for (let curPage = 0; curPage < pagesTotal; curPage++) {
       page = curPage;
       await generatePreviewData(page);
-      sources.push(previewCanvas.toDataURL("image/png"))
+      sources.push(previewCanvas.toDataURL("image/png"));
     }
-
 
     FileUtils.printImageUrls(sources);
   };
@@ -162,6 +162,10 @@
       iData = atkinson(iData, thresholdValue);
     }
 
+    if (postProcessInvert) {
+      iData = invert(iData);
+    }
+
     offsetWarning = "";
 
     if (offset.offsetType === "inner") {
@@ -223,6 +227,7 @@
       }
       savedProps = saved;
       if (saved.postProcess) postProcessType = saved.postProcess;
+      if (saved.postProcessInvert) postProcessInvert = saved.postProcessInvert;
       if (saved.threshold) thresholdValue = saved.threshold;
       if (saved.quantity) quantity = saved.quantity;
       if (saved.density) density = saved.density;
@@ -390,6 +395,15 @@
             value={postProcessType}
             savedValue={savedProps.postProcess}
             onClick={toggleSavedProp} />
+
+          <button
+            class="btn btn-sm {postProcessInvert ? 'btn-secondary' : 'btn-outline-secondary'}"
+            on:click={() => {
+              postProcessInvert = !postProcessInvert;
+              updatePreview();
+            }}>
+            <MdIcon icon="invert_colors" />
+          </button>
         </div>
 
         <div class="input-group input-group-sm">
@@ -516,7 +530,11 @@
           </button>
         {/if}
 
-        <button type="button" class="btn btn-secondary" title={$tr("preview.print.system")} on:click={onPrintOnSystemPrinter}>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          title={$tr("preview.print.system")}
+          on:click={onPrintOnSystemPrinter}>
           <MdIcon icon="print" />
         </button>
 
@@ -527,7 +545,6 @@
             <MdIcon icon="print" /> {$tr("preview.print")}
           {/if}
         </button>
-
       </div>
     </div>
   </div>

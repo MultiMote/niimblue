@@ -71,6 +71,7 @@ export const PreviewPropsOffsetSchema = z.object({
 
 export const PreviewPropsSchema = z.object({
   postProcess: z.enum(["threshold", "dither"]).optional(),
+  postProcessInvert: z.boolean().optional(),
   threshold: z.number().gte(1).lte(255).optional(),
   quantity: z.number().gte(1).optional(),
   density: z.number().gte(1).optional(),
