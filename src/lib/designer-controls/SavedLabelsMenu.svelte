@@ -132,7 +132,9 @@
 
   const onExportClicked = () => {
     try {
-      FileUtils.saveLabelAsJson(onRequestLabelTemplate());
+      const label = onRequestLabelTemplate();
+      label.title = title;
+      FileUtils.saveLabelAsJson(label);
     } catch (e) {
       Toasts.zodErrors(e, "Canvas save error:");
     }
