@@ -7,10 +7,10 @@
     onItemSelected: (index: number) => void;
     onItemDelete: (index: number) => void;
     presets: LabelPreset[];
-    [key: string]: any
+    class?: string;
   }
 
-  let { ...props }: Props = $props();
+  let { class: className = "", onItemDelete, onItemSelected, presets }: Props = $props();
   let deleteIndex: number = $state(-1);
 
   const scaleDimensions = (preset: LabelPreset): { width: number; height: number } => {
@@ -24,7 +24,7 @@
   const deleteConfirmed = (e: MouseEvent, idx: number) => {
     e.stopPropagation();
     deleteIndex = -1;
-    props.onItemDelete(idx);
+    onItemDelete(idx);
   };
 
   const deleteRejected = (e: MouseEvent) => {
@@ -38,14 +38,14 @@
   };
 </script>
 
-<div class="preset-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {props.class}">
-  {#each props.presets as item, idx (item)}
+<div class="preset-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {className}">
+  {#each presets as item, idx (item)}
     <div
       role="button"
       class="btn p-0 card-wrapper d-flex justify-content-center align-items-center"
       tabindex="0"
-      onkeydown={() => props.onItemSelected(idx)}
-      onclick={() => props.onItemSelected(idx)}>
+      onkeydown={() => onItemSelected(idx)}
+      onclick={() => onItemSelected(idx)}>
       <div
         class="card print-start-{item.printDirection} d-flex justify-content-center align-items-center"
         style="width: {scaleDimensions(item).width}%; height: {scaleDimensions(item).height}%;">

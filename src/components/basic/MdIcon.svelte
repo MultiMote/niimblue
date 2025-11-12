@@ -2,13 +2,13 @@
   import { iconCodepoints, type MaterialIcon } from "$styles/mdi_icons";
   interface Props {
     icon: MaterialIcon;
-    [key: string]: any;
+    class?: string;
   }
 
-  let { icon, ...rest }: Props = $props();
+  let { icon, class: className = "" }: Props = $props();
 </script>
 
-<span class="mdi {rest.class || ''}">
+<span class="mdi {className}">
   {String.fromCodePoint(iconCodepoints[icon])}
 </span>
 

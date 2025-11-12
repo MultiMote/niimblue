@@ -1,5 +1,4 @@
 {
-  "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
     "noImplicitOverride": true,
     "esModuleInterop": true,
@@ -26,11 +25,7 @@
     }
   },
   "include": [
-    ".svelte-kit/ambient.d.ts",
-    ".svelte-kit/non-ambient.d.ts",
-    ".svelte-kit/types/**/$types.d.ts",
     "vite.config.ts",
-    "src/ambient.d.ts",
     "src/**/*.js",
     "src/**/*.ts",
     "src/**/*.svelte",
