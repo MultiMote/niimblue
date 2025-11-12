@@ -123,7 +123,13 @@
     }
 
     try {
-      onLoadRequested(ExportedLabelTemplateSchema.parse(rawData));
+      const label = ExportedLabelTemplateSchema.parse(rawData);
+      onLoadRequested(label);
+
+      if(label.title) {
+        title = label.title;
+      }
+
       new Dropdown(dropdownRef).hide();
     } catch (e) {
       Toasts.zodErrors(e, "Canvas load error:");
@@ -133,7 +139,9 @@
   const onExportClicked = () => {
     try {
       const label = onRequestLabelTemplate();
-      label.title = title;
+      if (title) {
+        label.title = title.replaceAll(/[\\\/:*?"<>|]/g, '_');
+      }
       FileUtils.saveLabelAsJson(label);
     } catch (e) {
       Toasts.zodErrors(e, "Canvas save error:");
