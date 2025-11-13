@@ -46,7 +46,7 @@
   </span>
   {#if $fontCache.length > 1}
     <select class="form-select" {value} onchange={(e) => valueUpdated(e.currentTarget.value)}>
-      {#each $fontCache as font}
+      {#each $fontCache as font (font)}
         <option value={font} style="font-family: {font}">{font}</option>
       {/each}
     </select>

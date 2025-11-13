@@ -33,17 +33,10 @@
     csvEnabled: boolean;
   }
 
-  let {
-    onClosed,
-    labelProps,
-    canvasCallback,
-    printNow = false,
-    csvData,
-    csvEnabled
-  }: Props = $props();
+  let { onClosed, labelProps, canvasCallback, printNow = false, csvData, csvEnabled }: Props = $props();
 
-  let modalElement: HTMLElement = $state();
-  let previewCanvas: HTMLCanvasElement = $state();
+  let modalElement = $state<HTMLElement>();
+  let previewCanvas = $state<HTMLCanvasElement>();
   let printState: "idle" | "sending" | "printing" = $state("idle");
   let modal: Modal;
   let printProgress: number = 0; // todo: more progress data
@@ -56,6 +49,7 @@
   let previewContext: CanvasRenderingContext2D;
   let printTaskName: PrintTaskName = $state("D110");
   let labelType: LabelType = $state(LabelType.WithGaps);
+  // eslint-disable-next-line no-undef
   let statusTimer: NodeJS.Timeout | undefined = undefined;
   let error: string = $state("");
   let detectedPrintTaskName: PrintTaskName | undefined = $printerClient?.getPrintTaskType();
@@ -467,7 +461,7 @@
         <div class="input-group input-group-sm">
           <span class="input-group-text">{$tr("preview.label_type")}</span>
           <select class="form-select" bind:value={labelType} onchange={() => updateSavedProp("labelType", labelType)}>
-            {#each Object.values(LabelType) as lt}
+            {#each Object.values(LabelType) as lt (lt)}
               {#if typeof lt !== "string"}
                 <option value={lt}>
                   {#if $printerMeta?.paperTypes.includes(lt)}✔{/if}
@@ -490,7 +484,7 @@
             class="form-select"
             bind:value={printTaskName}
             onchange={() => updateSavedProp("printTaskName", printTaskName)}>
-            {#each printTaskNames as name}
+            {#each printTaskNames as name (name)}
               <option value={name}>
                 {#if detectedPrintTaskName === name}✔{/if}
                 {name}

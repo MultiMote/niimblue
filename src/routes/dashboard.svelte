@@ -5,7 +5,9 @@
   import PrinterConnector from "$components/PrinterConnector.svelte";
   import { locale, locales, tr } from "$utils/i18n";
 
+  // eslint-disable-next-line no-undef
   const appCommit = __APP_COMMIT__;
+  // eslint-disable-next-line no-undef
   const buildDate = __BUILD_DATE__;
 
   let isStandalone = Utils.getAvailableTransports().capacitorBle;

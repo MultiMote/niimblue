@@ -1,10 +1,5 @@
 <script lang="ts">
-  import {
-    NiimbotCapacitorBleClient,
-    SoundSettingsItemType,
-    Utils,
-    type AvailableTransports,
-  } from "@mmote/niimbluelib";
+  import { NiimbotCapacitorBleClient, SoundSettingsItemType, Utils, type AvailableTransports } from "@mmote/niimbluelib";
   import {
     printerClient,
     connectedPrinterName,
@@ -28,7 +23,6 @@
 
   let connectionType: ConnectionType = $state("bluetooth");
   let featureSupport: AvailableTransports = $state({ webBluetooth: false, webSerial: false, capacitorBle: false });
-
 
   const onConnectClicked = async () => {
     initClient(connectionType);
@@ -126,7 +120,7 @@
         <div>
           Printer info:
           <ul>
-            {#each Object.entries($printerInfo) as [k, v]}
+            {#each Object.entries($printerInfo) as [k, v] (k)}
               <li>{k}: <strong>{v ?? "-"}</strong></li>
             {/each}
           </ul>
@@ -144,7 +138,7 @@
 
         <div class="collapse" id="modelMeta">
           <ul>
-            {#each Object.entries($printerMeta) as [k, v]}
+            {#each Object.entries($printerMeta) as [k, v] (k)}
               <li>{k}: <strong>{v ?? "-"}</strong></li>
             {/each}
           </ul>
@@ -164,7 +158,7 @@
           <button class="btn btn-outline-secondary btn-sm mt-1" onclick={getRfidInfo}>Update</button>
 
           <ul>
-            {#each Object.entries($rfidInfo) as [k, v]}
+            {#each Object.entries($rfidInfo) as [k, v] (v)}
               <li>{k}: <strong>{v ?? "-"}</strong></li>
             {/each}
           </ul>
@@ -182,14 +176,14 @@
 
         <div class="collapse" id="heartbeatData">
           <ul>
-            {#each Object.entries($heartbeatData) as [k, v]}
+            {#each Object.entries($heartbeatData) as [k, v] (v)}
               <li>{k}: <strong>{v ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
       {/if}
 
-      <FirmwareUpdater/>
+      <FirmwareUpdater />
 
       <button
         class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"

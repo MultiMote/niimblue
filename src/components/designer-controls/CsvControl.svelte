@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
+  import { run } from "svelte/legacy";
 
   import { tr } from "../../utils/i18n";
   import { csvParse } from "d3-dsv";
@@ -12,12 +12,7 @@
     onPlaceholderPicked: (name: string) => void;
   }
 
-  let {
-    enabled = $bindable(),
-    csv = $bindable(),
-    onUpdate,
-    onPlaceholderPicked
-  }: Props = $props();
+  let { enabled = $bindable(), csv = $bindable(), onUpdate, onPlaceholderPicked }: Props = $props();
 
   let placeholders: string[] = $state([]);
   let rows: number = $state(0);
@@ -70,9 +65,8 @@
       </div>
       <div class="placeholders pt-1">
         {$tr("params.csv.placeholders")}
-        {#each placeholders as p}
-          <button class="btn btn-sm btn-outline-info px-1 py-0" onclick={() => onPlaceholderPicked(p)}>{`{${p}}`}</button>
-          {" "}
+        {#each placeholders as p (p)}
+          <button class="btn btn-sm btn-outline-info px-1 py-0" onclick={() => onPlaceholderPicked(p)}>{`{${p}}`} </button>
         {/each}
       </div>
     </div>

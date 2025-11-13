@@ -18,7 +18,7 @@
 
   let { onRequestLabelTemplate, onLoadRequested, canvas }: Props = $props();
 
-  let dropdownRef: Element = $state();
+  let dropdownRef = $state<Element>();
   let savedLabels: ExportedLabelTemplate[] = $state([]);
   let selectedIndex: number = $state(-1);
   let title: string = $state("");
@@ -31,7 +31,7 @@
 
   const onLabelSelected = (index: number) => {
     selectedIndex = index;
-    title = savedLabels[index].title ?? "";
+    title = savedLabels[index]?.title ?? "";
   };
 
   const onLabelExport = (idx: number) => {
@@ -130,7 +130,7 @@
       const label = ExportedLabelTemplateSchema.parse(rawData);
       onLoadRequested(label);
 
-      if(label.title) {
+      if (label.title) {
         title = label.title;
       }
 
@@ -144,7 +144,7 @@
     try {
       const label = onRequestLabelTemplate();
       if (title) {
-        label.title = title.replaceAll(/[\\\/:*?"<>|]/g, '_');
+        label.title = title.replaceAll(/[\\/:*?"<>|]/g, "_");
       }
       FileUtils.saveLabelAsJson(label);
     } catch (e) {
@@ -189,6 +189,7 @@
           </button>
           <button
             type="button"
+            aria-label="dropdown"
             class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
             data-bs-toggle="dropdown">
           </button>

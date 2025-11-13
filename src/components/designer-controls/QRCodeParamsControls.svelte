@@ -64,7 +64,8 @@
         valueUpdated();
       }}>
       <option value={0}>Auto</option>
-      {#each { length: 40 } as _, i}
+      <!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -->
+      {#each { length: 40 } as _, i (i)}
         <option value={i + 1}>{i + 1}</option>
       {/each}
     </select>

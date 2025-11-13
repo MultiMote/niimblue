@@ -63,8 +63,12 @@ interface UniqueQRCodeProps {
   mode: Mode;
   qrVersion: QrVersion;
 }
-export interface QRCodeProps extends fabric.FabricObjectProps, UniqueQRCodeProps {}
-export interface SerializedQRCodeProps extends fabric.SerializedObjectProps, UniqueQRCodeProps {}
+export interface QRCodeProps
+  extends fabric.FabricObjectProps,
+    UniqueQRCodeProps {}
+export interface SerializedQRCodeProps
+  extends fabric.SerializedObjectProps,
+    UniqueQRCodeProps {}
 const QRCODE_PROPS = ["text", "ecl", "size", "mode", "qrVersion"] as const;
 
 export class QRCode<
@@ -165,7 +169,7 @@ export class QRCode<
       return;
     }
 
-    let qrScale = Math.floor(this.width / qr.getModuleCount());
+    const qrScale = Math.floor(this.width / qr.getModuleCount());
     let qrWidth = qrScale * qr.getModuleCount();
     qrWidth -= qrWidth % 2; // avoid half-pixel rendering
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
+  import { run } from "svelte/legacy";
 
   import {
     LabelPresetSchema,
@@ -185,7 +185,7 @@
     }
 
     if (headSize % 8 !== 0) {
-      error += $tr("params.label.warning.div8");;
+      error += $tr("params.label.warning.div8");
     }
   };
 
@@ -323,7 +323,7 @@
 
       <div class="input-group flex-nowrap input-group-sm print-dir-switch mb-2" role="group">
         <span class="input-group-text w-100">{$tr("params.label.direction")}</span>
-        {#each printDirections as v}
+        {#each printDirections as v (v)}
           <input
             type="radio"
             class="btn-check"
@@ -340,7 +340,7 @@
 
       <div class="input-group flex-nowrap input-group-sm label-shape-switch mb-2" role="group">
         <span class="input-group-text w-100">{$tr("params.label.shape")}</span>
-        {#each labelShapes as v}
+        {#each labelShapes as v (v)}
           <input
             type="radio"
             class="btn-check"
@@ -358,7 +358,7 @@
       {#if shape !== "circle"}
         <div class="input-group flex-nowrap input-group-sm label-split-switch mb-2" role="group">
           <span class="input-group-text w-100">{$tr("params.label.split")}</span>
-          {#each labelSplits as v}
+          {#each labelSplits as v (v)}
             <input
               type="radio"
               class="btn-check"
@@ -384,7 +384,7 @@
       {#if split !== "none"}
         <div class="input-group flex-nowrap input-group-sm mirror-switch mb-2" role="group">
           <span class="input-group-text w-100">{$tr("params.label.mirror")}</span>
-          {#each mirrorTypes as v}
+          {#each mirrorTypes as v (v)}
             <input
               type="radio"
               class="btn-check"
@@ -401,7 +401,7 @@
 
         <div class="input-group flex-nowrap input-group-sm tail-pos-switch mb-2" role="group">
           <span class="input-group-text w-100">{$tr("params.label.tail.position")}</span>
-          {#each tailPositions as v}
+          {#each tailPositions as v (v)}
             <input
               type="radio"
               class="btn-check"

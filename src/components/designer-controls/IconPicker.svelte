@@ -12,7 +12,7 @@
 
   let iconNames: MaterialIcon[] = $state([]);
   let search: string = $state("");
-  let dropdown: Element = $state();
+  let dropdown = $state<Element>();
 
   const onShow = () => {
     if (iconNames.length === 0) {
@@ -21,11 +21,11 @@
   };
 
   onMount(() => {
-    dropdown.addEventListener("show.bs.dropdown", onShow);
+    dropdown?.addEventListener("show.bs.dropdown", onShow);
   });
 
   onDestroy(() => {
-    dropdown.removeEventListener("show.bs.dropdown", onShow);
+    dropdown?.removeEventListener("show.bs.dropdown", onShow);
   });
 </script>
 
@@ -40,7 +40,7 @@
     <div class="p-3">
       <input type="text" class="form-control" placeholder={$tr("editor.iconpicker.search")} bind:value={search} />
       <div class="icons">
-        {#each iconNames as name}
+        {#each iconNames as name (name)}
           {#if !search || name.includes(search.toLowerCase())}
             <button class="btn me-1" title={name} onclick={() => onSubmit(name)}>
               <MdIcon icon={name} />
