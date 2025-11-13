@@ -102,7 +102,13 @@ export class FileUtils {
   static saveLabelAsJson(label: ExportedLabelTemplate) {
     const parsed = ExportedLabelTemplateSchema.parse(label);
     const timestamp = label.timestamp ?? this.timestamp();
-    this.downloadBase64(`label_${timestamp}.json`, "application/json", this.base64obj(parsed));
+    let filename = `label_${timestamp}.json`;
+
+    if (parsed.title && parsed.title.trim().length > 0) {
+      filename = `${parsed.title}.json`;
+    }
+    
+    this.downloadBase64(filename, "application/json", this.base64obj(parsed));
   }
 
   /** Convert canvas to PNG and download it */
