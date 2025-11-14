@@ -403,7 +403,7 @@
 
           <button
             class="btn btn-sm {postProcessInvert ? 'btn-secondary' : 'btn-outline-secondary'}"
-            on:click={() => {
+            onclick={() => {
               postProcessInvert = !postProcessInvert;
               updatePreview();
             }}>
@@ -539,7 +539,7 @@
           type="button"
           class="btn btn-secondary"
           title={$tr("preview.print.system")}
-          on:click={onPrintOnSystemPrinter}>
+          onclick={onPrintOnSystemPrinter}>
           <MdIcon icon="print" />
         </button>
 
