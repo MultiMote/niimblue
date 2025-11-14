@@ -4,9 +4,13 @@
   import MdIcon from "../basic/MdIcon.svelte";
   import ZplImportButton from "./ZplImportButton.svelte";
 
-  export let onSubmit: (i: OjectType) => void;
-  export let labelProps: LabelProps;
-  export let zplImageReady: (img: Blob) => void;
+  interface Props {
+    onSubmit: (i: OjectType) => void;
+    labelProps: LabelProps;
+    zplImageReady: (img: Blob) => void;
+  }
+
+  let { onSubmit, labelProps, zplImageReady }: Props = $props();
 </script>
 
 <div class="dropdown">
@@ -18,32 +22,32 @@
   <div class="dropdown-menu">
     <h6 class="dropdown-header">{$tr("editor.objectpicker.title")}</h6>
     <div class="p-3">
-      <button class="btn me-1" on:click={() => onSubmit("text")}>
+      <button class="btn me-1" onclick={() => onSubmit("text")}>
         <MdIcon icon="title" />
         {$tr("editor.objectpicker.text")}
       </button>
-      <button class="btn me-1" on:click={() => onSubmit("line")}>
+      <button class="btn me-1" onclick={() => onSubmit("line")}>
         <MdIcon icon="remove" />
         {$tr("editor.objectpicker.line")}
       </button>
-      <button class="btn me-1" on:click={() => onSubmit("rectangle")}>
+      <button class="btn me-1" onclick={() => onSubmit("rectangle")}>
         <MdIcon icon="crop_square" />
         {$tr("editor.objectpicker.rectangle")}
       </button>
-      <button class="btn me-1" on:click={() => onSubmit("circle")}>
+      <button class="btn me-1" onclick={() => onSubmit("circle")}>
         <MdIcon icon="radio_button_unchecked" />
         {$tr("editor.objectpicker.circle")}
       </button>
 
-      <button class="btn me-1" on:click={() => onSubmit("image")}>
+      <button class="btn me-1" onclick={() => onSubmit("image")}>
         <MdIcon icon="image" />
         {$tr("editor.objectpicker.image")}
       </button>
-      <button class="btn me-1" on:click={() => onSubmit("qrcode")}>
+      <button class="btn me-1" onclick={() => onSubmit("qrcode")}>
         <MdIcon icon="qr_code_2" />
         {$tr("editor.objectpicker.qrcode")}
       </button>
-      <button class="btn me-1" on:click={() => onSubmit("barcode")}>
+      <button class="btn me-1" onclick={() => onSubmit("barcode")}>
         <MdIcon icon="view_week" />
         {$tr("editor.objectpicker.barcode")}
       </button>

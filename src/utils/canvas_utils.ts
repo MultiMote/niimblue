@@ -7,7 +7,7 @@ export function equalSpacingFillText(
   text: string,
   x: number,
   y: number,
-  printWidth: number
+  printWidth: number,
 ) {
   // calculate every character width, and spacing
   const widths = [];

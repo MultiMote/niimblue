@@ -38,7 +38,7 @@ export const automation = readable<AutomationProps | undefined>(
       console.error(e);
     }
     return undefined;
-  })()
+  })(),
 );
 
 export const initClient = (connectionType: ConnectionType) => {

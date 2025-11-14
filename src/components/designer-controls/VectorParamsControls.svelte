@@ -3,8 +3,12 @@
   import MdIcon from "../basic/MdIcon.svelte";
   import * as fabric from "fabric";
 
-  export let selectedObject: fabric.FabricObject | undefined;
-  export let valueUpdated: () => void;
+  interface Props {
+    selectedObject: fabric.FabricObject | undefined;
+    valueUpdated: () => void;
+  }
+
+  let { selectedObject, valueUpdated }: Props = $props();
 
   const roundRadiusChanged = (value: number) => {
     const rect = selectedObject as fabric.Rect;
@@ -37,7 +41,7 @@
       max={Math.min(selectedObject.width, selectedObject.height) / 2}
       class="form-control"
       value={selectedObject.rx}
-      on:input={(e) => roundRadiusChanged(e.currentTarget.valueAsNumber)} />
+      oninput={(e) => roundRadiusChanged(e.currentTarget.valueAsNumber)} />
   </div>
 {/if}
 
@@ -51,7 +55,7 @@
       min="1"
       class="form-control"
       value={selectedObject.strokeWidth}
-      on:input={(e) => strokeWidthChanged(e.currentTarget.valueAsNumber)} />
+      oninput={(e) => strokeWidthChanged(e.currentTarget.valueAsNumber)} />
   </div>
 {/if}
 
@@ -63,7 +67,7 @@
     <select
       class="form-select"
       value={selectedObject.fill}
-      on:change={(e) => fillChanged(e.currentTarget.value)}>
+      onchange={(e) => fillChanged(e.currentTarget.value)}>
       <option value="transparent">{$tr("params.color.transparent")}</option>
       <option value="white">{$tr("params.color.white")}</option>
       <option value="black">{$tr("params.color.black")}</option>

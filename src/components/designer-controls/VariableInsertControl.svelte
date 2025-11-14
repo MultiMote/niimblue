@@ -5,8 +5,12 @@
   import Barcode from "../../fabric-object/barcode";
   import MdIcon from "../basic/MdIcon.svelte";
 
-  export let selectedObject: fabric.FabricObject;
-  export let valueUpdated: () => void;
+  interface Props {
+    selectedObject: fabric.FabricObject;
+    valueUpdated: () => void;
+  }
+
+  let { selectedObject, valueUpdated }: Props = $props();
 
   const insertDateTime = (format?: string) => {
     let value = "{dt}";
@@ -34,15 +38,15 @@
 
   <div class="dropdown-menu px-2">
     <div class="d-flex gap-1 flex-wrap">
-      <button class="btn btn-secondary btn-sm" on:click={() => insertDateTime()}>
+      <button class="btn btn-secondary btn-sm" onclick={() => insertDateTime()}>
         <MdIcon icon="calendar_today" />
         {$tr("params.variables.insert.datetime")}
       </button>
-      <button class="btn btn-secondary btn-sm" on:click={() => insertDateTime("YYYY-MM-DD")}>
+      <button class="btn btn-secondary btn-sm" onclick={() => insertDateTime("YYYY-MM-DD")}>
         <MdIcon icon="calendar_today" />
         {$tr("params.variables.insert.date")}
       </button>
-      <button class="btn btn-secondary btn-sm" on:click={() => insertDateTime("HH:mm:ss")}>
+      <button class="btn btn-secondary btn-sm" onclick={() => insertDateTime("HH:mm:ss")}>
         <MdIcon icon="schedule" />
         {$tr("params.variables.insert.time")}
       </button>

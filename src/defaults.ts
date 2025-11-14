@@ -63,5 +63,5 @@ export const THUMBNAIL_HEIGHT = 48;
 export const THUMBNAIL_QUALITY = 0.7;
 
 export const APP_CONFIG_DEFAULTS: AppConfig = {
-  fitMode: "stretch"
-}
+  fitMode: "stretch",
+};

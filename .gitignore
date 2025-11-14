@@ -1,5 +1,7 @@
 /.vscode
 /dist
+/build
 /node_modules
 .idea
 CLAUDE.md
+.svelte-kit
