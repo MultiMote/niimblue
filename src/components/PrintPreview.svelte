@@ -345,7 +345,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5">{$tr("preview.title")}</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <button aria-label="Dismiss" type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body text-center">

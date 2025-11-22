@@ -97,8 +97,11 @@
     <button type="button" class="btn btn-secondary" onclick={fit} title={$tr("params.generic.fit")}>
       <MdIcon icon="fit_screen" />
     </button>
-    <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split px-1" data-bs-toggle="dropdown"
-    ></button>
+    <button
+      aria-label="Toggle"
+      type="button"
+      class="btn btn-secondary dropdown-toggle dropdown-toggle-split px-1"
+      data-bs-toggle="dropdown"></button>
     <div class="dropdown-menu p-1">
       <select class="form-select form-select-sm" value={$appConfig.fitMode ?? "stretch"} onchange={fitModeChanged}>
         <option value="stretch">{$tr("params.generic.fit.mode.stretch")}</option>
