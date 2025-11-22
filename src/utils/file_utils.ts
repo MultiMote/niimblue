@@ -177,7 +177,7 @@ export class FileUtils {
    * fixme: never ends if dialog closed
    *
    * */
-  static async pickAndReadBinaryFile(acceptExtension: string): Promise<{name: string, data: Uint8Array}> {
+  static async pickAndReadBinaryFile(acceptExtension: string): Promise<{ name: string; data: Uint8Array }> {
     return new Promise((resolve, reject) => {
       const input: HTMLInputElement = document.createElement("input");
       const reader = new FileReader();
@@ -195,7 +195,7 @@ export class FileUtils {
             reader.readAsArrayBuffer(file);
             reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
               if (readerEvt?.target?.result) {
-                resolve({name: file.name, data: new Uint8Array(readerEvt.target.result as ArrayBuffer)});
+                resolve({ name: file.name, data: new Uint8Array(readerEvt.target.result as ArrayBuffer) });
               }
             };
             reader.onerror = (readerEvt: ProgressEvent<FileReader>) => {

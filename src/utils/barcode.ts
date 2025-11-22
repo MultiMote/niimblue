@@ -189,10 +189,13 @@ const code128_bp: Code128BitPattern[] = [
   { ascii: 210, code: "11010011100" }, // A: StartC, B: StartC, C: StartC, BandCode: 211232
   { ascii: 211, code: "1100011101011" }, // A: Stop, B: Stop, C: Stop, BandCode: 2331112
 ];
-const code128_ascii_to_id = code128_bp.reduce((acc, { ascii }, idx) => {
-  acc[ascii] = idx;
-  return acc;
-}, {} as Record<number, number>);
+const code128_ascii_to_id = code128_bp.reduce(
+  (acc, { ascii }, idx) => {
+    acc[ascii] = idx;
+    return acc;
+  },
+  {} as Record<number, number>,
+);
 
 /**
  * Converts a string to Code128B barcode

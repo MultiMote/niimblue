@@ -3,13 +3,18 @@
   import { tr } from "../../utils/i18n";
   import MdIcon from "../basic/MdIcon.svelte";
 
-  export let onItemClicked: (index: number) => void;
-  export let onItemDelete: (index: number) => void;
-  export let onItemExport: (index: number) => void;
-  export let labels: ExportedLabelTemplate[];
-  export let selectedIndex: number = -1;
+  interface Props {
+    onItemClicked: (index: number) => void;
+    onItemDelete: (index: number) => void;
+    onItemExport: (index: number) => void;
+    labels: ExportedLabelTemplate[];
+    selectedIndex?: number;
+    class?: string;
+  }
 
-  let deleteIndex: number = -1;
+  let { onItemClicked, onItemDelete, onItemExport, labels, selectedIndex = -1, class: className }: Props = $props();
+
+  let deleteIndex: number = $state(-1);
 
   const scaleDimensions = (preset: LabelProps): { width: number; height: number } => {
     const scaleFactor = Math.min(100 / preset.size.width, 100 / preset.size.height);
@@ -41,33 +46,36 @@
   };
 </script>
 
-<div class="labels-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {$$props.class}">
-  {#each labels as item, idx}
-    <button
+<div class="labels-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {className}">
+  {#each labels as item, idx (item.title)}
+    <div
+      tabindex="0"
       class="btn p-0 card-wrapper d-flex justify-content-center align-items-center {selectedIndex === idx
         ? 'border-primary'
         : ''}"
-      on:click={() => onItemClicked(idx)}>
+      onkeydown={() => onItemClicked(idx)}
+      onclick={() => onItemClicked(idx)}
+      role="button">
       <div
         class="card print-start-{item.label.printDirection} d-flex justify-content-center align-items-center"
         style="width: {scaleDimensions(item.label).width}%; height: {scaleDimensions(item.label).height}%;">
         <div class="buttons d-flex">
           <button
             class="btn text-primary-emphasis"
-            on:click={(e) => exportRequested(e, idx)}
+            onclick={(e) => exportRequested(e, idx)}
             title={$tr("params.saved_labels.save.json")}>
             <MdIcon icon="download" />
           </button>
 
           {#if deleteIndex === idx}
-            <button class="remove btn text-danger-emphasis" on:click={(e) => deleteConfirmed(e, idx)}>
+            <button class="remove btn text-danger-emphasis" onclick={(e) => deleteConfirmed(e, idx)}>
               <MdIcon icon="delete" />
             </button>
-            <button class="remove btn text-success" on:click={(e) => deleteRejected(e)}>
+            <button class="remove btn text-success" onclick={(e) => deleteRejected(e)}>
               <MdIcon icon="close" />
             </button>
           {:else}
-            <button class="remove btn text-danger-emphasis" on:click={(e) => deleteRequested(e, idx)}>
+            <button class="remove btn text-danger-emphasis" onclick={(e) => deleteRequested(e, idx)}>
               <MdIcon icon="delete" />
             </button>
           {/if}
@@ -83,7 +91,7 @@
           </span>
         {/if}
       </div>
-    </button>
+    </div>
   {/each}
 </div>
 

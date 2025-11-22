@@ -1,15 +1,21 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import { tr } from "../../utils/i18n";
   import { csvParse } from "d3-dsv";
   import MdIcon from "../basic/MdIcon.svelte";
 
-  export let enabled: boolean;
-  export let csv: string;
-  export let onUpdate: (enabled: boolean, csv: string) => void;
-  export let onPlaceholderPicked: (name: string) => void;
+  interface Props {
+    enabled: boolean;
+    csv: string;
+    onUpdate: (enabled: boolean, csv: string) => void;
+    onPlaceholderPicked: (name: string) => void;
+  }
 
-  let placeholders: string[] = [];
-  let rows: number = 0;
+  let { enabled = $bindable(), csv = $bindable(), onUpdate, onPlaceholderPicked }: Props = $props();
+
+  let placeholders: string[] = $state([]);
+  let rows: number = $state(0);
 
   const refresh = (val: string) => {
     const result = csvParse(val);
@@ -21,7 +27,9 @@
     onUpdate(enabled, csv);
   };
 
-  $: refresh(csv);
+  run(() => {
+    refresh(csv);
+  });
 </script>
 
 <div class="dropdown">
@@ -42,7 +50,7 @@
           role="switch"
           id="enabled"
           bind:checked={enabled}
-          on:change={onDataChanged} />
+          onchange={onDataChanged} />
         <label class="form-check-label" for="enabled">{$tr("params.csv.enabled")}</label>
       </div>
 
@@ -50,16 +58,15 @@
         {$tr("params.csv.tip")}
       </div>
 
-      <textarea class="dsv form-control my-3" bind:value={csv} on:input={onDataChanged} />
+      <textarea class="dsv form-control my-3" bind:value={csv} oninput={onDataChanged}></textarea>
 
       <div class="placeholders pt-1">
         {$tr("params.csv.rowsfound")} <strong>{rows}</strong>
       </div>
       <div class="placeholders pt-1">
         {$tr("params.csv.placeholders")}
-        {#each placeholders as p}
-          <button class="btn btn-sm btn-outline-info px-1 py-0" on:click={() => onPlaceholderPicked(p)}>{`{${p}}`}</button>
-          {" "}
+        {#each placeholders as p (p)}
+          <button class="btn btn-sm btn-outline-info px-1 py-0" onclick={() => onPlaceholderPicked(p)}>{`{${p}}`} </button>
         {/each}
       </div>
     </div>
