@@ -39,12 +39,12 @@
   let previewCanvas = $state<HTMLCanvasElement>();
   let printState: "idle" | "sending" | "printing" = $state("idle");
   let modal: Modal;
-  let printProgress: number = 0; // todo: more progress data
-  let density: number = $printerMeta?.densityDefault ?? 3;
-  let quantity: number = 1;
-  let postProcessType: PostProcessType;
-  let postProcessInvert: boolean = false;
-  let thresholdValue: number = 140;
+  let printProgress = $state(0); // todo: more progress data
+  let density = $state($printerMeta?.densityDefault ?? 3);
+  let quantity = $state(1);
+  let postProcessType = $state<PostProcessType>();
+  let postProcessInvert = $state(false);
+  let thresholdValue = $state(140);
   let originalImage: ImageData;
   let previewContext: CanvasRenderingContext2D;
   let printTaskName: PrintTaskName = $state("D110");
