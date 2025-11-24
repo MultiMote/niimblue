@@ -5,8 +5,12 @@
   import { appConfig } from "../../stores";
   import ObjectPositionControls from "./ObjectPositionControls.svelte";
 
-  export let selectedObject: fabric.FabricObject;
-  export let valueUpdated: () => void;
+  interface Props {
+    selectedObject: fabric.FabricObject;
+    valueUpdated: () => void;
+  }
+
+  let { selectedObject, valueUpdated }: Props = $props();
 
   const putToCenterV = () => {
     selectedObject.canvas!.centerObjectV(selectedObject);
@@ -61,10 +65,10 @@
   };
 </script>
 
-<button class="btn btn-sm btn-secondary" on:click={putToCenterV} title={$tr("params.generic.center.vertical")}>
+<button class="btn btn-sm btn-secondary" onclick={putToCenterV} title={$tr("params.generic.center.vertical")}>
   <MdIcon icon="vertical_distribute" />
 </button>
-<button class="btn btn-sm btn-secondary" on:click={putToCenterH} title={$tr("params.generic.center.horizontal")}>
+<button class="btn btn-sm btn-secondary" onclick={putToCenterH} title={$tr("params.generic.center.horizontal")}>
   <MdIcon icon="horizontal_distribute" />
 </button>
 
@@ -79,10 +83,10 @@
     <MdIcon icon="segment" />
   </button>
   <div class="dropdown-menu arrangement p-2">
-    <button class="btn btn-sm" on:click={() => bringTo("top")}>
+    <button class="btn btn-sm" onclick={() => bringTo("top")}>
       {$tr("params.generic.arrange.top")}
     </button>
-    <button class="btn btn-sm" on:click={() => bringTo("bottom")}>
+    <button class="btn btn-sm" onclick={() => bringTo("bottom")}>
       {$tr("params.generic.arrange.bottom")}
     </button>
   </div>
@@ -90,13 +94,16 @@
 
 {#if selectedObject instanceof fabric.FabricImage}
   <div class="btn-group btn-group-sm">
-    <button type="button" class="btn btn-secondary" on:click={fit} title={$tr("params.generic.fit")}>
+    <button type="button" class="btn btn-secondary" onclick={fit} title={$tr("params.generic.fit")}>
       <MdIcon icon="fit_screen" />
     </button>
-    <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split px-1" data-bs-toggle="dropdown"
-    ></button>
+    <button
+      aria-label="Toggle"
+      type="button"
+      class="btn btn-secondary dropdown-toggle dropdown-toggle-split px-1"
+      data-bs-toggle="dropdown"></button>
     <div class="dropdown-menu p-1">
-      <select class="form-select form-select-sm" value={$appConfig.fitMode ?? "stretch"} on:change={fitModeChanged}>
+      <select class="form-select form-select-sm" value={$appConfig.fitMode ?? "stretch"} onchange={fitModeChanged}>
         <option value="stretch">{$tr("params.generic.fit.mode.stretch")}</option>
         <option value="ratio_min">{$tr("params.generic.fit.mode.ratio_min")}</option>
         <option value="ratio_max">{$tr("params.generic.fit.mode.ratio_max")}</option>

@@ -1,5 +1,9 @@
 import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const getDate = (): string => {
   const date = new Date();
@@ -20,6 +24,13 @@ export default defineConfig({
   },
   resolve: {
     preserveSymlinks: true, // Fix build error when using `npm link @mmote/niimbluelib`
+    alias: {
+      $: resolve(__dirname, "./src"),
+      $utils: resolve(__dirname, "./src/utils"),
+      $routes: resolve(__dirname, "./src/routes"),
+      $styles: resolve(__dirname, "src/styles"),
+      $components: resolve(__dirname, "src/components"),
+    },
   },
   build: {
     rollupOptions: {
@@ -32,7 +43,10 @@ export default defineConfig({
           if (id.includes("node_modules")) {
             if (id.includes("fabric")) {
               return "lib.2.fabric";
-            } else if (id.includes("@capacitor/filesystem") || id.includes("@capacitor/share")) {
+            } else if (
+              id.includes("@capacitor/filesystem") ||
+              id.includes("@capacitor/share")
+            ) {
               return "lib.2.cap";
             } else if (id.includes("zod")) {
               return "lib.2.zod";

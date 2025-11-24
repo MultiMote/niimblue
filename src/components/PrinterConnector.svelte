@@ -1,10 +1,5 @@
 <script lang="ts">
-  import {
-    NiimbotCapacitorBleClient,
-    SoundSettingsItemType,
-    Utils,
-    type AvailableTransports,
-  } from "@mmote/niimbluelib";
+  import { NiimbotCapacitorBleClient, SoundSettingsItemType, Utils, type AvailableTransports } from "@mmote/niimbluelib";
   import {
     printerClient,
     connectedPrinterName,
@@ -26,9 +21,8 @@
   import type { MaterialIcon } from "material-icons";
   import FirmwareUpdater from "./basic/FirmwareUpdater.svelte";
 
-  let connectionType: ConnectionType = "bluetooth";
-  let featureSupport: AvailableTransports = { webBluetooth: false, webSerial: false, capacitorBle: false };
-
+  let connectionType: ConnectionType = $state("bluetooth");
+  let featureSupport: AvailableTransports = $state({ webBluetooth: false, webSerial: false, capacitorBle: false });
 
   const onConnectClicked = async () => {
     initClient(connectionType);
@@ -126,7 +120,7 @@
         <div>
           Printer info:
           <ul>
-            {#each Object.entries($printerInfo) as [k, v]}
+            {#each Object.entries($printerInfo) as [k, v] (k)}
               <li>{k}: <strong>{v ?? "-"}</strong></li>
             {/each}
           </ul>
@@ -144,7 +138,7 @@
 
         <div class="collapse" id="modelMeta">
           <ul>
-            {#each Object.entries($printerMeta) as [k, v]}
+            {#each Object.entries($printerMeta) as [k, v] (k)}
               <li>{k}: <strong>{v ?? "-"}</strong></li>
             {/each}
           </ul>
@@ -161,10 +155,10 @@
         </button>
 
         <div class="collapse" id="rfidInfo">
-          <button class="btn btn-outline-secondary btn-sm mt-1" on:click={getRfidInfo}>Update</button>
+          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={getRfidInfo}>Update</button>
 
           <ul>
-            {#each Object.entries($rfidInfo) as [k, v]}
+            {#each Object.entries($rfidInfo) as [k, v] (v)}
               <li>{k}: <strong>{v ?? "-"}</strong></li>
             {/each}
           </ul>
@@ -182,14 +176,14 @@
 
         <div class="collapse" id="heartbeatData">
           <ul>
-            {#each Object.entries($heartbeatData) as [k, v]}
+            {#each Object.entries($heartbeatData) as [k, v] (v)}
               <li>{k}: <strong>{v ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
       {/if}
 
-      <FirmwareUpdater/>
+      <FirmwareUpdater />
 
       <button
         class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
@@ -201,12 +195,12 @@
 
       <div class="collapse" id="tests">
         <div class="d-flex flex-wrap gap-1 mt-1">
-          <button class="btn btn-sm btn-primary" on:click={startHeartbeat}>Heartbeat on</button>
-          <button class="btn btn-sm btn-primary" on:click={stopHeartbeat}>Heartbeat off</button>
-          <button class="btn btn-sm btn-primary" on:click={soundOn}>Sound on</button>
-          <button class="btn btn-sm btn-primary" on:click={soundOff}>Sound off</button>
-          <button class="btn btn-sm btn-primary" on:click={fetchInfo}>Fetch info again</button>
-          <button class="btn btn-sm btn-primary" on:click={reset}>Reset</button>
+          <button class="btn btn-sm btn-primary" onclick={startHeartbeat}>Heartbeat on</button>
+          <button class="btn btn-sm btn-primary" onclick={stopHeartbeat}>Heartbeat off</button>
+          <button class="btn btn-sm btn-primary" onclick={soundOn}>Sound on</button>
+          <button class="btn btn-sm btn-primary" onclick={soundOff}>Sound off</button>
+          <button class="btn btn-sm btn-primary" onclick={fetchInfo}>Fetch info again</button>
+          <button class="btn btn-sm btn-primary" onclick={reset}>Reset</button>
         </div>
       </div>
     </div>
@@ -230,7 +224,7 @@
       <button
         disabled={$connectionState === "connecting"}
         class="btn text-nowrap {connectionType === 'bluetooth' ? 'btn-light' : 'btn-outline-secondary'}"
-        on:click={() => switchConnectionType("bluetooth")}>
+        onclick={() => switchConnectionType("bluetooth")}>
         <MdIcon icon="bluetooth" />
         {$tr("connector.bluetooth")}
       </button>
@@ -239,7 +233,7 @@
       <button
         disabled={$connectionState === "connecting"}
         class="btn text-nowrap {connectionType === 'serial' ? 'btn-light' : 'btn-outline-secondary'}"
-        on:click={() => switchConnectionType((connectionType = "serial"))}>
+        onclick={() => switchConnectionType((connectionType = "serial"))}>
         <MdIcon icon="usb" />
         {$tr("connector.serial")}
       </button>
@@ -248,7 +242,7 @@
       <button
         disabled={$connectionState === "connecting"}
         class="btn text-nowrap {connectionType === 'capacitor-ble' ? 'btn-light' : 'btn-outline-secondary'}"
-        on:click={() => switchConnectionType((connectionType = "capacitor-ble"))}>
+        onclick={() => switchConnectionType((connectionType = "capacitor-ble"))}>
         <MdIcon icon="usb" />
         Capacitor BLE
       </button>
@@ -260,13 +254,13 @@
       class="btn btn-primary"
       disabled={$connectionState === "connecting" ||
         (!featureSupport.capacitorBle && !featureSupport.webBluetooth && !featureSupport.webSerial)}
-      on:click={onConnectClicked}>
+      onclick={onConnectClicked}>
       <MdIcon icon="power" />
     </button>
   {/if}
 
   {#if $connectionState === "connected"}
-    <button class="btn btn-danger" on:click={onDisconnectClicked}>
+    <button class="btn btn-danger" onclick={onDisconnectClicked}>
       <MdIcon icon="power_off" />
     </button>
   {/if}

@@ -3,10 +3,15 @@
   import { tr } from "../../utils/i18n";
   import MdIcon from "../basic/MdIcon.svelte";
 
-  export let onItemSelected: (index: number) => void;
-  export let onItemDelete: (index: number) => void;
-  export let presets: LabelPreset[];
-  let deleteIndex: number = -1;
+  interface Props {
+    onItemSelected: (index: number) => void;
+    onItemDelete: (index: number) => void;
+    presets: LabelPreset[];
+    class?: string;
+  }
+
+  let { class: className = "", onItemDelete, onItemSelected, presets }: Props = $props();
+  let deleteIndex: number = $state(-1);
 
   const scaleDimensions = (preset: LabelPreset): { width: number; height: number } => {
     const scaleFactor = Math.min(100 / preset.width, 100 / preset.height);
@@ -33,24 +38,27 @@
   };
 </script>
 
-<div class="preset-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {$$props.class}">
-  {#each presets as item, idx}
-    <button
+<div class="preset-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {className}">
+  {#each presets as item, idx (item)}
+    <div
+      role="button"
       class="btn p-0 card-wrapper d-flex justify-content-center align-items-center"
-      on:click={() => onItemSelected(idx)}>
+      tabindex="0"
+      onkeydown={() => onItemSelected(idx)}
+      onclick={() => onItemSelected(idx)}>
       <div
         class="card print-start-{item.printDirection} d-flex justify-content-center align-items-center"
         style="width: {scaleDimensions(item).width}%; height: {scaleDimensions(item).height}%;">
         <div class="remove d-flex">
           {#if deleteIndex === idx}
-            <button class="remove btn text-danger-emphasis" on:click={(e) => deleteConfirmed(e, idx)}>
+            <button class="remove btn text-danger-emphasis" onclick={(e) => deleteConfirmed(e, idx)}>
               <MdIcon icon="delete" />
             </button>
-            <button class="remove btn text-success" on:click={(e) => deleteRejected(e)}>
+            <button class="remove btn text-success" onclick={(e) => deleteRejected(e)}>
               <MdIcon icon="close" />
             </button>
           {:else}
-            <button class="remove btn text-danger-emphasis" on:click={(e) => deleteRequested(e, idx)}>
+            <button class="remove btn text-danger-emphasis" onclick={(e) => deleteRequested(e, idx)}>
               <MdIcon icon="delete" />
             </button>
           {/if}
@@ -66,7 +74,7 @@
           {/if}
         </span>
       </div>
-    </button>
+    </div>
   {/each}
 </div>
 

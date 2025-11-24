@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import {
     LabelPresetSchema,
     type LabelPreset,
@@ -22,8 +24,12 @@
   import { z } from "zod";
   import DpiSelector from "./DpiSelector.svelte";
 
-  export let labelProps: LabelProps;
-  export let onChange: (newProps: LabelProps) => void;
+  interface Props {
+    labelProps: LabelProps;
+    onChange: (newProps: LabelProps) => void;
+  }
+
+  let { labelProps, onChange }: Props = $props();
 
   const tailPositions: TailPosition[] = ["right", "bottom", "left", "top"];
   const printDirections: PrintDirection[] = ["left", "top"];
@@ -31,22 +37,22 @@
   const labelSplits: LabelSplit[] = ["none", "vertical", "horizontal"];
   const mirrorTypes: MirrorType[] = ["none", "flip", "copy"];
 
-  let labelPresets: LabelPreset[] = DEFAULT_LABEL_PRESETS;
+  let labelPresets: LabelPreset[] = $state(DEFAULT_LABEL_PRESETS);
 
-  let title: string | undefined = "";
+  let title: string | undefined = $state("");
   let prevUnit: LabelUnit = "mm";
-  let unit: LabelUnit = "mm";
-  let dpmm = 8;
-  let width = 0;
-  let height = 0;
-  let printDirection: PrintDirection = "left";
-  let shape: LabelShape = "rect";
-  let split: LabelSplit = "none";
-  let splitParts: number = 2;
-  let tailLength: number = 0;
-  let tailPos: TailPosition = "right";
-  let mirror: MirrorType = "none";
-  let error: string = "";
+  let unit: LabelUnit = $state("mm");
+  let dpmm = $state(8);
+  let width = $state(0);
+  let height = $state(0);
+  let printDirection: PrintDirection = $state("left");
+  let shape: LabelShape = $state("rect");
+  let split: LabelSplit = $state("none");
+  let splitParts: number = $state(2);
+  let tailLength: number = $state(0);
+  let tailPos: TailPosition = $state("right");
+  let mirror: MirrorType = $state("none");
+  let error: string = $state("");
 
   const onApply = () => {
     let newWidth = width;
@@ -179,7 +185,7 @@
     }
 
     if (headSize % 8 !== 0) {
-      error += $tr("params.label.warning.div8");;
+      error += $tr("params.label.warning.div8");
     }
   };
 
@@ -247,11 +253,21 @@
     tick().then(() => fillWithCurrentParams());
   });
 
-  $: checkError(labelProps);
-  $: if (shape === "circle" && split !== "none") split = "none";
-  $: if (split === "none") tailLength = 0;
-  $: if (mirror === "flip" && splitParts !== 2) mirror = "copy";
-  $: if (tailLength < 0) tailLength = 0;
+  run(() => {
+    checkError(labelProps);
+  });
+  run(() => {
+    if (shape === "circle" && split !== "none") split = "none";
+  });
+  run(() => {
+    if (split === "none") tailLength = 0;
+  });
+  run(() => {
+    if (mirror === "flip" && splitParts !== 2) mirror = "copy";
+  });
+  run(() => {
+    if (tailLength < 0) tailLength = 0;
+  });
 </script>
 
 <div class="dropdown">
@@ -263,11 +279,11 @@
 
     <div class="px-3">
       <div class="p-1">
-        <button class="btn btn-sm btn-outline-secondary" on:click={onImportClicked}>
+        <button class="btn btn-sm btn-outline-secondary" onclick={onImportClicked}>
           <MdIcon icon="data_object" />
           {$tr("params.label.import")}
         </button>
-        <button class="btn btn-sm btn-outline-secondary" on:click={onExportClicked}>
+        <button class="btn btn-sm btn-outline-secondary" onclick={onExportClicked}>
           <MdIcon icon="data_object" />
           {$tr("params.label.export")}
         </button>
@@ -281,7 +297,7 @@
         {:else if labelProps.printDirection === "left"}
           ({$tr("params.label.direction")} {$tr("params.label.direction.left")})
         {/if}
-        <button class="btn btn-sm" on:click={fillWithCurrentParams}><MdIcon icon="arrow_downward" /></button>
+        <button class="btn btn-sm" onclick={fillWithCurrentParams}><MdIcon icon="arrow_downward" /></button>
       </div>
 
       <LabelPresetsBrowser
@@ -293,9 +309,9 @@
       <div class="input-group flex-nowrap input-group-sm mb-2">
         <span class="input-group-text">{$tr("params.label.size")}</span>
         <input class="form-control" type="number" min="1" step={unit === "px" ? 8 : 1} bind:value={width} />
-        <button class="btn btn-sm btn-secondary" on:click={onFlip}><MdIcon icon="swap_horiz" /></button>
+        <button class="btn btn-sm btn-secondary" onclick={onFlip}><MdIcon icon="swap_horiz" /></button>
         <input class="form-control" type="number" min="1" step={unit === "px" ? 8 : 1} bind:value={height} />
-        <select class="form-select" bind:value={unit} on:change={onUnitChange}>
+        <select class="form-select" bind:value={unit} onchange={onUnitChange}>
           <option value="mm"> {$tr("params.label.mm")}</option>
           <option value="px"> {$tr("params.label.px")}</option>
         </select>
@@ -307,7 +323,7 @@
 
       <div class="input-group flex-nowrap input-group-sm print-dir-switch mb-2" role="group">
         <span class="input-group-text w-100">{$tr("params.label.direction")}</span>
-        {#each printDirections as v}
+        {#each printDirections as v (v)}
           <input
             type="radio"
             class="btn-check"
@@ -324,7 +340,7 @@
 
       <div class="input-group flex-nowrap input-group-sm label-shape-switch mb-2" role="group">
         <span class="input-group-text w-100">{$tr("params.label.shape")}</span>
-        {#each labelShapes as v}
+        {#each labelShapes as v (v)}
           <input
             type="radio"
             class="btn-check"
@@ -342,7 +358,7 @@
       {#if shape !== "circle"}
         <div class="input-group flex-nowrap input-group-sm label-split-switch mb-2" role="group">
           <span class="input-group-text w-100">{$tr("params.label.split")}</span>
-          {#each labelSplits as v}
+          {#each labelSplits as v (v)}
             <input
               type="radio"
               class="btn-check"
@@ -368,7 +384,7 @@
       {#if split !== "none"}
         <div class="input-group flex-nowrap input-group-sm mirror-switch mb-2" role="group">
           <span class="input-group-text w-100">{$tr("params.label.mirror")}</span>
-          {#each mirrorTypes as v}
+          {#each mirrorTypes as v (v)}
             <input
               type="radio"
               class="btn-check"
@@ -385,7 +401,7 @@
 
         <div class="input-group flex-nowrap input-group-sm tail-pos-switch mb-2" role="group">
           <span class="input-group-text w-100">{$tr("params.label.tail.position")}</span>
-          {#each tailPositions as v}
+          {#each tailPositions as v (v)}
             <input
               type="radio"
               class="btn-check"
@@ -416,10 +432,10 @@
       </div>
 
       <div class="text-end">
-        <button class="btn btn-sm btn-secondary" on:click={onLabelPresetAdd}>
+        <button class="btn btn-sm btn-secondary" onclick={onLabelPresetAdd}>
           {$tr("params.label.save_template")}
         </button>
-        <button class="btn btn-sm btn-primary" on:click={onApply}>{$tr("params.label.apply")}</button>
+        <button class="btn btn-sm btn-primary" onclick={onApply}>{$tr("params.label.apply")}</button>
       </div>
     </div>
   </div>

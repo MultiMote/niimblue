@@ -7,8 +7,12 @@
   import { LocalStoragePersistence } from "../../utils/persistence";
   import { fontCache } from "../../stores";
 
-  export let value: string;
-  export let valueUpdated: (v: string) => void;
+  interface Props {
+    value: string;
+    valueUpdated: (v: string) => void;
+  }
+
+  let { value, valueUpdated }: Props = $props();
 
   let fontQuerySupported = typeof queryLocalFonts !== "undefined";
 
@@ -41,17 +45,17 @@
     <MdIcon icon="text_format" />
   </span>
   {#if $fontCache.length > 1}
-    <select class="form-select" {value} on:change={(e) => valueUpdated(e.currentTarget.value)}>
-      {#each $fontCache as font}
+    <select class="form-select" {value} onchange={(e) => valueUpdated(e.currentTarget.value)}>
+      {#each $fontCache as font (font)}
         <option value={font} style="font-family: {font}">{font}</option>
       {/each}
     </select>
   {:else}
-    <input type="text" class="form-control" {value} on:input={(e) => valueUpdated(e.currentTarget.value)} />
+    <input type="text" class="form-control" {value} oninput={(e) => valueUpdated(e.currentTarget.value)} />
   {/if}
 
   {#if fontQuerySupported}
-    <button class="btn btn-secondary" on:click={getSystemFonts} title={$tr("params.text.fetch_fonts")}>
+    <button class="btn btn-secondary" onclick={getSystemFonts} title={$tr("params.text.fetch_fonts")}>
       <MdIcon icon="refresh" />
     </button>
   {/if}
