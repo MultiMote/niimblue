@@ -8,8 +8,6 @@
 		"dev-check-open": "npm run sv-check && npm run dev-open",
 		"dev": "vite",
 		"dev-open": "vite --open",
-		"build:android": "npm run build && npm run cap-run:android",
-		"cap-run:android": "cap sync android && cap open android",
 		"build": "vite build",
 		"build-rel": "vite build --base=./",
 		"preview": "vite preview",
@@ -18,10 +16,9 @@
 		"lint": "eslint ."
 	},
 	"dependencies": {
-		"@capacitor/cli": "^7.4.4",
-		"@capacitor/core": "^7.4.4",
-		"@capacitor/filesystem": "^7.1.4",
-		"@capacitor/share": "^7.0.2",
+		"@capacitor/core": "^7.2.0",
+		"@capacitor/filesystem": "^7.0.1",
+		"@capacitor/share": "^7.0.1",
 		"@fontsource-variable/noto-sans": "^5.2.10",
 		"@formatjs/intl-localematcher": "^0.6.2",
 		"@mmote/niimbluelib": "0.0.1-alpha.29",
