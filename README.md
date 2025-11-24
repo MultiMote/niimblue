@@ -101,12 +101,6 @@ Skip steps you have done.
     npm run dev
     ```
 
-Eslint not included. Install it with:
-
-```bash
-npm install --no-save --no-package-lock eslint@9.x globals @types/eslint @eslint/js typescript-eslint eslint-plugin-svelte
-```
-
 ## Translation status
 
 [![translation](https://weblate.mmote.ru/widget/niimblue/web/multi-auto.svg)](https://weblate.mmote.ru/engage/niimblue/)
