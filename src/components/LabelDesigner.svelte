@@ -2,9 +2,9 @@
   import Dropdown from "bootstrap/js/dist/dropdown";
   import * as fabric from "fabric";
   import { onDestroy, onMount, tick } from "svelte";
-  import { Barcode } from "../fabric-object/barcode";
-  import { QRCode } from "../fabric-object/qrcode";
-  import { iconCodepoints, type MaterialIcon } from "$styles/mdi_icons";
+  import { Barcode } from "$/fabric-object/barcode";
+  import { QRCode } from "$/fabric-object/qrcode";
+  import { iconCodepoints, type MaterialIcon } from "$/styles/mdi_icons";
   import { automation, connectionState } from "$/stores";
   import {
     type ExportedLabelTemplate,
@@ -12,30 +12,30 @@
     type LabelProps,
     type MoveDirection,
     type OjectType,
-  } from "../types";
-  import { FileUtils } from "../utils/file_utils";
-  import { tr } from "../utils/i18n";
-  import { LabelDesignerObjectHelper } from "../utils/label_desinder_object_helper";
-  import { LocalStoragePersistence } from "../utils/persistence";
-  import { Toasts } from "../utils/toasts";
-  import { UndoRedo, type UndoState } from "../utils/undo_redo";
-  import BarcodeParamsPanel from "./designer-controls/BarcodeParamsControls.svelte";
-  import CsvControl from "./designer-controls/CsvControl.svelte";
-  import GenericObjectParamsControls from "./designer-controls/GenericObjectParamsControls.svelte";
-  import IconPicker from "./designer-controls/IconPicker.svelte";
-  import LabelPropsEditor from "./designer-controls/LabelPropsEditor.svelte";
-  import MdIcon from "./basic/MdIcon.svelte";
-  import ObjectPicker from "./designer-controls/ObjectPicker.svelte";
-  import PrintPreview from "./PrintPreview.svelte";
-  import QrCodeParamsPanel from "./designer-controls/QRCodeParamsControls.svelte";
-  import TextParamsControls from "./designer-controls/TextParamsControls.svelte";
-  import VariableInsertControl from "./designer-controls/VariableInsertControl.svelte";
-  import { DEFAULT_LABEL_PROPS, GRID_SIZE } from "../defaults";
-  import { LabelDesignerUtils } from "../utils/label_designer_utils";
-  import SavedLabelsMenu from "./designer-controls/SavedLabelsMenu.svelte";
-  import { CustomCanvas } from "../fabric-object/custom_canvas";
-  import VectorParamsControls from "./designer-controls/VectorParamsControls.svelte";
-  import { fixFabricObjectScale } from "../utils/canvas_utils";
+  } from "$/types";
+  import { FileUtils } from "$/utils/file_utils";
+  import { tr } from "$/utils/i18n";
+  import { LabelDesignerObjectHelper } from "$/utils/label_designer_object_helper";
+  import { LocalStoragePersistence } from "$/utils/persistence";
+  import { Toasts } from "$/utils/toasts";
+  import { UndoRedo, type UndoState } from "$/utils/undo_redo";
+  import BarcodeParamsPanel from "$/components/designer-controls/BarcodeParamsControls.svelte";
+  import CsvControl from "$/components/designer-controls/CsvControl.svelte";
+  import GenericObjectParamsControls from "$/components/designer-controls/GenericObjectParamsControls.svelte";
+  import IconPicker from "$/components/designer-controls/IconPicker.svelte";
+  import LabelPropsEditor from "$/components/designer-controls/LabelPropsEditor.svelte";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import ObjectPicker from "$/components/designer-controls/ObjectPicker.svelte";
+  import PrintPreview from "$/components/PrintPreview.svelte";
+  import QrCodeParamsPanel from "$/components/designer-controls/QRCodeParamsControls.svelte";
+  import TextParamsControls from "$/components/designer-controls/TextParamsControls.svelte";
+  import VariableInsertControl from "$/components/designer-controls/VariableInsertControl.svelte";
+  import { DEFAULT_LABEL_PROPS, GRID_SIZE } from "$/defaults";
+  import { LabelDesignerUtils } from "$/utils/label_designer_utils";
+  import SavedLabelsMenu from "$/components/designer-controls/SavedLabelsMenu.svelte";
+  import { CustomCanvas } from "$/fabric-object/custom_canvas";
+  import VectorParamsControls from "$/components/designer-controls/VectorParamsControls.svelte";
+  import { fixFabricObjectScale } from "$/utils/canvas_utils";
 
   let htmlCanvas: HTMLCanvasElement;
   let fabricCanvas: CustomCanvas | undefined = $state();

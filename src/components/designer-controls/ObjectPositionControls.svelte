@@ -1,10 +1,10 @@
 <script lang="ts">
-  import MdIcon from "../basic/MdIcon.svelte";
-  import { tr } from "../../utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { tr } from "$/utils/i18n";
   import * as fabric from "fabric";
   import { onDestroy } from "svelte";
-  import QRCode from "../../fabric-object/qrcode";
-  import Barcode from "../../fabric-object/barcode";
+  import QRCode from "$/fabric-object/qrcode";
+  import Barcode from "$/fabric-object/barcode";
 
   interface Props {
     selectedObject: fabric.FabricObject;

@@ -1,6 +1,6 @@
 import * as fabric from "fabric";
-import { DEFAULT_LABEL_PROPS } from "../defaults";
-import type { LabelProps } from "../types";
+import { DEFAULT_LABEL_PROPS } from "$/defaults";
+import type { LabelProps } from "$/types";
 
 type LabelBounds = {
   startX: number;

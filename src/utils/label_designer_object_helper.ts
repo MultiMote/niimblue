@@ -1,9 +1,9 @@
 import * as fabric from "fabric";
-import { OBJECT_DEFAULTS, OBJECT_DEFAULTS_TEXT, OBJECT_DEFAULTS_VECTOR, OBJECT_SIZE_DEFAULTS } from "../defaults";
-import Barcode from "../fabric-object/barcode";
-import { QRCode } from "../fabric-object/qrcode";
-import type { OjectType } from "../types";
-import { Toasts } from "./toasts";
+import { OBJECT_DEFAULTS, OBJECT_DEFAULTS_TEXT, OBJECT_DEFAULTS_VECTOR, OBJECT_SIZE_DEFAULTS } from "$/defaults";
+import Barcode from "$/fabric-object/barcode";
+import { QRCode } from "$/fabric-object/qrcode";
+import type { OjectType } from "$/types";
+import { Toasts } from "$/utils/toasts";
 
 export class LabelDesignerObjectHelper {
   static async addSvg(canvas: fabric.Canvas, svgCode: string): Promise<fabric.FabricObject | fabric.Group> {

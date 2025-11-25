@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { QRCode } from "../../fabric-object/qrcode";
-  import { tr } from "../../utils/i18n";
-  import MdIcon from "../basic/MdIcon.svelte";
+  import { QRCode } from "$/fabric-object/qrcode";
+  import { tr } from "$/utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
   import * as fabric from "fabric";
 
   interface Props {

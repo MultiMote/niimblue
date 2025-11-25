@@ -1,6 +1,6 @@
 import * as fabric from "fabric";
-import QRCode from "../fabric-object/qrcode";
-import Barcode from "../fabric-object/barcode";
+import QRCode from "$/fabric-object/qrcode";
+import Barcode from "$/fabric-object/barcode";
 import dayjs from "dayjs";
 
 const VARIABLE_TEMPLATE_RX = /{\s*(\w+)\s*(?:\|\s*(.*?)\s*)?}/g;

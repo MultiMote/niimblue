@@ -1,8 +1,8 @@
 <script lang="ts">
   import * as fabric from "fabric";
-  import { Barcode } from "../../fabric-object/barcode";
-  import { tr } from "../../utils/i18n";
-  import MdIcon from "../basic/MdIcon.svelte";
+  import { Barcode } from "$/fabric-object/barcode";
+  import { tr } from "$/utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
 
   interface Props {
     selectedObject: fabric.FabricObject | undefined;
@@ -12,7 +12,7 @@
   let { selectedObject, valueUpdated }: Props = $props();
   let selectedBarcode: Barcode | undefined = $derived(selectedObject instanceof Barcode ? (selectedObject as Barcode) : undefined);
 
-  
+
 </script>
 
 {#if selectedBarcode}

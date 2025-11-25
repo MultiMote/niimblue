@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { ExportedLabelTemplate, LabelProps } from "../../types";
-  import { tr } from "../../utils/i18n";
-  import MdIcon from "../basic/MdIcon.svelte";
+  import type { ExportedLabelTemplate, LabelProps } from "$/types";
+  import { tr } from "$/utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
 
   interface Props {
     onItemClicked: (index: number) => void;

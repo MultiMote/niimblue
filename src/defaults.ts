@@ -1,5 +1,5 @@
 import * as fabric from "fabric";
-import type { AppConfig, LabelPreset, LabelProps } from "./types";
+import type { AppConfig, LabelPreset, LabelProps } from "$/types";
 
 /** Default presets for LabelPropsEditor */
 export const DEFAULT_LABEL_PRESETS: LabelPreset[] = [

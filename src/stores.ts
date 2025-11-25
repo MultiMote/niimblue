@@ -1,5 +1,5 @@
 import { get, readable, writable } from "svelte/store";
-import { AppConfigSchema, type AppConfig, type AutomationProps, type ConnectionState, type ConnectionType } from "./types";
+import { AppConfigSchema, type AppConfig, type AutomationProps, type ConnectionState, type ConnectionType } from "$/types";
 import {
   NiimbotBluetoothClient,
   NiimbotCapacitorBleClient,
@@ -14,10 +14,10 @@ import {
   type PrinterModelMeta,
   type RfidInfo,
 } from "@mmote/niimbluelib";
-import { Toasts } from "./utils/toasts";
-import { tr } from "./utils/i18n";
-import { LocalStoragePersistence, writablePersisted } from "./utils/persistence";
-import { APP_CONFIG_DEFAULTS, OBJECT_DEFAULTS_TEXT } from "./defaults";
+import { Toasts } from "$/utils/toasts";
+import { tr } from "$/utils/i18n";
+import { LocalStoragePersistence, writablePersisted } from "$/utils/persistence";
+import { APP_CONFIG_DEFAULTS, OBJECT_DEFAULTS_TEXT } from "$/defaults";
 
 export const fontCache = writable<string[]>([OBJECT_DEFAULTS_TEXT.fontFamily]);
 export const appConfig = writablePersisted<AppConfig>("config", AppConfigSchema, APP_CONFIG_DEFAULTS);

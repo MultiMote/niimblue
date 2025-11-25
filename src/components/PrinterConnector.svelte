@@ -11,15 +11,15 @@
     heartbeatFails,
     automation,
     rfidInfo,
-  } from "../stores";
-  import type { ConnectionType } from "../types";
-  import { tr } from "../utils/i18n";
-  import MdIcon from "./basic/MdIcon.svelte";
-  import { Toasts } from "../utils/toasts";
+  } from "$/stores";
+  import type { ConnectionType } from "$/types";
+  import { tr } from "$/utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { Toasts } from "$/utils/toasts";
   import { onMount } from "svelte";
-  import { LocalStoragePersistence } from "../utils/persistence";
+  import { LocalStoragePersistence } from "$/utils/persistence";
   import type { MaterialIcon } from "material-icons";
-  import FirmwareUpdater from "./basic/FirmwareUpdater.svelte";
+  import FirmwareUpdater from "$/components/basic/FirmwareUpdater.svelte";
 
   let connectionType: ConnectionType = $state("bluetooth");
   let featureSupport: AvailableTransports = $state({ webBluetooth: false, webSerial: false, capacitorBle: false });

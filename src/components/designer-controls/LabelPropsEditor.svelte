@@ -8,19 +8,19 @@
     type LabelUnit,
     type MirrorType,
     type TailPosition,
-  } from "../../types";
-  import LabelPresetsBrowser from "./LabelPresetsBrowser.svelte";
-  import { printerMeta } from "../../stores";
-  import { tr } from "../../utils/i18n";
-  import { DEFAULT_LABEL_PRESETS } from "../../defaults";
+  } from "$/types";
+  import LabelPresetsBrowser from "$/components/designer-controls/LabelPresetsBrowser.svelte";
+  import { printerMeta } from "$/stores";
+  import { tr } from "$/utils/i18n";
+  import { DEFAULT_LABEL_PRESETS } from "$/defaults";
   import { onMount, tick } from "svelte";
-  import { LocalStoragePersistence } from "../../utils/persistence";
+  import { LocalStoragePersistence } from "$/utils/persistence";
   import type { PrintDirection } from "@mmote/niimbluelib";
-  import MdIcon from "../basic/MdIcon.svelte";
-  import { Toasts } from "../../utils/toasts";
-  import { FileUtils } from "../../utils/file_utils";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { Toasts } from "$/utils/toasts";
+  import { FileUtils } from "$/utils/file_utils";
   import { z } from "zod";
-  import DpiSelector from "./DpiSelector.svelte";
+  import DpiSelector from "$/components/designer-controls/DpiSelector.svelte";
 
   interface Props {
     labelProps: LabelProps;

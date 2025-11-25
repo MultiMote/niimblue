@@ -11,9 +11,9 @@ import {
   type LabelPreset,
   type LabelProps,
   type PreviewProps,
-} from "../types";
+} from "$/types";
 import { z } from "zod";
-import { FileUtils } from "./file_utils";
+import { FileUtils } from "$/utils/file_utils";
 import { get, writable, type Updater, type Writable } from "svelte/store";
 
 /** Writable store, value is persisted to localStorage */

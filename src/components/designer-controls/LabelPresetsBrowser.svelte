@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { LabelPreset } from "../../types";
-  import { tr } from "../../utils/i18n";
-  import MdIcon from "../basic/MdIcon.svelte";
+  import type { LabelPreset } from "$/types";
+  import { tr } from "$/utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
 
   interface Props {
     onItemSelected: (index: number) => void;

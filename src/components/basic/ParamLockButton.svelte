@@ -1,5 +1,6 @@
 <script lang="ts">
-  import MdIcon from "./MdIcon.svelte";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+
   interface Props {
     propName: string;
     savedValue: any;

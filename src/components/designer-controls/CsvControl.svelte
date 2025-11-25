@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { tr } from "../../utils/i18n";
+  import { tr } from "$/utils/i18n";
   import { csvParse } from "d3-dsv";
-  import MdIcon from "../basic/MdIcon.svelte";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
 
   interface Props {
     enabled: boolean;

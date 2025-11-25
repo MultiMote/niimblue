@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { FirmwareProgressEvent } from "@mmote/niimbluelib";
-  import { printerClient } from "../../stores";
-  import { Toasts } from "../../utils/toasts";
-  import { FileUtils } from "../../utils/file_utils";
+  import { printerClient } from "$/stores";
+  import { Toasts } from "$/utils/toasts";
+  import { FileUtils } from "$/utils/file_utils";
 
   let fwVersion: string = $state("");
   let fwVersionValid: boolean = $derived(/^\d+\.\d+$/.test(fwVersion));

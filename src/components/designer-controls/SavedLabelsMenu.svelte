@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { tr } from "../../utils/i18n";
+  import { tr } from "$/utils/i18n";
   import { onMount } from "svelte";
-  import MdIcon from "../basic/MdIcon.svelte";
-  import SavedLabelsBrowser from "./SavedLabelsBrowser.svelte";
-  import { ExportedLabelTemplateSchema, type ExportedLabelTemplate } from "../../types";
-  import { LocalStoragePersistence } from "../../utils/persistence";
-  import { Toasts } from "../../utils/toasts";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import SavedLabelsBrowser from "$/components/designer-controls/SavedLabelsBrowser.svelte";
+  import { ExportedLabelTemplateSchema, type ExportedLabelTemplate } from "$/types";
+  import { LocalStoragePersistence } from "$/utils/persistence";
+  import { Toasts } from "$/utils/toasts";
   import Dropdown from "bootstrap/js/dist/dropdown";
-  import { FileUtils } from "../../utils/file_utils";
+  import { FileUtils } from "$/utils/file_utils";
   import * as fabric from "fabric";
 
   interface Props {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { tr } from "../../utils/i18n";
+  import { tr } from "$/utils/i18n";
   interface Props {
     value: number;
   }

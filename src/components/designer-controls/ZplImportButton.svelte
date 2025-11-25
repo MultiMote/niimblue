@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { LabelProps } from "../../types";
-  import { FileUtils } from "../../utils/file_utils";
-  import MdIcon from "../basic/MdIcon.svelte";
+  import type { LabelProps } from "$/types";
+  import { FileUtils } from "$/utils/file_utils";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
 
   interface Props {
     text: string;

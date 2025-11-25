@@ -1,51 +1,12 @@
 import QRCodeFactory from "qrcode-generator";
 import * as fabric from "fabric";
-import { OBJECT_DEFAULTS_TEXT, OBJECT_SIZE_DEFAULTS } from "../defaults";
+import { OBJECT_DEFAULTS_TEXT, OBJECT_SIZE_DEFAULTS } from "$/defaults";
+import { Range } from "$/types";
 
 export type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
 export type Mode = "Numeric" | "Alphanumeric" | "Byte" /* Default */ | "Kanji";
-export type QrVersion =
-  | 0 // Automatic
-  | 1
-  | 2
-  | 3
-  | 4
-  | 5
-  | 6
-  | 7
-  | 8
-  | 9
-  | 10
-  | 11
-  | 12
-  | 13
-  | 14
-  | 15
-  | 16
-  | 17
-  | 18
-  | 19
-  | 20
-  | 21
-  | 22
-  | 23
-  | 24
-  | 25
-  | 26
-  | 27
-  | 28
-  | 29
-  | 30
-  | 31
-  | 32
-  | 33
-  | 34
-  | 35
-  | 36
-  | 37
-  | 38
-  | 39
-  | 40;
+
+export type QrVersion = Range<41>; // 0-40, 0 is automatic
 
 export const qrCodeDefaultValues: Partial<fabric.TClassProperties<QRCode>> = {
   text: "Text",
