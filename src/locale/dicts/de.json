@@ -142,5 +142,7 @@
     "editor.clear.confirm": "Inhalte des Arbeitsbereichs löschen?",
     "params.generic.arrange": "Ausrichten",
     "params.generic.arrange.top": "Nach vorne verschieben",
-    "params.generic.arrange.bottom": "In den Hintergrund verschieben"
+    "params.generic.arrange.bottom": "In den Hintergrund verschieben",
+    "params.vector.round_radius": "Rundungsradius",
+    "params.vector.stroke_width": "Linienbreite"
 }
