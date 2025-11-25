@@ -47,7 +47,7 @@
 </script>
 
 <div class="labels-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {className}">
-  {#each labels as item, idx (item.title)}
+  {#each labels as item, idx (item.timestamp)}
     <div
       tabindex="0"
       class="btn p-0 card-wrapper d-flex justify-content-center align-items-center {selectedIndex === idx

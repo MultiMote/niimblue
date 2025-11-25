@@ -39,6 +39,7 @@
 </script>
 
 <div class="preset-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {className}">
+  <!-- fixme: key -->
   {#each presets as item, idx (item)}
     <div
       role="button"
