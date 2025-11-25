@@ -5,14 +5,10 @@
   import { FileUtils } from "../../utils/file_utils";
 
   let fwVersion: string = $state("");
-  let fwVersionValid: boolean = $state(false);
+  let fwVersionValid: boolean = $derived(/^\d+\.\d+$/.test(fwVersion));
   let fwProgress: string = $state("");
   let fwData: Uint8Array | undefined = $state();
   let fwName: string = $state("");
-
-  $effect(() => {
-    fwVersionValid = /^\d+\.\d+$/.test(fwVersion);
-  });
 
   const browseFw = async () => {
     const file = await FileUtils.pickAndReadBinaryFile("bin");
