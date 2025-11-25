@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import {
     LabelPresetSchema,
     type LabelPreset,
@@ -253,19 +251,19 @@
     tick().then(() => fillWithCurrentParams());
   });
 
-  run(() => {
+  $effect(() => {
     checkError(labelProps);
   });
-  run(() => {
+  $effect(() => {
     if (shape === "circle" && split !== "none") split = "none";
   });
-  run(() => {
+  $effect(() => {
     if (split === "none") tailLength = 0;
   });
-  run(() => {
+  $effect(() => {
     if (mirror === "flip" && splitParts !== 2) mirror = "copy";
   });
-  run(() => {
+  $effect(() => {
     if (tailLength < 0) tailLength = 0;
   });
 </script>

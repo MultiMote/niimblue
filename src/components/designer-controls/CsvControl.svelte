@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import { tr } from "../../utils/i18n";
   import { csvParse } from "d3-dsv";
   import MdIcon from "../basic/MdIcon.svelte";
@@ -27,7 +25,7 @@
     onUpdate(enabled, csv);
   };
 
-  run(() => {
+  $effect(() => {
     refresh(csv);
   });
 </script>

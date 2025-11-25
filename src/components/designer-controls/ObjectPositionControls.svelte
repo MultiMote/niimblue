@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import MdIcon from "../basic/MdIcon.svelte";
   import { tr } from "../../utils/i18n";
   import * as fabric from "fabric";
@@ -55,7 +53,7 @@
 
   onDestroy(() => selectedObject.off("modified", objectDimensionsChanged));
 
-  run(() => {
+  $effect(() => {
     objectChanged(selectedObject);
   });
 </script>

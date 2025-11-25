@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import type { FirmwareProgressEvent } from "@mmote/niimbluelib";
   import { printerClient } from "../../stores";
   import { Toasts } from "../../utils/toasts";
@@ -12,7 +10,7 @@
   let fwData: Uint8Array | undefined = $state();
   let fwName: string = $state("");
 
-  run(() => {
+  $effect(() => {
     fwVersionValid = /^\d+\.\d+$/.test(fwVersion);
   });
 
@@ -57,7 +55,7 @@
       await $printerClient.disconnect();
 
       Toasts.message("Flashing is finished, the printer will shut down now");
-      
+
       fwData = undefined;
       fwName = "";
       fwVersion = "";

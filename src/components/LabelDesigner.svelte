@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import Dropdown from "bootstrap/js/dist/dropdown";
   import * as fabric from "fabric";
   import { onDestroy, onMount, tick } from "svelte";
@@ -381,7 +379,7 @@
     fabricCanvas.dispose();
   });
 
-  run(() => {
+  $effect(() => {
     fabricCanvas?.setLabelProps(labelProps);
   });
 </script>
