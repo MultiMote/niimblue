@@ -13,10 +13,10 @@
   let { selectedObject }: Props = $props();
   let prevObject: fabric.FabricObject | undefined;
 
-  let x: number = $state();
-  let y: number = $state();
-  let width: number = $state();
-  let height: number = $state();
+  let x: number | undefined = $state();
+  let y: number | undefined = $state();
+  let width: number | undefined  = $state();
+  let height: number | undefined = $state();
 
   const objectDimensionsChanged = () => {
     const pos = selectedObject.getPointByOrigin("left", "top");
@@ -38,13 +38,13 @@
   };
 
   const updateObject = () => {
-    const newPos = new fabric.Point(Math.round(Math.max(x, 1)), Math.round(Math.max(y, 1)));
+    const newPos = new fabric.Point(Math.round(Math.max(x!, 1)), Math.round(Math.max(y!, 1)));
 
     selectedObject.setPositionByOrigin(newPos, "left", "top");
 
     selectedObject.set({
-      width: Math.round(Math.max(width, 1)),
-      height: Math.round(Math.max(height, 1)),
+      width: Math.round(Math.max(width!, 1)),
+      height: Math.round(Math.max(height!, 1)),
     });
 
     selectedObject.setCoords();

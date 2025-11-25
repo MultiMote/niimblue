@@ -35,8 +35,8 @@
 
   let { onClosed, labelProps, canvasCallback, printNow = false, csvData, csvEnabled }: Props = $props();
 
-  let modalElement = $state<HTMLElement>();
-  let previewCanvas = $state<HTMLCanvasElement>();
+  let modalElement: HTMLElement;
+  let previewCanvas: HTMLCanvasElement;
   let printState: "idle" | "sending" | "printing" = $state("idle");
   let modal: Modal;
   let printProgress = $state(0); // todo: more progress data

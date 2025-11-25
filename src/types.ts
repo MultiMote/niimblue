@@ -75,7 +75,7 @@ export const PreviewPropsSchema = z.object({
   threshold: z.number().gte(1).lte(255).optional(),
   quantity: z.number().gte(1).optional(),
   density: z.number().gte(1).optional(),
-  labelType: z.nativeEnum(LabelType).optional(),
+  labelType: z.enum(LabelType).optional(),
   printTaskName: z.enum([firstTask, ...otherTasks]).optional(),
   offset: PreviewPropsOffsetSchema.optional(),
 });

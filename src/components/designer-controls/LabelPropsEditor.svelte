@@ -93,19 +93,21 @@
   const onLabelPresetSelected = (index: number) => {
     const preset = labelPresets[index];
 
-    dpmm = preset.dpmm;
-    prevUnit = preset.unit;
-    unit = preset.unit;
-    printDirection = preset.printDirection;
-    width = preset.width;
-    height = preset.height;
-    title = preset.title ?? "";
-    shape = preset.shape ?? "rect";
-    split = preset.split ?? "none";
-    splitParts = preset.splitParts ?? 2;
-    tailPos = preset.tailPos ?? "right";
-    tailLength = preset.tailLength ?? 0;
-    mirror = preset.mirror ?? "none";
+    if (preset !== undefined) {
+      dpmm = preset.dpmm;
+      prevUnit = preset.unit;
+      unit = preset.unit;
+      printDirection = preset.printDirection;
+      width = preset.width;
+      height = preset.height;
+      title = preset.title ?? "";
+      shape = preset.shape ?? "rect";
+      split = preset.split ?? "none";
+      splitParts = preset.splitParts ?? 2;
+      tailPos = preset.tailPos ?? "right";
+      tailLength = preset.tailLength ?? 0;
+      mirror = preset.mirror ?? "none";
+    }
 
     onApply();
   };

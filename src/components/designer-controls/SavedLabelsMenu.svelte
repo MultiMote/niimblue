@@ -18,7 +18,7 @@
 
   let { onRequestLabelTemplate, onLoadRequested, canvas }: Props = $props();
 
-  let dropdownRef = $state<Element>();
+  let dropdownRef: HTMLDivElement;
   let savedLabels: ExportedLabelTemplate[] = $state([]);
   let selectedIndex: number = $state(-1);
   let title: string = $state("");

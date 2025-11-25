@@ -18,7 +18,7 @@
     const match = fwName.match(/(\d+\.\d+)/);
 
     // For modern firmware images version is stored in header
-    if (fwData[0] === 0x18) {
+    if (fwData[0] === 0x18 && fwData.length >= 0x1C) {
       const verNumber = (fwData[0x15] << 8) + fwData[0x14];
       fwVersion = (verNumber / 100).toFixed(2);
     } else if (match) {

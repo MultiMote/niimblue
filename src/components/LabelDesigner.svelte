@@ -37,8 +37,8 @@
   import VectorParamsControls from "./designer-controls/VectorParamsControls.svelte";
   import { fixFabricObjectScale } from "../utils/canvas_utils";
 
-  let htmlCanvas: HTMLCanvasElement = $state();
-  let fabricCanvas: CustomCanvas = $state();
+  let htmlCanvas: HTMLCanvasElement;
+  let fabricCanvas: CustomCanvas | undefined = $state();
   let labelProps: LabelProps = $state(DEFAULT_LABEL_PROPS);
   let previewOpened: boolean = $state(false);
   let selectedObject: fabric.FabricObject | undefined = $state(undefined);
@@ -52,8 +52,8 @@
   let undoState: UndoState = $state({ undoDisabled: false, redoDisabled: false });
 
   const discardSelection = () => {
-    fabricCanvas.discardActiveObject();
-    fabricCanvas.requestRenderAll();
+    fabricCanvas!.discardActiveObject();
+    fabricCanvas!.requestRenderAll();
     selectedObject = undefined;
     selectedCount = 0;
   };
@@ -61,7 +61,7 @@
   const loadLabelData = async (data: ExportedLabelTemplate) => {
     undo.paused = true;
     onUpdateLabelProps(data.label);
-    await FileUtils.loadCanvasState(fabricCanvas, data.canvas);
+    await FileUtils.loadCanvasState(fabricCanvas!, data.canvas);
     undo.paused = false;
   };
 
@@ -71,17 +71,17 @@
   };
 
   const deleteSelected = () => {
-    LabelDesignerUtils.deleteSelection(fabricCanvas);
+    LabelDesignerUtils.deleteSelection(fabricCanvas!);
     discardSelection();
   };
 
   const cloneSelected = () => {
-    LabelDesignerUtils.cloneSelection(fabricCanvas).then(() => undo.push(fabricCanvas, labelProps));
+    LabelDesignerUtils.cloneSelection(fabricCanvas!).then(() => undo.push(fabricCanvas!, labelProps));
   };
 
   const moveSelected = (direction: MoveDirection, ctrl?: boolean) => {
-    LabelDesignerUtils.moveSelection(fabricCanvas, direction, ctrl);
-    undo.push(fabricCanvas, labelProps);
+    LabelDesignerUtils.moveSelection(fabricCanvas!, direction, ctrl);
+    undo.push(fabricCanvas!, labelProps);
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
@@ -95,7 +95,7 @@
       return;
     }
 
-    if (LabelDesignerUtils.isAnyInputFocused(fabricCanvas)) {
+    if (LabelDesignerUtils.isAnyInputFocused(fabricCanvas!)) {
       return;
     }
 
@@ -143,43 +143,43 @@
 
   const onUpdateLabelProps = (newProps: LabelProps) => {
     labelProps = newProps;
-    fabricCanvas.setDimensions(labelProps.size);
-    fabricCanvas.virtualZoom(fabricCanvas.getVirtualZoom());
+    fabricCanvas!.setDimensions(labelProps.size);
+    fabricCanvas!.virtualZoom(fabricCanvas!.getVirtualZoom());
     try {
       LocalStoragePersistence.saveLastLabelProps(labelProps);
-      undo.push(fabricCanvas, labelProps);
+      undo.push(fabricCanvas!, labelProps);
     } catch (e) {
       Toasts.zodErrors(e, "Label parameters save error:");
     }
   };
 
   const exportCurrentLabel = (): ExportedLabelTemplate => {
-    return FileUtils.makeExportedLabel(fabricCanvas, labelProps);
+    return FileUtils.makeExportedLabel(fabricCanvas!, labelProps);
   };
 
   const onLoadRequested = (label: ExportedLabelTemplate) => {
-    loadLabelData(label).then(() => undo.push(fabricCanvas, labelProps));
+    loadLabelData(label).then(() => undo.push(fabricCanvas!, labelProps));
   };
 
   const zplImageReady = (img: Blob) => {
-    LabelDesignerObjectHelper.addImageBlob(fabricCanvas, img).then(() => undo.push(fabricCanvas, labelProps));
+    LabelDesignerObjectHelper.addImageBlob(fabricCanvas!, img).then(() => undo.push(fabricCanvas!, labelProps));
   };
 
   const onObjectPicked = (objectType: OjectType) => {
-    const obj = LabelDesignerObjectHelper.addObject(fabricCanvas, objectType);
+    const obj = LabelDesignerObjectHelper.addObject(fabricCanvas!, objectType);
     if (obj !== undefined) {
-      fabricCanvas.setActiveObject(obj);
-      undo.push(fabricCanvas, labelProps);
+      fabricCanvas!.setActiveObject(obj);
+      undo.push(fabricCanvas!, labelProps);
     }
   };
 
   const onIconPicked = (i: MaterialIcon) => {
     // todo: icon is not vertically centered
-    LabelDesignerObjectHelper.addStaticText(fabricCanvas, String.fromCodePoint(iconCodepoints[i]), {
+    LabelDesignerObjectHelper.addStaticText(fabricCanvas!, String.fromCodePoint(iconCodepoints[i]), {
       fontFamily: "Material Icons",
       fontSize: 100,
     });
-    undo.push(fabricCanvas, labelProps);
+    undo.push(fabricCanvas!, labelProps);
   };
 
   const onPreviewClosed = () => {
@@ -201,14 +201,14 @@
     if (selectedObject) {
       selectedObject.setCoords();
       selectedObject.dirty = true;
-      undo.push(fabricCanvas, labelProps);
+      undo.push(fabricCanvas!, labelProps);
     }
-    fabricCanvas.requestRenderAll();
+    fabricCanvas!.requestRenderAll();
     selectedObject = selectedObject;
   };
 
   const getCanvasForPreview = (): FabricJson => {
-    return fabricCanvas.toJSON();
+    return fabricCanvas!.toJSON();
   };
 
   const onCsvUpdate = (enabled: boolean, csv: string) => {
@@ -218,17 +218,17 @@
   };
 
   const onCsvPlaceholderPicked = (name: string) => {
-    const obj = LabelDesignerObjectHelper.addText(fabricCanvas, `{${name}}`, {
+    const obj = LabelDesignerObjectHelper.addText(fabricCanvas!, `{${name}}`, {
       textAlign: "left",
       originX: "left",
       originY: "top",
     });
-    fabricCanvas.setActiveObject(obj);
-    undo.push(fabricCanvas, labelProps);
+    fabricCanvas!.setActiveObject(obj);
+    undo.push(fabricCanvas!, labelProps);
   };
 
   const onPaste = async (event: ClipboardEvent) => {
-    if (LabelDesignerUtils.isAnyInputFocused(fabricCanvas)) {
+    if (LabelDesignerUtils.isAnyInputFocused(fabricCanvas!)) {
       return;
     }
 
@@ -239,11 +239,11 @@
 
     if (event.clipboardData != null) {
       event.preventDefault();
-      const obj = await LabelDesignerObjectHelper.addObjectFromClipboard(fabricCanvas, event.clipboardData);
+      const obj = await LabelDesignerObjectHelper.addObjectFromClipboard(fabricCanvas!, event.clipboardData);
 
       if (obj !== undefined) {
-        fabricCanvas.setActiveObject(obj);
-        undo.push(fabricCanvas, labelProps);
+        fabricCanvas!.setActiveObject(obj);
+        undo.push(fabricCanvas!, labelProps);
       }
     }
   };
@@ -252,8 +252,8 @@
     if (!confirm($tr("editor.clear.confirm"))) {
       return;
     }
-    undo.push(fabricCanvas, labelProps);
-    fabricCanvas.clear();
+    undo.push(fabricCanvas!, labelProps);
+    fabricCanvas!.clear();
   };
 
   onMount(() => {
@@ -303,11 +303,11 @@
     });
 
     fabricCanvas.on("object:modified", (): void => {
-      undo.push(fabricCanvas, labelProps);
+      undo.push(fabricCanvas!, labelProps);
     });
 
     fabricCanvas.on("object:removed", (): void => {
-      undo.push(fabricCanvas, labelProps);
+      undo.push(fabricCanvas!, labelProps);
     });
 
     fabricCanvas.on("selection:created", (e): void => {
@@ -338,7 +338,7 @@
       if (dragEvt.dataTransfer?.files) {
         for (const file of dragEvt.dataTransfer.files) {
           try {
-            await LabelDesignerObjectHelper.addImageFile(fabricCanvas, file);
+            await LabelDesignerObjectHelper.addImageFile(fabricCanvas!, file);
             dropped = true;
           } catch (e) {
             Toasts.error(e);
@@ -346,7 +346,7 @@
         }
 
         if (dropped) {
-          undo.push(fabricCanvas, labelProps);
+          undo.push(fabricCanvas!, labelProps);
         }
       }
     });
@@ -376,7 +376,7 @@
   });
 
   onDestroy(() => {
-    fabricCanvas.dispose();
+    fabricCanvas!.dispose();
   });
 
   $effect(() => {
@@ -404,7 +404,7 @@
           <MdIcon icon="cancel_presentation" />
         </button>
 
-        <SavedLabelsMenu canvas={fabricCanvas} onRequestLabelTemplate={exportCurrentLabel} {onLoadRequested} />
+        <SavedLabelsMenu canvas={fabricCanvas!} onRequestLabelTemplate={exportCurrentLabel} {onLoadRequested} />
 
         <button
           class="btn btn-sm btn-secondary"

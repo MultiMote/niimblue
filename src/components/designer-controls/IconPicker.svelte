@@ -12,7 +12,7 @@
 
   let iconNames: MaterialIcon[] = $state([]);
   let search: string = $state("");
-  let dropdown = $state<Element>();
+  let dropdown: HTMLDivElement;
 
   const onShow = () => {
     if (iconNames.length === 0) {

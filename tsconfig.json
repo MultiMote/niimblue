@@ -4,16 +4,17 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "target": "es2022",
-    "allowJs": true,
+    "module": "es2022",
+    "moduleResolution": "bundler",
+    "allowJs": false,
     "resolveJsonModule": true,
     "moduleDetection": "force",
     "isolatedModules": true,
     "strict": true,
     "strictNullChecks": true,
-    "noUncheckedIndexedAccess": true,
+    "noUncheckedIndexedAccess": false,
     "forceConsistentCasingInFileNames": true,
     "useUnknownInCatchVariables": true,
-    "module": "NodeNext",
     "lib": ["dom", "dom.iterable", "es2022", "webworker"],
     "baseUrl": "./",
     "paths": {
@@ -28,9 +29,6 @@
     "vite.config.ts",
     "src/**/*.js",
     "src/**/*.ts",
-    "src/**/*.svelte",
-    "tests/**/*.js",
-    "tests/**/*.ts",
-    "tests/**/*.svelte"
+    "src/**/*.svelte"
   ]
 }
