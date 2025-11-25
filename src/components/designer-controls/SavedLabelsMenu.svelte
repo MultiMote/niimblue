@@ -19,11 +19,11 @@
   let { onRequestLabelTemplate, onLoadRequested, canvas }: Props = $props();
 
   let dropdownRef: HTMLDivElement;
-  let savedLabels: ExportedLabelTemplate[] = $state([]);
-  let selectedIndex: number = $state(-1);
-  let title: string = $state("");
-  let usedSpace: number = $state(0);
-  let customDefaultTemplate: boolean = $state(LocalStoragePersistence.hasCustomDefaultTemplate());
+  let savedLabels = $state<ExportedLabelTemplate[]>([]);
+  let selectedIndex = $state<number>(-1);
+  let title = $state<string>("");
+  let usedSpace = $state<number>(0);
+  let customDefaultTemplate = $state<boolean>(LocalStoragePersistence.hasCustomDefaultTemplate());
 
   const calcUsedSpace = () => {
     usedSpace = LocalStoragePersistence.usedSpace();

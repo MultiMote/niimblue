@@ -13,10 +13,10 @@
   let { selectedObject }: Props = $props();
   let prevObject: fabric.FabricObject | undefined;
 
-  let x: number | undefined = $state();
-  let y: number | undefined = $state();
-  let width: number | undefined  = $state();
-  let height: number | undefined = $state();
+  let x = $state<number>();
+  let y = $state<number>();
+  let width = $state<number>();
+  let height = $state<number>();
 
   const objectDimensionsChanged = () => {
     const pos = selectedObject.getPointByOrigin("left", "top");

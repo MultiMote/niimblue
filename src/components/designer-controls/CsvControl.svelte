@@ -12,8 +12,8 @@
 
   let { enabled = $bindable(), csv = $bindable(), onUpdate, onPlaceholderPicked }: Props = $props();
 
-  let placeholders: string[] = $state([]);
-  let rows: number = $state(0);
+  let placeholders = $state<string[]>([]);
+  let rows = $state<number>(0);
 
   const refresh = (val: string) => {
     const result = csvParse(val);

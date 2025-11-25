@@ -14,7 +14,7 @@
 
   let { onItemClicked, onItemDelete, onItemExport, labels, selectedIndex = -1, class: className }: Props = $props();
 
-  let deleteIndex: number = $state(-1);
+  let deleteIndex = $state<number>(-1);
 
   const scaleDimensions = (preset: LabelProps): { width: number; height: number } => {
     const scaleFactor = Math.min(100 / preset.size.width, 100 / preset.size.height);

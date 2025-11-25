@@ -35,22 +35,22 @@
   const labelSplits: LabelSplit[] = ["none", "vertical", "horizontal"];
   const mirrorTypes: MirrorType[] = ["none", "flip", "copy"];
 
-  let labelPresets: LabelPreset[] = $state(DEFAULT_LABEL_PRESETS);
+  let labelPresets = $state<LabelPreset[]>(DEFAULT_LABEL_PRESETS);
 
-  let title: string | undefined = $state("");
+  let title = $state<string | undefined>("");
   let prevUnit: LabelUnit = "mm";
-  let unit: LabelUnit = $state("mm");
-  let dpmm = $state(8);
-  let width = $state(0);
-  let height = $state(0);
-  let printDirection: PrintDirection = $state("left");
-  let shape: LabelShape = $state("rect");
-  let split: LabelSplit = $state("none");
-  let splitParts: number = $state(2);
-  let tailLength: number = $state(0);
-  let tailPos: TailPosition = $state("right");
-  let mirror: MirrorType = $state("none");
-  let error: string = $state("");
+  let unit = $state<LabelUnit>("mm");
+  let dpmm = $state<number>(8);
+  let width = $state<number>(0);
+  let height = $state<number>(0);
+  let printDirection = $state<PrintDirection>("left");
+  let shape = $state<LabelShape>("rect");
+  let split = $state<LabelSplit>("none");
+  let splitParts = $state<number>(2);
+  let tailLength = $state<number>(0);
+  let tailPos = $state<TailPosition>("right");
+  let mirror = $state<MirrorType>("none");
+  let error = $state<string>("");
 
   const onApply = () => {
     let newWidth = width;

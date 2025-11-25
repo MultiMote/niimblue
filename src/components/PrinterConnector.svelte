@@ -21,8 +21,8 @@
   import type { MaterialIcon } from "material-icons";
   import FirmwareUpdater from "$/components/basic/FirmwareUpdater.svelte";
 
-  let connectionType: ConnectionType = $state("bluetooth");
-  let featureSupport: AvailableTransports = $state({ webBluetooth: false, webSerial: false, capacitorBle: false });
+  let connectionType = $state<ConnectionType>("bluetooth");
+  let featureSupport = $state<AvailableTransports>({ webBluetooth: false, webSerial: false, capacitorBle: false });
 
   const onConnectClicked = async () => {
     initClient(connectionType);

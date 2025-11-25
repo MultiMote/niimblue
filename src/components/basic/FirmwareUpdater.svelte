@@ -4,11 +4,11 @@
   import { Toasts } from "$/utils/toasts";
   import { FileUtils } from "$/utils/file_utils";
 
-  let fwVersion: string = $state("");
+  let fwVersion = $state<string>("");
   let fwVersionValid: boolean = $derived(/^\d+\.\d+$/.test(fwVersion));
-  let fwProgress: string = $state("");
-  let fwData: Uint8Array | undefined = $state();
-  let fwName: string = $state("");
+  let fwProgress = $state<string>("");
+  let fwData = $state<Uint8Array>();
+  let fwName = $state<string>("");
 
   const browseFw = async () => {
     const file = await FileUtils.pickAndReadBinaryFile("bin");

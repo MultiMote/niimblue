@@ -10,8 +10,8 @@
 
   let { onSubmit }: Props = $props();
 
-  let iconNames: MaterialIcon[] = $state([]);
-  let search: string = $state("");
+  let iconNames = $state<MaterialIcon[]>([]);
+  let search = $state<string>("");
   let dropdown: HTMLDivElement;
 
   const onShow = () => {

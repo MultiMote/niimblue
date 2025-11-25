@@ -10,7 +10,7 @@
   }
 
   let { text, labelProps, onImageReady }: Props = $props();
-  let importState: "idle" | "processing" | "error" = $state("idle");
+  let importState = $state<"idle" | "processing" | "error">("idle");
 
   const onImportClicked = async () => {
     const mmToInchCoeff = 25.4;
