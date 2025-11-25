@@ -5,9 +5,8 @@
 	"version": "0.0.1",
 	"scripts": {
 		"dev-check": "npm run sv-check && npm run dev",
-		"dev-check-open": "npm run sv-check && npm run dev-open",
 		"dev": "vite",
-		"dev-open": "vite --open",
+		"dev-local-lib": "vite --force",
 		"build": "vite build",
 		"build-rel": "vite build --base=./",
 		"preview": "vite preview",
