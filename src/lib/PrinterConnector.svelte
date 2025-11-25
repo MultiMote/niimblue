@@ -16,6 +16,7 @@
     heartbeatFails,
     automation,
     rfidInfo,
+    rfidInfo2,
   } from "../stores";
   import type { ConnectionType } from "../types";
   import { tr } from "../utils/i18n";
@@ -50,6 +51,11 @@
   };
   const getRfidInfo = async () => {
     $rfidInfo = await $printerClient.abstraction.rfidInfo();
+    try {
+      $rfidInfo2 = await $printerClient.abstraction.rfidInfo2();
+    } catch (e) {
+      console.warn("rfidInfo2 not supported", e);
+    }
   };
 
   const startHeartbeat = async () => {
@@ -165,6 +171,26 @@
 
           <ul>
             {#each Object.entries($rfidInfo) as [k, v]}
+              <li>{k}: <strong>{v ?? "-"}</strong></li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
+
+      {#if $rfidInfo2}
+        <button
+          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#rfidInfo">
+          Ribbon Rfid info <MdIcon icon="expand_more" />
+        </button>
+
+        <div class="collapse" id="rfidInfo">
+          <button class="btn btn-outline-secondary btn-sm mt-1" on:click={getRfidInfo}>Update</button>
+
+          <ul>
+            {#each Object.entries($rfidInfo2) as [k, v]}
               <li>{k}: <strong>{v ?? "-"}</strong></li>
             {/each}
           </ul>
