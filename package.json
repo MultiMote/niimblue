@@ -12,7 +12,8 @@
 		"preview": "vite preview",
 		"sv-check": "svelte-check --tsconfig ./tsconfig.json",
 		"gen-mdi-list": "node gen-mdi-list.mjs > src/styles/mdi_icons.ts",
-		"lint": "eslint ."
+		"lint": "eslint .",
+		"format-all": "prettier --write \"src/**/*.{ts,svelte}\" \"!src/styles/mdi_icons.ts\""
 	},
 	"dependencies": {
 		"@capacitor/core": "^7.2.0",
@@ -55,9 +56,6 @@
 	"overrides": {
 		"fabric": {
 			"canvas": "npm:uninstall"
-		},
-		"vite": {
-			"esbuild": "0.25.0"
 		}
 	}
 }
