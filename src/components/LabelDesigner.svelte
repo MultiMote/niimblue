@@ -38,6 +38,7 @@
   import { fixFabricObjectScale } from "$/utils/canvas_utils";
 
   let htmlCanvas: HTMLCanvasElement;
+  
   let fabricCanvas = $state<CustomCanvas>();
   let labelProps = $state<LabelProps>(DEFAULT_LABEL_PROPS);
   let previewOpened = $state<boolean>(false);
@@ -47,9 +48,9 @@
   let csvData = $state<string>("");
   let csvEnabled = $state<boolean>(false);
   let windowWidth = $state<number>(0);
-
-  const undo = $state<UndoRedo>(new UndoRedo());
   let undoState = $state<UndoState>({ undoDisabled: false, redoDisabled: false });
+
+  const undo = new UndoRedo();
 
   const discardSelection = () => {
     fabricCanvas!.discardActiveObject();
