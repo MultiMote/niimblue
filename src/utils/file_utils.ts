@@ -100,7 +100,7 @@ export class FileUtils {
 
   /** Convert label template to JSON and download it */
   static saveLabelAsJson(label: ExportedLabelTemplate) {
-    const parsed = ExportedLabelTemplateSchema.parse(label);
+    const parsed = ExportedLabelTemplateSchema.omit({ id: true }).parse(label);
     const timestamp = label.timestamp ?? this.timestamp();
     let filename = `label_${timestamp}.json`;
 

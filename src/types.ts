@@ -64,6 +64,7 @@ export const ExportedLabelTemplateSchema = z.object({
   thumbnailBase64: z.string().optional(),
   title: z.string().optional(),
   timestamp: z.number().positive().optional(),
+  id: z.string().optional(), // filled with localStorage key, not exported
 });
 
 const [firstTask, ...otherTasks] = printTaskNames;
