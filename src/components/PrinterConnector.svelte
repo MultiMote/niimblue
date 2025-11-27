@@ -120,8 +120,8 @@
         <div>
           Printer info:
           <ul>
-            {#each Object.entries($printerInfo) as [k, v] (k)}
-              <li>{k}: <strong>{v ?? "-"}</strong></li>
+            {#each Object.entries($printerInfo) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
@@ -138,8 +138,8 @@
 
         <div class="collapse" id="modelMeta">
           <ul>
-            {#each Object.entries($printerMeta) as [k, v] (k)}
-              <li>{k}: <strong>{v ?? "-"}</strong></li>
+            {#each Object.entries($printerMeta) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
@@ -158,8 +158,8 @@
           <button class="btn btn-outline-secondary btn-sm mt-1" onclick={getRfidInfo}>Update</button>
 
           <ul>
-            {#each Object.entries($rfidInfo) as [k, v] (v)}
-              <li>{k}: <strong>{v ?? "-"}</strong></li>
+            {#each Object.entries($rfidInfo) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
@@ -176,8 +176,8 @@
 
         <div class="collapse" id="heartbeatData">
           <ul>
-            {#each Object.entries($heartbeatData) as [k, v] (v)}
-              <li>{k}: <strong>{v ?? "-"}</strong></li>
+            {#each Object.entries($heartbeatData) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
