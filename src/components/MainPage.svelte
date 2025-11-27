@@ -1,9 +1,9 @@
 <script lang="ts">
   import { Utils } from "@mmote/niimbluelib";
-  import BrowserWarning from "$components/basic/BrowserWarning.svelte";
-  import LabelDesigner from "$components/LabelDesigner.svelte";
-  import PrinterConnector from "$components/PrinterConnector.svelte";
-  import { locale, locales, tr } from "$utils/i18n";
+  import BrowserWarning from "$/components/basic/BrowserWarning.svelte";
+  import LabelDesigner from "$/components/LabelDesigner.svelte";
+  import PrinterConnector from "$/components/PrinterConnector.svelte";
+  import { locale, locales, tr } from "$/utils/i18n";
 
   // eslint-disable-next-line no-undef
   const appCommit = __APP_COMMIT__;

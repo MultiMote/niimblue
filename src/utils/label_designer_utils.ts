@@ -1,6 +1,6 @@
 import * as fabric from "fabric";
-import { GRID_SIZE, OBJECT_DEFAULTS } from "../defaults";
-import type { MoveDirection } from "../types";
+import { GRID_SIZE, OBJECT_DEFAULTS } from "$/defaults";
+import type { MoveDirection } from "$/types";
 
 export class LabelDesignerUtils {
   static async cloneSelection(canvas: fabric.Canvas): Promise<void> {

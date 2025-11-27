@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { tr } from "$utils/i18n";
-  import { iconCodepoints, type MaterialIcon } from "$styles/mdi_icons";
-  import MdIcon from "$components/basic/MdIcon.svelte";
+  import { tr } from "$/utils/i18n";
+  import { iconCodepoints, type MaterialIcon } from "$/styles/mdi_icons";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
 
   interface Props {
     onSubmit: (i: MaterialIcon) => void;
@@ -10,9 +10,9 @@
 
   let { onSubmit }: Props = $props();
 
-  let iconNames: MaterialIcon[] = $state([]);
-  let search: string = $state("");
-  let dropdown = $state<Element>();
+  let iconNames = $state<MaterialIcon[]>([]);
+  let search = $state<string>("");
+  let dropdown: HTMLDivElement;
 
   const onShow = () => {
     if (iconNames.length === 0) {

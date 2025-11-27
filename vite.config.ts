@@ -1,9 +1,6 @@
 import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+import { resolve } from "node:path";
 
 const getDate = (): string => {
   const date = new Date();
@@ -25,11 +22,7 @@ export default defineConfig({
   resolve: {
     preserveSymlinks: true, // Fix build error when using `npm link @mmote/niimbluelib`
     alias: {
-      $: resolve(__dirname, "./src"),
-      $utils: resolve(__dirname, "./src/utils"),
-      $routes: resolve(__dirname, "./src/routes"),
-      $styles: resolve(__dirname, "src/styles"),
-      $components: resolve(__dirname, "src/components"),
+      $: resolve(__dirname, "./src")
     },
   },
   build: {

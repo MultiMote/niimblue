@@ -1,7 +1,7 @@
 import * as fabric from "fabric";
-import { code128b, ean13 } from "../utils/barcode";
-import { equalSpacingFillText } from "../utils/canvas_utils";
-import { OBJECT_DEFAULTS_TEXT } from "../defaults";
+import { code128b, ean13 } from "$/utils/barcode";
+import { equalSpacingFillText } from "$/utils/canvas_utils";
+import { OBJECT_DEFAULTS_TEXT } from "$/defaults";
 
 const EAN13_LONG_BAR_INDEXES: number[] = [
   0, 1, 2, 45, 46, 47, 48, 49, 92, 93, 94,

@@ -1,9 +1,10 @@
 <script lang="ts">
   import * as fabric from "fabric";
-  import { tr } from "../../utils/i18n";
-  import MdIcon from "../basic/MdIcon.svelte";
-  import { appConfig } from "../../stores";
-  import ObjectPositionControls from "./ObjectPositionControls.svelte";
+  import { tr } from "$/utils/i18n";
+  import { appConfig } from "$/stores";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import ObjectPositionControls from "$/components/designer-controls/ObjectPositionControls.svelte";
+
 
   interface Props {
     selectedObject: fabric.FabricObject;

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { ExportedLabelTemplate, LabelProps } from "../../types";
-  import { tr } from "../../utils/i18n";
-  import MdIcon from "../basic/MdIcon.svelte";
+  import type { ExportedLabelTemplate, LabelProps } from "$/types";
+  import { tr } from "$/utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
 
   interface Props {
     onItemClicked: (index: number) => void;
@@ -14,7 +14,7 @@
 
   let { onItemClicked, onItemDelete, onItemExport, labels, selectedIndex = -1, class: className }: Props = $props();
 
-  let deleteIndex: number = $state(-1);
+  let deleteIndex = $state<number>(-1);
 
   const scaleDimensions = (preset: LabelProps): { width: number; height: number } => {
     const scaleFactor = Math.min(100 / preset.size.width, 100 / preset.size.height);
@@ -47,7 +47,7 @@
 </script>
 
 <div class="labels-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {className}">
-  {#each labels as item, idx (item.title)}
+  {#each labels as item, idx (item.id ?? item.timestamp)}
     <div
       tabindex="0"
       class="btn p-0 card-wrapper d-flex justify-content-center align-items-center {selectedIndex === idx

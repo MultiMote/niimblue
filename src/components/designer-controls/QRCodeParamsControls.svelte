@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { QRCode } from "../../fabric-object/qrcode";
-  import { tr } from "../../utils/i18n";
-  import MdIcon from "../basic/MdIcon.svelte";
+  import { QRCode } from "$/fabric-object/qrcode";
+  import { tr } from "$/utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
   import * as fabric from "fabric";
 
   interface Props {
@@ -64,8 +64,7 @@
         valueUpdated();
       }}>
       <option value={0}>Auto</option>
-      <!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -->
-      {#each { length: 40 } as _, i (i)}
+      {#each { length: 40 }, i (i)}
         <option value={i + 1}>{i + 1}</option>
       {/each}
     </select>

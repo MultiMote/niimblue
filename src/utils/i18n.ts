@@ -1,6 +1,6 @@
 import { derived, writable } from "svelte/store";
-import type { TranslationKey, SupportedLanguage } from "../locale";
-import { languageNames, langPack } from "../locale";
+import type { TranslationKey, SupportedLanguage } from "$/locale";
+import { languageNames, langPack } from "$/locale";
 import { match as langMatch } from "@formatjs/intl-localematcher";
 
 /** Check browser language and return supported language code.
@@ -37,4 +37,4 @@ export const tr = derived(locale, ($locale) => (key: TranslationKey) => {
 });
 
 export const locales = languageNames;
-export type { TranslationKey, SupportedLanguage } from "../locale";
+export type { TranslationKey, SupportedLanguage } from "$/locale";

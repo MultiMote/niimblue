@@ -6,12 +6,12 @@ import {
   type FabricJson,
   type LabelPreset,
   type LabelProps,
-} from "../types";
-import { OBJECT_DEFAULTS, THUMBNAIL_HEIGHT, THUMBNAIL_QUALITY } from "../defaults";
+} from "$/types";
+import { OBJECT_DEFAULTS, THUMBNAIL_HEIGHT, THUMBNAIL_QUALITY } from "$/defaults";
 import { z } from "zod";
-import { CustomCanvas } from "../fabric-object/custom_canvas";
+import { CustomCanvas } from "$/fabric-object/custom_canvas";
 import { Capacitor } from "@capacitor/core";
-import { fixFabricObjectScale } from "./canvas_utils";
+import { fixFabricObjectScale } from "$/utils/canvas_utils";
 
 export class FileUtils {
   static timestamp(): number {
@@ -100,14 +100,14 @@ export class FileUtils {
 
   /** Convert label template to JSON and download it */
   static saveLabelAsJson(label: ExportedLabelTemplate) {
-    const parsed = ExportedLabelTemplateSchema.parse(label);
+    const parsed = ExportedLabelTemplateSchema.omit({ id: true }).parse(label);
     const timestamp = label.timestamp ?? this.timestamp();
     let filename = `label_${timestamp}.json`;
 
     if (parsed.title && parsed.title.trim().length > 0) {
       filename = `${parsed.title}.json`;
     }
-    
+
     this.downloadBase64(filename, "application/json", this.base64obj(parsed));
   }
 

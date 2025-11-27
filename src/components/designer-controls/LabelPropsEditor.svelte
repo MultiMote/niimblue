@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import {
     LabelPresetSchema,
     type LabelPreset,
@@ -10,19 +8,19 @@
     type LabelUnit,
     type MirrorType,
     type TailPosition,
-  } from "../../types";
-  import LabelPresetsBrowser from "./LabelPresetsBrowser.svelte";
-  import { printerMeta } from "../../stores";
-  import { tr } from "../../utils/i18n";
-  import { DEFAULT_LABEL_PRESETS } from "../../defaults";
+  } from "$/types";
+  import LabelPresetsBrowser from "$/components/designer-controls/LabelPresetsBrowser.svelte";
+  import { printerMeta } from "$/stores";
+  import { tr } from "$/utils/i18n";
+  import { DEFAULT_LABEL_PRESETS } from "$/defaults";
   import { onMount, tick } from "svelte";
-  import { LocalStoragePersistence } from "../../utils/persistence";
+  import { LocalStoragePersistence } from "$/utils/persistence";
   import type { PrintDirection } from "@mmote/niimbluelib";
-  import MdIcon from "../basic/MdIcon.svelte";
-  import { Toasts } from "../../utils/toasts";
-  import { FileUtils } from "../../utils/file_utils";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { Toasts } from "$/utils/toasts";
+  import { FileUtils } from "$/utils/file_utils";
   import { z } from "zod";
-  import DpiSelector from "./DpiSelector.svelte";
+  import DpiSelector from "$/components/designer-controls/DpiSelector.svelte";
 
   interface Props {
     labelProps: LabelProps;
@@ -37,22 +35,22 @@
   const labelSplits: LabelSplit[] = ["none", "vertical", "horizontal"];
   const mirrorTypes: MirrorType[] = ["none", "flip", "copy"];
 
-  let labelPresets: LabelPreset[] = $state(DEFAULT_LABEL_PRESETS);
+  let labelPresets = $state<LabelPreset[]>(DEFAULT_LABEL_PRESETS);
 
-  let title: string | undefined = $state("");
+  let title = $state<string | undefined>("");
   let prevUnit: LabelUnit = "mm";
-  let unit: LabelUnit = $state("mm");
-  let dpmm = $state(8);
-  let width = $state(0);
-  let height = $state(0);
-  let printDirection: PrintDirection = $state("left");
-  let shape: LabelShape = $state("rect");
-  let split: LabelSplit = $state("none");
-  let splitParts: number = $state(2);
-  let tailLength: number = $state(0);
-  let tailPos: TailPosition = $state("right");
-  let mirror: MirrorType = $state("none");
-  let error: string = $state("");
+  let unit = $state<LabelUnit>("mm");
+  let dpmm = $state<number>(8);
+  let width = $state<number>(0);
+  let height = $state<number>(0);
+  let printDirection = $state<PrintDirection>("left");
+  let shape = $state<LabelShape>("rect");
+  let split = $state<LabelSplit>("none");
+  let splitParts = $state<number>(2);
+  let tailLength = $state<number>(0);
+  let tailPos = $state<TailPosition>("right");
+  let mirror = $state<MirrorType>("none");
+  let error = $state<string>("");
 
   const onApply = () => {
     let newWidth = width;
@@ -95,19 +93,21 @@
   const onLabelPresetSelected = (index: number) => {
     const preset = labelPresets[index];
 
-    dpmm = preset.dpmm;
-    prevUnit = preset.unit;
-    unit = preset.unit;
-    printDirection = preset.printDirection;
-    width = preset.width;
-    height = preset.height;
-    title = preset.title ?? "";
-    shape = preset.shape ?? "rect";
-    split = preset.split ?? "none";
-    splitParts = preset.splitParts ?? 2;
-    tailPos = preset.tailPos ?? "right";
-    tailLength = preset.tailLength ?? 0;
-    mirror = preset.mirror ?? "none";
+    if (preset !== undefined) {
+      dpmm = preset.dpmm;
+      prevUnit = preset.unit;
+      unit = preset.unit;
+      printDirection = preset.printDirection;
+      width = preset.width;
+      height = preset.height;
+      title = preset.title ?? "";
+      shape = preset.shape ?? "rect";
+      split = preset.split ?? "none";
+      splitParts = preset.splitParts ?? 2;
+      tailPos = preset.tailPos ?? "right";
+      tailLength = preset.tailLength ?? 0;
+      mirror = preset.mirror ?? "none";
+    }
 
     onApply();
   };
@@ -253,19 +253,19 @@
     tick().then(() => fillWithCurrentParams());
   });
 
-  run(() => {
+  $effect(() => {
     checkError(labelProps);
   });
-  run(() => {
+  $effect(() => {
     if (shape === "circle" && split !== "none") split = "none";
   });
-  run(() => {
+  $effect(() => {
     if (split === "none") tailLength = 0;
   });
-  run(() => {
+  $effect(() => {
     if (mirror === "flip" && splitParts !== 2) mirror = "copy";
   });
-  run(() => {
+  $effect(() => {
     if (tailLength < 0) tailLength = 0;
   });
 </script>

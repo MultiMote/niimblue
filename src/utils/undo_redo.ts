@@ -1,5 +1,5 @@
 import * as fabric from "fabric";
-import type { ExportedLabelTemplate, LabelProps } from "../types";
+import type { ExportedLabelTemplate, LabelProps } from "$/types";
 
 export type UndoState = { undoDisabled: boolean; redoDisabled: boolean };
 

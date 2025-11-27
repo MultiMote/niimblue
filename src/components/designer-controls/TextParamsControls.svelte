@@ -1,8 +1,8 @@
 <script lang="ts">
   import * as fabric from "fabric";
-  import { tr } from "../../utils/i18n";
-  import MdIcon from "../basic/MdIcon.svelte";
-  import FontFamilyPicker from "./FontFamilyPicker.svelte";
+  import { tr } from "$/utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import FontFamilyPicker from "$/components/designer-controls/FontFamilyPicker.svelte";
 
   interface Props {
     selectedObject: fabric.FabricObject;
@@ -101,7 +101,7 @@
     }
   };
 
-  
+
 </script>
 
 {#if selectedText}

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { LabelPreset } from "../../types";
-  import { tr } from "../../utils/i18n";
-  import MdIcon from "../basic/MdIcon.svelte";
+  import type { LabelPreset } from "$/types";
+  import { tr } from "$/utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
 
   interface Props {
     onItemSelected: (index: number) => void;
@@ -11,7 +11,7 @@
   }
 
   let { class: className = "", onItemDelete, onItemSelected, presets }: Props = $props();
-  let deleteIndex: number = $state(-1);
+  let deleteIndex = $state<number>(-1);
 
   const scaleDimensions = (preset: LabelPreset): { width: number; height: number } => {
     const scaleFactor = Math.min(100 / preset.width, 100 / preset.height);
@@ -39,6 +39,7 @@
 </script>
 
 <div class="preset-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {className}">
+  <!-- fixme: key -->
   {#each presets as item, idx (item)}
     <div
       role="button"

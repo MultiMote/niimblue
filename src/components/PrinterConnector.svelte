@@ -11,18 +11,18 @@
     heartbeatFails,
     automation,
     rfidInfo,
-  } from "../stores";
-  import type { ConnectionType } from "../types";
-  import { tr } from "../utils/i18n";
-  import MdIcon from "./basic/MdIcon.svelte";
-  import { Toasts } from "../utils/toasts";
+  } from "$/stores";
+  import type { ConnectionType } from "$/types";
+  import { tr } from "$/utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { Toasts } from "$/utils/toasts";
   import { onMount } from "svelte";
-  import { LocalStoragePersistence } from "../utils/persistence";
+  import { LocalStoragePersistence } from "$/utils/persistence";
   import type { MaterialIcon } from "material-icons";
-  import FirmwareUpdater from "./basic/FirmwareUpdater.svelte";
+  import FirmwareUpdater from "$/components/basic/FirmwareUpdater.svelte";
 
-  let connectionType: ConnectionType = $state("bluetooth");
-  let featureSupport: AvailableTransports = $state({ webBluetooth: false, webSerial: false, capacitorBle: false });
+  let connectionType = $state<ConnectionType>("bluetooth");
+  let featureSupport = $state<AvailableTransports>({ webBluetooth: false, webSerial: false, capacitorBle: false });
 
   const onConnectClicked = async () => {
     initClient(connectionType);
@@ -120,8 +120,8 @@
         <div>
           Printer info:
           <ul>
-            {#each Object.entries($printerInfo) as [k, v] (k)}
-              <li>{k}: <strong>{v ?? "-"}</strong></li>
+            {#each Object.entries($printerInfo) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
@@ -138,8 +138,8 @@
 
         <div class="collapse" id="modelMeta">
           <ul>
-            {#each Object.entries($printerMeta) as [k, v] (k)}
-              <li>{k}: <strong>{v ?? "-"}</strong></li>
+            {#each Object.entries($printerMeta) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
@@ -158,8 +158,8 @@
           <button class="btn btn-outline-secondary btn-sm mt-1" onclick={getRfidInfo}>Update</button>
 
           <ul>
-            {#each Object.entries($rfidInfo) as [k, v] (v)}
-              <li>{k}: <strong>{v ?? "-"}</strong></li>
+            {#each Object.entries($rfidInfo) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
@@ -176,8 +176,8 @@
 
         <div class="collapse" id="heartbeatData">
           <ul>
-            {#each Object.entries($heartbeatData) as [k, v] (v)}
-              <li>{k}: <strong>{v ?? "-"}</strong></li>
+            {#each Object.entries($heartbeatData) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>

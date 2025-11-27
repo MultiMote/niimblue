@@ -11,9 +11,9 @@ import {
   type LabelPreset,
   type LabelProps,
   type PreviewProps,
-} from "../types";
+} from "$/types";
 import { z } from "zod";
-import { FileUtils } from "./file_utils";
+import { FileUtils } from "$/utils/file_utils";
 import { get, writable, type Updater, type Writable } from "svelte/store";
 
 /** Writable store, value is persisted to localStorage */
@@ -154,7 +154,7 @@ export class LocalStoragePersistence {
 
     labels.forEach((label) => {
       try {
-        if (label.timestamp == undefined) {
+        if (label.timestamp === undefined) {
           label.timestamp = FileUtils.timestamp();
         }
 
@@ -168,7 +168,7 @@ export class LocalStoragePersistence {
         this.validateAndSaveObject(
           `${basename}_${counter}`,
           label,
-          ExportedLabelTemplateSchema,
+          ExportedLabelTemplateSchema.omit({ id: true }),
         );
       } catch (e) {
         if (e instanceof z.ZodError) {
@@ -221,6 +221,7 @@ export class LocalStoragePersistence {
               ExportedLabelTemplateSchema,
             );
             if (item != null) {
+              item.id = key;
               items.push(item);
             }
           } catch (e) {
@@ -308,7 +309,7 @@ export class LocalStoragePersistence {
     this.validateAndSaveObject(
       "default_template",
       value,
-      ExportedLabelTemplateSchema,
+      ExportedLabelTemplateSchema.omit({ id: true }),
     );
   }
 

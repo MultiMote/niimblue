@@ -5,23 +5,20 @@
 	"version": "0.0.1",
 	"scripts": {
 		"dev-check": "npm run sv-check && npm run dev",
-		"dev-check-open": "npm run sv-check && npm run dev-open",
 		"dev": "vite",
-		"dev-open": "vite --open",
-		"build:android": "npm run build && npm run cap-run:android",
-		"cap-run:android": "cap sync android && cap open android",
+		"dev-local-lib": "vite --force",
 		"build": "vite build",
 		"build-rel": "vite build --base=./",
 		"preview": "vite preview",
 		"sv-check": "svelte-check --tsconfig ./tsconfig.json",
 		"gen-mdi-list": "node gen-mdi-list.mjs > src/styles/mdi_icons.ts",
-		"lint": "eslint ."
+		"lint": "eslint .",
+		"format-all": "prettier --write \"src/**/*.{ts,svelte}\" \"!src/styles/mdi_icons.ts\""
 	},
 	"dependencies": {
-		"@capacitor/cli": "^7.4.4",
-		"@capacitor/core": "^7.4.4",
-		"@capacitor/filesystem": "^7.1.4",
-		"@capacitor/share": "^7.0.2",
+		"@capacitor/core": "^7.2.0",
+		"@capacitor/filesystem": "^7.0.1",
+		"@capacitor/share": "^7.0.1",
 		"@fontsource-variable/noto-sans": "^5.2.10",
 		"@formatjs/intl-localematcher": "^0.6.2",
 		"@mmote/niimbluelib": "0.0.1-alpha.29",
@@ -44,8 +41,6 @@
 		"@types/node": "^24.10.0",
 		"@types/qrcode-svg": "^1.1.5",
 		"@types/toastify-js": "^1.12.4",
-		"eslint-config-prettier": "^10.1.8",
-		"eslint-plugin-prettier": "^5.5.4",
 		"eslint-plugin-svelte": "^3.13.0",
 		"globals": "^16.5.0",
 		"prettier": "^3.6.2",
@@ -61,9 +56,6 @@
 	"overrides": {
 		"fabric": {
 			"canvas": "npm:uninstall"
-		},
-		"vite": {
-			"esbuild": "0.25.0"
 		}
 	}
 }

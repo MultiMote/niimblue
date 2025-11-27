@@ -2,8 +2,8 @@
   import { onDestroy, onMount } from "svelte";
   import { derived } from "svelte/store";
   import Modal from "bootstrap/js/dist/modal";
-  import { connectionState, printerClient, printerMeta } from "../stores";
-  import { copyImageData, threshold, atkinson, invert } from "../utils/post_process";
+  import { connectionState, printerClient, printerMeta } from "$/stores";
+  import { copyImageData, threshold, atkinson, invert } from "$/utils/post_process";
   import {
     type EncodedImage,
     ImageEncoder,
@@ -13,16 +13,16 @@
     type PrintTaskName,
     AbstractPrintTask,
   } from "@mmote/niimbluelib";
-  import type { LabelProps, PostProcessType, FabricJson, PreviewProps, PreviewPropsOffset } from "../types";
-  import ParamLockButton from "./basic/ParamLockButton.svelte";
-  import { tr, type TranslationKey } from "../utils/i18n";
-  import { canvasPreprocess } from "../utils/canvas_preprocess";
+  import type { LabelProps, PostProcessType, FabricJson, PreviewProps, PreviewPropsOffset } from "$/types";
+  import ParamLockButton from "$/components/basic/ParamLockButton.svelte";
+  import { tr, type TranslationKey } from "$/utils/i18n";
+  import { canvasPreprocess } from "$/utils/canvas_preprocess";
   import { type DSVRowArray, csvParse } from "d3-dsv";
-  import { LocalStoragePersistence } from "../utils/persistence";
-  import MdIcon from "./basic/MdIcon.svelte";
-  import { Toasts } from "../utils/toasts";
-  import { CustomCanvas } from "../fabric-object/custom_canvas";
-  import { FileUtils } from "../utils/file_utils";
+  import { LocalStoragePersistence } from "$/utils/persistence";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { Toasts } from "$/utils/toasts";
+  import { CustomCanvas } from "$/fabric-object/custom_canvas";
+  import { FileUtils } from "$/utils/file_utils";
 
   interface Props {
     onClosed: () => void;
@@ -35,32 +35,32 @@
 
   let { onClosed, labelProps, canvasCallback, printNow = false, csvData, csvEnabled }: Props = $props();
 
-  let modalElement = $state<HTMLElement>();
-  let previewCanvas = $state<HTMLCanvasElement>();
-  let printState: "idle" | "sending" | "printing" = $state("idle");
+  let modalElement: HTMLElement;
+  let previewCanvas: HTMLCanvasElement;
+  let printState = $state<"idle" | "sending" | "printing">("idle");
   let modal: Modal;
-  let printProgress = $state(0); // todo: more progress data
-  let density = $state($printerMeta?.densityDefault ?? 3);
-  let quantity = $state(1);
+  let printProgress = $state<number>(0); // todo: more progress data
+  let density = $state<number>($printerMeta?.densityDefault ?? 3);
+  let quantity = $state<number>(1);
   let postProcessType = $state<PostProcessType>();
-  let postProcessInvert = $state(false);
-  let thresholdValue = $state(140);
+  let postProcessInvert = $state<boolean>(false);
+  let thresholdValue = $state<number>(140);
   let originalImage: ImageData;
   let previewContext: CanvasRenderingContext2D;
-  let printTaskName: PrintTaskName = $state("D110");
-  let labelType: LabelType = $state(LabelType.WithGaps);
+  let printTaskName = $state<PrintTaskName>("D110");
+  let labelType = $state<LabelType>(LabelType.WithGaps);
   // eslint-disable-next-line no-undef
   let statusTimer: NodeJS.Timeout | undefined = undefined;
-  let error: string = $state("");
+  let error = $state<string>("");
   let detectedPrintTaskName: PrintTaskName | undefined = $printerClient?.getPrintTaskType();
   let csvParsed: DSVRowArray<string>;
-  let page: number = $state(0);
-  let pagesTotal: number = $state(1);
-  let offset: PreviewPropsOffset = $state({ x: 0, y: 0, offsetType: "inner" });
-  let offsetWarning: string = $state("");
+  let page = $state<number>(0);
+  let pagesTotal = $state<number>(1);
+  let offset = $state<PreviewPropsOffset>({ x: 0, y: 0, offsetType: "inner" });
+  let offsetWarning = $state<string>("");
   let currentPrintTask: AbstractPrintTask | undefined;
 
-  let savedProps = $state({} as PreviewProps);
+  let savedProps = $state<PreviewProps>({});
 
   const disconnected = derived(connectionState, ($connectionState) => $connectionState !== "connected");
 

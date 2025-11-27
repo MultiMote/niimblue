@@ -1,9 +1,7 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
-  import { tr } from "../../utils/i18n";
+  import { tr } from "$/utils/i18n";
   import { csvParse } from "d3-dsv";
-  import MdIcon from "../basic/MdIcon.svelte";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
 
   interface Props {
     enabled: boolean;
@@ -14,8 +12,8 @@
 
   let { enabled = $bindable(), csv = $bindable(), onUpdate, onPlaceholderPicked }: Props = $props();
 
-  let placeholders: string[] = $state([]);
-  let rows: number = $state(0);
+  let placeholders = $state<string[]>([]);
+  let rows = $state<number>(0);
 
   const refresh = (val: string) => {
     const result = csvParse(val);
@@ -27,7 +25,7 @@
     onUpdate(enabled, csv);
   };
 
-  run(() => {
+  $effect(() => {
     refresh(csv);
   });
 </script>

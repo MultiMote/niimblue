@@ -1,12 +1,10 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
-  import MdIcon from "../basic/MdIcon.svelte";
-  import { tr } from "../../utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { tr } from "$/utils/i18n";
   import * as fabric from "fabric";
   import { onDestroy } from "svelte";
-  import QRCode from "../../fabric-object/qrcode";
-  import Barcode from "../../fabric-object/barcode";
+  import QRCode from "$/fabric-object/qrcode";
+  import Barcode from "$/fabric-object/barcode";
 
   interface Props {
     selectedObject: fabric.FabricObject;
@@ -15,10 +13,10 @@
   let { selectedObject }: Props = $props();
   let prevObject: fabric.FabricObject | undefined;
 
-  let x: number = $state();
-  let y: number = $state();
-  let width: number = $state();
-  let height: number = $state();
+  let x = $state<number>();
+  let y = $state<number>();
+  let width = $state<number>();
+  let height = $state<number>();
 
   const objectDimensionsChanged = () => {
     const pos = selectedObject.getPointByOrigin("left", "top");
@@ -40,13 +38,13 @@
   };
 
   const updateObject = () => {
-    const newPos = new fabric.Point(Math.round(Math.max(x, 1)), Math.round(Math.max(y, 1)));
+    const newPos = new fabric.Point(Math.round(Math.max(x!, 1)), Math.round(Math.max(y!, 1)));
 
     selectedObject.setPositionByOrigin(newPos, "left", "top");
 
     selectedObject.set({
-      width: Math.round(Math.max(width, 1)),
-      height: Math.round(Math.max(height, 1)),
+      width: Math.round(Math.max(width!, 1)),
+      height: Math.round(Math.max(height!, 1)),
     });
 
     selectedObject.setCoords();
@@ -55,7 +53,7 @@
 
   onDestroy(() => selectedObject.off("modified", objectDimensionsChanged));
 
-  run(() => {
+  $effect(() => {
     objectChanged(selectedObject);
   });
 </script>

@@ -1,11 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { OBJECT_DEFAULTS_TEXT } from "../../defaults";
-  import { tr } from "../../utils/i18n";
-  import { Toasts } from "../../utils/toasts";
-  import MdIcon from "../basic/MdIcon.svelte";
-  import { LocalStoragePersistence } from "../../utils/persistence";
-  import { fontCache } from "../../stores";
+  import { OBJECT_DEFAULTS_TEXT } from "$/defaults";
+  import { tr } from "$/utils/i18n";
+  import { Toasts } from "$/utils/toasts";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { LocalStoragePersistence } from "$/utils/persistence";
+  import { fontCache } from "$/stores";
 
   interface Props {
     value: string;

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { Utils } from "@mmote/niimbluelib";
-  import { tr } from "$utils/i18n";
-  import MdIcon from "./MdIcon.svelte";
-  import { detectAntiFingerprinting } from "../../utils/browsers";
+  import { tr } from "$/utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { detectAntiFingerprinting } from "$/utils/browsers";
   let caps = Utils.getAvailableTransports();
 
   let antiFingerprinting = detectAntiFingerprinting();

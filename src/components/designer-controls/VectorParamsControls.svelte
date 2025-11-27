@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { tr } from "../../utils/i18n";
-  import MdIcon from "../basic/MdIcon.svelte";
+  import { tr } from "$/utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
   import * as fabric from "fabric";
 
   interface Props {

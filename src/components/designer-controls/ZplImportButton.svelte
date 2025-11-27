@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { LabelProps } from "../../types";
-  import { FileUtils } from "../../utils/file_utils";
-  import MdIcon from "../basic/MdIcon.svelte";
+  import type { LabelProps } from "$/types";
+  import { FileUtils } from "$/utils/file_utils";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
 
   interface Props {
     text: string;
@@ -10,7 +10,7 @@
   }
 
   let { text, labelProps, onImageReady }: Props = $props();
-  let importState: "idle" | "processing" | "error" = $state("idle");
+  let importState = $state<"idle" | "processing" | "error">("idle");
 
   const onImportClicked = async () => {
     const mmToInchCoeff = 25.4;
