@@ -141,5 +141,11 @@
     "params.color": "Barva",
     "params.label.warning.div8": "Šířka štítku musí být dělitelná 8",
     "params.text.italic": "Kurzíva",
-    "params.generic.position": "Pozice"
+    "params.generic.position": "Pozice",
+    "browser_warning.fingerprinting": "Ups! Vypadá to, že váš prohlížeč deformuje vykreslování jako ochranu proti snímání. Prosím vypněte tuto ochranu, může způsobovat artefakty na štítcích.",
+    "params.qrcode.mode": "Režim",
+    "params.qrcode.version": "Verze",
+    "params.params.text.split": "Dělení textu (zalamování)",
+    "params.params.text.split.spaces": "Mezery",
+    "params.params.text.split.grapheme": "Znaky"
 }
