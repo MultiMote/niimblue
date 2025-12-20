@@ -50,7 +50,34 @@
   let tailLength = $state<number>(0);
   let tailPos = $state<TailPosition>("right");
   let mirror = $state<MirrorType>("none");
-  let error = $state<string>("");
+
+  let error = $derived.by<string>(() => {
+    let error = "";
+
+    const headSize = labelProps.printDirection == "left" ? labelProps.size.height : labelProps.size.width;
+    if ($printerMeta !== undefined) {
+      if (headSize > $printerMeta.printheadPixels) {
+        error += $tr("params.label.warning.width") + " ";
+        error += `(${headSize} > ${$printerMeta.printheadPixels})`;
+        error += "\n";
+      }
+
+      if ($printerMeta.printDirection !== labelProps.printDirection) {
+        error += $tr("params.label.warning.direction") + " ";
+        if ($printerMeta.printDirection == "left") {
+          error += $tr("params.label.direction.left");
+        } else {
+          error += $tr("params.label.direction.top");
+        }
+      }
+    }
+
+    if (headSize % 8 !== 0) {
+      error += $tr("params.label.warning.div8");
+    }
+
+    return error;
+  });
 
   const onApply = () => {
     let newWidth = width;
@@ -163,32 +190,6 @@
     prevUnit = unit;
   };
 
-  const checkError = (props: LabelProps) => {
-    error = "";
-
-    const headSize = props.printDirection == "left" ? props.size.height : props.size.width;
-    if ($printerMeta !== undefined) {
-      if (headSize > $printerMeta.printheadPixels) {
-        error += $tr("params.label.warning.width") + " ";
-        error += `(${headSize} > ${$printerMeta.printheadPixels})`;
-        error += "\n";
-      }
-
-      if ($printerMeta.printDirection !== props.printDirection) {
-        error += $tr("params.label.warning.direction") + " ";
-        if ($printerMeta.printDirection == "left") {
-          error += $tr("params.label.direction.left");
-        } else {
-          error += $tr("params.label.direction.top");
-        }
-      }
-    }
-
-    if (headSize % 8 !== 0) {
-      error += $tr("params.label.warning.div8");
-    }
-  };
-
   const fillWithCurrentParams = () => {
     prevUnit = "px";
     width = labelProps.size.width;
@@ -254,19 +255,15 @@
   });
 
   $effect(() => {
-    checkError(labelProps);
-  });
-  $effect(() => {
     if (shape === "circle" && split !== "none") split = "none";
   });
+
   $effect(() => {
-    if (split === "none") tailLength = 0;
+    if (split === "none" || tailLength < 0) tailLength = 0;
   });
+
   $effect(() => {
     if (mirror === "flip" && splitParts !== 2) mirror = "copy";
-  });
-  $effect(() => {
-    if (tailLength < 0) tailLength = 0;
   });
 </script>
 
