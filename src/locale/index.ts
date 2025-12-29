@@ -9,6 +9,10 @@ import lang_zh_tw from "$/locale/dicts/zh_tw.json";
 import lang_fr from "$/locale/dicts/fr.json";
 import lang_pt_br from "$/locale/dicts/pt_BR.json";
 import lang_hr from "$/locale/dicts/hr.json";
+import lang_ko_kr from "$/locale/dicts/ko_KR.json";
+import lang_es from "$/locale/dicts/es.json";
+import lang_ar from "$/locale/dicts/ar.json";
+import lang_hu from "$/locale/dicts/hu.json";
 
 export type TranslationKey = keyof typeof lang_en;
 export type TranslationDict = Record<TranslationKey, string>;
@@ -35,7 +39,15 @@ export const langPack = {
   /** Portuguese (Brazil) */
   pt_br: lang_pt_br as TranslationDict,
   /** Croatian */
-  hr: lang_hr as TranslationDict
+  hr: lang_hr as TranslationDict,
+  /** Korean */
+  ko_kr: lang_ko_kr as TranslationDict,
+  /** Spanish */
+  es: lang_es as TranslationDict,
+  /** Arabic */
+  ar: lang_ar as TranslationDict,
+  /** Hungarian */
+  hu: lang_hu as TranslationDict,
 } as const;
 
 export type SupportedLanguage = keyof typeof langPack;
