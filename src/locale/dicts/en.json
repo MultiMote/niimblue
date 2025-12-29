@@ -90,6 +90,7 @@
     "params.saved_labels.save.browser.replace": "Save (replace)",
     "params.saved_labels.save.browser": "Save",
     "params.saved_labels.save.json": "Export",
+    "params.saved_labels.save.url": "Copy link",
     "params.text.align.center": "Align text: Center",
     "params.text.align.left": "Align text: Left",
     "params.text.align.right": "Align text: Right",
