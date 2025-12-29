@@ -160,6 +160,17 @@
     }
   };
 
+  const onExportUrlClicked = async () => {
+    try {
+      const label = onRequestLabelTemplate();
+      const url = await FileUtils.makeLabelUrl(label);
+      navigator.clipboard.writeText(url);
+      Toasts.message("Label URL copied to clipboard");
+    } catch (e) {
+      Toasts.zodErrors(e, "Unable to create label URL:");
+    }
+  };
+
   onMount(() => {
     savedLabels = LocalStoragePersistence.loadLabels();
     calcUsedSpace();
@@ -196,6 +207,9 @@
           <ul class="dropdown-menu">
             <li>
               <button class="dropdown-item" onclick={onExportPngClicked}>PNG</button>
+            </li>
+            <li>
+              <button class="dropdown-item" onclick={onExportUrlClicked}>{$tr("params.saved_labels.save.url")}</button>
             </li>
           </ul>
         </div>

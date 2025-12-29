@@ -38,7 +38,7 @@
   import { fixFabricObjectScale } from "$/utils/canvas_utils";
 
   let htmlCanvas: HTMLCanvasElement;
-  
+
   let fabricCanvas = $state<CustomCanvas>();
   let labelProps = $state<LabelProps>(DEFAULT_LABEL_PROPS);
   let previewOpened = $state<boolean>(false);
@@ -262,7 +262,7 @@
     fabricCanvas!.clear();
   };
 
-  onMount(() => {
+  onMount(async () => {
     const csvSaved = LocalStoragePersistence.loadCsv();
     csvData = csvSaved.data;
 
@@ -281,9 +281,16 @@
     });
     fabricCanvas.setLabelProps(labelProps);
 
-    const defaultTemplate = LocalStoragePersistence.loadDefaultTemplate();
+
     try {
-      if (defaultTemplate !== null) {
+      // fixme: handle errors correctly
+      const urlTemplate = await FileUtils.readLabelFromUrl();
+      const defaultTemplate = LocalStoragePersistence.loadDefaultTemplate();
+
+      if (urlTemplate !== null) {
+        onLoadRequested(urlTemplate);
+        Toasts.message("Label loaded from URL");
+      } else if (defaultTemplate !== null) {
         onLoadRequested(defaultTemplate);
       } else {
         LabelDesignerObjectHelper.addText(fabricCanvas, $tr("editor.default_text"));
@@ -291,6 +298,7 @@
     } catch (e) {
       Toasts.error(e);
     }
+
     undo.push(fabricCanvas, labelProps);
 
     // force close dropdowns on touch devices

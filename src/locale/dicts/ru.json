@@ -89,6 +89,7 @@
     "params.saved_labels.save.browser.replace": "Сохранить (заменить)",
     "params.saved_labels.save.browser": "Сохранить",
     "params.saved_labels.save.json": "Экспорт",
+    "params.saved_labels.save.url": "Копировать ссылку",
     "params.text.align.center": "Выравнивание текста: По центру",
     "params.text.align.left": "Выравнивание текста: Слева",
     "params.text.align.right": "Выравнивание текста: Справа",

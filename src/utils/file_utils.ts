@@ -262,4 +262,67 @@ export class FileUtils {
 
     document.body.appendChild(iframe);
   }
+
+  static async makeLabelUrl(label: ExportedLabelTemplate): Promise<string> {
+    const labelStr = JSON.stringify({ ...label, thumbnailBase64: undefined });
+
+    const encoder = new TextEncoder();
+    const data = encoder.encode(labelStr);
+
+    const cs = new CompressionStream("gzip");
+    const writer = cs.writable.getWriter();
+    writer.write(data);
+    writer.close();
+
+    const compressed = new Uint8Array(await new Response(cs.readable).arrayBuffer());
+    const arr = new Uint8Array(compressed);
+    const binString = String.fromCodePoint(...arr);
+    const baseUrl = location.protocol + "//" + location.host;
+    const b64data = btoa(binString);
+
+    return `${baseUrl}/#load=${b64data}`;
+  }
+
+  static urlHashParamsToDict(): Record<string, string> {
+    const anchorData = globalThis.location.hash.slice(1);
+
+    if (!anchorData) {
+      return {};
+    }
+
+    return anchorData.split("&").reduce((res: Record<string, string>, item: string) => {
+      const parts = item.split("=");
+      res[parts[0]] = parts[1];
+      return res;
+    }, {});
+  }
+
+  static async readLabelFromUrl(): Promise<ExportedLabelTemplate | null> {
+    const params = FileUtils.urlHashParamsToDict();
+
+    if (!("load" in params)) {
+      return null;
+    }
+
+    const b64data: string = params["load"];
+
+    const binaryString = atob(b64data);
+
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.codePointAt(i)!;
+    }
+
+    const ds = new DecompressionStream("gzip");
+    const writer = ds.writable.getWriter();
+    writer.write(bytes);
+    writer.close();
+
+    const decompressed = await new Response(ds.readable).arrayBuffer();
+    const decoder = new TextDecoder();
+
+    const decoded = decoder.decode(decompressed);
+    const labelObj = JSON.parse(decoded);
+    return ExportedLabelTemplateSchema.parse(labelObj);
+  }
 }
