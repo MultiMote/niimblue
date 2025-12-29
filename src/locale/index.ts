@@ -10,6 +10,9 @@ import lang_fr from "./dicts/fr.json";
 import lang_pt_br from "./dicts/pt_BR.json";
 import lang_hr from "./dicts/hr.json";
 import lang_ko_kr from "./dicts/ko_KR.json";
+import lang_es from "./dicts/es.json";
+import lang_ar from "./dicts/ar.json";
+import lang_hu from "./dicts/hu.json";
 
 export type TranslationKey = keyof typeof lang_en;
 export type TranslationDict = Record<TranslationKey, string>;
@@ -38,7 +41,13 @@ export const langPack = {
   /** Croatian */
   hr: lang_hr as TranslationDict,
   /** Korean */
-  ko_kr: lang_ko_kr as TranslationDict
+  ko_kr: lang_ko_kr as TranslationDict,
+  /** Spanish */
+  es: lang_es as TranslationDict,
+  /** Arabic */
+  ar: lang_ar as TranslationDict,
+  /** Hungarian */
+  hu: lang_hu as TranslationDict,
 } as const;
 
 export type SupportedLanguage = keyof typeof langPack;
