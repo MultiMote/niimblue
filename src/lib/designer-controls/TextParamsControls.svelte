@@ -93,6 +93,7 @@
     const text = prompt($tr("params.text.edit.title"), selectedText!.text);
     if (text !== null) {
       selectedText!.set({ text });
+      selectedText!.isEditing = false;
       valueUpdated();
     }
   };
