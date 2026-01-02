@@ -28,6 +28,7 @@ export const printerClient = writable<NiimbotAbstractClient>();
 export const heartbeatData = writable<HeartbeatData>();
 export const printerInfo = writable<PrinterInfo>();
 export const rfidInfo = writable<RfidInfo | undefined>();
+export const ribbonRfidInfo = writable<RfidInfo | undefined>();
 export const printerMeta = writable<PrinterModelMeta | undefined>();
 export const heartbeatFails = writable<number>(0);
 export const automation = readable<AutomationProps | undefined>(
@@ -91,6 +92,7 @@ export const initClient = (connectionType: ConnectionType) => {
         heartbeatData.update((prev) => {
           if (prev?.rfidReadState !== e.data?.rfidReadState) {
             newClient.abstraction.rfidInfo().then(rfidInfo.set).catch(console.error);
+            newClient.abstraction.rfidInfo2().then(ribbonRfidInfo.set).catch(() => console.log("RfidInfo2 not supported"));
           }
           return e.data;
         });
