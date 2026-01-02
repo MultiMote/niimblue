@@ -11,6 +11,7 @@
     heartbeatFails,
     automation,
     rfidInfo,
+    ribbonRfidInfo,
   } from "$/stores";
   import type { ConnectionType } from "$/types";
   import { tr } from "$/utils/i18n";
@@ -39,16 +40,27 @@
       Toasts.error(e);
     }
   };
+
   const onDisconnectClicked = () => {
     $printerClient.disconnect();
   };
+
   const getRfidInfo = async () => {
     $rfidInfo = await $printerClient.abstraction.rfidInfo();
+  };
+
+  const getRibbonRfidInfo = async () => {
+    try {
+      $ribbonRfidInfo = await $printerClient.abstraction.rfidInfo2();
+    } catch (e) {
+      Toasts.error(e);
+    }
   };
 
   const startHeartbeat = async () => {
     $printerClient.startHeartbeat();
   };
+
   const stopHeartbeat = async () => {
     $printerClient.stopHeartbeat();
   };
@@ -151,7 +163,7 @@
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#rfidInfo">
-          Rfid info <MdIcon icon="expand_more" />
+          RFID info <MdIcon icon="expand_more" />
         </button>
 
         <div class="collapse" id="rfidInfo">
@@ -160,6 +172,26 @@
           <ul>
             {#each Object.entries($rfidInfo) as [key, value] (key)}
               <li>{key}: <strong>{value ?? "-"}</strong></li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
+
+      {#if $ribbonRfidInfo}
+        <button
+          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#ribbonRfidInfo">
+          Ribbon RFID info <MdIcon icon="expand_more" />
+        </button>
+
+        <div class="collapse" id="ribbonRfidInfo">
+          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={getRibbonRfidInfo}>Update</button>
+
+          <ul>
+            {#each Object.entries($ribbonRfidInfo) as [k, v]}
+              <li>{k}: <strong>{v ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
