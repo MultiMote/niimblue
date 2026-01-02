@@ -1,25 +1,29 @@
 <script lang="ts">
-  import { tr } from "../../utils/i18n";
+  import { tr } from "$/utils/i18n";
   import { onMount } from "svelte";
-  import MdIcon from "../basic/MdIcon.svelte";
-  import SavedLabelsBrowser from "./SavedLabelsBrowser.svelte";
-  import { ExportedLabelTemplateSchema, type ExportedLabelTemplate } from "../../types";
-  import { LocalStoragePersistence } from "../../utils/persistence";
-  import { Toasts } from "../../utils/toasts";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import SavedLabelsBrowser from "$/components/designer-controls/SavedLabelsBrowser.svelte";
+  import { ExportedLabelTemplateSchema, type ExportedLabelTemplate } from "$/types";
+  import { LocalStoragePersistence } from "$/utils/persistence";
+  import { Toasts } from "$/utils/toasts";
   import Dropdown from "bootstrap/js/dist/dropdown";
-  import { FileUtils } from "../../utils/file_utils";
+  import { FileUtils } from "$/utils/file_utils";
   import * as fabric from "fabric";
 
-  export let onRequestLabelTemplate: () => ExportedLabelTemplate;
-  export let onLoadRequested: (label: ExportedLabelTemplate) => void;
-  export let canvas: fabric.Canvas;
+  interface Props {
+    onRequestLabelTemplate: () => ExportedLabelTemplate;
+    onLoadRequested: (label: ExportedLabelTemplate) => void;
+    canvas: fabric.Canvas;
+  }
 
-  let dropdownRef: Element;
-  let savedLabels: ExportedLabelTemplate[] = [];
-  let selectedIndex: number = -1;
-  let title: string = "";
-  let usedSpace: number = 0;
-  let customDefaultTemplate: boolean = LocalStoragePersistence.hasCustomDefaultTemplate();
+  let { onRequestLabelTemplate, onLoadRequested, canvas }: Props = $props();
+
+  let dropdownRef: HTMLDivElement;
+  let savedLabels = $state<ExportedLabelTemplate[]>([]);
+  let selectedIndex = $state<number>(-1);
+  let title = $state<string>("");
+  let usedSpace = $state<number>(0);
+  let customDefaultTemplate = $state<boolean>(LocalStoragePersistence.hasCustomDefaultTemplate());
 
   const calcUsedSpace = () => {
     usedSpace = LocalStoragePersistence.usedSpace();
@@ -27,7 +31,7 @@
 
   const onLabelSelected = (index: number) => {
     selectedIndex = index;
-    title = savedLabels[index].title ?? "";
+    title = savedLabels[index]?.title ?? "";
   };
 
   const onLabelExport = (idx: number) => {
@@ -126,7 +130,7 @@
       const label = ExportedLabelTemplateSchema.parse(rawData);
       onLoadRequested(label);
 
-      if(label.title) {
+      if (label.title) {
         title = label.title;
       }
 
@@ -140,7 +144,7 @@
     try {
       const label = onRequestLabelTemplate();
       if (title) {
-        label.title = title.replaceAll(/[\\\/:*?"<>|]/g, '_');
+        label.title = title.replaceAll(/[\\/:*?"<>|]/g, "_");
       }
       FileUtils.saveLabelAsJson(label);
     } catch (e) {
@@ -174,23 +178,24 @@
 
     <div class="px-3">
       <div class="p-1">
-        <button class="btn btn-sm btn-outline-secondary" on:click={onImportClicked}>
+        <button class="btn btn-sm btn-outline-secondary" onclick={onImportClicked}>
           <MdIcon icon="data_object" />
           {$tr("params.saved_labels.load.json")}
         </button>
         <div class="btn-group btn-group-sm">
-          <button class="btn btn-outline-secondary" on:click={onExportClicked}>
+          <button class="btn btn-outline-secondary" onclick={onExportClicked}>
             <MdIcon icon="data_object" />
             {$tr("params.saved_labels.save.json")}
           </button>
           <button
             type="button"
+            aria-label="dropdown"
             class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
             data-bs-toggle="dropdown">
           </button>
           <ul class="dropdown-menu">
             <li>
-              <button class="dropdown-item" on:click={onExportPngClicked}>PNG</button>
+              <button class="dropdown-item" onclick={onExportPngClicked}>PNG</button>
             </li>
           </ul>
         </div>
@@ -215,28 +220,28 @@
 
       <div class="d-flex gap-1 flex-wrap justify-content-end">
         <div class="btn-group btn-group-sm make-default">
-          <button class="btn text-secondary" on:click={onMakeDefaultClicked}>
+          <button class="btn text-secondary" onclick={onMakeDefaultClicked}>
             {$tr("params.saved_labels.make_default")}
           </button>
           {#if customDefaultTemplate}
-            <button class="btn text-secondary" on:click={onRemoveDefaultClicked}>
+            <button class="btn text-secondary" onclick={onRemoveDefaultClicked}>
               <MdIcon icon="close" />
             </button>
           {/if}
         </div>
 
-        <button class="btn btn-sm btn-secondary" on:click={onSaveClicked}>
+        <button class="btn btn-sm btn-secondary" onclick={onSaveClicked}>
           <MdIcon icon="save" />
           {$tr("params.saved_labels.save.browser")}
         </button>
 
         {#if selectedIndex !== -1}
-          <button class="btn btn-sm btn-secondary" on:click={onSaveReplaceClicked}>
+          <button class="btn btn-sm btn-secondary" onclick={onSaveReplaceClicked}>
             <MdIcon icon="edit_note" />
             {$tr("params.saved_labels.save.browser.replace")}
           </button>
 
-          <button class="btn btn-sm btn-primary" on:click={onLoadClicked}>
+          <button class="btn btn-sm btn-primary" onclick={onLoadClicked}>
             <MdIcon icon="folder" />
             {$tr("params.saved_labels.load.browser")}
           </button>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import MainPage from "./MainPage.svelte";
+  import MainPage from "$/components/MainPage.svelte";
 </script>
 
 <MainPage />

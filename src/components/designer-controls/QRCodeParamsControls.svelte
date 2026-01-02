@@ -1,16 +1,18 @@
 <script lang="ts">
-  import { QRCode } from "../../fabric-object/qrcode";
-  import { tr } from "../../utils/i18n";
-  import MdIcon from "../basic/MdIcon.svelte";
+  import { QRCode } from "$/fabric-object/qrcode";
+  import { tr } from "$/utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
   import * as fabric from "fabric";
 
-  export let selectedObject: fabric.FabricObject | undefined;
-  export let valueUpdated: () => void;
-  let selectedQRCode: QRCode | undefined;
-
-  $: {
-    selectedQRCode = selectedObject instanceof QRCode ? (selectedObject as QRCode) : undefined;
+  interface Props {
+    selectedObject: fabric.FabricObject | undefined;
+    valueUpdated: () => void;
   }
+
+  let { selectedObject, valueUpdated }: Props = $props();
+  let selectedQRCode: QRCode | undefined = $derived(
+    selectedObject instanceof QRCode ? (selectedObject as QRCode) : undefined,
+  );
 </script>
 
 {#if selectedQRCode}
@@ -21,7 +23,7 @@
     <select
       class="form-select"
       value={selectedQRCode.ecl}
-      on:change={(e) => {
+      onchange={(e) => {
         selectedQRCode?.set("ecl", e.currentTarget.value);
         valueUpdated();
       }}>
@@ -39,7 +41,7 @@
     <select
       class="form-select"
       value={selectedQRCode.mode}
-      on:change={(e) => {
+      onchange={(e) => {
         selectedQRCode?.set("mode", e.currentTarget.value);
         valueUpdated();
       }}>
@@ -57,12 +59,12 @@
     <select
       class="form-select"
       value={selectedQRCode.qrVersion}
-      on:change={(e) => {
+      onchange={(e) => {
         selectedQRCode?.set("qrVersion", parseInt(e.currentTarget.value));
         valueUpdated();
       }}>
       <option value={0}>Auto</option>
-      {#each { length: 40 } as _, i}
+      {#each { length: 40 }, i (i)}
         <option value={i + 1}>{i + 1}</option>
       {/each}
     </select>
@@ -71,10 +73,10 @@
   <textarea
     class="qrcode-content form-control"
     value={selectedQRCode.text}
-    on:input={(e) => {
+    oninput={(e) => {
       selectedQRCode?.set("text", e.currentTarget.value);
       valueUpdated();
-    }} />
+    }}></textarea>
 {/if}
 
 <style>

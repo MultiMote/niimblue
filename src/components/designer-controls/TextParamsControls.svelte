@@ -1,16 +1,20 @@
 <script lang="ts">
   import * as fabric from "fabric";
-  import { tr } from "../../utils/i18n";
-  import MdIcon from "../basic/MdIcon.svelte";
-  import FontFamilyPicker from "./FontFamilyPicker.svelte";
+  import { tr } from "$/utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import FontFamilyPicker from "$/components/designer-controls/FontFamilyPicker.svelte";
 
-  export let selectedObject: fabric.FabricObject;
-  export let valueUpdated: () => void;
+  interface Props {
+    selectedObject: fabric.FabricObject;
+    valueUpdated: () => void;
+  }
+
+  let { selectedObject, valueUpdated }: Props = $props();
 
   let sizeMin: number = 1;
   let sizeMax: number = 999;
 
-  let selectedText: fabric.IText | undefined;
+  let selectedText: fabric.IText | undefined = $derived(selectedObject instanceof fabric.IText ? (selectedObject as fabric.IText) : undefined);
 
   const setXAlign = (align: fabric.TOriginX) => {
     selectedText!.set({ textAlign: align });
@@ -98,24 +102,22 @@
     }
   };
 
-  $: {
-    selectedText = selectedObject instanceof fabric.IText ? (selectedObject as fabric.IText) : undefined;
-  }
+
 </script>
 
 {#if selectedText}
   <button
     title={$tr("params.text.align.left")}
     class="btn btn-sm {selectedText.textAlign === 'left' ? 'btn-secondary' : ''}"
-    on:click={() => setXAlign("left")}><MdIcon icon="format_align_left" /></button>
+    onclick={() => setXAlign("left")}><MdIcon icon="format_align_left" /></button>
   <button
     title={$tr("params.text.align.center")}
     class="btn btn-sm {selectedText.textAlign === 'center' ? 'btn-secondary' : ''}"
-    on:click={() => setXAlign("center")}><MdIcon icon="format_align_center" /></button>
+    onclick={() => setXAlign("center")}><MdIcon icon="format_align_center" /></button>
   <button
     title={$tr("params.text.align.right")}
     class="btn btn-sm {selectedText.textAlign === 'right' ? 'btn-secondary' : ''}"
-    on:click={() => setXAlign("right")}><MdIcon icon="format_align_right" /></button>
+    onclick={() => setXAlign("right")}><MdIcon icon="format_align_right" /></button>
   <div class="dropdown">
     <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" title={$tr("params.text.vorigin")}>
       {#if selectedText.originY === "top"}
@@ -129,19 +131,19 @@
     <div class="dropdown-menu p-2">
       <button
         class="btn btn-sm {selectedText.originY === 'top' ? 'btn-secondary' : ''}"
-        on:click={() => setYAlign("top")}
+        onclick={() => setYAlign("top")}
         title={$tr("params.text.vorigin.top")}>
         <MdIcon icon="vertical_align_top" />
       </button>
       <button
         class="btn btn-sm {selectedText.originY === 'center' ? 'btn-secondary' : ''}"
-        on:click={() => setYAlign("center")}
+        onclick={() => setYAlign("center")}
         title={$tr("params.text.vorigin.center")}>
         <MdIcon icon="vertical_align_center" />
       </button>
       <button
         class="btn btn-sm {selectedText.originY === 'bottom' ? 'btn-secondary' : ''}"
-        on:click={() => setYAlign("bottom")}
+        onclick={() => setYAlign("bottom")}
         title={$tr("params.text.vorigin.bottom")}>
         <MdIcon icon="vertical_align_bottom" />
       </button>
@@ -151,14 +153,14 @@
   <button
     class="btn btn-sm {selectedText.fontWeight === 'bold' ? 'btn-secondary' : ''}"
     title={$tr("params.text.bold")}
-    on:click={toggleBold}>
+    onclick={toggleBold}>
     <MdIcon icon="format_bold" />
   </button>
 
   <button
     class="btn btn-sm {selectedText.fontStyle === 'italic' ? 'btn-secondary' : ''}"
     title={$tr("params.text.italic")}
-    on:click={toggleItalic}>
+    onclick={toggleItalic}>
     <MdIcon icon="format_italic" />
   </button>
 
@@ -172,7 +174,7 @@
         <span class="input-group-text">
           <MdIcon icon="format_color_text" />
         </span>
-        <select class="form-select" value={selectedObject.fill} on:change={(e) => fillChanged(e.currentTarget.value)}>
+        <select class="form-select" value={selectedObject.fill} onchange={(e) => fillChanged(e.currentTarget.value)}>
           <option value="white">{$tr("params.color.white")}</option>
           <option value="black">{$tr("params.color.black")}</option>
         </select>
@@ -184,7 +186,7 @@
         <select
           class="form-select"
           value={selectedObject.backgroundColor || "transparent"}
-          on:change={(e) => backgroundColorChanged(e.currentTarget.value)}>
+          onchange={(e) => backgroundColorChanged(e.currentTarget.value)}>
           <option value="white">{$tr("params.color.white")}</option>
           <option value="black">{$tr("params.color.black")}</option>
           <option value="transparent">{$tr("params.color.transparent")}</option>
@@ -193,7 +195,7 @@
     </div>
   </div>
 
-  {#if selectedText instanceof fabric.Textbox }
+  {#if selectedText instanceof fabric.Textbox}
     <div class="dropdown">
       <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" title={$tr("params.params.text.split")}>
         <MdIcon icon="wrap_text" />
@@ -201,7 +203,7 @@
 
       <div class="dropdown-menu arrangement p-2">
         <div class="input-group input-group-sm flex-nowrap split pb-2">
-          <select class="form-select" value={selectedText.splitByGrapheme ? "grapheme" : "space"} on:change={(e) => splitChanged(e.currentTarget.value)}>
+          <select class="form-select" value={selectedText.splitByGrapheme ? "grapheme" : "space"} onchange={(e) => splitChanged(e.currentTarget.value)}>
             <option value="space">{$tr("params.params.text.split.spaces")}</option>
             <option value="grapheme">{$tr("params.params.text.split.grapheme")}</option>
           </select>
@@ -220,11 +222,11 @@
       step="2"
       class="form-control"
       value={selectedText.fontSize}
-      on:input={(e) => fontSizeChange(e.currentTarget.valueAsNumber)} />
-    <button class="btn btn-secondary" title={$tr("params.text.font_size.up")} on:click={fontSizeUp}>
+      oninput={(e) => fontSizeChange(e.currentTarget.valueAsNumber)} />
+    <button class="btn btn-secondary" title={$tr("params.text.font_size.up")} onclick={fontSizeUp}>
       <MdIcon icon="text_increase" />
     </button>
-    <button class="btn btn-secondary" title={$tr("params.text.font_size.down")} on:click={fontSizeDown}>
+    <button class="btn btn-secondary" title={$tr("params.text.font_size.down")} onclick={fontSizeDown}>
       <MdIcon icon="text_decrease" />
     </button>
   </div>
@@ -240,12 +242,12 @@
       max="10"
       class="form-control"
       value={selectedText.lineHeight}
-      on:input={(e) => lineHeightChange(e.currentTarget.valueAsNumber)} />
+      oninput={(e) => lineHeightChange(e.currentTarget.valueAsNumber)} />
   </div>
 
   <FontFamilyPicker value={selectedText.fontFamily} valueUpdated={updateFontFamily} />
 
-  <button class="btn btn-sm btn-secondary" on:click={editInPopup} title={$tr("params.text.edit")}>
+  <button class="btn btn-sm btn-secondary" onclick={editInPopup} title={$tr("params.text.edit")}>
     <MdIcon icon="edit" />
   </button>
 {/if}

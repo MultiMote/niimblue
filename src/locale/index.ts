@@ -1,18 +1,18 @@
-import lang_cs from "./dicts/cs.json";
-import lang_de from "./dicts/de.json";
-import lang_en from "./dicts/en.json";
-import lang_it from "./dicts/it.json";
-import lang_ru from "./dicts/ru.json";
-import lang_pl from "./dicts/pl.json";
-import lang_zh_cn from "./dicts/zh_cn.json";
-import lang_zh_tw from "./dicts/zh_tw.json";
-import lang_fr from "./dicts/fr.json";
-import lang_pt_br from "./dicts/pt_BR.json";
-import lang_hr from "./dicts/hr.json";
-import lang_ko_kr from "./dicts/ko_KR.json";
-import lang_es from "./dicts/es.json";
-import lang_ar from "./dicts/ar.json";
-import lang_hu from "./dicts/hu.json";
+import lang_cs from "$/locale/dicts/cs.json";
+import lang_de from "$/locale/dicts/de.json";
+import lang_en from "$/locale/dicts/en.json";
+import lang_it from "$/locale/dicts/it.json";
+import lang_ru from "$/locale/dicts/ru.json";
+import lang_pl from "$/locale/dicts/pl.json";
+import lang_zh_cn from "$/locale/dicts/zh_cn.json";
+import lang_zh_tw from "$/locale/dicts/zh_tw.json";
+import lang_fr from "$/locale/dicts/fr.json";
+import lang_pt_br from "$/locale/dicts/pt_BR.json";
+import lang_hr from "$/locale/dicts/hr.json";
+import lang_ko_kr from "$/locale/dicts/ko_KR.json";
+import lang_es from "$/locale/dicts/es.json";
+import lang_ar from "$/locale/dicts/ar.json";
+import lang_hu from "$/locale/dicts/hu.json";
 
 export type TranslationKey = keyof typeof lang_en;
 export type TranslationDict = Record<TranslationKey, string>;
@@ -55,6 +55,6 @@ export type SupportedLanguage = keyof typeof langPack;
 export const languageNames = Object.assign(
   {},
   ...Object.entries(langPack).map(([k, v]) => ({
-    [k]: v["lang.name"] ?? k
-  }))
+    [k]: v["lang.name"] ?? k,
+  })),
 ) as Record<SupportedLanguage, string>;

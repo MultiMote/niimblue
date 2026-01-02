@@ -1,6 +1,10 @@
 <script lang="ts">
-  import { tr } from "../../utils/i18n";
-  export let value: number;
+  import { tr } from "$/utils/i18n";
+  interface Props {
+    value: number;
+  }
+
+  let { value = $bindable() }: Props = $props();
 </script>
 
 <div class="input-group flex-nowrap input-group-sm mb-2">

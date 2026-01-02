@@ -14,6 +14,11 @@ export type LabelSplit = "none" | "vertical" | "horizontal";
 export type TailPosition = "right" | "bottom" | "left" | "top";
 export type MirrorType = "none" | "copy" | "flip";
 
+type _Range<T extends number, R extends unknown[]> =
+  R['length'] extends T ? R[number] : _Range<T, [R['length'], ...R]>;
+
+export type Range<T extends number> = number extends T ? number : _Range<T, []>;
+
 /** Not validated */
 export const FabricObjectSchema = z.custom<fabric.FabricObject>((val: any): boolean => {
   return typeof val === "object";
@@ -59,6 +64,7 @@ export const ExportedLabelTemplateSchema = z.object({
   thumbnailBase64: z.string().optional(),
   title: z.string().optional(),
   timestamp: z.number().positive().optional(),
+  id: z.string().optional(), // filled with localStorage key, not exported
 });
 
 const [firstTask, ...otherTasks] = printTaskNames;
@@ -75,7 +81,7 @@ export const PreviewPropsSchema = z.object({
   threshold: z.number().gte(1).lte(255).optional(),
   quantity: z.number().gte(1).optional(),
   density: z.number().gte(1).optional(),
-  labelType: z.nativeEnum(LabelType).optional(),
+  labelType: z.enum(LabelType).optional(),
   printTaskName: z.enum([firstTask, ...otherTasks]).optional(),
   offset: PreviewPropsOffsetSchema.optional(),
 });

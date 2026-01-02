@@ -1,18 +1,22 @@
 <script lang="ts">
-  import MdIcon from "../basic/MdIcon.svelte";
-  import { tr } from "../../utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { tr } from "$/utils/i18n";
   import * as fabric from "fabric";
   import { onDestroy } from "svelte";
-  import QRCode from "../../fabric-object/qrcode";
-  import Barcode from "../../fabric-object/barcode";
+  import QRCode from "$/fabric-object/qrcode";
+  import Barcode from "$/fabric-object/barcode";
 
-  export let selectedObject: fabric.FabricObject;
+  interface Props {
+    selectedObject: fabric.FabricObject;
+  }
+
+  let { selectedObject }: Props = $props();
   let prevObject: fabric.FabricObject | undefined;
 
-  let x: number;
-  let y: number;
-  let width: number;
-  let height: number;
+  let x = $state<number>();
+  let y = $state<number>();
+  let width = $state<number>();
+  let height = $state<number>();
 
   const objectDimensionsChanged = () => {
     const pos = selectedObject.getPointByOrigin("left", "top");
@@ -34,13 +38,13 @@
   };
 
   const updateObject = () => {
-    const newPos = new fabric.Point(Math.round(Math.max(x, 1)), Math.round(Math.max(y, 1)));
+    const newPos = new fabric.Point(Math.round(Math.max(x!, 1)), Math.round(Math.max(y!, 1)));
 
     selectedObject.setPositionByOrigin(newPos, "left", "top");
 
     selectedObject.set({
-      width: Math.round(Math.max(width, 1)),
-      height: Math.round(Math.max(height, 1)),
+      width: Math.round(Math.max(width!, 1)),
+      height: Math.round(Math.max(height!, 1)),
     });
 
     selectedObject.setCoords();
@@ -49,7 +53,9 @@
 
   onDestroy(() => selectedObject.off("modified", objectDimensionsChanged));
 
-  $: objectChanged(selectedObject);
+  $effect(() => {
+    objectChanged(selectedObject);
+  });
 </script>
 
 <div class="dropdown">
@@ -63,17 +69,17 @@
   <div class="dropdown-menu arrangement p-2">
     <div class="input-group flex-nowrap input-group-sm mb-2">
       <span class="input-group-text">x</span>
-      <input class="form-control" type="number" min="1" bind:value={x} on:change={updateObject} />
+      <input class="form-control" type="number" min="1" bind:value={x} onchange={updateObject} />
     </div>
     <div class="input-group flex-nowrap input-group-sm mb-2">
       <span class="input-group-text">y</span>
-      <input class="form-control" type="number" min="1" bind:value={y} on:change={updateObject} />
+      <input class="form-control" type="number" min="1" bind:value={y} onchange={updateObject} />
     </div>
     {#if !(selectedObject instanceof fabric.FabricText || selectedObject instanceof fabric.FabricImage || selectedObject instanceof QRCode || selectedObject instanceof Barcode)}
       <div class="input-group flex-nowrap input-group-sm mb-2">
-        <input class="form-control" type="number" min="1" bind:value={width} on:change={updateObject} />
+        <input class="form-control" type="number" min="1" bind:value={width} onchange={updateObject} />
         <span class="input-group-text">x</span>
-        <input class="form-control" type="number" min="1" bind:value={height} on:change={updateObject} />
+        <input class="form-control" type="number" min="1" bind:value={height} onchange={updateObject} />
       </div>
     {/if}
   </div>

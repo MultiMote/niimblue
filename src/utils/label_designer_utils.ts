@@ -1,6 +1,6 @@
 import * as fabric from "fabric";
-import { GRID_SIZE, OBJECT_DEFAULTS } from "../defaults";
-import type { MoveDirection } from "../types";
+import { GRID_SIZE, OBJECT_DEFAULTS } from "$/defaults";
+import type { MoveDirection } from "$/types";
 
 export class LabelDesignerUtils {
   static async cloneSelection(canvas: fabric.Canvas): Promise<void> {
@@ -12,7 +12,7 @@ export class LabelDesignerUtils {
       return;
     }
 
-    let selected: fabric.FabricObject[] = canvas.getActiveObjects();
+    const selected: fabric.FabricObject[] = canvas.getActiveObjects();
 
     for (const obj of selected) {
       const cloned = await obj.clone();
@@ -35,7 +35,11 @@ export class LabelDesignerUtils {
     canvas.setActiveObject(newSelection);
   }
 
-  static moveSelection(canvas: fabric.Canvas, direction: MoveDirection, ctrl?: boolean) {
+  static moveSelection(
+    canvas: fabric.Canvas,
+    direction: MoveDirection,
+    ctrl?: boolean,
+  ) {
     const selected: fabric.FabricObject[] = canvas.getActiveObjects();
     const amount = ctrl ? 1 : GRID_SIZE;
 
@@ -65,11 +69,16 @@ export class LabelDesignerUtils {
   static isAnyInputFocused(canvas: fabric.Canvas): boolean {
     const focused: Element | null = document.activeElement;
 
-    if (focused !== null && (focused.tagName === "INPUT" || focused.tagName === "TEXTAREA")) {
+    if (
+      focused !== null &&
+      (focused.tagName === "INPUT" || focused.tagName === "TEXTAREA")
+    ) {
       return true;
     }
     const selected: fabric.FabricObject[] = canvas.getActiveObjects();
-    const editing = selected.some((obj) => obj instanceof fabric.IText && obj.isEditing);
+    const editing = selected.some(
+      (obj) => obj instanceof fabric.IText && obj.isEditing,
+    );
 
     if (editing) {
       return true;

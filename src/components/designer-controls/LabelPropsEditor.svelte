@@ -8,22 +8,26 @@
     type LabelUnit,
     type MirrorType,
     type TailPosition,
-  } from "../../types";
-  import LabelPresetsBrowser from "./LabelPresetsBrowser.svelte";
-  import { printerMeta } from "../../stores";
-  import { tr } from "../../utils/i18n";
-  import { DEFAULT_LABEL_PRESETS } from "../../defaults";
+  } from "$/types";
+  import LabelPresetsBrowser from "$/components/designer-controls/LabelPresetsBrowser.svelte";
+  import { printerMeta } from "$/stores";
+  import { tr } from "$/utils/i18n";
+  import { DEFAULT_LABEL_PRESETS } from "$/defaults";
   import { onMount, tick } from "svelte";
-  import { LocalStoragePersistence } from "../../utils/persistence";
+  import { LocalStoragePersistence } from "$/utils/persistence";
   import type { PrintDirection } from "@mmote/niimbluelib";
-  import MdIcon from "../basic/MdIcon.svelte";
-  import { Toasts } from "../../utils/toasts";
-  import { FileUtils } from "../../utils/file_utils";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { Toasts } from "$/utils/toasts";
+  import { FileUtils } from "$/utils/file_utils";
   import { z } from "zod";
-  import DpiSelector from "./DpiSelector.svelte";
+  import DpiSelector from "$/components/designer-controls/DpiSelector.svelte";
 
-  export let labelProps: LabelProps;
-  export let onChange: (newProps: LabelProps) => void;
+  interface Props {
+    labelProps: LabelProps;
+    onChange: (newProps: LabelProps) => void;
+  }
+
+  let { labelProps, onChange }: Props = $props();
 
   const tailPositions: TailPosition[] = ["right", "bottom", "left", "top"];
   const printDirections: PrintDirection[] = ["left", "top"];
@@ -31,22 +35,49 @@
   const labelSplits: LabelSplit[] = ["none", "vertical", "horizontal"];
   const mirrorTypes: MirrorType[] = ["none", "flip", "copy"];
 
-  let labelPresets: LabelPreset[] = DEFAULT_LABEL_PRESETS;
+  let labelPresets = $state<LabelPreset[]>(DEFAULT_LABEL_PRESETS);
 
-  let title: string | undefined = "";
+  let title = $state<string | undefined>("");
   let prevUnit: LabelUnit = "mm";
-  let unit: LabelUnit = "mm";
-  let dpmm = 8;
-  let width = 0;
-  let height = 0;
-  let printDirection: PrintDirection = "left";
-  let shape: LabelShape = "rect";
-  let split: LabelSplit = "none";
-  let splitParts: number = 2;
-  let tailLength: number = 0;
-  let tailPos: TailPosition = "right";
-  let mirror: MirrorType = "none";
-  let error: string = "";
+  let unit = $state<LabelUnit>("mm");
+  let dpmm = $state<number>(8);
+  let width = $state<number>(0);
+  let height = $state<number>(0);
+  let printDirection = $state<PrintDirection>("left");
+  let shape = $state<LabelShape>("rect");
+  let split = $state<LabelSplit>("none");
+  let splitParts = $state<number>(2);
+  let tailLength = $state<number>(0);
+  let tailPos = $state<TailPosition>("right");
+  let mirror = $state<MirrorType>("none");
+
+  let error = $derived.by<string>(() => {
+    let error = "";
+
+    const headSize = labelProps.printDirection == "left" ? labelProps.size.height : labelProps.size.width;
+    if ($printerMeta !== undefined) {
+      if (headSize > $printerMeta.printheadPixels) {
+        error += $tr("params.label.warning.width") + " ";
+        error += `(${headSize} > ${$printerMeta.printheadPixels})`;
+        error += "\n";
+      }
+
+      if ($printerMeta.printDirection !== labelProps.printDirection) {
+        error += $tr("params.label.warning.direction") + " ";
+        if ($printerMeta.printDirection == "left") {
+          error += $tr("params.label.direction.left");
+        } else {
+          error += $tr("params.label.direction.top");
+        }
+      }
+    }
+
+    if (headSize % 8 !== 0) {
+      error += $tr("params.label.warning.div8");
+    }
+
+    return error;
+  });
 
   const onApply = () => {
     let newWidth = width;
@@ -89,19 +120,21 @@
   const onLabelPresetSelected = (index: number) => {
     const preset = labelPresets[index];
 
-    dpmm = preset.dpmm;
-    prevUnit = preset.unit;
-    unit = preset.unit;
-    printDirection = preset.printDirection;
-    width = preset.width;
-    height = preset.height;
-    title = preset.title ?? "";
-    shape = preset.shape ?? "rect";
-    split = preset.split ?? "none";
-    splitParts = preset.splitParts ?? 2;
-    tailPos = preset.tailPos ?? "right";
-    tailLength = preset.tailLength ?? 0;
-    mirror = preset.mirror ?? "none";
+    if (preset !== undefined) {
+      dpmm = preset.dpmm;
+      prevUnit = preset.unit;
+      unit = preset.unit;
+      printDirection = preset.printDirection;
+      width = preset.width;
+      height = preset.height;
+      title = preset.title ?? "";
+      shape = preset.shape ?? "rect";
+      split = preset.split ?? "none";
+      splitParts = preset.splitParts ?? 2;
+      tailPos = preset.tailPos ?? "right";
+      tailLength = preset.tailLength ?? 0;
+      mirror = preset.mirror ?? "none";
+    }
 
     onApply();
   };
@@ -155,32 +188,6 @@
       tailLength = Math.floor(tailLength / dpmm);
     }
     prevUnit = unit;
-  };
-
-  const checkError = (props: LabelProps) => {
-    error = "";
-
-    const headSize = props.printDirection == "left" ? props.size.height : props.size.width;
-    if ($printerMeta !== undefined) {
-      if (headSize > $printerMeta.printheadPixels) {
-        error += $tr("params.label.warning.width") + " ";
-        error += `(${headSize} > ${$printerMeta.printheadPixels})`;
-        error += "\n";
-      }
-
-      if ($printerMeta.printDirection !== props.printDirection) {
-        error += $tr("params.label.warning.direction") + " ";
-        if ($printerMeta.printDirection == "left") {
-          error += $tr("params.label.direction.left");
-        } else {
-          error += $tr("params.label.direction.top");
-        }
-      }
-    }
-
-    if (headSize % 8 !== 0) {
-      error += $tr("params.label.warning.div8");;
-    }
   };
 
   const fillWithCurrentParams = () => {
@@ -247,11 +254,17 @@
     tick().then(() => fillWithCurrentParams());
   });
 
-  $: checkError(labelProps);
-  $: if (shape === "circle" && split !== "none") split = "none";
-  $: if (split === "none") tailLength = 0;
-  $: if (mirror === "flip" && splitParts !== 2) mirror = "copy";
-  $: if (tailLength < 0) tailLength = 0;
+  $effect(() => {
+    if (shape === "circle" && split !== "none") split = "none";
+  });
+
+  $effect(() => {
+    if (split === "none" || tailLength < 0) tailLength = 0;
+  });
+
+  $effect(() => {
+    if (mirror === "flip" && splitParts !== 2) mirror = "copy";
+  });
 </script>
 
 <div class="dropdown">
@@ -263,11 +276,11 @@
 
     <div class="px-3">
       <div class="p-1">
-        <button class="btn btn-sm btn-outline-secondary" on:click={onImportClicked}>
+        <button class="btn btn-sm btn-outline-secondary" onclick={onImportClicked}>
           <MdIcon icon="data_object" />
           {$tr("params.label.import")}
         </button>
-        <button class="btn btn-sm btn-outline-secondary" on:click={onExportClicked}>
+        <button class="btn btn-sm btn-outline-secondary" onclick={onExportClicked}>
           <MdIcon icon="data_object" />
           {$tr("params.label.export")}
         </button>
@@ -281,7 +294,7 @@
         {:else if labelProps.printDirection === "left"}
           ({$tr("params.label.direction")} {$tr("params.label.direction.left")})
         {/if}
-        <button class="btn btn-sm" on:click={fillWithCurrentParams}><MdIcon icon="arrow_downward" /></button>
+        <button class="btn btn-sm" onclick={fillWithCurrentParams}><MdIcon icon="arrow_downward" /></button>
       </div>
 
       <LabelPresetsBrowser
@@ -293,9 +306,9 @@
       <div class="input-group flex-nowrap input-group-sm mb-2">
         <span class="input-group-text">{$tr("params.label.size")}</span>
         <input class="form-control" type="number" min="1" step={unit === "px" ? 8 : 1} bind:value={width} />
-        <button class="btn btn-sm btn-secondary" on:click={onFlip}><MdIcon icon="swap_horiz" /></button>
+        <button class="btn btn-sm btn-secondary" onclick={onFlip}><MdIcon icon="swap_horiz" /></button>
         <input class="form-control" type="number" min="1" step={unit === "px" ? 8 : 1} bind:value={height} />
-        <select class="form-select" bind:value={unit} on:change={onUnitChange}>
+        <select class="form-select" bind:value={unit} onchange={onUnitChange}>
           <option value="mm"> {$tr("params.label.mm")}</option>
           <option value="px"> {$tr("params.label.px")}</option>
         </select>
@@ -307,7 +320,7 @@
 
       <div class="input-group flex-nowrap input-group-sm print-dir-switch mb-2" role="group">
         <span class="input-group-text w-100">{$tr("params.label.direction")}</span>
-        {#each printDirections as v}
+        {#each printDirections as v (v)}
           <input
             type="radio"
             class="btn-check"
@@ -324,7 +337,7 @@
 
       <div class="input-group flex-nowrap input-group-sm label-shape-switch mb-2" role="group">
         <span class="input-group-text w-100">{$tr("params.label.shape")}</span>
-        {#each labelShapes as v}
+        {#each labelShapes as v (v)}
           <input
             type="radio"
             class="btn-check"
@@ -342,7 +355,7 @@
       {#if shape !== "circle"}
         <div class="input-group flex-nowrap input-group-sm label-split-switch mb-2" role="group">
           <span class="input-group-text w-100">{$tr("params.label.split")}</span>
-          {#each labelSplits as v}
+          {#each labelSplits as v (v)}
             <input
               type="radio"
               class="btn-check"
@@ -368,7 +381,7 @@
       {#if split !== "none"}
         <div class="input-group flex-nowrap input-group-sm mirror-switch mb-2" role="group">
           <span class="input-group-text w-100">{$tr("params.label.mirror")}</span>
-          {#each mirrorTypes as v}
+          {#each mirrorTypes as v (v)}
             <input
               type="radio"
               class="btn-check"
@@ -385,7 +398,7 @@
 
         <div class="input-group flex-nowrap input-group-sm tail-pos-switch mb-2" role="group">
           <span class="input-group-text w-100">{$tr("params.label.tail.position")}</span>
-          {#each tailPositions as v}
+          {#each tailPositions as v (v)}
             <input
               type="radio"
               class="btn-check"
@@ -416,10 +429,10 @@
       </div>
 
       <div class="text-end">
-        <button class="btn btn-sm btn-secondary" on:click={onLabelPresetAdd}>
+        <button class="btn btn-sm btn-secondary" onclick={onLabelPresetAdd}>
           {$tr("params.label.save_template")}
         </button>
-        <button class="btn btn-sm btn-primary" on:click={onApply}>{$tr("params.label.apply")}</button>
+        <button class="btn btn-sm btn-primary" onclick={onApply}>{$tr("params.label.apply")}</button>
       </div>
     </div>
   </div>

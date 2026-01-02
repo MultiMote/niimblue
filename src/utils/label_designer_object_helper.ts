@@ -1,16 +1,16 @@
 import * as fabric from "fabric";
-import { OBJECT_DEFAULTS, OBJECT_DEFAULTS_TEXT, OBJECT_DEFAULTS_VECTOR, OBJECT_SIZE_DEFAULTS } from "../defaults";
-import Barcode from "../fabric-object/barcode";
-import { QRCode } from "../fabric-object/qrcode";
-import type { OjectType } from "../types";
-import { Toasts } from "./toasts";
+import { OBJECT_DEFAULTS, OBJECT_DEFAULTS_TEXT, OBJECT_DEFAULTS_VECTOR, OBJECT_SIZE_DEFAULTS } from "$/defaults";
+import Barcode from "$/fabric-object/barcode";
+import { QRCode } from "$/fabric-object/qrcode";
+import type { OjectType } from "$/types";
+import { Toasts } from "$/utils/toasts";
 
 export class LabelDesignerObjectHelper {
   static async addSvg(canvas: fabric.Canvas, svgCode: string): Promise<fabric.FabricObject | fabric.Group> {
     const { objects, options } = await fabric.loadSVGFromString(svgCode);
     const obj = fabric.util.groupSVGElements(
       objects.filter((o) => o !== null),
-      options
+      options,
     );
     obj.scaleToWidth(OBJECT_SIZE_DEFAULTS.width);
     obj.scaleToHeight(OBJECT_SIZE_DEFAULTS.height);
@@ -100,7 +100,7 @@ export class LabelDesignerObjectHelper {
 
   static async addObjectFromClipboard(
     fabricCanvas: fabric.Canvas,
-    data: DataTransfer
+    data: DataTransfer,
   ): Promise<fabric.FabricObject | undefined> {
     // paste image
     for (const item of data.items) {
@@ -144,7 +144,7 @@ export class LabelDesignerObjectHelper {
   static addHLine(canvas: fabric.Canvas): fabric.Line {
     const obj = new fabric.Line(
       [OBJECT_DEFAULTS.left, OBJECT_DEFAULTS.top, OBJECT_DEFAULTS.left + OBJECT_SIZE_DEFAULTS.width, OBJECT_DEFAULTS.top],
-      { ...OBJECT_DEFAULTS_VECTOR }
+      { ...OBJECT_DEFAULTS_VECTOR },
     );
     obj.setControlsVisibility({
       tl: false,
@@ -172,7 +172,7 @@ export class LabelDesignerObjectHelper {
   static addRect(canvas: fabric.Canvas): fabric.Rect {
     const obj = new fabric.Rect({
       ...OBJECT_SIZE_DEFAULTS,
-      ...OBJECT_DEFAULTS_VECTOR
+      ...OBJECT_DEFAULTS_VECTOR,
     });
     canvas.add(obj);
     canvas.centerObjectV(obj);

@@ -1,16 +1,14 @@
 <script lang="ts">
   import type { FirmwareProgressEvent } from "@mmote/niimbluelib";
-  import { printerClient } from "../../stores";
-  import { Toasts } from "../../utils/toasts";
-  import { FileUtils } from "../../utils/file_utils";
+  import { printerClient } from "$/stores";
+  import { Toasts } from "$/utils/toasts";
+  import { FileUtils } from "$/utils/file_utils";
 
-  let fwVersion: string = "";
-  let fwVersionValid: boolean = false;
-  let fwProgress: string = "";
-  let fwData: Uint8Array | undefined;
-  let fwName: string = "";
-
-  $: fwVersionValid = /^\d+\.\d+$/.test(fwVersion);
+  let fwVersion = $state<string>("");
+  let fwVersionValid: boolean = $derived(/^\d+\.\d+$/.test(fwVersion));
+  let fwProgress = $state<string>("");
+  let fwData = $state<Uint8Array>();
+  let fwName = $state<string>("");
 
   const browseFw = async () => {
     const file = await FileUtils.pickAndReadBinaryFile("bin");
@@ -20,7 +18,7 @@
     const match = fwName.match(/(\d+\.\d+)/);
 
     // For modern firmware images version is stored in header
-    if (fwData[0] === 0x18) {
+    if (fwData.length >= 0x1C && fwData[0] === 0x18) {
       const verNumber = (fwData[0x15] << 8) + fwData[0x14];
       fwVersion = (verNumber / 100).toFixed(2);
     } else if (match) {
@@ -53,7 +51,7 @@
       await $printerClient.disconnect();
 
       Toasts.message("Flashing is finished, the printer will shut down now");
-      
+
       fwData = undefined;
       fwName = "";
       fwVersion = "";
@@ -74,7 +72,7 @@
       <span class="input-group-text">Uploading {fwProgress}</span>
     {:else}
       <span class="input-group-text">To</span>
-      <button class="btn btn-sm btn-secondary" title={fwName} on:click={browseFw} disabled={!!fwProgress}>
+      <button class="btn btn-sm btn-secondary" title={fwName} onclick={browseFw} disabled={!!fwProgress}>
         {fwName.length > 0 ? fwName.slice(0, 8) + "..." : "Browse..."}
       </button>
       <span class="input-group-text">ver.</span>
@@ -82,7 +80,7 @@
 
       <button
         class="btn btn-sm btn-danger"
-        on:click={upgradeFw}
+        onclick={upgradeFw}
         disabled={!!fwProgress || !fwVersionValid || fwData === undefined}>Burn</button>
     {/if}
   </div>
