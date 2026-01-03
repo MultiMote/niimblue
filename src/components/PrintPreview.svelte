@@ -2,7 +2,7 @@
   import { onDestroy, onMount } from "svelte";
   import { derived } from "svelte/store";
   import Modal from "bootstrap/js/dist/modal";
-  import { connectionState, printerClient, printerMeta } from "$/stores";
+  import { connectionState, printerClient, printerMeta, refreshRfidInfo } from "$/stores";
   import { copyImageData, threshold, atkinson, invert } from "$/utils/post_process";
   import {
     type EncodedImage,
@@ -12,6 +12,8 @@
     type PrintProgressEvent,
     type PrintTaskName,
     AbstractPrintTask,
+    PacketGenerator,
+    HeartbeatType,
   } from "@mmote/niimbluelib";
   import type { LabelProps, PostProcessType, FabricJson, PreviewProps, PreviewPropsOffset } from "$/types";
   import ParamLockButton from "$/components/basic/ParamLockButton.svelte";
@@ -71,7 +73,6 @@
     clearInterval(statusTimer);
 
     if (!$disconnected && printState !== "idle") {
-      await $printerClient.abstraction.printEnd();
 
       if (currentPrintTask !== undefined) {
         await currentPrintTask.printEnd();
@@ -79,6 +80,8 @@
         console.warn("Print task undefined, falling back to PrintEnd command");
         await $printerClient.abstraction.printEnd();
       }
+
+      refreshRfidInfo();
 
       $printerClient.startHeartbeat();
     }

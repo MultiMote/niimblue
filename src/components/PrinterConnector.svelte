@@ -12,6 +12,7 @@
     automation,
     rfidInfo,
     ribbonRfidInfo,
+    refreshRfidInfo,
   } from "$/stores";
   import type { ConnectionType } from "$/types";
   import { tr } from "$/utils/i18n";
@@ -43,18 +44,6 @@
 
   const onDisconnectClicked = () => {
     $printerClient.disconnect();
-  };
-
-  const getRfidInfo = async () => {
-    $rfidInfo = await $printerClient.abstraction.rfidInfo();
-  };
-
-  const getRibbonRfidInfo = async () => {
-    try {
-      $ribbonRfidInfo = await $printerClient.abstraction.rfidInfo2();
-    } catch (e) {
-      Toasts.error(e);
-    }
   };
 
   const startHeartbeat = async () => {
@@ -167,7 +156,7 @@
         </button>
 
         <div class="collapse" id="rfidInfo">
-          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={getRfidInfo}>Update</button>
+          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
 
           <ul>
             {#each Object.entries($rfidInfo) as [key, value] (key)}
@@ -187,7 +176,7 @@
         </button>
 
         <div class="collapse" id="ribbonRfidInfo">
-          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={getRibbonRfidInfo}>Update</button>
+          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
 
           <ul>
             {#each Object.entries($ribbonRfidInfo) as [k, v]}

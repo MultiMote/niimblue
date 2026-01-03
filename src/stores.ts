@@ -42,7 +42,23 @@ export const automation = readable<AutomationProps | undefined>(
   })(),
 );
 
+export const refreshRfidInfo = () => {
+  const client = get(printerClient);
+
+  if (!client) {
+    return;
+  }
+
+  client.abstraction.rfidInfo().then(rfidInfo.set).catch(console.error);
+
+  client.abstraction
+    .rfidInfo2()
+    .then(ribbonRfidInfo.set)
+    .catch(() => {});
+};
+
 export const initClient = (connectionType: ConnectionType) => {
+  refreshRfidInfo();
   printerClient.update((prevClient: NiimbotAbstractClient) => {
     let newClient: NiimbotAbstractClient = prevClient;
 
@@ -91,8 +107,7 @@ export const initClient = (connectionType: ConnectionType) => {
         heartbeatFails.set(0);
         heartbeatData.update((prev) => {
           if (prev?.rfidReadState !== e.data?.rfidReadState) {
-            newClient.abstraction.rfidInfo().then(rfidInfo.set).catch(console.error);
-            newClient.abstraction.rfidInfo2().then(ribbonRfidInfo.set).catch(() => console.log("RfidInfo2 not supported"));
+            refreshRfidInfo();
           }
           return e.data;
         });
