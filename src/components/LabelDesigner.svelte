@@ -287,9 +287,9 @@
       const urlTemplate = await FileUtils.readLabelFromUrl();
       const defaultTemplate = LocalStoragePersistence.loadDefaultTemplate();
 
-      if (urlTemplate !== null) {
+      if (urlTemplate !== null && confirm($tr("params.saved_labels.load.url.warn"))) {
         onLoadRequested(urlTemplate);
-        Toasts.message("Label loaded from URL");
+        Toasts.message($tr("params.saved_labels.load.url.loaded"));
       } else if (defaultTemplate !== null) {
         onLoadRequested(defaultTemplate);
       } else {

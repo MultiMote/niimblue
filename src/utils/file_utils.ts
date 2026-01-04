@@ -269,6 +269,10 @@ export class FileUtils {
     const encoder = new TextEncoder();
     const data = encoder.encode(labelStr);
 
+    if (data.length > (2 * 1024 * 1024)) {
+      throw new Error("Label data size > 2MB");
+    }
+
     const cs = new CompressionStream("gzip");
     const writer = cs.writable.getWriter();
     writer.write(data);

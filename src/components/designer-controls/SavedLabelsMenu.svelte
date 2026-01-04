@@ -9,6 +9,7 @@
   import Dropdown from "bootstrap/js/dist/dropdown";
   import { FileUtils } from "$/utils/file_utils";
   import * as fabric from "fabric";
+  import { Utils } from "@mmote/niimbluelib";
 
   interface Props {
     onRequestLabelTemplate: () => ExportedLabelTemplate;
@@ -24,6 +25,8 @@
   let title = $state<string>("");
   let usedSpace = $state<number>(0);
   let customDefaultTemplate = $state<boolean>(LocalStoragePersistence.hasCustomDefaultTemplate());
+  let isStandalone = Utils.getAvailableTransports().capacitorBle;
+
 
   const calcUsedSpace = () => {
     usedSpace = LocalStoragePersistence.usedSpace();
@@ -164,10 +167,15 @@
     try {
       const label = onRequestLabelTemplate();
       const url = await FileUtils.makeLabelUrl(label);
+
+      if (url.length > 2000 && !confirm($tr("params.saved_labels.save.url.warn"))) {
+        return;
+      }
+
       navigator.clipboard.writeText(url);
-      Toasts.message("Label URL copied to clipboard");
+      Toasts.message($tr("params.saved_labels.save.url.copied"));
     } catch (e) {
-      Toasts.zodErrors(e, "Unable to create label URL:");
+      Toasts.error(e);
     }
   };
 
@@ -208,9 +216,11 @@
             <li>
               <button class="dropdown-item" onclick={onExportPngClicked}>PNG</button>
             </li>
-            <li>
-              <button class="dropdown-item" onclick={onExportUrlClicked}>{$tr("params.saved_labels.save.url")}</button>
-            </li>
+            {#if !isStandalone}
+              <li>
+                <button class="dropdown-item" onclick={onExportUrlClicked}>{$tr("params.saved_labels.save.url")}</button>
+              </li>
+            {/if}
           </ul>
         </div>
       </div>
