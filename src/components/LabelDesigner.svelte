@@ -205,7 +205,12 @@
       undo.push(fabricCanvas!, labelProps);
     }
     fabricCanvas!.requestRenderAll();
-    selectedObject = selectedObject;
+
+    // trigger reactivity
+    // fixme: find a better way to do this
+    const _selectedObject = selectedObject;
+    selectedObject = undefined;
+    selectedObject = _selectedObject;
   };
 
   const getCanvasForPreview = (): FabricJson => {
@@ -469,14 +474,17 @@
         {/if}
 
         {#if selectedObject instanceof fabric.IText}
-          <TextParamsControls {selectedObject} valueUpdated={controlValueUpdated} />
+          <TextParamsControls selectedText={selectedObject} valueUpdated={controlValueUpdated} />
         {/if}
+
         {#if selectedObject instanceof QRCode}
-          <QrCodeParamsPanel {selectedObject} valueUpdated={controlValueUpdated} />
+          <QrCodeParamsPanel selectedQRCode={selectedObject} valueUpdated={controlValueUpdated} />
         {/if}
+
         {#if selectedObject instanceof Barcode}
-          <BarcodeParamsPanel {selectedObject} valueUpdated={controlValueUpdated} />
+          <BarcodeParamsPanel selectedBarcode={selectedObject} valueUpdated={controlValueUpdated} />
         {/if}
+
         {#if selectedObject instanceof fabric.IText || selectedObject instanceof QRCode || (selectedObject instanceof Barcode && selectedObject.encoding === "CODE128B")}
           <VariableInsertControl {selectedObject} valueUpdated={controlValueUpdated} />
         {/if}

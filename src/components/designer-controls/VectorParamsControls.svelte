@@ -4,7 +4,7 @@
   import * as fabric from "fabric";
 
   interface Props {
-    selectedObject: fabric.FabricObject | undefined;
+    selectedObject: fabric.FabricObject;
     valueUpdated: () => void;
   }
 
@@ -20,12 +20,12 @@
   };
 
   const strokeWidthChanged = (value: number) => {
-    selectedObject!.set({ strokeWidth: value });
+    selectedObject.set({ strokeWidth: value });
     valueUpdated();
   };
 
   const fillChanged = (value: string) => {
-    selectedObject!.set({ fill: value });
+    selectedObject.set({ fill: value });
     valueUpdated();
   };
 </script>
