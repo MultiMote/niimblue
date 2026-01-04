@@ -103,13 +103,9 @@
 
 </script>
 
-<!--
-A single $state.eager fixes component not updating when selectedText changes.
-I didn't find a better way to do this, svelte5 makes me sad.
--->
 <button
   title={$tr("params.text.align.left")}
-  class="btn btn-sm {$state.eager(selectedText.textAlign) === 'left' ? 'btn-secondary' : ''}"
+  class="btn btn-sm {selectedText.textAlign === 'left' ? 'btn-secondary' : ''}"
   onclick={() => setXAlign("left")}><MdIcon icon="format_align_left" /></button>
 <button
   title={$tr("params.text.align.center")}
