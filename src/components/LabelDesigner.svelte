@@ -44,6 +44,7 @@
   let previewOpened = $state<boolean>(false);
   let selectedObject = $state<fabric.FabricObject | undefined>(undefined);
   let selectedCount = $state<number>(0);
+  let editRevision = $state<number>(0);
   let printNow = $state<boolean>(false);
   let csvData = $state<string>("");
   let csvEnabled = $state<boolean>(false);
@@ -57,6 +58,7 @@
     fabricCanvas!.requestRenderAll();
     selectedObject = undefined;
     selectedCount = 0;
+    editRevision = 0;
   };
 
   const loadLabelData = async (data: ExportedLabelTemplate) => {
@@ -206,11 +208,8 @@
     }
     fabricCanvas!.requestRenderAll();
 
-    // trigger reactivity
-    // fixme: find a better way to do this
-    const _selectedObject = selectedObject;
-    selectedObject = undefined;
-    selectedObject = _selectedObject;
+    // trigger reactivity for controls
+    editRevision++;
   };
 
   const getCanvasForPreview = (): FabricJson => {
@@ -327,16 +326,19 @@
     fabricCanvas.on("selection:created", (e): void => {
       selectedCount = e.selected?.length ?? 0;
       selectedObject = e.selected?.length === 1 ? e.selected[0] : undefined;
+      editRevision++;
     });
 
     fabricCanvas.on("selection:updated", (e): void => {
       selectedCount = e.selected?.length ?? 0;
       selectedObject = e.selected?.length === 1 ? e.selected[0] : undefined;
+      editRevision++;
     });
 
     fabricCanvas.on("selection:cleared", (): void => {
       selectedObject = undefined;
       selectedCount = 0;
+      editRevision++;
     });
 
     fabricCanvas.on("dragover", (e): void => {
@@ -474,23 +476,23 @@
         {/if}
 
         {#if selectedObject && selectedCount === 1}
-          <GenericObjectParamsControls {selectedObject} valueUpdated={controlValueUpdated} />
+          <GenericObjectParamsControls {selectedObject} {editRevision} valueUpdated={controlValueUpdated} />
         {/if}
 
         {#if selectedObject}
-          <VectorParamsControls {selectedObject} valueUpdated={controlValueUpdated} />
+          <VectorParamsControls {selectedObject} {editRevision} valueUpdated={controlValueUpdated} />
         {/if}
 
         {#if selectedObject instanceof fabric.IText}
-          <TextParamsControls selectedText={selectedObject} valueUpdated={controlValueUpdated} />
+          <TextParamsControls selectedText={selectedObject} {editRevision} valueUpdated={controlValueUpdated} />
         {/if}
 
         {#if selectedObject instanceof QRCode}
-          <QrCodeParamsPanel selectedQRCode={selectedObject} valueUpdated={controlValueUpdated} />
+          <QrCodeParamsPanel selectedQRCode={selectedObject} {editRevision} valueUpdated={controlValueUpdated} />
         {/if}
 
         {#if selectedObject instanceof Barcode}
-          <BarcodeParamsPanel selectedBarcode={selectedObject} valueUpdated={controlValueUpdated} />
+          <BarcodeParamsPanel selectedBarcode={selectedObject} {editRevision} valueUpdated={controlValueUpdated} />
         {/if}
 
         {#if selectedObject instanceof fabric.IText || selectedObject instanceof QRCode || (selectedObject instanceof Barcode && selectedObject.encoding === "CODE128B")}

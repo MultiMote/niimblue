@@ -6,10 +6,11 @@
 
   interface Props {
     selectedText: fabric.IText;
+    editRevision: number;
     valueUpdated: () => void;
   }
 
-  let { selectedText, valueUpdated }: Props = $props();
+  let { selectedText, editRevision, valueUpdated }: Props = $props();
 
   let sizeMin: number = 1;
   let sizeMax: number = 999;
@@ -102,6 +103,9 @@
 
 
 </script>
+
+<!-- Fix component not updating when selectedText changes. I didn't find a better way to do this. -->
+<input type="hidden" value={editRevision}>
 
 <button
   title={$tr("params.text.align.left")}

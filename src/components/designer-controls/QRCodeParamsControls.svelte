@@ -5,11 +5,14 @@
 
   interface Props {
     selectedQRCode: QRCode;
+    editRevision: number;
     valueUpdated: () => void;
   }
 
-  let { selectedQRCode, valueUpdated }: Props = $props();
+  let { selectedQRCode, editRevision, valueUpdated }: Props = $props();
 </script>
+
+<input type="hidden" value={editRevision}>
 
 <div class="input-group input-group-sm flex-nowrap">
   <span class="input-group-text" title={$tr("params.qrcode.ecl")}>

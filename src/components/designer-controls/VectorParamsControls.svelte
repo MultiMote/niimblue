@@ -5,10 +5,11 @@
 
   interface Props {
     selectedObject: fabric.FabricObject;
+    editRevision: number;
     valueUpdated: () => void;
   }
 
-  let { selectedObject, valueUpdated }: Props = $props();
+  let { selectedObject, editRevision, valueUpdated }: Props = $props();
 
   const roundRadiusChanged = (value: number) => {
     const rect = selectedObject as fabric.Rect;
@@ -29,6 +30,8 @@
     valueUpdated();
   };
 </script>
+
+<input type="hidden" value={editRevision}>
 
 {#if selectedObject instanceof fabric.Rect}
   <div class="input-group flex-nowrap input-group-sm">

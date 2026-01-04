@@ -8,10 +8,11 @@
 
   interface Props {
     selectedObject: fabric.FabricObject;
+    editRevision: number;
     valueUpdated: () => void;
   }
 
-  let { selectedObject, valueUpdated }: Props = $props();
+  let { selectedObject, editRevision, valueUpdated }: Props = $props();
 
   const putToCenterV = () => {
     selectedObject.canvas!.centerObjectV(selectedObject);
@@ -65,6 +66,8 @@
     appConfig.update((v) => ({ ...v, fitMode: fitMode }));
   };
 </script>
+
+<input type="hidden" value={editRevision}>
 
 <button class="btn btn-sm btn-secondary" onclick={putToCenterV} title={$tr("params.generic.center.vertical")}>
   <MdIcon icon="vertical_distribute" />

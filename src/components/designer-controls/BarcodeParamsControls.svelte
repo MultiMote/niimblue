@@ -5,11 +5,14 @@
 
   interface Props {
     selectedBarcode: Barcode;
+    editRevision: number;
     valueUpdated: () => void;
   }
 
-  let { selectedBarcode, valueUpdated }: Props = $props();
+  let { selectedBarcode, editRevision, valueUpdated }: Props = $props();
 </script>
+
+<input type="hidden" value={editRevision}>
 
 <div class="input-group input-group-sm flex-nowrap">
   <span class="input-group-text" title={$tr("params.barcode.encoding")}><MdIcon icon="code" /></span>
