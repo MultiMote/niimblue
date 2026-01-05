@@ -12,6 +12,7 @@ import { z } from "zod";
 import { CustomCanvas } from "$/fabric-object/custom_canvas";
 import { Capacitor } from "@capacitor/core";
 import { fixFabricObjectScale } from "$/utils/canvas_utils";
+import { LocalStoragePersistence } from "./persistence";
 
 export class FileUtils {
   static timestamp(): number {
@@ -90,12 +91,16 @@ export class FileUtils {
       format: "jpeg",
     });
 
-    return {
+    const tpl: ExportedLabelTemplate = {
       canvas: canvas.toJSON(),
       label: labelProps,
       thumbnailBase64,
       timestamp: this.timestamp(),
     };
+
+    tpl.id = LocalStoragePersistence.createUidForLabel(tpl);
+
+    return tpl;
   }
 
   /** Convert label template to JSON and download it */

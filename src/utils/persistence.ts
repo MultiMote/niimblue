@@ -139,6 +139,17 @@ export class LocalStoragePersistence {
     this.validateAndSaveObject("last_label_props", labelData, LabelPropsSchema);
   }
 
+  static createUidForLabel(label: ExportedLabelTemplate): string {
+    const basename = `saved_label_${label.timestamp}`;
+    let counter = 0;
+
+    while (`${basename}_${counter}` in localStorage) {
+      counter++;
+    }
+
+    return `${basename}_${counter}`;
+  }
+
   static saveLabels(labels: ExportedLabelTemplate[]): {
     zodErrors: z.ZodError[];
     otherErrors: Error[];
@@ -166,7 +177,7 @@ export class LocalStoragePersistence {
         }
 
         this.validateAndSaveObject(
-          `${basename}_${counter}`,
+          this.createUidForLabel(label),
           label,
           ExportedLabelTemplateSchema.omit({ id: true }),
         );
