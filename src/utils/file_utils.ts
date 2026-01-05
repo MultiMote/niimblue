@@ -34,7 +34,6 @@ export class FileUtils {
 
   /** Convert base64 string to bytes */
   static base64toBytes(b64str: string): Uint8Array<ArrayBuffer> {
-    console.log(b64str)
     const binaryString = atob(b64str);
     const bytes = new Uint8Array(binaryString.length);
     for (let i = 0; i < binaryString.length; i++) {
