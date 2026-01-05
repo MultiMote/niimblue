@@ -12,8 +12,6 @@
     type PrintProgressEvent,
     type PrintTaskName,
     AbstractPrintTask,
-    PacketGenerator,
-    HeartbeatType,
   } from "@mmote/niimbluelib";
   import type { LabelProps, PostProcessType, FabricJson, PreviewProps, PreviewPropsOffset } from "$/types";
   import ParamLockButton from "$/components/basic/ParamLockButton.svelte";
@@ -49,7 +47,7 @@
   let thresholdValue = $state<number>(140);
   let originalImage: ImageData;
   let previewContext: CanvasRenderingContext2D;
-  let printTaskName = $state<PrintTaskName>("D110");
+  let printTaskName = $state<PrintTaskName>("B1");
   let labelType = $state<LabelType>(LabelType.WithGaps);
   // eslint-disable-next-line no-undef
   let statusTimer: NodeJS.Timeout | undefined = undefined;
