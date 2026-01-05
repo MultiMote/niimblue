@@ -261,6 +261,33 @@
     fabricCanvas!.clear();
   };
 
+  const loadDefaultLabel = async () => {
+    try {
+      const urlTemplate = await FileUtils.readLabelFromUrl();
+
+      if (urlTemplate !== null && confirm($tr("params.saved_labels.load.url.warn"))) {
+        onLoadRequested(urlTemplate);
+        Toasts.message($tr("params.saved_labels.load.url.loaded"));
+        return;
+      }
+    } catch (e) {
+      Toasts.error(e);
+    }
+
+    try {
+      const defaultTemplate = LocalStoragePersistence.loadDefaultTemplate();
+
+      if (defaultTemplate !== null) {
+        onLoadRequested(defaultTemplate);
+        return;
+      }
+    } catch (e) {
+      Toasts.error(e);
+    }
+
+    LabelDesignerObjectHelper.addText(fabricCanvas!, $tr("editor.default_text"));
+  };
+
   onMount(async () => {
     const csvSaved = LocalStoragePersistence.loadCsv();
     csvData = csvSaved.data;
@@ -280,23 +307,7 @@
     });
     fabricCanvas.setLabelProps(labelProps);
 
-
-    try {
-      // fixme: handle errors correctly
-      const urlTemplate = await FileUtils.readLabelFromUrl();
-      const defaultTemplate = LocalStoragePersistence.loadDefaultTemplate();
-
-      if (urlTemplate !== null && confirm($tr("params.saved_labels.load.url.warn"))) {
-        onLoadRequested(urlTemplate);
-        Toasts.message($tr("params.saved_labels.load.url.loaded"));
-      } else if (defaultTemplate !== null) {
-        onLoadRequested(defaultTemplate);
-      } else {
-        LabelDesignerObjectHelper.addText(fabricCanvas, $tr("editor.default_text"));
-      }
-    } catch (e) {
-      Toasts.error(e);
-    }
+    await loadDefaultLabel();
 
     undo.push(fabricCanvas, labelProps);
 

@@ -32,6 +32,17 @@ export class FileUtils {
     return this.base64str(json);
   }
 
+  /** Convert base64 string to bytes */
+  static base64toBytes(b64str: string): Uint8Array<ArrayBuffer> {
+    console.log(b64str)
+    const binaryString = atob(b64str);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.codePointAt(i)!;
+    }
+    return bytes;
+  }
+
   static async downloadBase64Web(filename: string, mime: string, base64Data: string) {
     const byteChars = atob(base64Data);
     const byteNumbers = new Array(byteChars.length);
@@ -300,8 +311,17 @@ export class FileUtils {
     }
 
     return anchorData.split("&").reduce((res: Record<string, string>, item: string) => {
-      const parts = item.split("=");
-      res[parts[0]] = parts[1];
+      const firstEqualsIndex = item.indexOf("=");
+
+      if (firstEqualsIndex === -1) {
+        // Handle case without value (e.g., "key" without "=value")
+        res[item] = "";
+      } else {
+        const key = item.slice(0, firstEqualsIndex);
+        const value = item.slice(firstEqualsIndex + 1);
+        res[key] = value;
+      }
+
       return res;
     }, {});
   }
@@ -309,18 +329,20 @@ export class FileUtils {
   static async readLabelFromUrl(): Promise<ExportedLabelTemplate | null> {
     const params = FileUtils.urlHashParamsToDict();
 
+    if ("uload" in params) {
+      const b64data: string = params["uload"];
+      const jsonBytes = this.base64toBytes(b64data);
+      const jsonStr = new TextDecoder().decode(jsonBytes);
+      const labelObj = JSON.parse(jsonStr);
+      return ExportedLabelTemplateSchema.parse(labelObj);
+    }
+
     if (!("load" in params)) {
       return null;
     }
 
     const b64data: string = params["load"];
-
-    const binaryString = atob(b64data);
-
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.codePointAt(i)!;
-    }
+    const bytes = this.base64toBytes(b64data);
 
     const ds = new DecompressionStream("gzip");
     const writer = ds.writable.getWriter();
