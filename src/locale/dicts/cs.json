@@ -147,5 +147,10 @@
     "params.qrcode.version": "Verze",
     "params.params.text.split": "Dělení textu (zalamování)",
     "params.params.text.split.spaces": "Mezery",
-    "params.params.text.split.grapheme": "Znaky"
+    "params.params.text.split.grapheme": "Znaky",
+    "params.saved_labels.save.url": "Zkopírovat odkaz",
+    "params.saved_labels.load.url.loaded": "Štítek byl načten z URL",
+    "params.saved_labels.save.url.copied": "URL štítku byla zkopírována do schránky",
+    "params.saved_labels.save.url.warn": "Data štítku jsou příliš velká a URL by nemusela fungovat ve všech prohlížečích.\nPokuste se zmenšit velikost štítku (například odstraněním obrázků).\nPokračovat?",
+    "params.saved_labels.load.url.warn": "Načíst štítek z URL?"
 }
