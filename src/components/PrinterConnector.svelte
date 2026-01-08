@@ -179,8 +179,8 @@
           <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
 
           <ul>
-            {#each Object.entries($ribbonRfidInfo) as [k, v]}
-              <li>{k}: <strong>{v ?? "-"}</strong></li>
+            {#each Object.entries($ribbonRfidInfo) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
