@@ -5,7 +5,7 @@
   import { Barcode } from "$/fabric-object/barcode";
   import { QRCode } from "$/fabric-object/qrcode";
   import { iconCodepoints, type MaterialIcon } from "$/styles/mdi_icons";
-  import { automation, connectionState } from "$/stores";
+  import { automation, connectionState, csvData } from "$/stores";
   import {
     type ExportedLabelTemplate,
     type FabricJson,
@@ -46,7 +46,6 @@
   let selectedCount = $state<number>(0);
   let editRevision = $state<number>(0);
   let printNow = $state<boolean>(false);
-  let csvData = $state<string>("");
   let csvEnabled = $state<boolean>(false);
   let windowWidth = $state<number>(0);
   let undoState = $state<UndoState>({ undoDisabled: false, redoDisabled: false });
@@ -64,6 +63,10 @@
   const loadLabelData = async (data: ExportedLabelTemplate) => {
     undo.paused = true;
     onUpdateLabelProps(data.label);
+    if (data.csv) {
+      $csvData = data.csv;
+      csvEnabled = true;
+    }
     await FileUtils.loadCanvasState(fabricCanvas!, data.canvas);
     undo.paused = false;
   };
@@ -156,8 +159,8 @@
     }
   };
 
-  const exportCurrentLabel = (): ExportedLabelTemplate => {
-    return FileUtils.makeExportedLabel(fabricCanvas!, labelProps);
+  const exportCurrentLabel = (includeCsv: boolean): ExportedLabelTemplate => {
+    return FileUtils.makeExportedLabel(fabricCanvas!, labelProps, includeCsv && csvEnabled);
   };
 
   const onLoadRequested = (label: ExportedLabelTemplate) => {
@@ -214,12 +217,6 @@
 
   const getCanvasForPreview = (): FabricJson => {
     return fabricCanvas!.toJSON();
-  };
-
-  const onCsvUpdate = (enabled: boolean, csv: string) => {
-    csvData = csv;
-    csvEnabled = enabled;
-    LocalStoragePersistence.saveCsv(csvData);
   };
 
   const onCsvPlaceholderPicked = (name: string) => {
@@ -289,9 +286,6 @@
   };
 
   onMount(async () => {
-    const csvSaved = LocalStoragePersistence.loadCsv();
-    csvData = csvSaved.data;
-
     try {
       const savedLabelProps = LocalStoragePersistence.loadLastLabelProps();
       if (savedLabelProps !== null) {
@@ -431,7 +425,11 @@
           <MdIcon icon="cancel_presentation" />
         </button>
 
-        <SavedLabelsMenu canvas={fabricCanvas!} onRequestLabelTemplate={exportCurrentLabel} {onLoadRequested} />
+        <SavedLabelsMenu
+          canvas={fabricCanvas!}
+          onRequestLabelTemplate={exportCurrentLabel}
+          {onLoadRequested}
+          {csvEnabled} />
 
         <button
           class="btn btn-sm btn-secondary"
@@ -449,11 +447,7 @@
           <MdIcon icon="redo" />
         </button>
 
-        <CsvControl
-          csv={csvData}
-          enabled={csvEnabled}
-          onUpdate={onCsvUpdate}
-          onPlaceholderPicked={onCsvPlaceholderPicked} />
+        <CsvControl bind:enabled={csvEnabled} onPlaceholderPicked={onCsvPlaceholderPicked} />
 
         <IconPicker onSubmit={onIconPicked} />
         <ObjectPicker onSubmit={onObjectPicked} {labelProps} {zplImageReady} />
@@ -520,7 +514,7 @@
       {labelProps}
       {printNow}
       {csvEnabled}
-      {csvData} />
+      csvData={$csvData.data} />
   {/if}
 </div>
 

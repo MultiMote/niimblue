@@ -26,10 +26,10 @@ export function writablePersisted<T>(
 
   try {
     const val = LocalStoragePersistence.loadAndValidateObject(key, schema);
-    if (val != null) {
-      wr.set(val);
-    } else {
+    if (val === null) {
       wr.set(initialValue);
+    } else {
+      wr.set(val);
     }
   } catch {
     wr.set(initialValue);
@@ -62,7 +62,7 @@ export class LocalStoragePersistence {
   }
 
   static saveObject(key: string, data: any) {
-    if (data == null || data == undefined) {
+    if (data === null || data === undefined) {
       localStorage.removeItem(key);
       return;
     }
@@ -107,23 +107,22 @@ export class LocalStoragePersistence {
     this.saveObject(key, obj);
   }
 
-  static saveCsv(data: string) {
-    this.saveObject("csv_params", { data });
-  }
+  // static saveCsv(data: string) {
+  //   this.saveObject("csv_params", { data });
+  // }
+  // static loadCsv(): { data: string } {
+  //   const result = this.loadObject("csv_params");
 
-  static loadCsv(): { data: string } {
-    const result = this.loadObject("csv_params");
+  //   if (result === null) {
+  //     return {
+  //       data: "var1,var2\n123,456\n777,888",
+  //     };
+  //   }
 
-    if (result === null) {
-      return {
-        data: "var1,var2\n123,456\n777,888",
-      };
-    }
-
-    return {
-      data: result.data,
-    };
-  }
+  //   return {
+  //     data: result.data,
+  //   };
+  // }
 
   /**
    * @throws {z.ZodError}

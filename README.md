@@ -90,7 +90,9 @@ In real life:
 </details>
 
 
-## Launching development server
+## Development
+
+### Launching development server
 
 Skip steps you have done.
 
@@ -124,8 +126,23 @@ Skip steps you have done.
     npm run dev
     ```
 
-To run own instance, build static files (`npm run build`) and host on yor web server,
+### Deployment
+
+To run own instance, build static files (`npm run build`) and host on yor web server (HTTPS required),
 or use [Docker Image](https://github.com/MultiMote/niimblue/wiki/Running-own-instance-with-Docker).
+
+### IDE setup
+
+Project uses path aliases.
+
+VSCode (settings.json):
+
+```json
+{
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "javascript.preferences.importModuleSpecifier": "non-relative"
+}
+```
 
 ## Translations (click to contribute)
 

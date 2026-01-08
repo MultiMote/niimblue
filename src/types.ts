@@ -19,6 +19,11 @@ type _Range<T extends number, R extends unknown[]> =
 
 export type Range<T extends number> = number extends T ? number : _Range<T, []>;
 
+export const CsvParamsSchema = z.object({
+  data: z.string(),
+});
+
+
 /** Not validated */
 export const FabricObjectSchema = z.custom<fabric.FabricObject>((val: any): boolean => {
   return typeof val === "object";
@@ -65,6 +70,7 @@ export const ExportedLabelTemplateSchema = z.object({
   title: z.string().optional(),
   timestamp: z.number().positive().optional(),
   id: z.string().optional(), // filled with localStorage key, not exported
+  csv: CsvParamsSchema.optional(),
 });
 
 const [firstTask, ...otherTasks] = printTaskNames;
@@ -100,6 +106,7 @@ export const AppConfigSchema = z.object({
   fitMode: z.enum(["stretch", "ratio_min", "ratio_max"]).optional(),
 });
 
+export type CsvParams = z.infer<typeof CsvParamsSchema>;
 export type LabelProps = z.infer<typeof LabelPropsSchema>;
 export type LabelPreset = z.infer<typeof LabelPresetSchema>;
 export type FabricJson = z.infer<typeof FabricJsonSchema>;

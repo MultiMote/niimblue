@@ -1,5 +1,5 @@
 import { get, readable, writable } from "svelte/store";
-import { AppConfigSchema, type AppConfig, type AutomationProps, type ConnectionState, type ConnectionType } from "$/types";
+import { AppConfigSchema, CsvParams, CsvParamsSchema, type AppConfig, type AutomationProps, type ConnectionState, type ConnectionType } from "$/types";
 import {
   NiimbotBluetoothClient,
   NiimbotCapacitorBleClient,
@@ -17,7 +17,7 @@ import {
 import { Toasts } from "$/utils/toasts";
 import { tr } from "$/utils/i18n";
 import { LocalStoragePersistence, writablePersisted } from "$/utils/persistence";
-import { APP_CONFIG_DEFAULTS, OBJECT_DEFAULTS_TEXT } from "$/defaults";
+import { APP_CONFIG_DEFAULTS, CSV_DEFAULT, OBJECT_DEFAULTS_TEXT } from "$/defaults";
 
 export const fontCache = writable<string[]>([OBJECT_DEFAULTS_TEXT.fontFamily]);
 export const appConfig = writablePersisted<AppConfig>("config", AppConfigSchema, APP_CONFIG_DEFAULTS);
@@ -31,6 +31,8 @@ export const rfidInfo = writable<RfidInfo | undefined>();
 export const ribbonRfidInfo = writable<RfidInfo | undefined>();
 export const printerMeta = writable<PrinterModelMeta | undefined>();
 export const heartbeatFails = writable<number>(0);
+export const csvData = writablePersisted<CsvParams>("csv_params", CsvParamsSchema, { data: CSV_DEFAULT });
+
 export const automation = readable<AutomationProps | undefined>(
   (() => {
     try {

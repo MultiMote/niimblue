@@ -12,12 +12,13 @@
   import { Utils } from "@mmote/niimbluelib";
 
   interface Props {
-    onRequestLabelTemplate: () => ExportedLabelTemplate;
+    onRequestLabelTemplate: (includeCsv: boolean) => ExportedLabelTemplate;
     onLoadRequested: (label: ExportedLabelTemplate) => void;
     canvas: fabric.Canvas;
+    csvEnabled: boolean;
   }
 
-  let { onRequestLabelTemplate, onLoadRequested, canvas }: Props = $props();
+  let { onRequestLabelTemplate, onLoadRequested, canvas, csvEnabled }: Props = $props();
 
   let dropdownRef: HTMLDivElement;
   let savedLabels = $state<ExportedLabelTemplate[]>([]);
@@ -26,7 +27,6 @@
   let usedSpace = $state<number>(0);
   let customDefaultTemplate = $state<boolean>(LocalStoragePersistence.hasCustomDefaultTemplate());
   let isStandalone = Utils.getAvailableTransports().capacitorBle;
-
 
   const calcUsedSpace = () => {
     usedSpace = LocalStoragePersistence.usedSpace();
@@ -77,7 +77,7 @@
       return;
     }
 
-    const label = onRequestLabelTemplate();
+    const label = onRequestLabelTemplate(true);
     label.title = title;
 
     const result = [...savedLabels];
@@ -87,7 +87,7 @@
   };
 
   const onMakeDefaultClicked = () => {
-    const label = onRequestLabelTemplate();
+    const label = onRequestLabelTemplate(false);
     label.title = title;
     label.thumbnailBase64 = undefined;
     LocalStoragePersistence.saveDefaultTemplate(label);
@@ -102,7 +102,7 @@
   };
 
   const onSaveClicked = () => {
-    const label = onRequestLabelTemplate();
+    const label = onRequestLabelTemplate(true);
     label.title = title;
     const result = [...savedLabels, label];
     saveLabels(result);
@@ -113,11 +113,19 @@
       return;
     }
 
-    if (!confirm($tr("editor.warning.load"))) {
+    const label = savedLabels[selectedIndex];
+
+    let message = $tr("editor.warning.load");
+
+    if (label.csv) {
+      message += "\n" + $tr("editor.warning.load.csv");
+    }
+
+    if (!confirm(message)) {
       return;
     }
 
-    onLoadRequested(savedLabels[selectedIndex]);
+    onLoadRequested(label);
     new Dropdown(dropdownRef).hide();
   };
 
@@ -125,12 +133,20 @@
     const contents = await FileUtils.pickAndReadTextFile("json");
     const rawData = JSON.parse(contents);
 
-    if (!confirm($tr("editor.warning.load"))) {
-      return;
-    }
 
     try {
       const label = ExportedLabelTemplateSchema.parse(rawData);
+
+      let message = $tr("editor.warning.load");
+
+      if (label.csv) {
+        message += "\n" + $tr("editor.warning.load.csv");
+      }
+
+      if (!confirm(message)) {
+        return;
+      }
+
       onLoadRequested(label);
 
       if (label.title) {
@@ -145,7 +161,7 @@
 
   const onExportClicked = () => {
     try {
-      const label = onRequestLabelTemplate();
+      const label = onRequestLabelTemplate(true);
       if (title) {
         label.title = title.replaceAll(/[\\/:*?"<>|]/g, "_");
       }
@@ -165,7 +181,7 @@
 
   const onExportUrlClicked = async () => {
     try {
-      const label = onRequestLabelTemplate();
+      const label = onRequestLabelTemplate(true);
       const url = await FileUtils.makeLabelUrl(label);
 
       if (url.length > 2000 && !confirm($tr("params.saved_labels.save.url.warn"))) {
@@ -193,7 +209,14 @@
     <h6 class="dropdown-header text-wrap">
       {$tr("params.saved_labels.menu_title")} - {usedSpace}
       {$tr("params.saved_labels.kb_used")}
+
+      {#if csvEnabled}
+        <div class="pt-3 text-warning">
+            {$tr("params.saved_labels.save.withcsv")}
+        </div>
+      {/if}
     </h6>
+
 
     <div class="px-3">
       <div class="p-1">
@@ -218,7 +241,8 @@
             </li>
             {#if !isStandalone}
               <li>
-                <button class="dropdown-item" onclick={onExportUrlClicked}>{$tr("params.saved_labels.save.url")}</button>
+                <button class="dropdown-item" onclick={onExportUrlClicked}
+                  >{$tr("params.saved_labels.save.url")}</button>
               </li>
             {/if}
           </ul>

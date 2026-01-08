@@ -13,6 +13,8 @@ import { CustomCanvas } from "$/fabric-object/custom_canvas";
 import { Capacitor } from "@capacitor/core";
 import { fixFabricObjectScale } from "$/utils/canvas_utils";
 import { LocalStoragePersistence } from "./persistence";
+import { csvData } from "$/stores";
+import { get } from "svelte/store";
 
 export class FileUtils {
   static timestamp(): number {
@@ -90,7 +92,7 @@ export class FileUtils {
     this.downloadBase64Web(filename, mime, base64Data);
   }
 
-  static makeExportedLabel(canvas: fabric.Canvas, labelProps: LabelProps): ExportedLabelTemplate {
+  static makeExportedLabel(canvas: fabric.Canvas, labelProps: LabelProps, includeCsv: boolean): ExportedLabelTemplate {
     const thumbnailBase64: string = canvas.toDataURL({
       width: canvas.width,
       height: canvas.height,
@@ -107,6 +109,10 @@ export class FileUtils {
       thumbnailBase64,
       timestamp: this.timestamp(),
     };
+
+    if (includeCsv) {
+      tpl.csv = get(csvData);
+    }
 
     tpl.id = LocalStoragePersistence.createUidForLabel(tpl);
 

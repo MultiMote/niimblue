@@ -2,31 +2,27 @@
   import { tr } from "$/utils/i18n";
   import { csvParse } from "d3-dsv";
   import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { type CsvParams } from "$/types";
+  import { csvData } from "$/stores";
 
   interface Props {
     enabled: boolean;
-    csv: string;
-    onUpdate: (enabled: boolean, csv: string) => void;
     onPlaceholderPicked: (name: string) => void;
   }
 
-  let { enabled = $bindable(), csv = $bindable(), onUpdate, onPlaceholderPicked }: Props = $props();
+  let { enabled = $bindable(), onPlaceholderPicked }: Props = $props();
 
   let placeholders = $state<string[]>([]);
   let rows = $state<number>(0);
 
-  const refresh = (val: string) => {
-    const result = csvParse(val);
+  const parse = (csv: CsvParams) => {
+    const result = csvParse(csv.data);
     placeholders = result.columns;
     rows = result.length;
   };
 
-  const onDataChanged = () => {
-    onUpdate(enabled, csv);
-  };
-
   $effect(() => {
-    refresh(csv);
+    parse($csvData);
   });
 </script>
 
@@ -42,13 +38,7 @@
     <h6 class="dropdown-header">{$tr("params.csv.title")}</h6>
     <div class="p-3 text-body-secondary">
       <div class="form-check form-switch">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          role="switch"
-          id="enabled"
-          bind:checked={enabled}
-          onchange={onDataChanged} />
+        <input class="form-check-input" type="checkbox" role="switch" id="enabled" bind:checked={enabled} />
         <label class="form-check-label" for="enabled">{$tr("params.csv.enabled")}</label>
       </div>
 
@@ -56,7 +46,7 @@
         {$tr("params.csv.tip")}
       </div>
 
-      <textarea class="dsv form-control my-3" bind:value={csv} oninput={onDataChanged}></textarea>
+      <textarea class="dsv form-control my-3" bind:value={$csvData.data} oninput={() => (enabled = true)}></textarea>
 
       <div class="placeholders pt-1">
         {$tr("params.csv.rowsfound")} <strong>{rows}</strong>
@@ -64,7 +54,9 @@
       <div class="placeholders pt-1">
         {$tr("params.csv.placeholders")}
         {#each placeholders as p (p)}
-          <button class="btn btn-sm btn-outline-info px-1 py-0" onclick={() => onPlaceholderPicked(p)}>{`{${p}}`} </button>
+          <button class="btn btn-sm btn-outline-info px-1 py-0" onclick={() => onPlaceholderPicked(p)}
+            >{`{${p}}`}
+          </button>
         {/each}
       </div>
     </div>
