@@ -12,7 +12,7 @@
   import { Utils } from "@mmote/niimbluelib";
 
   interface Props {
-    onRequestLabelTemplate: (includeCsv: boolean) => ExportedLabelTemplate;
+    onRequestLabelTemplate: () => ExportedLabelTemplate;
     onLoadRequested: (label: ExportedLabelTemplate) => void;
     canvas: fabric.Canvas;
     csvEnabled: boolean;
@@ -77,7 +77,7 @@
       return;
     }
 
-    const label = onRequestLabelTemplate(true);
+    const label = onRequestLabelTemplate();
     label.title = title;
 
     const result = [...savedLabels];
@@ -87,7 +87,7 @@
   };
 
   const onMakeDefaultClicked = () => {
-    const label = onRequestLabelTemplate(false);
+    const label = onRequestLabelTemplate();
     label.title = title;
     label.thumbnailBase64 = undefined;
     LocalStoragePersistence.saveDefaultTemplate(label);
@@ -102,7 +102,7 @@
   };
 
   const onSaveClicked = () => {
-    const label = onRequestLabelTemplate(true);
+    const label = onRequestLabelTemplate();
     label.title = title;
     const result = [...savedLabels, label];
     saveLabels(result);
@@ -161,7 +161,7 @@
 
   const onExportClicked = () => {
     try {
-      const label = onRequestLabelTemplate(true);
+      const label = onRequestLabelTemplate();
       if (title) {
         label.title = title.replaceAll(/[\\/:*?"<>|]/g, "_");
       }
@@ -181,7 +181,7 @@
 
   const onExportUrlClicked = async () => {
     try {
-      const label = onRequestLabelTemplate(true);
+      const label = onRequestLabelTemplate();
       const url = await FileUtils.makeLabelUrl(label);
 
       if (url.length > 2000 && !confirm($tr("params.saved_labels.save.url.warn"))) {

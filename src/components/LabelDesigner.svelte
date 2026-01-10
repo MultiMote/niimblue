@@ -159,8 +159,8 @@
     }
   };
 
-  const exportCurrentLabel = (includeCsv: boolean): ExportedLabelTemplate => {
-    return FileUtils.makeExportedLabel(fabricCanvas!, labelProps, includeCsv && csvEnabled);
+  const exportCurrentLabel = (): ExportedLabelTemplate => {
+    return FileUtils.makeExportedLabel(fabricCanvas!, labelProps, csvEnabled);
   };
 
   const onLoadRequested = (label: ExportedLabelTemplate) => {
