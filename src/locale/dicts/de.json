@@ -144,5 +144,6 @@
     "params.generic.arrange.top": "Nach vorne verschieben",
     "params.generic.arrange.bottom": "In den Hintergrund verschieben",
     "params.vector.round_radius": "Rundungsradius",
-    "params.vector.stroke_width": "Linienbreite"
+    "params.vector.stroke_width": "Linienbreite",
+    "params.params.text.split": "Zeilenumbruch"
 }
