@@ -119,5 +119,7 @@
     "preview.print.cancel": "Annulla stampa",
     "preview.print": "Stampa",
     "preview.threshold": "Soglia",
-    "preview.title": "Anteprima"
+    "preview.title": "Anteprima",
+    "params.color.white": "bianco",
+    "params.color.black": "nero"
 }
