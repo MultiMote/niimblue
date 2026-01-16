@@ -146,6 +146,7 @@
     "preview.offset.outer": "Снаружи",
     "preview.offset": "Смещение",
     "preview.postprocess.atkinson": "Дизеринг (Аткинсон)",
+    "preview.postprocess.bayer": "Дизеринг (Байер)",
     "preview.postprocess.threshold": "Порог",
     "preview.postprocess": "Постобработка",
     "preview.print_task": "Задача печати",

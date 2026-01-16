@@ -3,7 +3,7 @@
   import { derived } from "svelte/store";
   import Modal from "bootstrap/js/dist/modal";
   import { connectionState, printerClient, printerMeta, refreshRfidInfo } from "$/stores";
-  import { copyImageData, threshold, atkinson, invert } from "$/utils/post_process";
+  import { copyImageData, threshold, atkinson, invert, bayer } from "$/utils/post_process";
   import {
     type EncodedImage,
     ImageEncoder,
@@ -166,6 +166,8 @@
       iData = threshold(iData, thresholdValue);
     } else if (postProcessType === "dither") {
       iData = atkinson(iData, thresholdValue);
+    } else if (postProcessType === "bayer") {
+      iData = bayer(iData, thresholdValue);
     }
 
     if (postProcessInvert) {
@@ -394,6 +396,7 @@
             onchange={() => updateSavedProp("postProcess", postProcessType, true)}>
             <option value="threshold">{$tr("preview.postprocess.threshold")}</option>
             <option value="dither">{$tr("preview.postprocess.atkinson")}</option>
+            <option value="bayer">{$tr("preview.postprocess.bayer")}</option>
           </select>
 
           <ParamLockButton

@@ -56,6 +56,43 @@ export const atkinson = (image: ImageData, threshold: number): ImageData => {
   return image;
 };
 
+/**
+ * Change the image to blank and white using the Bayer ordered dithering
+ *
+ * @param  {object}   image         The imageData of a Canvas 2d context
+ * @param  {number}   threshold     Threshold value (0-255)
+ * @return {object}                 The resulting imageData
+ *
+ */
+export const bayer = (image: ImageData, threshold: number): ImageData => {
+  const src = image.data;
+  const width = image.width;
+
+  // Pre-calculated 8x8 Bayer matrix (normalized to 0-255)
+  const bayerMatrix = [
+    [0, 191, 48, 239, 12, 203, 60, 251],
+    [128, 64, 176, 112, 140, 76, 188, 124],
+    [32, 223, 16, 207, 44, 235, 28, 219],
+    [160, 96, 144, 80, 172, 108, 156, 92],
+    [8, 199, 56, 247, 4, 195, 52, 243],
+    [136, 72, 184, 120, 132, 68, 180, 116],
+    [40, 231, 24, 215, 36, 227, 20, 211],
+    [168, 104, 152, 88, 164, 100, 148, 84]
+  ];
+
+  for (let i = 0; i < src.length; i += 4) {
+    const x = (i / 4) % width;
+    const y = Math.floor((i / 4) / width);
+
+    const gray = src[i] * 0.299 + src[i + 1] * 0.587 + src[i + 2] * 0.114;
+    const bayerValue = bayerMatrix[y % 8][x % 8];
+    const value = gray < threshold - bayerValue / 2 ? 0 : 255;
+
+    src[i] = src[i + 1] = src[i + 2] = value;
+  }
+
+  return image;
+};
 
 /**
  * Invert image
