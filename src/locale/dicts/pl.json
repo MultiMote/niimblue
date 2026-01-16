@@ -4,7 +4,7 @@
     "browser_warning.lines.second": "Mimo tego możesz nadal projektować etykiety.",
     "connector.bluetooth": "Bluetooth",
     "connector.disconnect.heartbeat": "Rozłączono (drukarka nie odpowiada)",
-    "connector.serial": "Port seryjny (USB)",
+    "connector.serial": "Port szeregowy (USB)",
     "editor.clone": "Klonuj",
     "editor.default_text": "Tekst",
     "editor.delete": "Usuń",
