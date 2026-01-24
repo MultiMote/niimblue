@@ -6,6 +6,8 @@
     "connector.bluetooth": "Bluetooth",
     "connector.disconnect.heartbeat": "Disconnected (printer does not respond)",
     "connector.serial": "Serial (USB)",
+    "config.page_delay": "Delay between pages",
+    "config.page_delay.help": "Add delay if you have multi-page print problems",
     "editor.clear": "Clear canvas",
     "editor.clear.confirm": "Clear canvas contents?",
     "editor.clone": "Clone",

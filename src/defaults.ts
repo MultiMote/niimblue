@@ -64,6 +64,7 @@ export const THUMBNAIL_QUALITY = 0.7;
 
 export const APP_CONFIG_DEFAULTS: AppConfig = {
   fitMode: "stretch",
+  pageDelay: 0,
 };
 
 export const CSV_DEFAULT = "var1,var2\n123,456\n777,888";

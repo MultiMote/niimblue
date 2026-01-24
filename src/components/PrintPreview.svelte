@@ -2,7 +2,7 @@
   import { onDestroy, onMount } from "svelte";
   import { derived } from "svelte/store";
   import Modal from "bootstrap/js/dist/modal";
-  import { connectionState, printerClient, printerMeta, refreshRfidInfo } from "$/stores";
+  import { appConfig, connectionState, printerClient, printerMeta, refreshRfidInfo } from "$/stores";
   import { copyImageData, threshold, atkinson, invert, bayer } from "$/utils/post_process";
   import {
     type EncodedImage,
@@ -12,6 +12,7 @@
     type PrintProgressEvent,
     type PrintTaskName,
     AbstractPrintTask,
+    Utils,
   } from "@mmote/niimbluelib";
   import type { LabelProps, PostProcessType, FabricJson, PreviewProps, PreviewPropsOffset } from "$/types";
   import ParamLockButton from "$/components/basic/ParamLockButton.svelte";
@@ -71,7 +72,6 @@
     clearInterval(statusTimer);
 
     if (!$disconnected && printState !== "idle") {
-
       if (currentPrintTask !== undefined) {
         await currentPrintTask.printEnd();
       } else {
@@ -149,6 +149,10 @@
       $printerClient.off("printprogress", listener);
 
       await endPrint();
+
+      if ($appConfig.pageDelay > 0 && pagesTotal > 1 && curPage < pagesTotal - 1) {
+        await Utils.sleep($appConfig.pageDelay);
+      }
     }
 
     printState = "idle";
@@ -459,7 +463,11 @@
             max={$printerMeta?.densityMax ?? 20}
             bind:value={density}
             onchange={() => updateSavedProp("density", density)} />
-          <ParamLockButton propName="density" value={density} savedValue={savedProps.density} onClick={toggleSavedProp} />
+          <ParamLockButton
+            propName="density"
+            value={density}
+            savedValue={savedProps.density}
+            onClick={toggleSavedProp} />
         </div>
 
         <div class="input-group input-group-sm">
@@ -531,6 +539,24 @@
           <ParamLockButton propName="offset" value={offset} savedValue={savedProps.offset} onClick={toggleSavedProp} />
         </div>
 
+        {#if pagesTotal > 1}
+          <div class="input-group flex-nowrap input-group-sm" role="group">
+            <span class="input-group-text w-100 cursor-help" title={$tr("config.page_delay.help")}
+              >{$tr("config.page_delay")}</span>
+            {#each [0, 1000] as ms (ms)}
+              <input
+                type="radio"
+                class="btn-check"
+                name="page-delay"
+                id="page-delay-{ms}"
+                autocomplete="off"
+                bind:group={$appConfig.pageDelay}
+                value={ms} />
+              <label class="btn btn-outline-secondary px-3" for="page-delay-{ms}">{ms}ms</label>
+            {/each}
+          </div>
+        {/if}
+
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{$tr("preview.close")}</button>
 
         {#if printState !== "idle"}
@@ -547,7 +573,11 @@
           <MdIcon icon="print" />
         </button>
 
-        <button type="button" class="btn btn-primary" disabled={$disconnected || printState !== "idle"} onclick={onPrint}>
+        <button
+          type="button"
+          class="btn btn-primary"
+          disabled={$disconnected || printState !== "idle"}
+          onclick={onPrint}>
           {#if $disconnected}
             {$tr("preview.not_connected")}
           {:else}

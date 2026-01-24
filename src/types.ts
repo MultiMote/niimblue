@@ -103,7 +103,8 @@ export const AutomationPropsSchema = z.object({
 
 export const AppConfigSchema = z.object({
   /** Keep image aspect ration when using "fit" button */
-  fitMode: z.enum(["stretch", "ratio_min", "ratio_max"]).optional(),
+  fitMode: z.enum(["stretch", "ratio_min", "ratio_max"]),
+  pageDelay: z.number().gte(0)
 });
 
 export type CsvParams = z.infer<typeof CsvParamsSchema>;
