@@ -314,7 +314,29 @@
 
   onMount(async () => {
     if (csvEnabled) {
-      csvParsed = csvParse(csvData);
+      const parseResult = csvParse(csvData);
+      const spread: DSVRowArray<string> = Object.assign([], { columns: parseResult.columns });
+
+      for(const row of parseResult) {
+        let times = 1;
+        if ("$times" in row && row["$times"] !== "") {
+          try {
+            times = parseInt(row["$times"]);
+          } catch (e) {
+            console.warn("$times parse error", e);
+          }
+        }
+
+        if (times < 0 ) {
+          times = 0;
+        }
+
+        for (let i = 0; i < times; i++) {
+          spread.push(row);
+        }
+      }
+
+      csvParsed = spread;
       pagesTotal = csvParsed.length;
     }
 
