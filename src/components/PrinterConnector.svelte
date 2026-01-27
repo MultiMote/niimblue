@@ -78,6 +78,10 @@
   };
 
   const batteryIcon = (value: number): MaterialIcon => {
+    if (value > 4) {
+      value = Math.min(4, Math.max(1, Math.ceil(value / 25)));
+    }
+
     if (value === 4) {
       return "battery_full";
     } else if (value === 3) {
@@ -235,9 +239,9 @@
     <span class="input-group-text {$heartbeatFails > 0 ? 'text-warning' : ''}">
       {$printerMeta?.model ?? $connectedPrinterName}
     </span>
-    {#if $heartbeatData}
+    {#if $heartbeatData?.chargeLevel}
       <span class="input-group-text">
-        <MdIcon icon={batteryIcon($heartbeatData.powerLevel)} class="r-90"></MdIcon>
+        <MdIcon icon={batteryIcon($heartbeatData.chargeLevel)} class="r-90"></MdIcon>
       </span>
     {/if}
   {:else}

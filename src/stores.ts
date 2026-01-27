@@ -108,7 +108,10 @@ export const initClient = (connectionType: ConnectionType) => {
       newClient.on("heartbeat", (e) => {
         heartbeatFails.set(0);
         heartbeatData.update((prev) => {
-          if (prev?.rfidReadState !== e.data?.rfidReadState) {
+          if (
+            prev?.paperRfidSuccess !== e.data?.paperRfidSuccess ||
+            prev?.ribbonRfidSuccess !== e.data?.ribbonRfidSuccess
+          ) {
             refreshRfidInfo();
           }
           return e.data;
