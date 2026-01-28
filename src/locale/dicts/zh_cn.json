@@ -147,5 +147,15 @@
     "params.params.text.split.spaces": "空格",
     "params.params.text.split.grapheme": "按字",
     "params.qrcode.mode": "模式",
-    "params.generic.position": "位置"
+    "params.generic.position": "位置",
+    "config.page_delay": "页面之间的延迟",
+    "config.page_delay.help": "如果多页打印出现了问题，请尝试添加延迟",
+    "params.saved_labels.save.url": "复制链接",
+    "params.saved_labels.load.url.warn": "确定从URL加载标签数据吗？这个操作是危险的！",
+    "params.saved_labels.load.url.loaded": "已从URL加载标签数据",
+    "params.saved_labels.save.url.copied": "标签URL已复制到剪贴板",
+    "params.saved_labels.save.url.warn": "标签数据太大了，部分浏览器可能无法正确处理这个URL。\n可以尝试减小标签大小（例如删除图像）。\n继续吗？",
+    "preview.postprocess.bayer": "抖动（Bayer）",
+    "editor.warning.load.csv": "CSV数据也将会被替换。",
+    "params.saved_labels.save.withcsv": "动态数据 (CSV) 已启用，因此它将包含在已保存的标签中。"
 }
