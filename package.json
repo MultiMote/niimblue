@@ -16,9 +16,9 @@
 		"format-all": "prettier --write \"src/**/*.{ts,svelte}\" \"!src/styles/mdi_icons.ts\""
 	},
 	"dependencies": {
-		"@capacitor/core": "^7.2.0",
-		"@capacitor/filesystem": "^7.0.1",
-		"@capacitor/share": "^7.0.1",
+		"@capacitor/core": "^7.4.5",
+		"@capacitor/filesystem": "^7.1.6",
+		"@capacitor/share": "^7.0.3",
 		"@fontsource-variable/noto-sans": "^5.2.10",
 		"@formatjs/intl-localematcher": "^0.6.2",
 		"@mmote/niimbluelib": "0.0.1-alpha.33",

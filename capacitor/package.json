@@ -12,17 +12,29 @@
   },
   "dependencies": {
     "@capacitor-community/bluetooth-le": "^7.1.0",
-    "@capacitor/android": "^7.2.0",
-    "@capacitor/core": "^7.2.0",
-    "@capacitor/filesystem": "^7.0.1",
-    "@capacitor/ios": "^7.2.0",
-    "@capacitor/share": "^7.0.1",
-    "@capacitor/splash-screen": "^7.0.1"
+    "@capacitor/android": "^7.4.5",
+    "@capacitor/core": "^7.4.5",
+    "@capacitor/filesystem": "^7.1.6",
+    "@capacitor/ios": "^7.4.5",
+    "@capacitor/share": "^7.0.3",
+    "@capacitor/splash-screen": "^7.0.4"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "^7.2.0"
+    "@capacitor/cli": "^7.4.5"
   },
+
+  "overrides": {
+    "@capacitor/assets": {
+      "@capacitor/cli": {
+        "tar": "^7.5.7"
+      }
+    },
+    "@capacitor/cli": {
+      "tar": "^7.5.7"
+    }
+  },
+
   "author": "MultiMote",
   "license": "MIT"
 }
