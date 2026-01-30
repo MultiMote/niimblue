@@ -21,6 +21,10 @@ export class FileUtils {
     return Math.floor(Date.now() / 1000);
   }
 
+  static timestampFloat(): number {
+    return Date.now() / 1000;
+  }
+
   /** Convert string to base64 string */
   static base64str(str: string): string {
     const bytes = new TextEncoder().encode(str);
@@ -185,6 +189,8 @@ export class FileUtils {
               console.error(readerEvt);
               reject(new Error("Unable to load file"));
             };
+          } else {
+            reject(new Error(`Only ${acceptExtension} allowed`));
           }
         }
       };
@@ -223,6 +229,8 @@ export class FileUtils {
               console.error(readerEvt);
               reject(new Error("Unable to load file"));
             };
+          } else {
+            reject(new Error(`Only ${acceptExtension} allowed`));
           }
         }
       };

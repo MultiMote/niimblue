@@ -23,6 +23,12 @@ export const CsvParamsSchema = z.object({
   data: z.string(),
 });
 
+export const UserIconsListSchema = z.array(
+  z.object({
+    name: z.string(),
+    data: z.string(),
+  }),
+);
 
 /** Not validated */
 export const FabricObjectSchema = z.custom<fabric.FabricObject>((val: any): boolean => {
@@ -104,10 +110,12 @@ export const AutomationPropsSchema = z.object({
 export const AppConfigSchema = z.object({
   /** Keep image aspect ration when using "fit" button */
   fitMode: z.enum(["stretch", "ratio_min", "ratio_max"]),
-  pageDelay: z.number().gte(0)
+  pageDelay: z.number().gte(0),
+  iconListMode: z.enum(["user", "pack", "both"]),
 });
 
 export type CsvParams = z.infer<typeof CsvParamsSchema>;
+export type UserIconsList = z.infer<typeof UserIconsListSchema>;
 export type LabelProps = z.infer<typeof LabelPropsSchema>;
 export type LabelPreset = z.infer<typeof LabelPresetSchema>;
 export type FabricJson = z.infer<typeof FabricJsonSchema>;

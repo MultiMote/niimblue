@@ -1,5 +1,5 @@
 import { get, readable, writable } from "svelte/store";
-import { AppConfigSchema, CsvParams, CsvParamsSchema, type AppConfig, type AutomationProps, type ConnectionState, type ConnectionType } from "$/types";
+import { AppConfigSchema, CsvParams, CsvParamsSchema, UserIconsList, UserIconsListSchema, type AppConfig, type AutomationProps, type ConnectionState, type ConnectionType } from "$/types";
 import {
   NiimbotBluetoothClient,
   NiimbotCapacitorBleClient,
@@ -21,6 +21,7 @@ import { APP_CONFIG_DEFAULTS, CSV_DEFAULT, OBJECT_DEFAULTS_TEXT } from "$/defaul
 
 export const fontCache = writable<string[]>([OBJECT_DEFAULTS_TEXT.fontFamily]);
 export const appConfig = writablePersisted<AppConfig>("config", AppConfigSchema, APP_CONFIG_DEFAULTS);
+export const userIcons = writablePersisted<UserIconsList>("user_icons", UserIconsListSchema, []);
 
 export const connectionState = writable<ConnectionState>("disconnected");
 export const connectedPrinterName = writable<string>("");

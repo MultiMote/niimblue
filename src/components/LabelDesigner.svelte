@@ -188,6 +188,11 @@
     undo.push(fabricCanvas!, labelProps);
   };
 
+  const onSvgIconPicked = (i: string) => {
+    LabelDesignerObjectHelper.addSvg(fabricCanvas!, i);
+    undo.push(fabricCanvas!, labelProps);
+  };
+
   const onPreviewClosed = () => {
     printNow = false;
     previewOpened = false;
@@ -449,7 +454,7 @@
 
         <CsvControl bind:enabled={csvEnabled} onPlaceholderPicked={onCsvPlaceholderPicked} />
 
-        <IconPicker onSubmit={onIconPicked} />
+        <IconPicker onSubmit={onIconPicked} onSubmitSvg={onSvgIconPicked} />
         <ObjectPicker onSubmit={onObjectPicked} {labelProps} {zplImageReady} />
 
         <button class="btn btn-sm btn-primary ms-1" onclick={openPreview}>
