@@ -95,7 +95,7 @@
         {#if $appConfig.iconListMode === "both" || $appConfig.iconListMode === "user"}
           {#each $userIcons as { name, data } (name)}
             <button
-              class="btn {deleteMode ? 'btn-danger' : 'btn-light'} me-1 user-icon"
+              class="btn {deleteMode ? 'btn-danger' : 'btn-light'} me-1 mb-1 user-icon"
               onclick={() => svgClicked(name, data)}>
               <img src="data:image/svg+xml;base64,{FileUtils.base64str(data)}" alt="user-svg" />
             </button>
