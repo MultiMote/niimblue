@@ -27,14 +27,14 @@
 
   const addOwn = async () => {
     try {
-      const data = await FileUtils.pickAndReadTextFile("svg");
-      userIcons.update((prev) => [
-        ...prev,
-        {
-          name: `i_${FileUtils.timestampFloat()}`,
-          data,
-        },
-      ]);
+      let counter = 0;
+      const xmls = await FileUtils.pickAndReadTextFile("svg", true);
+      const iconsToAdd = xmls.map((xml) => ({
+        name: `i_${FileUtils.timestampFloat()}_${counter++}`,
+        data: xml,
+      }));
+
+      userIcons.update((prev) => [...prev, ...iconsToAdd]);
     } catch (e) {
       Toasts.error(e);
     }
@@ -42,7 +42,7 @@
 
   const svgClicked = (name: string, data: string) => {
     if (deleteMode) {
-      userIcons.update((prev) => prev.filter(e => e.name !== name));
+      userIcons.update((prev) => prev.filter((e) => e.name !== name));
       return;
     }
 

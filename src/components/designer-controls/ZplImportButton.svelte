@@ -18,7 +18,7 @@
     const widthInches = labelProps.size.width / dpmm / mmToInchCoeff;
     const heightInches = labelProps.size.height / dpmm / mmToInchCoeff;
 
-    const contents = await FileUtils.pickAndReadTextFile("zpl");
+    const contents = await FileUtils.pickAndReadSingleTextFile("zpl");
 
     importState = "processing";
 

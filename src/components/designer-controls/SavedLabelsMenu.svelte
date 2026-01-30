@@ -130,7 +130,7 @@
   };
 
   const onImportClicked = async () => {
-    const contents = await FileUtils.pickAndReadTextFile("json");
+    const contents = await FileUtils.pickAndReadSingleTextFile("json");
     const rawData = JSON.parse(contents);
 
 

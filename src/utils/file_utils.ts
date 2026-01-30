@@ -158,51 +158,62 @@ export class FileUtils {
     this.downloadBase64(`presets_${this.timestamp()}.json`, "application/json", this.base64obj(parsed));
   }
 
+
   /**
    * Open file picker and return file contents
    *
    * fixme: never ends if dialog closed
    *
    * */
-  static async pickAndReadTextFile(acceptExtension: string): Promise<string> {
-    return new Promise((resolve, reject) => {
+  static async pickFileAsync(acceptExtension: string, multiple: boolean): Promise<FileList> {
+    return new Promise((resolve) => {
       const input: HTMLInputElement = document.createElement("input");
-      const reader = new FileReader();
 
       input.type = "file";
       input.accept = `.${acceptExtension}`;
+      input.multiple = multiple;
 
       input.onchange = (e: Event) => {
         const target = e.target as HTMLInputElement;
-        if (target.files !== null) {
-          const file: File = target.files[0];
-          const ext = file.name.split(".").pop();
-
-          if (ext === acceptExtension) {
-            reader.readAsText(file, "UTF-8");
-            reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
-              if (readerEvt?.target?.result) {
-                resolve(readerEvt.target.result as string);
-              }
-            };
-            reader.onerror = (readerEvt: ProgressEvent<FileReader>) => {
-              console.error(readerEvt);
-              reject(new Error("Unable to load file"));
-            };
-          } else {
-            reject(new Error(`Only ${acceptExtension} allowed`));
-          }
+        if (target.files !== null && target.files.length > 0) {
+          resolve(target.files);
         }
       };
       input.click();
     });
   }
 
+  static async pickAndReadTextFile(acceptExtension: string, multiple: boolean): Promise<string[]> {
+    const fileList = await this.pickFileAsync(acceptExtension, multiple);
+
+    const result: string[] = [];
+
+    for (const file of fileList) {
+      const ext = file.name.split(".").pop();
+      if (ext === acceptExtension) {
+        const data = await file.text()
+        result.push(data);
+      } else {
+        throw new Error(`Only ${acceptExtension} allowed`);
+      }
+    }
+
+    return result;
+  }
+
+  static async pickAndReadSingleTextFile(acceptExtension: string): Promise<string> {
+    const result = await this.pickAndReadTextFile(acceptExtension, false);
+    if (result.length === 0) {
+      throw new Error("No files processed");
+    }
+    return result[0];
+  }
+
   /**
    * Open file picker and return file contents
    *
    * fixme: never ends if dialog closed
-   *
+   * todo: use pickFileAsync
    * */
   static async pickAndReadBinaryFile(acceptExtension: string): Promise<{ name: string; data: Uint8Array }> {
     return new Promise((resolve, reject) => {
@@ -298,7 +309,7 @@ export class FileUtils {
     const encoder = new TextEncoder();
     const data = encoder.encode(labelStr);
 
-    if (data.length > (2 * 1024 * 1024)) {
+    if (data.length > 2 * 1024 * 1024) {
       throw new Error("Label data size > 2MB");
     }
 
