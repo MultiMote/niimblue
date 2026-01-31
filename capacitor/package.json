@@ -24,17 +24,6 @@
     "@capacitor/cli": "^7.4.5"
   },
 
-  "overrides": {
-    "@capacitor/assets": {
-      "@capacitor/cli": {
-        "tar": "^7.5.7"
-      }
-    },
-    "@capacitor/cli": {
-      "tar": "^7.5.7"
-    }
-  },
-
   "author": "MultiMote",
   "license": "MIT"
 }
