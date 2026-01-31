@@ -4,6 +4,7 @@ import Barcode from "$/fabric-object/barcode";
 import { QRCode } from "$/fabric-object/qrcode";
 import type { OjectType } from "$/types";
 import { Toasts } from "$/utils/toasts";
+import { FileUtils } from "$/utils/file_utils";
 
 export class LabelDesignerObjectHelper {
   static async addSvg(canvas: fabric.Canvas, svgCode: string): Promise<fabric.FabricObject | fabric.Group> {
@@ -21,81 +22,41 @@ export class LabelDesignerObjectHelper {
   }
 
   static async addImageFile(canvas: fabric.Canvas, file: File): Promise<fabric.FabricObject | fabric.Group> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
+    if (file.type.startsWith("image/svg")) {
+      const data = await file.text();
+      return await this.addSvg(canvas, data);
+    }
 
-      if (file.type.startsWith("image/svg")) {
-        reader.readAsText(file, "UTF-8");
-        reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
-          if (readerEvt?.target?.result) {
-            this.addSvg(canvas, readerEvt.target.result as string).then(resolve);
-          }
-        };
-        reader.onerror = (readerEvt: ProgressEvent<FileReader>) => {
-          console.error(readerEvt);
-          reject(new Error("File read error"));
-        };
-      } else if (file.type === "image/png" || file.type === "image/jpeg" || file.type === "image/bmp") {
-        reader.readAsDataURL(file);
-        reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
-          if (readerEvt?.target?.result) {
-            fabric.FabricImage.fromURL(readerEvt.target.result as string).then((img) => {
-              img.set({ ...OBJECT_DEFAULTS });
-              img.scaleToHeight(OBJECT_SIZE_DEFAULTS.width);
-              img.scaleToHeight(OBJECT_SIZE_DEFAULTS.height);
-              canvas.add(img);
-              resolve(img);
-            });
-          }
-        };
-        reader.onerror = (readerEvt: ProgressEvent<FileReader>) => {
-          console.error(readerEvt);
-          reject(new Error("File read error"));
-        };
-      } else {
-        reject(new Error("Unsupported image"));
-      }
-    });
+    if (file.type === "image/png" || file.type === "image/jpeg" || file.type === "image/bmp") {
+      const url = await FileUtils.blobToDataUrl(file);
+      const fabricImg = await fabric.FabricImage.fromURL(url);
+      fabricImg.set({ ...OBJECT_DEFAULTS });
+      fabricImg.scaleToHeight(OBJECT_SIZE_DEFAULTS.width);
+      fabricImg.scaleToHeight(OBJECT_SIZE_DEFAULTS.height);
+      canvas.add(fabricImg);
+      return fabricImg;
+    }
+
+    throw new Error("Unsupported image");
   }
 
   static async addImageWithFilePicker(fabricCanvas: fabric.Canvas): Promise<fabric.FabricObject | fabric.Group> {
-    return new Promise((resolve) => {
-      const input: HTMLInputElement = document.createElement("input");
-
-      input.type = "file";
-
-      input.onchange = (e: Event) => {
-        const target = e.target as HTMLInputElement;
-        if (target.files !== null) {
-          // fixme: catch error in other place
-          this.addImageFile(fabricCanvas, target.files[0]).then(resolve).catch(Toasts.error);
-        }
-      };
-
-      input.click();
-    });
+    const files = await FileUtils.pickFileAsync("*", false);
+    try {
+      return await this.addImageFile(fabricCanvas, files[0]);
+    } catch (e) {
+      // fixme: catch error in other place
+      Toasts.error(e);
+      throw e;
+    }
   }
 
   static async addImageBlob(fabricCanvas: fabric.Canvas, img: Blob): Promise<fabric.FabricImage> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-
-      reader.readAsDataURL(img);
-      reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
-        if (readerEvt?.target?.result) {
-          fabric.FabricImage.fromURL(readerEvt.target.result as string).then((img) => {
-            img.set({ left: 0, top: 0, snapAngle: OBJECT_DEFAULTS.snapAngle });
-            fabricCanvas.add(img);
-            resolve(img);
-          });
-        }
-      };
-
-      reader.onerror = (readerEvt: ProgressEvent<FileReader>) => {
-        console.error(readerEvt);
-        reject(new Error("Image read error"));
-      };
-    });
+    const url = await FileUtils.blobToDataUrl(img);
+    const fabricImg = await fabric.FabricImage.fromURL(url);
+    fabricImg.set({ left: 0, top: 0, snapAngle: OBJECT_DEFAULTS.snapAngle });
+    fabricCanvas.add(fabricImg);
+    return fabricImg;
   }
 
   static async addObjectFromClipboard(
@@ -143,7 +104,12 @@ export class LabelDesignerObjectHelper {
 
   static addHLine(canvas: fabric.Canvas): fabric.Line {
     const obj = new fabric.Line(
-      [OBJECT_DEFAULTS.left, OBJECT_DEFAULTS.top, OBJECT_DEFAULTS.left + OBJECT_SIZE_DEFAULTS.width, OBJECT_DEFAULTS.top],
+      [
+        OBJECT_DEFAULTS.left,
+        OBJECT_DEFAULTS.top,
+        OBJECT_DEFAULTS.left + OBJECT_SIZE_DEFAULTS.width,
+        OBJECT_DEFAULTS.top,
+      ],
       { ...OBJECT_DEFAULTS_VECTOR },
     );
     obj.setControlsVisibility({

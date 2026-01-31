@@ -167,8 +167,9 @@
     loadLabelData(label).then(() => undo.push(fabricCanvas!, labelProps));
   };
 
-  const zplImageReady = (img: Blob) => {
-    LabelDesignerObjectHelper.addImageBlob(fabricCanvas!, img).then(() => undo.push(fabricCanvas!, labelProps));
+  const zplImageReady = async (img: Blob) => {
+    await LabelDesignerObjectHelper.addImageBlob(fabricCanvas!, img);
+    undo.push(fabricCanvas!, labelProps);
   };
 
   const onObjectPicked = (objectType: OjectType) => {

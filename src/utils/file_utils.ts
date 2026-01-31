@@ -48,6 +48,22 @@ export class FileUtils {
     return bytes;
   }
 
+  static async blobToDataUrl(file: Blob): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
+        if (readerEvt?.target?.result) {
+          resolve(readerEvt.target.result as string);
+        }
+      };
+      reader.onerror = (readerEvt: ProgressEvent<FileReader>) => {
+        console.error(readerEvt);
+        reject(new Error("File read error"));
+      };
+    });
+  }
+
   static async downloadBase64Web(filename: string, mime: string, base64Data: string) {
     const byteChars = atob(base64Data);
     const byteNumbers = new Array(byteChars.length);
@@ -158,20 +174,22 @@ export class FileUtils {
     this.downloadBase64(`presets_${this.timestamp()}.json`, "application/json", this.base64obj(parsed));
   }
 
-
   /**
    * Open file picker and return file contents
    *
    * fixme: never ends if dialog closed
    *
-   * */
+   **/
   static async pickFileAsync(acceptExtension: string, multiple: boolean): Promise<FileList> {
     return new Promise((resolve) => {
       const input: HTMLInputElement = document.createElement("input");
 
       input.type = "file";
-      input.accept = `.${acceptExtension}`;
       input.multiple = multiple;
+
+      if (acceptExtension !== "*") {
+        input.accept = `.${acceptExtension}`;
+      }
 
       input.onchange = (e: Event) => {
         const target = e.target as HTMLInputElement;
@@ -191,7 +209,7 @@ export class FileUtils {
     for (const file of fileList) {
       const ext = file.name.split(".").pop();
       if (ext === acceptExtension) {
-        const data = await file.text()
+        const data = await file.text();
         result.push(data);
       } else {
         throw new Error(`Only ${acceptExtension} allowed`);
@@ -211,42 +229,18 @@ export class FileUtils {
 
   /**
    * Open file picker and return file contents
-   *
-   * fixme: never ends if dialog closed
-   * todo: use pickFileAsync
    * */
   static async pickAndReadBinaryFile(acceptExtension: string): Promise<{ name: string; data: Uint8Array }> {
-    return new Promise((resolve, reject) => {
-      const input: HTMLInputElement = document.createElement("input");
-      const reader = new FileReader();
+    const fileList = await this.pickFileAsync(acceptExtension, false);
+    const file: File = fileList[0];
+    const ext = file.name.split(".").pop();
 
-      input.type = "file";
-      input.accept = `.${acceptExtension}`;
+    if (ext !== acceptExtension) {
+      throw new Error(`Only ${acceptExtension} allowed`);
+    }
 
-      input.onchange = (e: Event) => {
-        const target = e.target as HTMLInputElement;
-        if (target.files !== null) {
-          const file: File = target.files[0];
-          const ext = file.name.split(".").pop();
-
-          if (ext === acceptExtension) {
-            reader.readAsArrayBuffer(file);
-            reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
-              if (readerEvt?.target?.result) {
-                resolve({ name: file.name, data: new Uint8Array(readerEvt.target.result as ArrayBuffer) });
-              }
-            };
-            reader.onerror = (readerEvt: ProgressEvent<FileReader>) => {
-              console.error(readerEvt);
-              reject(new Error("Unable to load file"));
-            };
-          } else {
-            reject(new Error(`Only ${acceptExtension} allowed`));
-          }
-        }
-      };
-      input.click();
-    });
+    const data: ArrayBuffer = await file.arrayBuffer();
+    return { name: file.name, data: new Uint8Array(data) };
   }
 
   static async loadCanvasState(canvas: fabric.Canvas, state: FabricJson): Promise<void> {
