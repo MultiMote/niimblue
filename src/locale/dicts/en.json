@@ -21,7 +21,7 @@
     "editor.iconpicker.show.pack": "pack icons only",
     "editor.iconpicker.show.both": "user + pack icons",
     "editor.iconpicker.mdi_link_title": "See detailed list here",
-    "editor.iconpicker.title": "Add own icon",
+    "editor.iconpicker.title": "Add icon",
     "editor.import.zpl": "Import ZPL",
     "editor.objectpicker.barcode": "Barcode",
     "editor.objectpicker.circle": "Circle",
