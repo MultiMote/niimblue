@@ -147,5 +147,20 @@
     "preview.print.system": "İşletim sistemi yazıcısıyla yazdır",
     "preview.print": "Yazdır",
     "preview.threshold": "Eşik",
-    "preview.title": "Yazdırma önizlemesi"
+    "preview.title": "Yazdırma önizlemesi",
+    "config.page_delay": "Sayfalar arası gecikme",
+    "config.page_delay.help": "Çok sayfalı yazdırma sorunları var ise gecikme ekleyin",
+    "editor.iconpicker.add": "Yeni ekle",
+    "editor.iconpicker.delete_mode": "Silme modu",
+    "editor.iconpicker.show": "Görüntüle",
+    "editor.iconpicker.show.user": "Sadece kullanıcı simgeleri",
+    "editor.iconpicker.show.pack": "Sadece paket simgeleri",
+    "editor.iconpicker.show.both": "kullanıcı + paket simgeleri",
+    "editor.warning.load.csv": "CSV verileri de değiştirilecek",
+    "params.saved_labels.save.withcsv": "Dinamik veri (CSV) etkinleştirildi, kaydedilen etikete dahil edilecek",
+    "params.saved_labels.save.url": "Link’i kopyala",
+    "params.saved_labels.load.url.warn": "Etiket URL’den yüklensin mi? Zindana girmeye hazır ol.",
+    "params.saved_labels.load.url.loaded": "Etiket URL’den yüklendi",
+    "params.saved_labels.save.url.copied": "Etiket URL’si panoya kopyalandı",
+    "preview.postprocess.bayer": "Dither (Bayer)"
 }
