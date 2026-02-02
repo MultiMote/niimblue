@@ -10,7 +10,7 @@
   // eslint-disable-next-line no-undef
   const buildDate = __BUILD_DATE__;
 
-  let isStandalone = Utils.getAvailableTransports().capacitorBle;
+  let isStandalone = Utils.getAvailableTransports().capacitorBle || "__TAURI__" in window;
 </script>
 
 <div class="container my-2">
