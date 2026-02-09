@@ -31,8 +31,13 @@ export class LabelDesignerObjectHelper {
       const url = await FileUtils.blobToDataUrl(file);
       const fabricImg = await fabric.FabricImage.fromURL(url);
       fabricImg.set({ ...OBJECT_DEFAULTS });
-      fabricImg.scaleToHeight(OBJECT_SIZE_DEFAULTS.width);
-      fabricImg.scaleToHeight(OBJECT_SIZE_DEFAULTS.height);
+
+      const widthRatio = (canvas.width - OBJECT_DEFAULTS.left * 2) / fabricImg.width;
+      const heightRatio = (canvas.height - OBJECT_DEFAULTS.top * 2) / fabricImg.height;
+      const scaleFactor = Math.min(widthRatio, heightRatio);
+
+      fabricImg.scale(scaleFactor)
+
       canvas.add(fabricImg);
       return fabricImg;
     }
