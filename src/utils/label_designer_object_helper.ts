@@ -5,6 +5,7 @@ import { QRCode } from "$/fabric-object/qrcode";
 import type { OjectType } from "$/types";
 import { Toasts } from "$/utils/toasts";
 import { FileUtils } from "$/utils/file_utils";
+import { fitObjectIntoCanvas } from "$/utils/canvas_utils";
 
 export class LabelDesignerObjectHelper {
   static async addSvg(canvas: fabric.Canvas, svgCode: string): Promise<fabric.FabricObject | fabric.Group> {
@@ -13,9 +14,8 @@ export class LabelDesignerObjectHelper {
       objects.filter((o) => o !== null),
       options,
     );
-    obj.scaleToWidth(OBJECT_SIZE_DEFAULTS.width);
-    obj.scaleToHeight(OBJECT_SIZE_DEFAULTS.height);
     obj.set({ ...OBJECT_DEFAULTS });
+    fitObjectIntoCanvas(canvas, obj, OBJECT_DEFAULTS.left, OBJECT_DEFAULTS.top);
     canvas.add(obj);
     canvas.renderAll();
     return obj;
@@ -27,17 +27,11 @@ export class LabelDesignerObjectHelper {
       return await this.addSvg(canvas, data);
     }
 
-    if (file.type === "image/png" || file.type === "image/jpeg" || file.type === "image/bmp") {
+    if (file.type === "image/png" || file.type === "image/jpeg" || file.type === "image/bmp" || file.type === "image/gif") {
       const url = await FileUtils.blobToDataUrl(file);
       const fabricImg = await fabric.FabricImage.fromURL(url);
       fabricImg.set({ ...OBJECT_DEFAULTS });
-
-      const widthRatio = (canvas.width - OBJECT_DEFAULTS.left * 2) / fabricImg.width;
-      const heightRatio = (canvas.height - OBJECT_DEFAULTS.top * 2) / fabricImg.height;
-      const scaleFactor = Math.min(widthRatio, heightRatio);
-
-      fabricImg.scale(scaleFactor)
-
+      fitObjectIntoCanvas(canvas, fabricImg, OBJECT_DEFAULTS.left, OBJECT_DEFAULTS.top);
       canvas.add(fabricImg);
       return fabricImg;
     }

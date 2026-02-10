@@ -2,13 +2,13 @@ import * as fabric from "fabric";
 import Barcode from "$/fabric-object/barcode";
 import QRCode from "$/fabric-object/qrcode";
 
-export function equalSpacingFillText(
+export const equalSpacingFillText = (
   ctx: CanvasRenderingContext2D,
   text: string,
   x: number,
   y: number,
   printWidth: number,
-) {
+) => {
   // calculate every character width, and spacing
   const widths = [];
   for (let i = 0; i < text.length; i++) {
@@ -26,9 +26,9 @@ export function equalSpacingFillText(
     ctx.fillText(char, x + offset, y);
     offset += widths[i] + spacing;
   }
-}
+};
 
-export function fixFabricObjectScale(obj: fabric.FabricObject) {
+export const fixFabricObjectScale = (obj: fabric.FabricObject) => {
   const isNotScalable = obj instanceof Barcode || obj instanceof fabric.Rect || obj instanceof QRCode;
 
   if (isNotScalable) {
@@ -51,4 +51,19 @@ export function fixFabricObjectScale(obj: fabric.FabricObject) {
       });
     }
   }
-}
+};
+
+export const fitObjectIntoCanvas = (
+  canvas: fabric.Canvas,
+  obj: fabric.FabricObject,
+  xMargin: number,
+  yMarin: number,
+) => {
+  const widthRatio = canvas.width / (obj.width + xMargin * 2);
+  const heightRatio = canvas.height / (obj.height + yMarin * 2);
+  const scaleFactor = Math.min(widthRatio, heightRatio);
+  obj.set({ left: xMargin, top: yMarin });
+  obj.scale(scaleFactor);
+  canvas.centerObjectV(obj);
+  canvas.centerObjectH(obj);
+};
