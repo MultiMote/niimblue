@@ -92,6 +92,10 @@ export class LabelDesignerObjectHelper {
       ...OBJECT_DEFAULTS_TEXT,
       ...options,
     });
+     obj.setControlsVisibility({
+      mb: false,
+      mt: false,
+    });
     canvas.add(obj);
     canvas.centerObject(obj);
     return obj;
