@@ -1,6 +1,24 @@
 import * as fabric from "fabric";
 import type { AppConfig, LabelPreset, LabelProps } from "$/types";
 
+export const configureFabric = () => {
+  fabric.config.disableStyleCopyPaste = true;
+  
+  fabric.Textbox.prototype.setControlsVisibility({
+    mb: false,
+    mt: false,
+  });
+
+  fabric.Line.prototype.setControlsVisibility({
+    tl: false,
+    bl: false,
+    tr: false,
+    br: false,
+    mt: false,
+    mb: false,
+  });
+};
+
 /** Default presets for LabelPropsEditor */
 export const DEFAULT_LABEL_PRESETS: LabelPreset[] = [
   // 203dpi

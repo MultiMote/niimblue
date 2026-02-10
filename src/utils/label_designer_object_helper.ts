@@ -70,7 +70,7 @@ export class LabelDesignerObjectHelper {
   ): Promise<fabric.FabricObject | undefined> {
     // paste image
     for (const item of data.items) {
-      if (item.type.indexOf("image") !== -1) {
+      if (item.type.includes("image")) {
         const file = item.getAsFile();
         if (file) {
           return await LabelDesignerObjectHelper.addImageFile(fabricCanvas, file);
@@ -91,10 +91,6 @@ export class LabelDesignerObjectHelper {
     const obj = new fabric.Textbox(text ?? "Text", {
       ...OBJECT_DEFAULTS_TEXT,
       ...options,
-    });
-     obj.setControlsVisibility({
-      mb: false,
-      mt: false,
     });
     canvas.add(obj);
     canvas.centerObject(obj);
@@ -121,14 +117,6 @@ export class LabelDesignerObjectHelper {
       ],
       { ...OBJECT_DEFAULTS_VECTOR },
     );
-    obj.setControlsVisibility({
-      tl: false,
-      bl: false,
-      tr: false,
-      br: false,
-      mt: false,
-      mb: false,
-    });
     canvas.add(obj);
     canvas.centerObjectV(obj);
     return obj;
