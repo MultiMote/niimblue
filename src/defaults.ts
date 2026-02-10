@@ -3,11 +3,14 @@ import type { AppConfig, LabelPreset, LabelProps } from "$/types";
 
 export const configureFabric = () => {
   fabric.config.disableStyleCopyPaste = true;
-  
+
   fabric.Textbox.prototype.setControlsVisibility({
     mb: false,
     mt: false,
   });
+
+  fabric.Textbox.customProperties = ["fontAutoSize"];
+  fabric.Textbox.prototype.fontAutoSize = false;
 
   fabric.Line.prototype.setControlsVisibility({
     tl: false,
@@ -17,6 +20,7 @@ export const configureFabric = () => {
     mt: false,
     mb: false,
   });
+
 };
 
 /** Default presets for LabelPropsEditor */

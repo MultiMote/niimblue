@@ -28,7 +28,23 @@ const preprocessString = (input: string, variables?: { [v: string]: string }): s
 export const canvasPreprocess = (canvas: fabric.Canvas, variables?: { [key: string]: string }) => {
   canvas.forEachObject((obj: fabric.FabricObject) => {
     if (obj instanceof fabric.IText) {
-      obj.set({ text: preprocessString(obj.text ?? "", variables) });
+      const text = preprocessString(obj.text ?? "", variables);
+
+      if (obj instanceof fabric.Textbox && obj.fontAutoSize) {
+        const currentWidth = obj.width;
+        const currentLinesCount = obj._splitTextIntoLines(obj.text).lines.length;
+        let linesCount = obj._splitTextIntoLines(text).lines.length;
+
+        obj.set({ text });
+
+        while ((linesCount > currentLinesCount || obj.width > currentWidth) && obj.fontSize > 2) {
+          obj.fontSize -= 1;
+          obj.set({ text, width: currentWidth });
+          linesCount = obj._splitTextIntoLines(text).lines.length;
+        }
+      } else {
+        obj.set({ text });
+      }
     } else if (obj instanceof QRCode) {
       obj.set({ text: preprocessString(obj.text ?? "", variables) });
     } else if (obj instanceof Barcode && obj.encoding === "CODE128B") {

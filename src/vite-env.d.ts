@@ -13,3 +13,4 @@ declare type FontData = {
 };
 
 declare function queryLocalFonts(): Promise<ReadonlyArray<FontData>>;
+

@@ -107,6 +107,7 @@
     "params.text.align.center": "Выравнивание текста: По центру",
     "params.text.align.left": "Выравнивание текста: Слева",
     "params.text.align.right": "Выравнивание текста: Справа",
+    "params.text.autosize": "Подгонять размер текста под ширину поля",
     "params.text.bold": "Полужирный",
     "params.text.edit.title": "Редактирование текста",
     "params.text.edit": "Редактировать во всплывающем диалоге",

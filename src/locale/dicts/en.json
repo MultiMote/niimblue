@@ -108,6 +108,7 @@
     "params.text.align.center": "Align text: Center",
     "params.text.align.left": "Align text: Left",
     "params.text.align.right": "Align text: Right",
+    "params.text.autosize": "Adjust text size to fit field width",
     "params.text.bold": "Bold",
     "params.text.edit.title": "Editing text",
     "params.text.edit": "Edit in popup",

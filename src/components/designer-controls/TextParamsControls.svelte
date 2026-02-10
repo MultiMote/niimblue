@@ -46,6 +46,13 @@
     valueUpdated();
   };
 
+  const toggleFontAutoSize = () => {
+    if (selectedText instanceof fabric.Textbox) {
+      selectedText.fontAutoSize = !selectedText.fontAutoSize;
+    }
+    valueUpdated();
+  };
+
   const updateFontFamily = (v: string) => {
     selectedText.set({ fontFamily: v });
     valueUpdated();
@@ -211,6 +218,15 @@
       </div>
     </div>
   </div>
+
+  <!-- fixme: Custom property not auto-rendered for some reason -->
+  <button
+    class="btn btn-sm {selectedText.fontAutoSize ? 'btn-secondary' : ''}"
+    title={$tr("params.text.autosize")}
+    data-ver={editRevision}
+    onclick={toggleFontAutoSize}>
+    <MdIcon icon="expand" class="r-90" />
+  </button>
 {/if}
 
 
