@@ -2,6 +2,7 @@ import * as fabric from "fabric";
 import QRCode from "$/fabric-object/qrcode";
 import Barcode from "$/fabric-object/barcode";
 import dayjs from "dayjs";
+import { CanvasUtils } from "$/utils/canvas_utils";
 
 const VARIABLE_TEMPLATE_RX = /{\s*(\$?\w+)\s*(?:\|\s*(.*?)\s*)?}/g;
 
@@ -31,17 +32,7 @@ export const canvasPreprocess = (canvas: fabric.Canvas, variables?: { [key: stri
       const text = preprocessString(obj.text ?? "", variables);
 
       if (obj instanceof fabric.Textbox && obj.fontAutoSize) {
-        const currentWidth = obj.width;
-        const currentLinesCount = obj._splitTextIntoLines(obj.text).lines.length;
-        let linesCount = obj._splitTextIntoLines(text).lines.length;
-
-        obj.set({ text });
-
-        while ((linesCount > currentLinesCount || obj.width > currentWidth) && obj.fontSize > 2) {
-          obj.fontSize -= 1;
-          obj.set({ text, width: currentWidth });
-          linesCount = obj._splitTextIntoLines(text).lines.length;
-        }
+        CanvasUtils.setAndShrinkTextboxText(obj, text, obj.width);
       } else {
         obj.set({ text });
       }

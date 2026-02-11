@@ -11,7 +11,7 @@ import { OBJECT_DEFAULTS, THUMBNAIL_HEIGHT, THUMBNAIL_QUALITY } from "$/defaults
 import { z } from "zod";
 import { CustomCanvas } from "$/fabric-object/custom_canvas";
 import { Capacitor } from "@capacitor/core";
-import { fixFabricObjectScale } from "$/utils/canvas_utils";
+import { CanvasUtils } from "$/utils/canvas_utils";
 import { LocalStoragePersistence } from "./persistence";
 import { csvData } from "$/stores";
 import { get } from "svelte/store";
@@ -247,7 +247,7 @@ export class FileUtils {
     await canvas.loadFromJSON(state, (_, obj) => {
       if (obj instanceof fabric.FabricObject) {
         obj.set({ snapAngle: OBJECT_DEFAULTS.snapAngle });
-        fixFabricObjectScale(obj);
+        CanvasUtils.fixFabricObjectScale(obj);
       }
     });
     if (canvas instanceof CustomCanvas) {

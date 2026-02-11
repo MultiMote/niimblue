@@ -1,6 +1,6 @@
 import * as fabric from "fabric";
 import { code128b, ean13 } from "$/utils/barcode";
-import { equalSpacingFillText } from "$/utils/canvas_utils";
+import { CanvasUtils } from "$/utils/canvas_utils";
 import { OBJECT_DEFAULTS_TEXT } from "$/defaults";
 
 const EAN13_LONG_BAR_INDEXES: number[] = [
@@ -244,7 +244,7 @@ export class Barcode<
 
         ctx.fillText(parts[0], 0, this.height); // first digit
 
-        equalSpacingFillText(
+        CanvasUtils.equalSpacingFillText(
           ctx,
           parts[1],
           letterWidth + longBars1End * this.scaleFactor,
@@ -252,7 +252,7 @@ export class Barcode<
           midPartWidth * this.scaleFactor,
         ); // part 1
 
-        equalSpacingFillText(
+        CanvasUtils.equalSpacingFillText(
           ctx,
           parts[2],
           letterWidth + longBars2End * this.scaleFactor,
@@ -262,7 +262,7 @@ export class Barcode<
 
         ctx.fillText(parts[3], this.width - letterWidth, this.height); // last digit
       } else {
-        equalSpacingFillText(
+        CanvasUtils.equalSpacingFillText(
           ctx,
           this.displayText,
           barcodeStartPos,
