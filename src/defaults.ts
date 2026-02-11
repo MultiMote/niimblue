@@ -1,16 +1,11 @@
 import * as fabric from "fabric";
 import type { AppConfig, LabelPreset, LabelProps } from "$/types";
+import { TextboxExt } from "$/fabric-object/textbox-ext";
 
 export const configureFabric = () => {
   fabric.config.disableStyleCopyPaste = true;
 
-  fabric.Textbox.prototype.setControlsVisibility({
-    mb: false,
-    mt: false,
-  });
-
-  fabric.Textbox.customProperties = ["fontAutoSize"];
-  fabric.Textbox.prototype.fontAutoSize = false;
+  fabric.classRegistry.setClass(TextboxExt, "Textbox");
 
   fabric.Line.prototype.setControlsVisibility({
     tl: false,

@@ -57,28 +57,4 @@ export class CanvasUtils {
     canvas.centerObjectV(obj);
     canvas.centerObjectH(obj);
   }
-
-  static setAndShrinkTextboxText(obj: fabric.Textbox, text: string, maxWidth: number, maxLines?: number) {
-    const linesLimit = maxLines ?? obj._splitTextIntoLines(obj.text).lines.length;
-
-    let linesCount = obj._splitTextIntoLines(text).lines.length;
-
-    obj.set({ text });
-
-    while ((linesCount > linesLimit || obj.width > maxWidth) && obj.fontSize > 2) {
-      obj.fontSize -= 1;
-      obj.set({ text, width: maxWidth });
-      linesCount = obj._splitTextIntoLines(text).lines.length;
-    }
-  }
-
-  static shrinkTextboxText(obj: fabric.Textbox, maxWidth: number, maxLines: number) {
-    let linesCount = obj._splitTextIntoLines(obj.text).lines.length;
-
-    while ((linesCount > maxLines || obj.width > maxWidth) && obj.fontSize > 2) {
-      obj.fontSize -= 1;
-      obj.set({ width: maxWidth });
-      linesCount = obj._splitTextIntoLines(obj.text).lines.length;
-    }
-  }
 }

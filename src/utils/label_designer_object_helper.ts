@@ -6,6 +6,7 @@ import type { OjectType } from "$/types";
 import { Toasts } from "$/utils/toasts";
 import { FileUtils } from "$/utils/file_utils";
 import { CanvasUtils } from "$/utils/canvas_utils";
+import { TextboxExt, TextboxExtProps } from "$/fabric-object/textbox-ext";
 
 export class LabelDesignerObjectHelper {
   static async addSvg(canvas: fabric.Canvas, svgCode: string): Promise<fabric.FabricObject | fabric.Group> {
@@ -81,8 +82,8 @@ export class LabelDesignerObjectHelper {
     }
   }
 
-  static addText(canvas: fabric.Canvas, text?: string, options?: Partial<fabric.TextboxProps>): fabric.Textbox {
-    const obj = new fabric.Textbox(text ?? "Text", {
+  static addText(canvas: fabric.Canvas, text?: string, options?: Partial<TextboxExtProps>): TextboxExt {
+    const obj = new TextboxExt(text ?? "Text", {
       ...OBJECT_DEFAULTS_TEXT,
       ...options,
     });

@@ -2,7 +2,7 @@ import * as fabric from "fabric";
 import QRCode from "$/fabric-object/qrcode";
 import Barcode from "$/fabric-object/barcode";
 import dayjs from "dayjs";
-import { CanvasUtils } from "$/utils/canvas_utils";
+import { TextboxExt } from "$/fabric-object/textbox-ext";
 
 const VARIABLE_TEMPLATE_RX = /{\s*(\$?\w+)\s*(?:\|\s*(.*?)\s*)?}/g;
 
@@ -31,8 +31,8 @@ export const canvasPreprocess = (canvas: fabric.Canvas, variables?: { [key: stri
     if (obj instanceof fabric.IText) {
       const text = preprocessString(obj.text ?? "", variables);
 
-      if (obj instanceof fabric.Textbox && obj.fontAutoSize) {
-        CanvasUtils.setAndShrinkTextboxText(obj, text, obj.width);
+      if (obj instanceof TextboxExt && obj.fontAutoSize) {
+        obj.setAndShrinkText(text, obj.width);
       } else {
         obj.set({ text });
       }

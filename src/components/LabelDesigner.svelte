@@ -330,34 +330,9 @@
       undo.push(fabricCanvas!, labelProps);
     });
 
-
-    // start TextBox hacks
-    // todo: move to other place (custom TextBox maybe)
-    let selectedTextboxWidth: number | null = null;
-
-    fabricCanvas.on('text:editing:entered', (e) => {
-      if (e.target instanceof fabric.Textbox) {
-        selectedTextboxWidth = e.target.width;
-      }
+    fabricCanvas.on('text:changed', () => {
+      editRevision++;
     });
-
-    fabricCanvas.on('text:editing:exited', (e) => {
-      if (e.target instanceof fabric.Textbox) {
-        selectedTextboxWidth = null;
-      }
-    });
-
-    fabricCanvas.on('text:changed', (e) => {
-      if (e.target instanceof fabric.Textbox && selectedTextboxWidth !== null && e.target.fontAutoSize) {
-        const lastFontSize = e.target.fontSize;
-        const lines = e.target.text.split("\n").length;
-        CanvasUtils.shrinkTextboxText(e.target, selectedTextboxWidth, lines);
-        if (lastFontSize !== e.target.fontSize) {
-          editRevision++;
-        }
-      }
-    });
-    // end TextBox hacks
 
     fabricCanvas.on("object:removed", (): void => {
       undo.push(fabricCanvas!, labelProps);

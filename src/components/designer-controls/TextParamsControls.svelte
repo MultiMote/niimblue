@@ -3,6 +3,7 @@
   import { tr } from "$/utils/i18n";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import FontFamilyPicker from "$/components/designer-controls/FontFamilyPicker.svelte";
+  import { TextboxExt } from "$/fabric-object/textbox-ext";
 
   interface Props {
     selectedText: fabric.IText;
@@ -47,8 +48,8 @@
   };
 
   const toggleFontAutoSize = () => {
-    if (selectedText instanceof fabric.Textbox) {
-      selectedText.fontAutoSize = !selectedText.fontAutoSize;
+    if (selectedText instanceof TextboxExt) {
+      selectedText.set({ fontAutoSize: !selectedText.fontAutoSize });
     }
     valueUpdated();
   };
@@ -86,9 +87,9 @@
     selectedText.set({ fill: value });
     valueUpdated();
   };
-  const splitChanged = (value: string) => {
 
-    if(selectedText instanceof fabric.Textbox) {
+  const splitChanged = (value: string) => {
+    if (selectedText instanceof fabric.Textbox) {
       selectedText.set({ splitByGrapheme: value === "grapheme" });
       valueUpdated();
     }
@@ -218,7 +219,9 @@
       </div>
     </div>
   </div>
+{/if}
 
+{#if selectedText instanceof TextboxExt}
   <!-- fixme: Custom property not auto-rendered for some reason -->
   <button
     class="btn btn-sm {selectedText.fontAutoSize ? 'btn-secondary' : ''}"
