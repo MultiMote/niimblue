@@ -115,18 +115,73 @@
   });
 </script>
 
-<div class="input-group w-auto input-group-sm flex-nowrap justify-content-end">
+<div class="nb-printer-card {$connectionState === 'connected' ? 'connected' : ''} {$connectionState === 'connecting' ? 'connecting' : ''}">
+  <!-- Decorative circles (clipped) -->
+  <div class="nb-circles-clip">
+    <div class="nb-circle-1"></div>
+    <div class="nb-circle-2"></div>
+  </div>
+
+  <div class="nb-card-content">
+    <div class="nb-card-left">
+      {#if $connectionState === "connected"}
+        <div class="nb-card-label">
+          {#if connectionType === "serial"}
+            USB
+          {:else}
+            BLUETOOTH
+          {/if}
+        </div>
+        <div class="nb-card-name-row">
+          <span class="nb-card-name">{$printerMeta?.model ?? $connectedPrinterName}</span>
+          {#if $heartbeatData?.chargeLevel}
+            <span class="nb-battery-inline">
+              <MdIcon icon={batteryIcon($heartbeatData.chargeLevel)} class="r-90"></MdIcon>
+              {$heartbeatData.chargeLevel}%
+            </span>
+          {/if}
+          {#if $heartbeatFails > 0}
+            <span class="nb-badge warn">
+              <MdIcon icon="warning" />
+            </span>
+          {/if}
+        </div>
+      {:else}
+        <div class="nb-card-label">
+          {$connectionState === "connecting" ? "CONNECTING..." : "NO PRINTER"}
+        </div>
+      {/if}
+    </div>
+
+    <div class="nb-card-actions">
+      {#if $connectionState === "connected"}
+        <button class="nb-settings-btn" data-bs-toggle="collapse" data-bs-target="#printerInfoPanel">
+          <MdIcon icon="settings" />
+        </button>
+
+        <button class="nb-bt-btn connected" onclick={onDisconnectClicked}>
+          <MdIcon icon="bluetooth" />
+        </button>
+      {:else}
+        <button
+          class="nb-bt-btn {$connectionState === 'connecting' ? 'scanning' : ''}"
+          disabled={$connectionState === "connecting" ||
+            (!featureSupport.capacitorBle && !featureSupport.webBluetooth && !featureSupport.webSerial)}
+          onclick={onConnectClicked}>
+          <MdIcon icon="bluetooth" />
+        </button>
+      {/if}
+    </div>
+  </div>
+
   {#if $connectionState === "connected"}
-    <button class="btn btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-      <MdIcon icon="settings" />
-    </button>
-    <div class="dropdown-menu p-1">
+    <div class="collapse nb-info-panel" id="printerInfoPanel">
       {#if $printerInfo}
-        <div>
-          Printer info:
-          <ul>
+        <div class="nb-info-section">
+          <div class="nb-section-title">Printer info</div>
+          <ul class="nb-info-list">
             {#each Object.entries($printerInfo) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
+              <li><span class="nb-info-key">{key}</span><strong>{value ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
@@ -140,11 +195,10 @@
           data-bs-target="#modelMeta">
           Model metadata <MdIcon icon="expand_more" />
         </button>
-
         <div class="collapse" id="modelMeta">
-          <ul>
+          <ul class="nb-info-list">
             {#each Object.entries($printerMeta) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
+              <li><span class="nb-info-key">{key}</span><strong>{value ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
@@ -158,13 +212,11 @@
           data-bs-target="#rfidInfo">
           RFID info <MdIcon icon="expand_more" />
         </button>
-
         <div class="collapse" id="rfidInfo">
           <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
-
-          <ul>
+          <ul class="nb-info-list">
             {#each Object.entries($rfidInfo) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
+              <li><span class="nb-info-key">{key}</span><strong>{value ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
@@ -178,13 +230,11 @@
           data-bs-target="#ribbonRfidInfo">
           Ribbon RFID info <MdIcon icon="expand_more" />
         </button>
-
         <div class="collapse" id="ribbonRfidInfo">
           <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
-
-          <ul>
+          <ul class="nb-info-list">
             {#each Object.entries($ribbonRfidInfo) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
+              <li><span class="nb-info-key">{key}</span><strong>{value ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
@@ -198,11 +248,10 @@
           data-bs-target="#heartbeatData">
           Heartbeat data <MdIcon icon="expand_more" />
         </button>
-
         <div class="collapse" id="heartbeatData">
-          <ul>
+          <ul class="nb-info-list">
             {#each Object.entries($heartbeatData) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
+              <li><span class="nb-info-key">{key}</span><strong>{value ?? "-"}</strong></li>
             {/each}
           </ul>
         </div>
@@ -217,7 +266,6 @@
         data-bs-target="#tests">
         Tests <MdIcon icon="expand_more" />
       </button>
-
       <div class="collapse" id="tests">
         <div class="d-flex flex-wrap gap-1 mt-1">
           <button class="btn btn-sm btn-primary" onclick={startHeartbeat}>Heartbeat on</button>
@@ -229,71 +277,306 @@
         </div>
       </div>
     </div>
-    <span class="input-group-text">
-      {#if connectionType === "serial"}
-        <MdIcon icon="usb" />
-      {:else}
-        <MdIcon icon="bluetooth" />
-      {/if}
-    </span>
-    <span class="input-group-text {$heartbeatFails > 0 ? 'text-warning' : ''}">
-      {$printerMeta?.model ?? $connectedPrinterName}
-    </span>
-    {#if $heartbeatData?.chargeLevel}
-      <span class="input-group-text">
-        <MdIcon icon={batteryIcon($heartbeatData.chargeLevel)} class="r-90"></MdIcon>
-      </span>
-    {/if}
-  {:else}
-    {#if featureSupport.webBluetooth}
-      <button
-        disabled={$connectionState === "connecting"}
-        class="btn text-nowrap {connectionType === 'bluetooth' ? 'btn-light' : 'btn-outline-secondary'}"
-        onclick={() => switchConnectionType("bluetooth")}>
-        <MdIcon icon="bluetooth" />
-        {$tr("connector.bluetooth")}
-      </button>
-    {/if}
-    {#if featureSupport.webSerial}
-      <button
-        disabled={$connectionState === "connecting"}
-        class="btn text-nowrap {connectionType === 'serial' ? 'btn-light' : 'btn-outline-secondary'}"
-        onclick={() => switchConnectionType((connectionType = "serial"))}>
-        <MdIcon icon="usb" />
-        {$tr("connector.serial")}
-      </button>
-    {/if}
-    {#if featureSupport.capacitorBle}
-      <button
-        disabled={$connectionState === "connecting"}
-        class="btn text-nowrap {connectionType === 'capacitor-ble' ? 'btn-light' : 'btn-outline-secondary'}"
-        onclick={() => switchConnectionType((connectionType = "capacitor-ble"))}>
-        <MdIcon icon="usb" />
-        Capacitor BLE
-      </button>
-    {/if}
   {/if}
 
   {#if $connectionState !== "connected"}
-    <button
-      class="btn btn-primary"
-      disabled={$connectionState === "connecting" ||
-        (!featureSupport.capacitorBle && !featureSupport.webBluetooth && !featureSupport.webSerial)}
-      onclick={onConnectClicked}>
-      <MdIcon icon="power" />
-    </button>
+    <div class="nb-transport-selector">
+      {#if featureSupport.webBluetooth}
+        <button
+          disabled={$connectionState === "connecting"}
+          class="nb-transport-btn {connectionType === 'bluetooth' ? 'active' : ''}"
+          onclick={() => switchConnectionType("bluetooth")}>
+          <MdIcon icon="bluetooth" />
+          {$tr("connector.bluetooth")}
+        </button>
+      {/if}
+      {#if featureSupport.webSerial}
+        <button
+          disabled={$connectionState === "connecting"}
+          class="nb-transport-btn {connectionType === 'serial' ? 'active' : ''}"
+          onclick={() => switchConnectionType((connectionType = "serial"))}>
+          <MdIcon icon="usb" />
+          {$tr("connector.serial")}
+        </button>
+      {/if}
+      {#if featureSupport.capacitorBle}
+        <button
+          disabled={$connectionState === "connecting"}
+          class="nb-transport-btn {connectionType === 'capacitor-ble' ? 'active' : ''}"
+          onclick={() => switchConnectionType((connectionType = "capacitor-ble"))}>
+          <MdIcon icon="usb" />
+          Capacitor BLE
+        </button>
+      {/if}
+    </div>
   {/if}
 
-  {#if $connectionState === "connected"}
-    <button class="btn btn-danger" onclick={onDisconnectClicked}>
-      <MdIcon icon="power_off" />
-    </button>
+  {#if $connectionState === "connecting"}
+    <div class="nb-scanning-indicator">
+      <div class="nb-spinner"></div>
+      Searching for printers...
+    </div>
   {/if}
 </div>
 
 <style>
-  .dropdown-menu {
-    width: 100vw;
-    max-width: 300px;
+  .nb-printer-card {
+    background: linear-gradient(135deg, #475569 0%, #64748B 100%);
+    border-radius: 14px;
+    padding: 12px 16px;
+    color: #fff;
+    position: relative;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transition: all 0.4s ease;
+    margin-bottom: 8px;
+  }
+
+  .nb-printer-card.connected {
+    background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 50%, #3B82F6 100%);
+    box-shadow: 0 8px 32px rgba(37,99,235,0.3);
+  }
+
+  .nb-circles-clip {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .nb-circle-1 {
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+  }
+
+  .nb-circle-2 {
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+
+  .nb-card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .nb-card-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 2px;
+  }
+
+  .nb-card-name-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .nb-card-name {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 0;
+  }
+
+  .nb-battery-inline {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.85;
+  }
+
+  .nb-badge.warn {
+    color: #FCD34D;
+    font-size: 14px;
+  }
+
+  .nb-card-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .nb-settings-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .nb-settings-btn:hover {
+    background: rgba(255,255,255,0.2);
+  }
+
+  .nb-bt-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .nb-bt-btn.connected {
+    background: rgba(239,68,68,0.3);
+    border-color: rgba(239,68,68,0.5);
+  }
+
+  .nb-bt-btn.scanning {
+    animation: nb-pulse 1.5s infinite;
+  }
+
+  .nb-bt-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .nb-transport-selector {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .nb-transport-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    color: rgba(255,255,255,0.7);
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+  }
+
+  .nb-transport-btn.active {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.3);
+    color: #fff;
+  }
+
+  .nb-transport-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .nb-scanning-indicator {
+    margin-top: 8px;
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 1;
+  }
+
+  .nb-spinner {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    animation: nb-spin 0.8s linear infinite;
+  }
+
+  @keyframes nb-pulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(255,255,255,0.4);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 12px rgba(255,255,255,0);
+    }
+  }
+
+  @keyframes nb-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .nb-info-panel {
+    margin-top: 10px;
+    padding: 12px;
+    background: var(--nb-surface);
+    border-radius: 12px;
+    position: relative;
+    z-index: 1;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .nb-info-section {
+    padding: 8px;
+  }
+
+  .nb-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--nb-text-tertiary);
+    margin-bottom: 8px;
+  }
+
+  .nb-info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .nb-info-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 13px;
+    border-bottom: 1px solid var(--nb-border-light);
+    color: var(--nb-text);
+  }
+
+  .nb-info-list li:last-child {
+    border-bottom: none;
+  }
+
+  .nb-info-key {
+    color: var(--nb-text-secondary);
   }
 </style>

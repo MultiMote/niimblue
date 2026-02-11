@@ -84,6 +84,7 @@
     result[selectedIndex] = label;
 
     saveLabels(result);
+    new Dropdown(dropdownRef).hide();
   };
 
   const onMakeDefaultClicked = () => {
@@ -106,6 +107,7 @@
     label.title = title;
     const result = [...savedLabels, label];
     saveLabels(result);
+    new Dropdown(dropdownRef).hide();
   };
 
   const onLoadClicked = () => {
@@ -205,17 +207,22 @@
   <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
     <MdIcon icon="sd_storage" />
   </button>
-  <div class="saved-labels dropdown-menu" bind:this={dropdownRef}>
-    <h6 class="dropdown-header text-wrap">
-      {$tr("params.saved_labels.menu_title")} - {usedSpace}
-      {$tr("params.saved_labels.kb_used")}
+  <div class="saved-labels dropdown-menu nb-modal-dropdown" bind:this={dropdownRef}>
+    <div class="nb-picker-header">
+      <h6 class="dropdown-header text-wrap">
+        {$tr("params.saved_labels.menu_title")} - {usedSpace}
+        {$tr("params.saved_labels.kb_used")}
 
-      {#if csvEnabled}
-        <div class="pt-3 text-warning">
-            {$tr("params.saved_labels.save.withcsv")}
-        </div>
-      {/if}
-    </h6>
+        {#if csvEnabled}
+          <div class="pt-3 text-warning">
+              {$tr("params.saved_labels.save.withcsv")}
+          </div>
+        {/if}
+      </h6>
+      <button class="nb-close-btn" onclick={() => { new Dropdown(dropdownRef).hide(); }}>
+        <MdIcon icon="close" />
+      </button>
+    </div>
 
 
     <div class="px-3">
@@ -303,6 +310,33 @@
   .saved-labels.dropdown-menu {
     width: 100vw;
     max-width: 450px;
+    padding: 16px !important;
+  }
+  .nb-picker-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .nb-picker-header .dropdown-header {
+    padding: 0;
+    margin: 0;
+  }
+  .nb-close-btn {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--nb-text-secondary);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .nb-close-btn:hover {
+    background: var(--nb-surface-alt);
+    color: var(--nb-text);
   }
   .make-default {
     margin-right: auto;

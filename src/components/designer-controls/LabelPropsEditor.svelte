@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Dropdown from "bootstrap/js/dist/dropdown";
   import {
     LabelPresetSchema,
     type LabelPreset,
@@ -28,6 +29,8 @@
   }
 
   let { labelProps, onChange }: Props = $props();
+
+  let dropdownBtn: HTMLButtonElement;
 
   const tailPositions: TailPosition[] = ["right", "bottom", "left", "top"];
   const printDirections: PrintDirection[] = ["left", "top"];
@@ -115,6 +118,10 @@
       tailLength: Math.floor(newTailLength),
       mirror,
     });
+
+    // Close the dropdown
+    const dd = Dropdown.getInstance(dropdownBtn);
+    dd?.hide();
   };
 
   const onLabelPresetSelected = (index: number) => {
@@ -268,11 +275,16 @@
 </script>
 
 <div class="dropdown">
-  <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+  <button class="btn btn-sm btn-secondary" bind:this={dropdownBtn} data-bs-toggle="dropdown" data-bs-auto-close="outside">
     <MdIcon icon="settings" />
   </button>
-  <div class="dropdown-menu">
-    <h6 class="dropdown-header">{$tr("params.label.menu_title")}</h6>
+  <div class="dropdown-menu nb-modal-dropdown">
+    <div class="nb-picker-header">
+      <h6 class="dropdown-header">{$tr("params.label.menu_title")}</h6>
+      <button class="nb-close-btn" onclick={() => { const dd = Dropdown.getInstance(dropdownBtn); dd?.hide(); }}>
+        <MdIcon icon="close" />
+      </button>
+    </div>
 
     <div class="px-3">
       <div class="p-1">
@@ -442,6 +454,36 @@
   .dropdown-menu {
     width: 100vw;
     max-width: 450px;
+    padding: 16px !important;
+  }
+
+  .nb-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .nb-picker-header .dropdown-header {
+    padding: 0;
+    margin: 0;
+  }
+
+  .nb-close-btn {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--nb-text-secondary);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nb-close-btn:hover {
+    background: var(--nb-surface-alt);
+    color: var(--nb-text);
   }
 
   .cursor-help {
@@ -452,6 +494,7 @@
     height: 1.5em;
     width: 1.5em;
     background-size: cover;
+    filter: invert(0.3);
   }
 
   .tail-pos-switch .svg-icon {

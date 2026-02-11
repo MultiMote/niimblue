@@ -385,7 +385,9 @@
             </button>
           {/if}
 
-          <canvas class="print-start-{labelProps.printDirection}" bind:this={previewCanvas}></canvas>
+          <div class="nb-preview-canvas-wrap print-start-{labelProps.printDirection}">
+            <canvas bind:this={previewCanvas}></canvas>
+          </div>
 
           {#if pagesTotal > 1}
             <button disabled={printState !== "idle"} class="btn w-100 fs-1" onclick={pageUp}>
@@ -614,14 +616,33 @@
 <style>
   canvas {
     image-rendering: pixelated;
-    border: 1px solid #6d6d6d;
     max-width: 100%;
+    display: block;
   }
-  canvas.print-start-left {
-    border-left: 2px solid #ff4646;
+  .nb-preview-canvas-wrap {
+    border: 1px solid var(--nb-border);
+    border-radius: 4px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
   }
-  canvas.print-start-top {
-    border-top: 2px solid #ff4646;
+  .nb-preview-canvas-wrap.print-start-left::before,
+  .nb-preview-canvas-wrap.print-start-top::before {
+    content: '';
+    position: absolute;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .nb-preview-canvas-wrap.print-start-left::before {
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: #EF4444;
+  }
+  .nb-preview-canvas-wrap.print-start-top::before {
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: #EF4444;
   }
   .progress-bar {
     transition: none;

@@ -43,37 +43,38 @@
   {#each presets as item, idx (item)}
     <div
       role="button"
-      class="btn p-0 card-wrapper d-flex justify-content-center align-items-center"
+      class="btn p-0 card-wrapper"
       tabindex="0"
       onkeydown={() => onItemSelected(idx)}
       onclick={() => onItemSelected(idx)}>
-      <div
-        class="card print-start-{item.printDirection} d-flex justify-content-center align-items-center"
-        style="width: {scaleDimensions(item).width}%; height: {scaleDimensions(item).height}%;">
-        <div class="remove d-flex">
-          {#if deleteIndex === idx}
-            <button class="remove btn text-danger-emphasis" onclick={(e) => deleteConfirmed(e, idx)}>
-              <MdIcon icon="delete" />
-            </button>
-            <button class="remove btn text-success" onclick={(e) => deleteRejected(e)}>
-              <MdIcon icon="close" />
-            </button>
-          {:else}
-            <button class="remove btn text-danger-emphasis" onclick={(e) => deleteRequested(e, idx)}>
-              <MdIcon icon="delete" />
-            </button>
-          {/if}
+      <div class="card-actions">
+        {#if deleteIndex === idx}
+          <button class="action-btn cancel" onclick={(e) => deleteRejected(e)}>
+            <MdIcon icon="close" />
+          </button>
+          <button class="action-btn confirm" onclick={(e) => deleteConfirmed(e, idx)}>
+            <MdIcon icon="delete" />
+          </button>
+        {:else}
+          <button class="action-btn trigger" onclick={(e) => deleteRequested(e, idx)}>
+            <MdIcon icon="delete" />
+          </button>
+        {/if}
+      </div>
+      <div class="card-preview">
+        <div
+          class="card print-start-{item.printDirection} shape-{item.shape ?? 'rect'} d-flex justify-content-center align-items-center"
+          style="width: {scaleDimensions(item).width}%; height: {scaleDimensions(item).height}%;">
+          <span class="label p-1">
+            {#if item.title}
+              {item.title}
+            {:else}
+              {item.width}x{item.height}{#if item.unit === "mm"}{$tr("params.label.mm")}{:else if item.unit === "px"}{$tr(
+                  "params.label.px",
+                )}{/if}
+            {/if}
+          </span>
         </div>
-
-        <span class="label p-1">
-          {#if item.title}
-            {item.title}
-          {:else}
-            {item.width}x{item.height}{#if item.unit === "mm"}{$tr("params.label.mm")}{:else if item.unit === "px"}{$tr(
-                "params.label.px",
-              )}{/if}
-          {/if}
-        </span>
       </div>
     </div>
   {/each}
@@ -84,39 +85,107 @@
     max-height: 200px;
     max-width: 100%;
     min-height: 96px;
+    border-radius: var(--nb-radius-sm) !important;
+    border-color: var(--nb-border) !important;
+    background: var(--nb-surface-alt) !important;
   }
 
   .card-wrapper {
     width: 96px;
     height: 96px;
+    border-radius: var(--nb-radius-xs) !important;
+    border: 1px solid var(--nb-border) !important;
+    transition: all 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .card-wrapper:hover {
+    border-color: var(--nb-primary) !important;
+  }
+
+  .card-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 20px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .action-btn {
+    background: none;
+    border: none;
+    padding: 1px 4px;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1;
+    color: #9CA3AF;
+  }
+
+  .action-btn.trigger:hover,
+  .action-btn.confirm {
+    color: #DC2626;
+  }
+
+  .action-btn.cancel {
+    position: absolute;
+    left: 0;
+  }
+
+  .action-btn.confirm,
+  .action-btn.trigger {
+    position: absolute;
+    right: 0;
+  }
+
+  .card-preview {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 4px 4px;
+    overflow: visible;
   }
 
   .card {
     background-color: white;
     position: relative;
+    border-radius: 4px;
   }
 
-  .card > .remove {
-    position: absolute;
-    top: 0;
-    right: 0;
+  .card.shape-rounded_rect {
+    border-radius: 12px;
   }
 
-  .card > .remove > button {
-    padding: 0;
-    line-height: 100%;
+  .card.shape-circle {
+    border-radius: 50%;
   }
 
   .card > .label {
-    background-color: rgba(255, 255, 255, 0.8);
-    color: black;
-    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: var(--nb-text);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
   }
 
   .card.print-start-left {
-    border-left: 2px solid #ff4646;
+    position: relative;
+  }
+  .card.print-start-left::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: #EF4444;
+    border-radius: 3px;
   }
   .card.print-start-top {
-    border-top: 2px solid #ff4646;
+    border-top: 5px solid #EF4444;
+    border-radius: 2px 2px 4px 4px;
   }
 </style>

@@ -1,0 +1,392 @@
+// ─── NiimBlue Modern Design System ───
+// Color palette matching the JSX redesign
+
+:root {
+  --nb-bg: #F5F6FA;
+  --nb-surface: #FFFFFF;
+  --nb-surface-alt: #F0F2F8;
+  --nb-primary: #2563EB;
+  --nb-primary-light: #DBEAFE;
+  --nb-primary-dark: #1D4ED8;
+  --nb-accent: #F43F5E;
+  --nb-accent-light: #FFE4E6;
+  --nb-success: #10B981;
+  --nb-success-light: #D1FAE5;
+  --nb-warning: #F59E0B;
+  --nb-warning-light: #FEF3C7;
+  --nb-text: #1E293B;
+  --nb-text-secondary: #64748B;
+  --nb-text-tertiary: #94A3B8;
+  --nb-border: #E2E8F0;
+  --nb-border-light: #F1F5F9;
+  --nb-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --nb-shadow-lg: 0 8px 32px rgba(0,0,0,0.1);
+  --nb-radius: 16px;
+  --nb-radius-sm: 10px;
+  --nb-radius-xs: 6px;
+}
+
+// ─── Base overrides ───
+
+body {
+  background-color: var(--nb-bg) !important;
+  color: var(--nb-text) !important;
+  font-family: "Noto Sans Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+// ─── Bootstrap Override: Buttons ───
+
+.btn {
+  border-radius: var(--nb-radius-sm) !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  border: none !important;
+  font-size: 0.875rem !important;
+  padding: 0.5rem 1rem !important;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--nb-primary) 0%, var(--nb-primary-dark) 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(37,99,235,0.25) !important;
+  border: none !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background: linear-gradient(135deg, var(--nb-primary-dark) 0%, #1e40af 100%) !important;
+  box-shadow: 0 6px 20px rgba(37,99,235,0.35) !important;
+}
+
+.btn-primary:disabled {
+  background: var(--nb-text-tertiary) !important;
+  box-shadow: none !important;
+  opacity: 0.6 !important;
+}
+
+.btn-secondary {
+  background-color: var(--nb-surface) !important;
+  color: var(--nb-text-secondary) !important;
+  border: 1px solid var(--nb-border) !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: var(--nb-surface-alt) !important;
+  color: var(--nb-text) !important;
+  border-color: var(--nb-primary) !important;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--nb-accent) 0%, #e11d48 100%) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(244,63,94,0.25) !important;
+}
+
+.btn-danger:hover {
+  box-shadow: 0 6px 20px rgba(244,63,94,0.35) !important;
+}
+
+.btn-outline-secondary {
+  background-color: transparent !important;
+  color: var(--nb-text-secondary) !important;
+  border: 1px solid var(--nb-border) !important;
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus,
+.btn-outline-secondary:active {
+  background-color: var(--nb-primary-light) !important;
+  color: var(--nb-primary) !important;
+  border-color: var(--nb-primary) !important;
+}
+
+.btn-light {
+  background-color: var(--nb-primary-light) !important;
+  color: var(--nb-primary) !important;
+  border: 1px solid rgba(37,99,235,0.2) !important;
+}
+
+.btn-check:checked + .btn-outline-secondary {
+  background-color: var(--nb-primary-light) !important;
+  color: var(--nb-primary) !important;
+  border-color: var(--nb-primary) !important;
+}
+
+.btn-sm {
+  padding: 0.35rem 0.75rem !important;
+  font-size: 0.8125rem !important;
+  border-radius: var(--nb-radius-xs) !important;
+}
+
+// ─── Bootstrap Override: Forms ───
+
+.form-control,
+.form-select {
+  border: 1px solid var(--nb-border) !important;
+  border-radius: var(--nb-radius-xs) !important;
+  background-color: var(--nb-surface) !important;
+  color: var(--nb-text) !important;
+  font-size: 0.875rem !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--nb-primary) !important;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.15) !important;
+  outline: none !important;
+}
+
+.input-group-text {
+  background-color: var(--nb-surface-alt) !important;
+  border: 1px solid var(--nb-border) !important;
+  color: var(--nb-text-secondary) !important;
+  font-size: 0.8125rem !important;
+  border-radius: var(--nb-radius-xs) !important;
+}
+
+.input-group {
+  .btn,
+  .form-control,
+  .form-select,
+  .input-group-text {
+    border-radius: var(--nb-radius-xs) !important;
+  }
+}
+
+// ─── Bootstrap Override: Dropdown ───
+
+.dropdown-menu {
+  background-color: var(--nb-surface) !important;
+  border: 1px solid var(--nb-border) !important;
+  border-radius: var(--nb-radius) !important;
+  box-shadow: var(--nb-shadow-lg) !important;
+  padding: 12px !important;
+  animation: nb-slideUp 0.2s ease;
+}
+
+.dropdown-header {
+  color: var(--nb-text) !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  padding: 8px 8px 12px !important;
+}
+
+.dropdown-item {
+  border-radius: var(--nb-radius-xs) !important;
+  color: var(--nb-text) !important;
+  padding: 8px 12px !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: var(--nb-primary-light) !important;
+  color: var(--nb-primary) !important;
+}
+
+// ─── Bootstrap Override: Modal (Bottom Sheet style) ───
+
+.modal-content {
+  background-color: var(--nb-surface) !important;
+  border: none !important;
+  border-radius: 20px 20px 0 0 !important;
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.15) !important;
+}
+
+.modal-dialog-centered {
+  align-items: flex-end !important;
+  min-height: 100% !important;
+  margin: 0 !important;
+}
+
+.modal-dialog {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--nb-border-light) !important;
+  padding: 16px 20px !important;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--nb-border);
+  }
+}
+
+.modal-title {
+  font-weight: 700 !important;
+  color: var(--nb-text) !important;
+  font-size: 1.125rem !important;
+}
+
+.modal-body {
+  padding: 20px !important;
+}
+
+.modal-footer {
+  border-top: 1px solid var(--nb-border-light) !important;
+  padding: 16px 20px 28px !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+.btn-close {
+  filter: none !important;
+  opacity: 0.5 !important;
+}
+
+.modal-backdrop {
+  backdrop-filter: blur(4px) !important;
+  background-color: rgba(0,0,0,0.4) !important;
+}
+
+// ─── Bootstrap Override: Progress ───
+
+.progress {
+  height: 8px !important;
+  border-radius: 4px !important;
+  background-color: var(--nb-surface-alt) !important;
+  overflow: hidden !important;
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, var(--nb-primary) 0%, var(--nb-primary-dark) 100%) !important;
+  border-radius: 4px !important;
+  font-size: 0.65rem !important;
+}
+
+// ─── Bootstrap Override: Alerts ───
+
+.alert {
+  border-radius: var(--nb-radius-sm) !important;
+  border: none !important;
+}
+
+.alert-danger {
+  background-color: var(--nb-accent-light) !important;
+  color: #be123c !important;
+}
+
+// ─── Bootstrap Override: Typography ───
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--nb-text) !important;
+  font-weight: 700 !important;
+}
+
+.text-secondary {
+  color: var(--nb-text-secondary) !important;
+}
+
+.text-warning {
+  color: var(--nb-warning) !important;
+}
+
+// ─── Animations ───
+
+@keyframes nb-slideUp {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes nb-fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes nb-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(37,99,235,0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 12px rgba(37,99,235,0);
+  }
+}
+
+@keyframes nb-spin {
+  to { transform: rotate(360deg); }
+}
+
+// ─── Toastify Overrides ───
+
+.toastify {
+  border-radius: var(--nb-radius) !important;
+  box-shadow: var(--nb-shadow-lg) !important;
+  font-family: "Noto Sans Variable", sans-serif !important;
+}
+
+.toastify.toast-danger {
+  background: var(--nb-accent-light) !important;
+  border: 1px solid rgba(244,63,94,0.2) !important;
+  color: #be123c !important;
+}
+
+.toastify.toast-info {
+  background: var(--nb-success-light) !important;
+  border: 1px solid rgba(16,185,129,0.2) !important;
+  color: #065f46 !important;
+}
+
+// ─── Form range ───
+
+.form-range {
+  &::-webkit-slider-thumb {
+    background: var(--nb-primary) !important;
+  }
+  &::-moz-range-thumb {
+    background: var(--nb-primary) !important;
+  }
+  &::-webkit-slider-runnable-track {
+    background: var(--nb-border) !important;
+  }
+}
+
+// ─── Scrollbar styling ───
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--nb-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--nb-text-tertiary);
+}

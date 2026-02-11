@@ -46,8 +46,17 @@
     valueUpdated();
   };
 
-  const updateFontFamily = (v: string) => {
+  const updateFontFamily = async (v: string) => {
+    // Ensure font is loaded before applying
+    try {
+      await document.fonts.load(`16px "${v}"`);
+    } catch (_) {
+      // ignore load errors, proceed anyway
+    }
     selectedText.set({ fontFamily: v });
+    selectedText.dirty = true;
+    selectedText.initDimensions();
+    selectedText.setCoords();
     valueUpdated();
   };
 

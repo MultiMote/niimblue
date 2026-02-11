@@ -13,23 +13,58 @@
 @import "bootstrap/scss/alert";
 @import "bootstrap/scss/transitions";
 @import "font";
+@import "theme";
+
+html {
+  height: 100%;
+  overflow: hidden;
+}
 
 body {
   font-family: "Noto Sans Variable", sans-serif;
+  overscroll-behavior: none;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 
-.toastify.toast-danger {
-  background: var(--bs-danger-bg-subtle);
-  border: 1px solid var(--bs-danger-border-subtle);
-  color: var(--bs-danger-text-emphasis);
-}
-
-.toastify.toast-info {
-  background: var(--bs-success-bg-subtle);
-  border: 1px solid var(--bs-success-border-subtle);
-  color: var(--bs-success-text-emphasis);
+#app {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
 }
 
 .cursor-help {
   cursor: help;
+}
+
+/* Modal-style centered dropdown panels */
+.dropdown:has(> .nb-modal-dropdown.show)::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
+  z-index: 1049;
+}
+.nb-modal-dropdown.dropdown-menu.show {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 1050 !important;
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  width: calc(100vw - 32px);
+  max-width: 420px;
 }

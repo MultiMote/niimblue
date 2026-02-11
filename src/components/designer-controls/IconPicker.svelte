@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Dropdown from "bootstrap/js/dist/dropdown";
   import { onDestroy, onMount } from "svelte";
   import { tr } from "$/utils/i18n";
   import { iconCodepoints, type MaterialIcon } from "$/styles/mdi_icons";
@@ -18,6 +19,7 @@
   let search = $state<string>("");
   let deleteMode = $state<boolean>(false);
   let dropdown: HTMLDivElement;
+  let dropdownBtn: HTMLButtonElement;
 
   const onShow = () => {
     if (iconNames.length === 0) {
@@ -67,13 +69,18 @@
 </script>
 
 <div class="dropdown" bind:this={dropdown}>
-  <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+  <button bind:this={dropdownBtn} class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
     <MdIcon icon="emoji_emotions" />
     <MdIcon icon="add" />
   </button>
 
-  <div class="dropdown-menu">
-    <h6 class="dropdown-header">{$tr("editor.iconpicker.title")}</h6>
+  <div class="dropdown-menu nb-modal-dropdown">
+    <div class="nb-picker-header">
+      <h6 class="dropdown-header">{$tr("editor.iconpicker.title")}</h6>
+      <button class="nb-close-btn" onclick={() => { const dd = Dropdown.getInstance(dropdownBtn); dd?.hide(); }}>
+        <MdIcon icon="close" />
+      </button>
+    </div>
     <div class="p-3">
       <input
         disabled={$appConfig.iconListMode === "user"}
@@ -141,6 +148,27 @@
   .dropdown-menu {
     width: 100vw;
     max-width: 450px;
+  }
+  .nb-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 8px;
+  }
+  .nb-close-btn {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--nb-text-secondary);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nb-close-btn:hover {
+    background: var(--nb-surface-alt);
+    color: var(--nb-text);
   }
   .icons {
     max-height: 400px;
