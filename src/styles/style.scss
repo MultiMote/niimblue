@@ -41,6 +41,20 @@ body {
   cursor: help;
 }
 
+/* Fix dropdown position flash: override Popper.js inline styles for toolbar dropdowns */
+.dropdown-menu:not(.nb-modal-dropdown) {
+  inset: auto !important;
+  transform: none !important;
+  top: 100% !important;
+  left: 0 !important;
+  margin-top: var(--bs-dropdown-spacer, 0.125rem) !important;
+}
+
+.dropdown-menu.dropdown-menu-end:not(.nb-modal-dropdown) {
+  left: auto !important;
+  right: 0 !important;
+}
+
 /* Modal-style centered dropdown panels */
 .dropdown:has(> .nb-modal-dropdown.show)::before {
   content: '';

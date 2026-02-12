@@ -82,11 +82,11 @@
   <button
     class="btn btn-sm btn-secondary dropdown-toggle"
     type="button"
-    data-bs-toggle="dropdown"
+    data-bs-toggle="dropdown" data-bs-display="static"
     title={$tr("params.generic.arrange")}>
     <MdIcon icon="segment" />
   </button>
-  <div class="dropdown-menu arrangement p-2">
+  <div class="dropdown-menu dropdown-menu-end arrangement p-2">
     <button class="btn btn-sm" onclick={() => bringTo("top")}>
       {$tr("params.generic.arrange.top")}
     </button>
@@ -105,7 +105,7 @@
       aria-label="Toggle"
       type="button"
       class="btn btn-secondary dropdown-toggle dropdown-toggle-split px-1"
-      data-bs-toggle="dropdown"></button>
+      data-bs-toggle="dropdown" data-bs-display="static"></button>
     <div class="dropdown-menu p-1">
       <select class="form-select form-select-sm" value={$appConfig.fitMode ?? "stretch"} onchange={fitModeChanged}>
         <option value="stretch">{$tr("params.generic.fit.mode.stretch")}</option>

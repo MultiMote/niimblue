@@ -101,13 +101,28 @@
     valueUpdated();
   };
 
+  let showEditModal = $state(false);
+  let editTextValue = $state("");
+
   const editInPopup = () => {
-    const text = prompt($tr("params.text.edit.title"), selectedText.text);
-    if (text !== null) {
-      selectedText.set({ text });
-      selectedText.isEditing = false;
-      valueUpdated();
-    }
+    editTextValue = selectedText.text;
+    showEditModal = true;
+    // Focus textarea after render
+    setTimeout(() => {
+      const ta = document.querySelector('.nb-edit-textarea') as HTMLTextAreaElement;
+      if (ta) { ta.focus(); ta.select(); }
+    }, 50);
+  };
+
+  const confirmEdit = () => {
+    selectedText.set({ text: editTextValue });
+    selectedText.isEditing = false;
+    valueUpdated();
+    showEditModal = false;
+  };
+
+  const cancelEdit = () => {
+    showEditModal = false;
   };
 
 
@@ -129,7 +144,7 @@
   class="btn btn-sm {selectedText.textAlign === 'right' ? 'btn-secondary' : ''}"
   onclick={() => setXAlign("right")}><MdIcon icon="format_align_right" /></button>
 <div class="dropdown">
-  <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" title={$tr("params.text.vorigin")}>
+  <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-display="static" title={$tr("params.text.vorigin")}>
     {#if selectedText.originY === "top"}
       <MdIcon icon="vertical_align_top" />
     {:else if selectedText.originY === "center"}
@@ -175,7 +190,7 @@
 </button>
 
 <div class="dropdown">
-  <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" title={$tr("params.color")}>
+  <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-display="static" title={$tr("params.color")}>
     <MdIcon icon="format_color_fill" />
   </button>
 
@@ -207,7 +222,7 @@
 
 {#if selectedText instanceof fabric.Textbox}
   <div class="dropdown">
-    <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" title={$tr("params.params.text.split")}>
+    <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-display="static" title={$tr("params.params.text.split")}>
       <MdIcon icon="wrap_text" />
     </button>
 
@@ -261,6 +276,34 @@
   <MdIcon icon="edit" />
 </button>
 
+{#if showEditModal}
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div class="nb-edit-overlay" onclick={cancelEdit} onkeydown={(e) => e.key === 'Escape' && cancelEdit()}>
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="nb-edit-dialog" onclick={(e) => e.stopPropagation()}>
+      <div class="nb-edit-icon">
+        <MdIcon icon="edit" />
+      </div>
+      <p class="nb-edit-title">{$tr("params.text.edit.title")}</p>
+      <textarea
+        class="nb-edit-textarea"
+        bind:value={editTextValue}
+        rows="3"
+        onkeydown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); confirmEdit(); } }}
+      ></textarea>
+      <div class="nb-edit-actions">
+        <button class="nb-edit-btn cancel" onclick={cancelEdit}>
+          <MdIcon icon="close" />
+        </button>
+        <button class="nb-edit-btn confirm" onclick={confirmEdit}>
+          <MdIcon icon="check" />
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}
+
 <style>
   .input-group {
     width: 7em;
@@ -273,5 +316,106 @@
   }
   .input-group.split {
     width: 14em;
+  }
+
+  .nb-edit-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+    backdrop-filter: blur(2px);
+  }
+
+  .nb-edit-dialog {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    width: calc(100vw - 32px);
+    max-width: 360px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  }
+
+  .nb-edit-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #DBEAFE;
+    color: #2563EB;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 24px;
+  }
+
+  .nb-edit-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1F2937;
+    margin: 0 0 16px;
+  }
+
+  .nb-edit-textarea {
+    width: 100%;
+    border: 1.5px solid #D1D5DB;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-family: inherit;
+    resize: vertical;
+    margin-bottom: 16px;
+    transition: border-color 0.15s ease;
+  }
+
+  .nb-edit-textarea:focus {
+    outline: none;
+    border-color: #2563EB;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  .nb-edit-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .nb-edit-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s ease;
+  }
+
+  .nb-edit-btn.cancel {
+    background: #F3F4F6;
+    color: #6B7280;
+  }
+
+  .nb-edit-btn.cancel:hover {
+    background: #E5E7EB;
+  }
+
+  .nb-edit-btn.confirm {
+    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  }
+
+  .nb-edit-btn.confirm:hover {
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
   }
 </style>
