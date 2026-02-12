@@ -63,7 +63,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--nb-overlay);
   backdrop-filter: blur(2px);
   z-index: 1049;
 }
@@ -75,10 +75,149 @@ body {
   bottom: auto !important;
   transform: translate(-50%, -50%) !important;
   z-index: 1050 !important;
-  max-height: 80vh;
+  max-height: calc(100vh - 40px);
   overflow-y: auto;
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--nb-shadow-lg);
   width: calc(100vw - 32px);
   max-width: 420px;
+}
+
+/* Confirm & Edit dialog styles (global to avoid Svelte scoping issues) */
+.nb-confirm-overlay,
+.nb-edit-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--nb-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  backdrop-filter: blur(2px);
+}
+
+.nb-confirm-dialog,
+.nb-edit-dialog {
+  background: var(--nb-surface-raised);
+  border-radius: 16px;
+  padding: 24px;
+  min-width: 280px;
+  max-width: 320px;
+  text-align: center;
+  box-shadow: var(--nb-shadow-lg);
+  border: 1px solid var(--nb-border);
+}
+
+.nb-edit-dialog {
+  width: calc(100vw - 32px);
+  max-width: 360px;
+  min-width: auto;
+}
+
+.nb-confirm-icon,
+.nb-edit-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--nb-primary-light);
+  color: var(--nb-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  font-size: 24px;
+}
+
+.nb-confirm-icon.danger {
+  background: var(--nb-accent-light);
+  color: var(--nb-accent);
+}
+
+.nb-confirm-text,
+.nb-edit-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--nb-text);
+  margin: 0 0 16px;
+}
+
+.nb-confirm-text {
+  margin-bottom: 20px;
+}
+
+.nb-edit-textarea {
+  width: 100%;
+  border: 1.5px solid var(--nb-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: inherit;
+  resize: vertical;
+  margin-bottom: 16px;
+  transition: border-color 0.15s ease;
+  background: var(--nb-surface);
+  color: var(--nb-text);
+}
+
+.nb-edit-textarea:focus {
+  outline: none;
+  border-color: var(--nb-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.nb-confirm-actions,
+.nb-edit-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.nb-confirm-btn,
+.nb-edit-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+}
+
+.nb-confirm-btn.cancel,
+.nb-edit-btn.cancel {
+  background: var(--nb-btn-cancel-bg);
+  color: var(--nb-text-secondary);
+}
+
+.nb-confirm-btn.cancel:hover,
+.nb-edit-btn.cancel:hover {
+  background: var(--nb-btn-cancel-hover);
+}
+
+.nb-confirm-btn.confirm,
+.nb-edit-btn.confirm {
+  background: linear-gradient(135deg, var(--nb-primary) 0%, var(--nb-primary-dark) 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.nb-confirm-btn.confirm:hover,
+.nb-edit-btn.confirm:hover {
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.nb-confirm-btn.confirm.danger {
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.nb-confirm-btn.confirm.danger:hover {
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
 }

@@ -38,35 +38,35 @@
     </div>
     <div class="nb-picker-grid">
       <button class="nb-picker-item" onclick={() => pickAndClose("text")}>
-        <div class="nb-picker-icon" style="background:#DBEAFE"><MdIcon icon="title" /></div>
+        <div class="nb-picker-icon" style="background:var(--nb-picker-text-bg)"><MdIcon icon="title" /></div>
         <span>{$tr("editor.objectpicker.text")}</span>
       </button>
       <button class="nb-picker-item" onclick={() => pickAndClose("line")}>
-        <div class="nb-picker-icon" style="background:#E0E7FF"><MdIcon icon="remove" /></div>
+        <div class="nb-picker-icon" style="background:var(--nb-picker-line-bg)"><MdIcon icon="remove" /></div>
         <span>{$tr("editor.objectpicker.line")}</span>
       </button>
       <button class="nb-picker-item" onclick={() => pickAndClose("rectangle")}>
-        <div class="nb-picker-icon" style="background:#FEF3C7"><MdIcon icon="crop_square" /></div>
+        <div class="nb-picker-icon" style="background:var(--nb-picker-rect-bg)"><MdIcon icon="crop_square" /></div>
         <span>{$tr("editor.objectpicker.rectangle")}</span>
       </button>
       <button class="nb-picker-item" onclick={() => pickAndClose("circle")}>
-        <div class="nb-picker-icon" style="background:#FCE7F3"><MdIcon icon="radio_button_unchecked" /></div>
+        <div class="nb-picker-icon" style="background:var(--nb-picker-circle-bg)"><MdIcon icon="radio_button_unchecked" /></div>
         <span>{$tr("editor.objectpicker.circle")}</span>
       </button>
       <button class="nb-picker-item" onclick={() => pickAndClose("image")}>
-        <div class="nb-picker-icon" style="background:#D1FAE5"><MdIcon icon="image" /></div>
+        <div class="nb-picker-icon" style="background:var(--nb-picker-image-bg)"><MdIcon icon="image" /></div>
         <span>{$tr("editor.objectpicker.image")}</span>
       </button>
       <button class="nb-picker-item" onclick={() => pickAndClose("qrcode")}>
-        <div class="nb-picker-icon" style="background:#DBEAFE"><MdIcon icon="qr_code_2" /></div>
+        <div class="nb-picker-icon" style="background:var(--nb-picker-qr-bg)"><MdIcon icon="qr_code_2" /></div>
         <span>{$tr("editor.objectpicker.qrcode")}</span>
       </button>
       <button class="nb-picker-item" onclick={() => pickAndClose("barcode")}>
-        <div class="nb-picker-icon" style="background:#FEF3C7"><MdIcon icon="view_week" /></div>
+        <div class="nb-picker-icon" style="background:var(--nb-picker-barcode-bg)"><MdIcon icon="view_week" /></div>
         <span>{$tr("editor.objectpicker.barcode")}</span>
       </button>
       <div class="nb-picker-item">
-        <div class="nb-picker-icon" style="background:#E5E7EB"><MdIcon icon="description" /></div>
+        <div class="nb-picker-icon" style="background:var(--nb-picker-zpl-bg)"><MdIcon icon="description" /></div>
         <ZplImportButton {labelProps} onImageReady={zplImageReady} text={$tr("editor.import.zpl")} />
       </div>
     </div>

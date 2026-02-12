@@ -262,6 +262,8 @@
     el.removeEventListener("touchend", onAreaTouchEnd);
   };
 
+  let baseZoom = $state<number>(1); // the fitToWidth zoom level
+
   const fitToWidth = () => {
     if (fabricCanvas && canvasAreaRef) {
       const containerWidth = canvasAreaRef.clientWidth - 32; // subtract padding
@@ -269,6 +271,7 @@
       const fitZoom = containerWidth / canvasWidth;
       fabricCanvas.virtualZoom(fitZoom);
       currentZoom = fabricCanvas.getVirtualZoom();
+      baseZoom = currentZoom;
       canvasAreaRef.scrollLeft = 0;
       canvasAreaRef.scrollTop = 0;
     }
@@ -701,10 +704,12 @@
         <MdIcon icon="close" />
       </button>
     {/if}
+    {#if Math.round(currentZoom * 100) !== Math.round(baseZoom * 100)}
     <button class="nb-zoom-badge" onclick={resetZoom} title="Fit to width">
       {Math.round(currentZoom * 100)}%
       <MdIcon icon="fit_screen" />
     </button>
+    {/if}
   </div>
 
   <!-- Object controls toolbar (shown when object selected) -->
@@ -749,15 +754,15 @@
   <!-- Main toolbar -->
   <div class="nb-toolbar">
     <div class="nb-toolbar-grid">
-      <div class="nb-grid-item" style="--icon-bg:#E5E7EB; --icon-color:#4B5563">
+      <div class="nb-grid-item" style="--icon-bg:var(--nb-icon-settings-bg); --icon-color:var(--nb-icon-settings-color)">
         <LabelPropsEditor {labelProps} onChange={onUpdateLabelProps} />
       </div>
 
       <button class="nb-grid-btn" onclick={clearCanvas} title={$tr("editor.clear")}>
-        <div class="nb-grid-icon" style="background:#FEE2E2; color:#DC2626"><MdIcon icon="cancel_presentation" /></div>
+        <div class="nb-grid-icon" style="background:var(--nb-icon-delete-bg); color:var(--nb-icon-delete-color)"><MdIcon icon="cancel_presentation" /></div>
       </button>
 
-      <div class="nb-grid-item" style="--icon-bg:#E0E7FF; --icon-color:#4338CA">
+      <div class="nb-grid-item" style="--icon-bg:var(--nb-icon-save-bg); --icon-color:var(--nb-icon-save-color)">
         <SavedLabelsMenu
           canvas={fabricCanvas!}
           onRequestLabelTemplate={exportCurrentLabel}
@@ -766,31 +771,31 @@
       </div>
 
       <button class="nb-grid-btn" disabled={undoState.undoDisabled} onclick={() => undo.undo()} title={$tr("editor.undo")}>
-        <div class="nb-grid-icon" style="background:#F3F4F6; color:#6B7280"><MdIcon icon="undo" /></div>
+        <div class="nb-grid-icon" style="background:var(--nb-icon-undo-bg); color:var(--nb-icon-undo-color)"><MdIcon icon="undo" /></div>
       </button>
 
       <button class="nb-grid-btn" disabled={undoState.redoDisabled} onclick={() => undo.redo()} title={$tr("editor.redo")}>
-        <div class="nb-grid-icon" style="background:#F3F4F6; color:#6B7280"><MdIcon icon="redo" /></div>
+        <div class="nb-grid-icon" style="background:var(--nb-icon-undo-bg); color:var(--nb-icon-undo-color)"><MdIcon icon="redo" /></div>
       </button>
 
-      <div class="nb-grid-item" style="--icon-bg:#FEF3C7; --icon-color:#D97706">
+      <div class="nb-grid-item" style="--icon-bg:var(--nb-icon-csv-bg); --icon-color:var(--nb-icon-csv-color)">
         <CsvControl bind:enabled={csvEnabled} onPlaceholderPicked={onCsvPlaceholderPicked} />
       </div>
 
-      <div class="nb-grid-item" style="--icon-bg:#FCE7F3; --icon-color:#DB2777">
+      <div class="nb-grid-item" style="--icon-bg:var(--nb-icon-emoji-bg); --icon-color:var(--nb-icon-emoji-color)">
         <IconPicker onSubmit={onIconPicked} onSubmitSvg={onSvgIconPicked} />
       </div>
 
-      <div class="nb-grid-item" style="--icon-bg:#DBEAFE; --icon-color:#2563EB">
+      <div class="nb-grid-item" style="--icon-bg:var(--nb-icon-objects-bg); --icon-color:var(--nb-icon-objects-color)">
         <ObjectPicker onSubmit={onObjectPicked} {labelProps} {zplImageReady} />
       </div>
 
       <button class="nb-grid-btn" onclick={openPreview}>
-        <div class="nb-grid-icon" style="background:#D1FAE5; color:#059669"><MdIcon icon="visibility" /></div>
+        <div class="nb-grid-icon" style="background:var(--nb-icon-preview-bg); color:var(--nb-icon-preview-color)"><MdIcon icon="visibility" /></div>
       </button>
 
       <button class="nb-grid-btn" onclick={openPreviewAndPrint} disabled={$connectionState !== "connected"}>
-        <div class="nb-grid-icon" style="background:#DBEAFE; color:#2563EB"><MdIcon icon="print" /></div>
+        <div class="nb-grid-icon" style="background:var(--nb-icon-print-bg); color:var(--nb-icon-print-color)"><MdIcon icon="print" /></div>
       </button>
     </div>
   </div>
@@ -810,7 +815,7 @@
           </button>
           <button class="nb-confirm-btn confirm danger" onclick={confirmClear}>
             <MdIcon icon="delete_forever" />
-            {$tr("editor.clear")}
+            Clear
           </button>
         </div>
       </div>
@@ -929,7 +934,7 @@
     border: 1px solid var(--nb-border);
     background-color: var(--nb-surface);
     border-radius: 4px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    box-shadow: var(--nb-shadow);
     position: relative;
     display: inline-block;
   }
@@ -995,7 +1000,7 @@
     background: var(--nb-surface);
     border-radius: var(--nb-radius);
     border: 1px solid var(--nb-border);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    box-shadow: var(--nb-shadow);
   }
 
   .nb-toolbar-controls:empty {
@@ -1010,15 +1015,15 @@
     background: var(--nb-surface);
     border-radius: var(--nb-radius);
     border: 1px solid var(--nb-border);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    box-shadow: var(--nb-shadow);
     width: 100%;
   }
 
   .nb-grid-btn {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
+    align-items: stretch;
+    justify-content: stretch;
+    padding: 0;
     border-radius: 8px;
     border: 1px solid var(--nb-border);
     background: var(--nb-surface);
@@ -1043,41 +1048,55 @@
 
   .nb-grid-item {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
+    align-items: stretch;
+    justify-content: stretch;
+    padding: 0;
     border-radius: 8px;
     border: 1px solid var(--nb-border);
-    background: var(--nb-surface);
+    background: var(--icon-bg, var(--nb-surface));
     transition: all 0.15s ease;
+    position: relative;
   }
 
-  .nb-grid-item:hover {
+  .nb-grid-item:hover,
+  .nb-grid-item:has(.dropdown.show) {
     border-color: var(--nb-primary);
     background: var(--nb-primary-light);
   }
 
-  /* Style component internal trigger buttons to look like grid icons */
+  /* Make dropdown container fill entire grid cell */
+  .nb-grid-item :global(.dropdown) {
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Make trigger button fill entire dropdown and be transparent */
   .nb-grid-item :global(.dropdown > .btn),
   .nb-grid-item :global(> .btn) {
-    height: 30px;
-    min-width: 30px;
-    width: auto;
-    padding: 0 6px !important;
-    border-radius: 8px !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    width: 100% !important;
+    height: 100% !important;
+    flex: 1 !important;
+    padding: 4px !important;
+    margin: 0 !important;
+    border-radius: 7px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     border: none !important;
-    font-size: 16px;
-    background: var(--icon-bg, #E5E7EB) !important;
-    color: var(--icon-color, #4B5563) !important;
+    font-size: 18px;
+    background: transparent !important;
+    color: var(--icon-color, var(--nb-text-secondary)) !important;
     box-shadow: none !important;
+    cursor: pointer;
   }
 
   .nb-grid-icon {
-    width: 30px;
-    height: 30px;
+    width: 100%;
+    height: 100%;
+    min-height: 30px;
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -1113,100 +1132,40 @@
     background: var(--nb-accent-light);
   }
 
-  .nb-confirm-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1050;
-    backdrop-filter: blur(2px);
+  /* Style all Bootstrap buttons inside the toolbar to be visible */
+  .nb-toolbar-controls :global(.btn) {
+    background: var(--nb-surface-alt) !important;
+    color: var(--nb-text-secondary) !important;
+    border: 1px solid var(--nb-border) !important;
   }
 
-  .nb-confirm-dialog {
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    min-width: 280px;
-    max-width: 320px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  .nb-toolbar-controls :global(.btn:hover) {
+    background: var(--nb-surface-raised) !important;
+    color: var(--nb-text) !important;
+    border-color: var(--nb-primary) !important;
   }
 
-  .nb-confirm-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: #DBEAFE;
-    color: #2563EB;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 12px;
-    font-size: 24px;
+  .nb-toolbar-controls :global(.btn.btn-secondary),
+  .nb-toolbar-controls :global(.btn-check:checked + .btn) {
+    background: var(--nb-primary-light) !important;
+    color: var(--nb-primary) !important;
+    border-color: var(--nb-primary) !important;
   }
 
-  .nb-confirm-text {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--nb-text);
-    margin: 0 0 20px;
+  .nb-toolbar-controls :global(.btn.btn-primary) {
+    background: linear-gradient(135deg, var(--nb-primary) 0%, var(--nb-primary-dark) 100%) !important;
+    color: #fff !important;
+    border: none !important;
   }
 
-  .nb-confirm-actions {
-    display: flex;
-    gap: 10px;
+  /* Keep nb-tool-btn styles (delete, clone) as they are */
+  .nb-toolbar-controls :global(.nb-tool-btn) {
+    background: var(--nb-surface) !important;
+    border: 1px solid var(--nb-border) !important;
   }
 
-  .nb-confirm-btn {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    border: none;
-    transition: all 0.15s ease;
-  }
-
-  .nb-confirm-btn.cancel {
-    background: #F3F4F6;
-    color: #6B7280;
-  }
-
-  .nb-confirm-btn.cancel:hover {
-    background: #E5E7EB;
-  }
-
-  .nb-confirm-btn.confirm {
-    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
-    color: white;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-  }
-
-  .nb-confirm-btn.confirm:hover {
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-  }
-
-  .nb-confirm-icon.danger {
-    background: #FEE2E2;
-    color: #DC2626;
-  }
-
-  .nb-confirm-btn.confirm.danger {
-    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
-    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
-  }
-
-  .nb-confirm-btn.confirm.danger:hover {
-    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+  .nb-toolbar-controls :global(.nb-tool-btn.danger) {
+    color: var(--nb-accent) !important;
+    border-color: rgba(244,63,94,0.2) !important;
   }
 </style>

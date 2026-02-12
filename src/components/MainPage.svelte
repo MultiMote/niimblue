@@ -4,6 +4,8 @@
   import LabelDesigner from "$/components/LabelDesigner.svelte";
   import PrinterConnector from "$/components/PrinterConnector.svelte";
   import { locale, locales, tr } from "$/utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { themeMode } from "$/stores";
 
   // eslint-disable-next-line no-undef
   const appCommit = __APP_COMMIT__;
@@ -24,12 +26,20 @@
   <div class="nb-content">
     <BrowserWarning />
     <LabelDesigner />
-    <div class="nb-lang-row">
+    <div class="nb-bottom-row">
       <select class="form-select form-select-sm nb-lang-select" bind:value={$locale}>
         {#each Object.entries(locales) as [key, name] (key)}
           <option value={key}>{name}</option>
         {/each}
       </select>
+
+      <button class="nb-theme-toggle" onclick={() => themeMode.toggle()} title="Toggle theme">
+        {#if $themeMode === "dark"}
+          <MdIcon icon="light_mode" />
+        {:else}
+          <MdIcon icon="dark_mode" />
+        {/if}
+      </button>
     </div>
   </div>
 </div>
@@ -75,11 +85,11 @@
   }
 
   .niim {
-    color: #EF4444;
+    color: var(--nb-logo-red);
   }
 
   .blue {
-    color: #2563EB;
+    color: var(--nb-logo-blue);
   }
 
   .nb-content {
@@ -113,9 +123,11 @@
     align-items: center;
   }
 
-  .nb-lang-row {
+  .nb-bottom-row {
     display: flex;
     justify-content: center;
+    align-items: center;
+    gap: 8px;
     margin-top: 8px;
   }
 
@@ -127,6 +139,29 @@
     border-radius: 8px !important;
     background-color: var(--nb-surface) !important;
     border-color: var(--nb-border) !important;
+  }
+
+  .nb-theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--nb-border);
+    background: var(--nb-surface);
+    color: var(--nb-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 16px;
+    padding: 0;
+    flex-shrink: 0;
+  }
+
+  .nb-theme-toggle:hover {
+    border-color: var(--nb-primary);
+    color: var(--nb-primary);
+    background: var(--nb-primary-light);
   }
 
   @media (min-width: 768px) {

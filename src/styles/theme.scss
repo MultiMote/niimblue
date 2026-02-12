@@ -1,10 +1,72 @@
-// ─── NiimBlue Modern Design System ───
-// Color palette matching the JSX redesign
+// ─── NiimBlue Dual Theme Design System ───
 
-:root {
+// Dark theme (default)
+:root,
+[data-theme="dark"] {
+  --nb-bg: #0F1117;
+  --nb-surface: #1A1D27;
+  --nb-surface-alt: #242836;
+  --nb-surface-raised: #2A2E3D;
+  --nb-primary: #3B82F6;
+  --nb-primary-light: rgba(59, 130, 246, 0.15);
+  --nb-primary-dark: #2563EB;
+  --nb-accent: #F43F5E;
+  --nb-accent-light: rgba(244, 63, 94, 0.15);
+  --nb-success: #10B981;
+  --nb-success-light: rgba(16, 185, 129, 0.15);
+  --nb-warning: #F59E0B;
+  --nb-warning-light: rgba(245, 158, 11, 0.15);
+  --nb-text: #E8EAF0;
+  --nb-text-secondary: #9CA3B4;
+  --nb-text-tertiary: #5C6478;
+  --nb-border: #2E3347;
+  --nb-border-light: #252938;
+  --nb-shadow: 0 2px 12px rgba(0,0,0,0.25);
+  --nb-shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
+  --nb-radius: 16px;
+  --nb-radius-sm: 10px;
+  --nb-radius-xs: 6px;
+  --nb-overlay: rgba(0, 0, 0, 0.6);
+  --nb-btn-cancel-bg: #242836;
+  --nb-btn-cancel-hover: #1A1D27;
+  --nb-btn-close-filter: invert(1);
+  --nb-logo-red: #F87171;
+  --nb-logo-blue: #60A5FA;
+  --nb-icon-settings-bg: rgba(156,163,180,0.15);
+  --nb-icon-settings-color: #9CA3B4;
+  --nb-icon-delete-bg: rgba(244,63,94,0.15);
+  --nb-icon-delete-color: #F87171;
+  --nb-icon-save-bg: rgba(99,102,241,0.15);
+  --nb-icon-save-color: #818CF8;
+  --nb-icon-undo-bg: rgba(156,163,180,0.1);
+  --nb-icon-undo-color: #9CA3B4;
+  --nb-icon-csv-bg: rgba(245,158,11,0.15);
+  --nb-icon-csv-color: #FBBF24;
+  --nb-icon-emoji-bg: rgba(236,72,153,0.15);
+  --nb-icon-emoji-color: #F472B6;
+  --nb-icon-objects-bg: rgba(59,130,246,0.15);
+  --nb-icon-objects-color: #60A5FA;
+  --nb-icon-preview-bg: rgba(16,185,129,0.15);
+  --nb-icon-preview-color: #34D399;
+  --nb-icon-print-bg: rgba(59,130,246,0.15);
+  --nb-icon-print-color: #60A5FA;
+  --nb-picker-text-bg: rgba(59,130,246,0.15);
+  --nb-picker-line-bg: rgba(99,102,241,0.15);
+  --nb-picker-rect-bg: rgba(245,158,11,0.15);
+  --nb-picker-circle-bg: rgba(236,72,153,0.15);
+  --nb-picker-image-bg: rgba(16,185,129,0.15);
+  --nb-picker-qr-bg: rgba(59,130,246,0.15);
+  --nb-picker-barcode-bg: rgba(245,158,11,0.15);
+  --nb-picker-zpl-bg: rgba(156,163,180,0.15);
+  --nb-svg-icon-filter: invert(0.7);
+}
+
+// Light theme
+[data-theme="light"] {
   --nb-bg: #F5F6FA;
   --nb-surface: #FFFFFF;
   --nb-surface-alt: #F0F2F8;
+  --nb-surface-raised: #FFFFFF;
   --nb-primary: #2563EB;
   --nb-primary-light: #DBEAFE;
   --nb-primary-dark: #1D4ED8;
@@ -21,9 +83,39 @@
   --nb-border-light: #F1F5F9;
   --nb-shadow: 0 2px 12px rgba(0,0,0,0.06);
   --nb-shadow-lg: 0 8px 32px rgba(0,0,0,0.1);
-  --nb-radius: 16px;
-  --nb-radius-sm: 10px;
-  --nb-radius-xs: 6px;
+  --nb-overlay: rgba(0, 0, 0, 0.4);
+  --nb-btn-cancel-bg: #F3F4F6;
+  --nb-btn-cancel-hover: #E5E7EB;
+  --nb-btn-close-filter: none;
+  --nb-logo-red: #EF4444;
+  --nb-logo-blue: #2563EB;
+  --nb-icon-settings-bg: #E5E7EB;
+  --nb-icon-settings-color: #4B5563;
+  --nb-icon-delete-bg: #FEE2E2;
+  --nb-icon-delete-color: #DC2626;
+  --nb-icon-save-bg: #E0E7FF;
+  --nb-icon-save-color: #4338CA;
+  --nb-icon-undo-bg: #F3F4F6;
+  --nb-icon-undo-color: #6B7280;
+  --nb-icon-csv-bg: #FEF3C7;
+  --nb-icon-csv-color: #D97706;
+  --nb-icon-emoji-bg: #FCE7F3;
+  --nb-icon-emoji-color: #DB2777;
+  --nb-icon-objects-bg: #DBEAFE;
+  --nb-icon-objects-color: #2563EB;
+  --nb-icon-preview-bg: #D1FAE5;
+  --nb-icon-preview-color: #059669;
+  --nb-icon-print-bg: #DBEAFE;
+  --nb-icon-print-color: #2563EB;
+  --nb-picker-text-bg: #DBEAFE;
+  --nb-picker-line-bg: #E0E7FF;
+  --nb-picker-rect-bg: #FEF3C7;
+  --nb-picker-circle-bg: #FCE7F3;
+  --nb-picker-image-bg: #D1FAE5;
+  --nb-picker-qr-bg: #DBEAFE;
+  --nb-picker-barcode-bg: #FEF3C7;
+  --nb-picker-zpl-bg: #E5E7EB;
+  --nb-svg-icon-filter: invert(0.3);
 }
 
 // ─── Base overrides ───
@@ -54,6 +146,11 @@ body {
   border: none !important;
   font-size: 0.875rem !important;
   padding: 0.5rem 1rem !important;
+  color: var(--nb-text-secondary) !important;
+}
+
+.btn:hover {
+  color: var(--nb-text) !important;
 }
 
 .btn:active {
@@ -76,19 +173,19 @@ body {
 .btn-primary:disabled {
   background: var(--nb-text-tertiary) !important;
   box-shadow: none !important;
-  opacity: 0.6 !important;
+  opacity: 0.5 !important;
 }
 
 .btn-secondary {
-  background-color: var(--nb-surface) !important;
+  background-color: var(--nb-surface-alt) !important;
   color: var(--nb-text-secondary) !important;
   border: 1px solid var(--nb-border) !important;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
+  box-shadow: none !important;
 }
 
 .btn-secondary:hover,
 .btn-secondary:focus {
-  background-color: var(--nb-surface-alt) !important;
+  background-color: var(--nb-surface-raised) !important;
   color: var(--nb-text) !important;
   border-color: var(--nb-primary) !important;
 }
@@ -138,6 +235,20 @@ body {
 
 // ─── Bootstrap Override: Forms ───
 
+.form-check-label {
+  color: var(--nb-text) !important;
+}
+
+.form-check-input {
+  background-color: var(--nb-surface-alt) !important;
+  border-color: var(--nb-border) !important;
+}
+
+.form-check-input:checked {
+  background-color: var(--nb-primary) !important;
+  border-color: var(--nb-primary) !important;
+}
+
 .form-control,
 .form-select {
   border: 1px solid var(--nb-border) !important;
@@ -153,6 +264,10 @@ body {
   border-color: var(--nb-primary) !important;
   box-shadow: 0 0 0 3px rgba(37,99,235,0.15) !important;
   outline: none !important;
+}
+
+[data-theme="dark"] .form-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%239CA3B4' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
 }
 
 .input-group-text {
@@ -175,7 +290,7 @@ body {
 // ─── Bootstrap Override: Dropdown ───
 
 .dropdown-menu {
-  background-color: var(--nb-surface) !important;
+  background-color: var(--nb-surface-raised) !important;
   border: 1px solid var(--nb-border) !important;
   border-radius: var(--nb-radius) !important;
   box-shadow: var(--nb-shadow-lg) !important;
@@ -202,43 +317,31 @@ body {
   color: var(--nb-primary) !important;
 }
 
-// ─── Bootstrap Override: Modal (Bottom Sheet style) ───
+// ─── Bootstrap Override: Modal (Centered panel style) ───
 
 .modal-content {
   background-color: var(--nb-surface) !important;
-  border: none !important;
-  border-radius: 20px 20px 0 0 !important;
-  box-shadow: 0 -8px 32px rgba(0,0,0,0.15) !important;
+  border: 1px solid var(--nb-border) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--nb-shadow-lg) !important;
 }
 
 .modal-dialog-centered {
-  align-items: flex-end !important;
+  align-items: center !important;
   min-height: 100% !important;
-  margin: 0 !important;
+  margin: 0 auto !important;
+  padding: 20px !important;
 }
 
 .modal-dialog {
-  max-width: 100% !important;
-  width: 100% !important;
-  margin: 0 !important;
+  max-width: 420px !important;
+  width: calc(100vw - 32px) !important;
+  margin: 0 auto !important;
 }
 
 .modal-header {
   border-bottom: 1px solid var(--nb-border-light) !important;
   padding: 16px 20px !important;
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--nb-border);
-  }
 }
 
 .modal-title {
@@ -249,23 +352,26 @@ body {
 
 .modal-body {
   padding: 20px !important;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  color: var(--nb-text) !important;
 }
 
 .modal-footer {
   border-top: 1px solid var(--nb-border-light) !important;
-  padding: 16px 20px 28px !important;
+  padding: 16px 20px 20px !important;
   gap: 8px !important;
   flex-wrap: wrap !important;
 }
 
 .btn-close {
-  filter: none !important;
+  filter: var(--nb-btn-close-filter) !important;
   opacity: 0.5 !important;
 }
 
 .modal-backdrop {
   backdrop-filter: blur(4px) !important;
-  background-color: rgba(0,0,0,0.4) !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
 }
 
 // ─── Bootstrap Override: Progress ───
@@ -292,7 +398,7 @@ body {
 
 .alert-danger {
   background-color: var(--nb-accent-light) !important;
-  color: #be123c !important;
+  color: var(--nb-accent) !important;
 }
 
 // ─── Bootstrap Override: Typography ───
@@ -348,13 +454,13 @@ h1, h2, h3, h4, h5, h6 {
 .toastify.toast-danger {
   background: var(--nb-accent-light) !important;
   border: 1px solid rgba(244,63,94,0.2) !important;
-  color: #be123c !important;
+  color: var(--nb-accent) !important;
 }
 
 .toastify.toast-info {
   background: var(--nb-success-light) !important;
   border: 1px solid rgba(16,185,129,0.2) !important;
-  color: #065f46 !important;
+  color: var(--nb-success) !important;
 }
 
 // ─── Form range ───

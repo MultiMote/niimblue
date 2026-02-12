@@ -23,6 +23,38 @@ export const fontCache = writable<string[]>([OBJECT_DEFAULTS_TEXT.fontFamily]);
 export const appConfig = writablePersisted<AppConfig>("config", AppConfigSchema, APP_CONFIG_DEFAULTS);
 export const userIcons = writablePersisted<UserIconsList>("user_icons", UserIconsListSchema, []);
 
+// Theme store (persisted manually to avoid zod overhead)
+function createThemeStore() {
+  const stored = typeof localStorage !== "undefined" ? localStorage.getItem("nb_theme") : null;
+  const initial = (stored === "light" || stored === "dark") ? stored : "dark";
+  const store = writable<"light" | "dark">(initial);
+
+  // Apply immediately
+  if (typeof document !== "undefined") {
+    document.documentElement.setAttribute("data-theme", initial);
+  }
+
+  return {
+    subscribe: store.subscribe,
+    set: (value: "light" | "dark") => {
+      store.set(value);
+      localStorage.setItem("nb_theme", value);
+      document.documentElement.setAttribute("data-theme", value);
+    },
+    toggle: () => {
+      let current: "light" | "dark" = "dark";
+      store.update(v => {
+        current = v === "dark" ? "light" : "dark";
+        return current;
+      });
+      localStorage.setItem("nb_theme", current);
+      document.documentElement.setAttribute("data-theme", current);
+    },
+  };
+}
+
+export const themeMode = createThemeStore();
+
 export const connectionState = writable<ConnectionState>("disconnected");
 export const connectedPrinterName = writable<string>("");
 export const printerClient = writable<NiimbotAbstractClient>();

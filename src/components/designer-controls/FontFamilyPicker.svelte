@@ -20,6 +20,9 @@
   let search = $state("");
   let pickerRef: HTMLDivElement;
 
+  // Track displayed value locally to ensure reactivity
+  let displayValue = $derived(value);
+
   const categoryLabels: Record<string, string> = {
     "sans-serif": "Sans Serif",
     "serif": "Serif",
@@ -35,6 +38,10 @@
 
   const getCategory = (font: string): string => {
     return bundledMap.get(font)?.category ?? "system";
+  };
+
+  const hasCyrillic = (font: string): boolean => {
+    return bundledMap.get(font)?.cyrillic === true;
   };
 
   const filteredFonts = $derived(() => {
@@ -106,7 +113,7 @@
 <div class="nb-font-picker" bind:this={pickerRef}>
   <button class="nb-font-trigger" onclick={toggle} title={$tr("params.text.font_family")}>
     <MdIcon icon="text_format" />
-    <span class="nb-font-current" style="font-family: '{value}'">{value}</span>
+    <span class="nb-font-current" style="font-family: '{displayValue}'">{displayValue}</span>
     <MdIcon icon={isOpen ? "expand_less" : "expand_more"} />
   </button>
 
@@ -132,12 +139,17 @@
           {#each fonts as font (font)}
             <button
               class="nb-font-item"
-              class:active={font === value}
+              class:active={font === displayValue}
               onclick={() => selectFont(font)}>
               <span class="nb-font-preview" style="font-family: '{font}'">{font}</span>
-              {#if font === value}
-                <MdIcon icon="check" />
-              {/if}
+              <span class="nb-font-badges">
+                {#if hasCyrillic(font)}
+                  <span class="nb-font-badge cyrillic">кир</span>
+                {/if}
+                {#if font === displayValue}
+                  <MdIcon icon="check" />
+                {/if}
+              </span>
             </button>
           {/each}
         {/each}
@@ -152,7 +164,8 @@
 <style>
   .nb-font-picker {
     position: relative;
-    width: 100%;
+    flex: 1;
+    min-width: 120px;
   }
 
   .nb-font-trigger {
@@ -161,7 +174,7 @@
     gap: 6px;
     width: 100%;
     padding: 4px 8px;
-    background: var(--nb-surface);
+    background: var(--nb-surface-alt);
     border: 1px solid var(--nb-border);
     border-radius: 6px;
     cursor: pointer;
@@ -189,10 +202,10 @@
     left: 0;
     right: 0;
     margin-top: 4px;
-    background: white;
+    background: var(--nb-surface-raised);
     border: 1px solid var(--nb-border);
     border-radius: 10px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--nb-shadow-lg);
     z-index: 1060;
     overflow: hidden;
     min-width: 250px;
@@ -212,6 +225,8 @@
     padding: 6px 10px;
     font-size: 13px;
     outline: none;
+    background: var(--nb-surface);
+    color: var(--nb-text);
   }
 
   .nb-font-search:focus {
@@ -263,6 +278,27 @@
   .nb-font-item.active {
     background: var(--nb-primary-light);
     color: var(--nb-primary);
+  }
+
+  .nb-font-badges {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .nb-font-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .nb-font-badge.cyrillic {
+    background: rgba(139, 92, 246, 0.15);
+    color: #A78BFA;
   }
 
   .nb-font-preview {

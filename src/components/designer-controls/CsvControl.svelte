@@ -44,7 +44,7 @@
         <MdIcon icon="close" />
       </button>
     </div>
-    <div class="p-3 text-body-secondary">
+    <div class="p-3" style="color: var(--nb-text)">
       <div class="form-check form-switch">
         <input class="form-check-input" type="checkbox" role="switch" id="enabled" bind:checked={enabled} />
         <label class="form-check-label" for="enabled">{$tr("params.csv.enabled")}</label>

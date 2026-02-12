@@ -117,9 +117,10 @@
   }
 
   .card {
-    background-color: white;
+    background-color: var(--nb-surface-raised);
     position: relative;
     border-radius: 4px;
+    border: 1px solid var(--nb-border);
   }
 
   .card.shape-rounded_rect {
@@ -146,6 +147,7 @@
     background: none;
     border: none;
     cursor: pointer;
+    color: var(--nb-text-tertiary);
   }
 
   .card > .buttons > .export-btn {
@@ -165,12 +167,12 @@
   }
 
   .card > .label {
-    background-color: rgba(255, 255, 255, 0.9);
-    color: var(--nb-text);
+    background-color: var(--nb-primary-light);
+    color: var(--nb-primary);
     border-radius: 6px;
     z-index: 1;
     font-size: 11px;
-    font-weight: 500;
+    font-weight: 600;
   }
 
   .card.print-start-left {

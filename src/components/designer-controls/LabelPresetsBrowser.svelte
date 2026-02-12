@@ -121,12 +121,12 @@
     cursor: pointer;
     font-size: 13px;
     line-height: 1;
-    color: #9CA3AF;
+    color: var(--nb-text-tertiary);
   }
 
   .action-btn.trigger:hover,
   .action-btn.confirm {
-    color: #DC2626;
+    color: var(--nb-accent);
   }
 
   .action-btn.cancel {
@@ -150,9 +150,10 @@
   }
 
   .card {
-    background-color: white;
+    background-color: var(--nb-surface-raised);
     position: relative;
     border-radius: 4px;
+    border: 1px solid var(--nb-border);
   }
 
   .card.shape-rounded_rect {
@@ -164,11 +165,11 @@
   }
 
   .card > .label {
-    background-color: rgba(255, 255, 255, 0.9);
-    color: var(--nb-text);
+    background-color: var(--nb-primary-light);
+    color: var(--nb-primary);
     border-radius: 6px;
     font-size: 11px;
-    font-weight: 500;
+    font-weight: 600;
   }
 
   .card.print-start-left {

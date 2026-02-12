@@ -46,6 +46,15 @@
     valueUpdated();
   };
 
+  let currentFont = $state(selectedText.fontFamily);
+
+  // Sync font when selected object changes
+  $effect(() => {
+    // editRevision dependency forces re-read
+    void editRevision;
+    currentFont = selectedText.fontFamily;
+  });
+
   const updateFontFamily = async (v: string) => {
     // Ensure font is loaded before applying
     try {
@@ -54,6 +63,7 @@
       // ignore load errors, proceed anyway
     }
     selectedText.set({ fontFamily: v });
+    currentFont = v;
     selectedText.dirty = true;
     selectedText.initDimensions();
     selectedText.setCoords();
@@ -270,7 +280,7 @@
     oninput={(e) => lineHeightChange(e.currentTarget.valueAsNumber)} />
 </div>
 
-<FontFamilyPicker value={selectedText.fontFamily} valueUpdated={updateFontFamily} />
+<FontFamilyPicker value={currentFont} valueUpdated={updateFontFamily} />
 
 <button class="btn btn-sm btn-secondary" onclick={editInPopup} title={$tr("params.text.edit")}>
   <MdIcon icon="edit" />
@@ -306,7 +316,7 @@
 
 <style>
   .input-group {
-    width: 7em;
+    width: 6em;
   }
   .font-size {
     width: 12em;
@@ -316,106 +326,5 @@
   }
   .input-group.split {
     width: 14em;
-  }
-
-  .nb-edit-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1050;
-    backdrop-filter: blur(2px);
-  }
-
-  .nb-edit-dialog {
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    width: calc(100vw - 32px);
-    max-width: 360px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-  }
-
-  .nb-edit-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: #DBEAFE;
-    color: #2563EB;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 12px;
-    font-size: 24px;
-  }
-
-  .nb-edit-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #1F2937;
-    margin: 0 0 16px;
-  }
-
-  .nb-edit-textarea {
-    width: 100%;
-    border: 1.5px solid #D1D5DB;
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 15px;
-    font-family: inherit;
-    resize: vertical;
-    margin-bottom: 16px;
-    transition: border-color 0.15s ease;
-  }
-
-  .nb-edit-textarea:focus {
-    outline: none;
-    border-color: #2563EB;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-  }
-
-  .nb-edit-actions {
-    display: flex;
-    gap: 10px;
-  }
-
-  .nb-edit-btn {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    border: none;
-    transition: all 0.15s ease;
-  }
-
-  .nb-edit-btn.cancel {
-    background: #F3F4F6;
-    color: #6B7280;
-  }
-
-  .nb-edit-btn.cancel:hover {
-    background: #E5E7EB;
-  }
-
-  .nb-edit-btn.confirm {
-    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
-    color: white;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-  }
-
-  .nb-edit-btn.confirm:hover {
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
   }
 </style>

@@ -494,7 +494,7 @@
     height: 1.5em;
     width: 1.5em;
     background-size: cover;
-    filter: invert(0.3);
+    filter: var(--nb-svg-icon-filter);
   }
 
   .tail-pos-switch .svg-icon {
