@@ -64,6 +64,11 @@
   let panStartScroll = { left: 0, top: 0 };
   let longPressTimer: ReturnType<typeof setTimeout> | null = null;
 
+  // Middle-mouse pan (desktop)
+  let isMiddlePanning = false;
+  let middlePanStart = { x: 0, y: 0 };
+  let middlePanScroll = { left: 0, top: 0 };
+
   const MOVE_THRESHOLD = 8;
   const LONG_PRESS_MS = 400;
 
@@ -260,6 +265,44 @@
     el.removeEventListener("touchstart", onAreaTouchStart);
     el.removeEventListener("touchmove", onAreaTouchMove);
     el.removeEventListener("touchend", onAreaTouchEnd);
+  };
+
+  // Right-click pan handlers (desktop browser)
+  const onPanMouseDown = (e: MouseEvent) => {
+    if (e.button === 2 && canvasAreaRef) {
+      e.preventDefault();
+      e.stopPropagation();
+      isMiddlePanning = true;
+      middlePanStart = { x: e.clientX, y: e.clientY };
+      middlePanScroll = {
+        left: canvasAreaRef.scrollLeft,
+        top: canvasAreaRef.scrollTop,
+      };
+      canvasAreaRef.style.cursor = "grabbing";
+    }
+  };
+
+  const onPanMouseMove = (e: MouseEvent) => {
+    if (isMiddlePanning && canvasAreaRef) {
+      e.preventDefault();
+      const dx = e.clientX - middlePanStart.x;
+      const dy = e.clientY - middlePanStart.y;
+      canvasAreaRef.scrollLeft = middlePanScroll.left - dx;
+      canvasAreaRef.scrollTop = middlePanScroll.top - dy;
+    }
+  };
+
+  const onPanMouseUp = (e: MouseEvent) => {
+    if (isMiddlePanning) {
+      e.preventDefault();
+      isMiddlePanning = false;
+      if (canvasAreaRef) canvasAreaRef.style.cursor = "";
+    }
+  };
+
+  // Prevent context menu on canvas area (right-click is used for pan)
+  const onContextMenu = (e: MouseEvent) => {
+    e.preventDefault();
   };
 
   let baseZoom = $state<number>(1); // the fitToWidth zoom level
@@ -665,6 +708,11 @@
     // Setup pinch-to-zoom on canvas area (always active, even in multi-select)
     if (canvasAreaRef) {
       setupPinchZoom(canvasAreaRef);
+      // Right-click pan (desktop)
+      canvasAreaRef.addEventListener("mousedown", onPanMouseDown, { capture: true });
+      canvasAreaRef.addEventListener("contextmenu", onContextMenu);
+      window.addEventListener("mousemove", onPanMouseMove);
+      window.addEventListener("mouseup", onPanMouseUp);
     }
 
     // Fit canvas to container width on initial load
@@ -677,6 +725,10 @@
     }
     if (canvasAreaRef) {
       teardownPinchZoom(canvasAreaRef);
+      canvasAreaRef.removeEventListener("mousedown", onPanMouseDown, { capture: true });
+      canvasAreaRef.removeEventListener("contextmenu", onContextMenu);
+      window.removeEventListener("mousemove", onPanMouseMove);
+      window.removeEventListener("mouseup", onPanMouseUp);
     }
     fabricCanvas!.dispose();
   });
