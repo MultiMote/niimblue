@@ -194,11 +194,6 @@
     undo.push(fabricCanvas!, labelProps);
   };
 
-  const onPreviewClosed = () => {
-    printNow = false;
-    previewOpened = false;
-  };
-
   const openPreview = () => {
     printNow = false;
     previewOpened = true;
@@ -330,7 +325,7 @@
       undo.push(fabricCanvas!, labelProps);
     });
 
-    fabricCanvas.on('text:changed', () => {
+    fabricCanvas.on("text:changed", () => {
       editRevision++;
     });
 
@@ -412,6 +407,12 @@
 
   $effect(() => {
     fabricCanvas?.setLabelProps(labelProps);
+  });
+
+  $effect(() => {
+    if (!previewOpened) {
+      printNow = false;
+    }
   });
 </script>
 
@@ -519,7 +520,7 @@
 
   {#if previewOpened}
     <PrintPreview
-      onClosed={onPreviewClosed}
+      bind:show={previewOpened}
       canvasCallback={getCanvasForPreview}
       {labelProps}
       {printNow}
