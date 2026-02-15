@@ -93,6 +93,7 @@ export const PreviewPropsSchema = z.object({
   threshold: z.number().gte(1).lte(255).optional(),
   quantity: z.number().gte(1).optional(),
   density: z.number().gte(1).optional(),
+  speed: z.union([z.literal(0), z.literal(1)]).optional(),
   labelType: z.enum(LabelType).optional(),
   printTaskName: z.enum([firstTask, ...otherTasks]).optional(),
   offset: PreviewPropsOffsetSchema.optional(),
@@ -110,8 +111,9 @@ export const AutomationPropsSchema = z.object({
 export const AppConfigSchema = z.object({
   /** Keep image aspect ration when using "fit" button */
   fitMode: z.enum(["stretch", "ratio_min", "ratio_max"]),
-  pageDelay: z.number().gte(0),
+  pageDelay: z.number().gte(0).optional(),
   iconListMode: z.enum(["user", "pack", "both"]),
+  packetIntervalMs: z.number().gte(0).optional(),
 });
 
 export type CsvParams = z.infer<typeof CsvParamsSchema>;

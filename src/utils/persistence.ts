@@ -107,23 +107,6 @@ export class LocalStoragePersistence {
     this.saveObject(key, obj);
   }
 
-  // static saveCsv(data: string) {
-  //   this.saveObject("csv_params", { data });
-  // }
-  // static loadCsv(): { data: string } {
-  //   const result = this.loadObject("csv_params");
-
-  //   if (result === null) {
-  //     return {
-  //       data: "var1,var2\n123,456\n777,888",
-  //     };
-  //   }
-
-  //   return {
-  //     data: result.data,
-  //   };
-  // }
-
   /**
    * @throws {z.ZodError}
    */

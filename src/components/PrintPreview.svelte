@@ -42,6 +42,7 @@
   let modal: Modal;
   let printProgress = $state<number>(0); // todo: more progress data
   let density = $state<number>($printerMeta?.densityDefault ?? 3);
+  let speed = $state<0 | 1>(1);
   let quantity = $state<number>(1);
   let postProcessType = $state<PostProcessType>();
   let postProcessInvert = $state<boolean>(false);
@@ -111,6 +112,7 @@
       currentPrintTask = $printerClient.abstraction.newPrintTask(printTaskName, {
         totalPages: quantity,
         density,
+        speed,
         labelType,
         statusPollIntervalMs: 100,
         statusTimeoutMs: 8_000,
@@ -150,7 +152,7 @@
 
       await endPrint();
 
-      if ($appConfig.pageDelay > 0 && pagesTotal > 1 && curPage < pagesTotal - 1) {
+      if ($appConfig.pageDelay !== undefined && $appConfig.pageDelay > 0 && pagesTotal > 1 && curPage < pagesTotal - 1) {
         await Utils.sleep($appConfig.pageDelay);
       }
     }
@@ -238,14 +240,15 @@
         return;
       }
       savedProps = saved;
-      if (saved.postProcess) postProcessType = saved.postProcess;
-      if (saved.postProcessInvert) postProcessInvert = saved.postProcessInvert;
-      if (saved.threshold) thresholdValue = saved.threshold;
-      if (saved.quantity) quantity = saved.quantity;
-      if (saved.density) density = saved.density;
-      if (saved.labelType) labelType = saved.labelType;
-      if (saved.printTaskName) printTaskName = saved.printTaskName;
-      if (saved.offset) offset = saved.offset;
+      if (saved.postProcess !== undefined) postProcessType = saved.postProcess;
+      if (saved.postProcessInvert !== undefined) postProcessInvert = saved.postProcessInvert;
+      if (saved.threshold !== undefined) thresholdValue = saved.threshold;
+      if (saved.quantity !== undefined) quantity = saved.quantity;
+      if (saved.density !== undefined) density = saved.density;
+      if (saved.speed !== undefined) speed = saved.speed;
+      if (saved.labelType !== undefined) labelType = saved.labelType;
+      if (saved.printTaskName !== undefined) printTaskName = saved.printTaskName;
+      if (saved.offset !== undefined) offset = saved.offset;
     } catch (e) {
       Toasts.zodErrors(e, "Preview parameters load error:");
     }
@@ -492,6 +495,25 @@
             onClick={toggleSavedProp} />
         </div>
 
+        {#if printTaskName === "D110M_V4"}
+          <div class="input-group flex-nowrap input-group-sm">
+            <span class="input-group-text">{$tr("preview.speed")}</span>
+            <select
+              class="form-select"
+              bind:value={speed}
+              onchange={() => updateSavedProp("speed", speed, true)}>
+              <option value={0}>{$tr("preview.speed.0")}</option>
+              <option value={1}>{$tr("preview.speed.1")}</option>
+            </select>
+
+            <ParamLockButton
+              propName="speed"
+              value={speed}
+              savedValue={savedProps.speed}
+              onClick={toggleSavedProp} />
+          </div>
+        {/if}
+
         <div class="input-group input-group-sm">
           <span class="input-group-text">{$tr("preview.label_type")}</span>
           <select class="form-select" bind:value={labelType} onchange={() => updateSavedProp("labelType", labelType)}>
@@ -560,24 +582,6 @@
 
           <ParamLockButton propName="offset" value={offset} savedValue={savedProps.offset} onClick={toggleSavedProp} />
         </div>
-
-        {#if pagesTotal > 1}
-          <div class="input-group flex-nowrap input-group-sm" role="group">
-            <span class="input-group-text w-100 cursor-help" title={$tr("config.page_delay.help")}
-              >{$tr("config.page_delay")}</span>
-            {#each [0, 1000] as ms (ms)}
-              <input
-                type="radio"
-                class="btn-check"
-                name="page-delay"
-                id="page-delay-{ms}"
-                autocomplete="off"
-                bind:group={$appConfig.pageDelay}
-                value={ms} />
-              <label class="btn btn-outline-secondary px-3" for="page-delay-{ms}">{ms}ms</label>
-            {/each}
-          </div>
-        {/if}
 
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{$tr("preview.close")}</button>
 

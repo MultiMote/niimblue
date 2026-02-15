@@ -61,7 +61,6 @@ export const refreshRfidInfo = () => {
 };
 
 export const initClient = (connectionType: ConnectionType) => {
-  refreshRfidInfo();
   printerClient.update((prevClient: NiimbotAbstractClient) => {
     let newClient: NiimbotAbstractClient = prevClient;
 
@@ -76,6 +75,13 @@ export const initClient = (connectionType: ConnectionType) => {
       }
 
       newClient = instantiateClient(connectionType);
+
+      const conf = get(appConfig);
+
+      if (conf.packetIntervalMs !== undefined) {
+        newClient.setPacketInterval(conf.packetIntervalMs);
+        console.log(conf.packetIntervalMs)
+      }
 
       newClient.on("packetsent", (e) => {
         console.log(`>> ${Utils.bufToHex(e.packet.toBytes())} (${RequestCommandId[e.packet.command]})`);

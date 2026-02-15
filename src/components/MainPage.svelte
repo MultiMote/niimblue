@@ -4,6 +4,8 @@
   import LabelDesigner from "$/components/LabelDesigner.svelte";
   import PrinterConnector from "$/components/PrinterConnector.svelte";
   import { locale, locales, tr } from "$/utils/i18n";
+  import DebugStuff from "$/components/DebugStuff.svelte";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
 
   // eslint-disable-next-line no-undef
   const appCommit = __APP_COMMIT__;
@@ -11,6 +13,8 @@
   const buildDate = __BUILD_DATE__;
 
   let isStandalone = Utils.getAvailableTransports().capacitorBle;
+
+  let debugStuffShow = $state<boolean>(false);
 </script>
 
 <div class="container my-2">
@@ -56,8 +60,15 @@
   </div>
   <div>
     <a class="text-secondary" href="https://github.com/MultiMote/niimblue">{$tr("main.code")}</a>
+    <button class="text-secondary btn btn-link p-0" onclick={() => debugStuffShow = true}>
+      <MdIcon icon="bug_report" />
+    </button>
   </div>
 </div>
+
+{#if debugStuffShow}
+  <DebugStuff bind:show={debugStuffShow} />
+{/if}
 
 <style>
   .niim {
