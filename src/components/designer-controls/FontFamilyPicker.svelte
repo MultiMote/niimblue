@@ -6,6 +6,7 @@
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import { LocalStoragePersistence } from "$/utils/persistence";
   import { fontCache } from "$/stores";
+  import FontsMenu from "$/components/designer-controls/FontsMenu.svelte";
 
   interface Props {
     value: string;
@@ -59,6 +60,8 @@
       <MdIcon icon="refresh" />
     </button>
   {/if}
+
+  <FontsMenu />
 </div>
 
 <style>

@@ -23,13 +23,6 @@ export const CsvParamsSchema = z.object({
   data: z.string(),
 });
 
-export const UserIconsListSchema = z.array(
-  z.object({
-    name: z.string(),
-    data: z.string(),
-  }),
-);
-
 /** Not validated */
 export const FabricObjectSchema = z.custom<fabric.FabricObject>((val: any): boolean => {
   return typeof val === "object";
@@ -116,8 +109,20 @@ export const AppConfigSchema = z.object({
   packetIntervalMs: z.number().gte(0).optional(),
 });
 
+export const UserIconSchema = z.object({
+  name: z.string(),
+  data: z.string(),
+});
+
+
+export const UserFontSchema = z.object({
+  base64data: z.string(),
+  name: z.string(),
+  mimeType: z.string(),
+});
+
 export type CsvParams = z.infer<typeof CsvParamsSchema>;
-export type UserIconsList = z.infer<typeof UserIconsListSchema>;
+export type UserIcon = z.infer<typeof UserIconSchema>;
 export type LabelProps = z.infer<typeof LabelPropsSchema>;
 export type LabelPreset = z.infer<typeof LabelPresetSchema>;
 export type FabricJson = z.infer<typeof FabricJsonSchema>;
@@ -126,3 +131,4 @@ export type PreviewPropsOffset = z.infer<typeof PreviewPropsOffsetSchema>;
 export type PreviewProps = z.infer<typeof PreviewPropsSchema>;
 export type AutomationProps = z.infer<typeof AutomationPropsSchema>;
 export type AppConfig = z.infer<typeof AppConfigSchema>;
+export type UserFont = z.infer<typeof UserFontSchema>;

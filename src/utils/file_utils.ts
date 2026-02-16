@@ -2,6 +2,7 @@ import * as fabric from "fabric";
 import {
   ExportedLabelTemplateSchema,
   LabelPresetSchema,
+  UserFont,
   type ExportedLabelTemplate,
   type FabricJson,
   type LabelPreset,
@@ -373,5 +374,19 @@ export class FileUtils {
     const decoded = decoder.decode(decompressed);
     const labelObj = JSON.parse(decoded);
     return ExportedLabelTemplateSchema.parse(labelObj);
+  }
+
+  static async loadFonts(fonts: UserFont[]) {
+    for (const font of fonts) {
+      const fontFace = new FontFace(font.name, `url(data:${font.mimeType};base64,${font.base64data})`);
+      try {
+        const loaded = await fontFace.load()
+        document.fonts.add(loaded);
+      } catch (e) {
+        console.error(`Failed to load font ${font.name}:`, e);
+      }
+    }
+
+    console.log("Loaded fonts:", [...document.fonts]);
   }
 }
