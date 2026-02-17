@@ -14,8 +14,7 @@ export type LabelSplit = "none" | "vertical" | "horizontal";
 export type TailPosition = "right" | "bottom" | "left" | "top";
 export type MirrorType = "none" | "copy" | "flip";
 
-type _Range<T extends number, R extends unknown[]> =
-  R['length'] extends T ? R[number] : _Range<T, [R['length'], ...R]>;
+type _Range<T extends number, R extends unknown[]> = R["length"] extends T ? R[number] : _Range<T, [R["length"], ...R]>;
 
 export type Range<T extends number> = number extends T ? number : _Range<T, []>;
 
@@ -114,12 +113,12 @@ export const UserIconSchema = z.object({
   data: z.string(),
 });
 
-
-export const UserFontSchema = z.object({
-  base64data: z.string(),
-  family: z.string(),
-  mimeType: z.string(),
-});
+export const UserFontSchema = z
+  .object({
+    gzippedDataB64: z.string(),
+    family: z.string(),
+    mimeType: z.string(),
+  });
 
 export type CsvParams = z.infer<typeof CsvParamsSchema>;
 export type UserIcon = z.infer<typeof UserIconSchema>;

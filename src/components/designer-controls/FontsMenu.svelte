@@ -17,31 +17,26 @@
   };
 
   const browseFont = async () => {
-    const fileList = await FileUtils.pickFileAsync(selectExt, false);
-    const file: File = fileList[0];
-    const ext = file.name.split(".").pop();
-    const mime = `text/${selectExt}`;
+    const result = await FileUtils.pickAndReadBinaryFile(selectExt);
 
-    let fontName = file.name.split(".")[0];
+    let fontName = result.name.split(".")[0];
+    const mime = `text/${selectExt}`;
 
     if (overrideFamily.trim() !== "") {
       fontName = overrideFamily.trim();
-    }
-
-
-    if (ext !== selectExt) {
-      throw new Error(`Only ${selectExt} allowed`);
     }
 
     if ($userFonts.some((e) => e.family == fontName)) {
       Toasts.error(`${fontName} already loaded`);
       return;
     }
-    const dataUrl = await FileUtils.blobToDataUrl(file);
+
+    const compressed = await FileUtils.compressData(result.data);
+    const b64data = await FileUtils.base64buf(compressed);
 
     userFonts.update((prev) => [
       ...prev,
-      { base64data: dataUrl.split(";base64,")[1], family: fontName, mimeType: mime },
+      { gzippedDataB64: b64data, family: fontName, mimeType: mime },
     ]);
 
     calcUsedSpace();
@@ -69,10 +64,6 @@
 {#if show}
   <AppModal title="Custom fonts" bind:show>
     <div class="mb-1">
-      {usedSpace}
-      {$tr("params.saved_labels.kb_used")}
-    </div>
-    <div class="mb-1">
       {#each $userFonts as font (font.family)}
         <div class="input-group input-group-sm">
           <span class="input-group-text fs-5" style="font-family: {font.family}">{font.family}</span>
@@ -81,7 +72,7 @@
       {/each}
     </div>
 
-    <div class="input-group input-group-sm">
+    <div class="input-group input-group-sm mb-1">
       <span class="input-group-text">Add font</span>
 
       <select class="form-select" bind:value={selectExt}>
@@ -89,9 +80,14 @@
         <option value="woff2">woff2</option>
       </select>
 
-      <input type="text" class="form-control w-50" placeholder="Override font name" bind:value={overrideFamily} />
+      <input type="text" class="form-control w-25" placeholder="Override font name" bind:value={overrideFamily} />
 
       <button class="btn btn-sm btn-secondary" onclick={browseFont}> Browse... </button>
+    </div>
+
+    <div class="text-secondary">
+      {usedSpace}
+      {$tr("params.saved_labels.kb_used")}
     </div>
   </AppModal>
 {/if}
