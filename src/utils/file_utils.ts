@@ -399,11 +399,8 @@ export class FileUtils {
 
     for (const font of fontsToLoad) {
       if (loadedList.some((e) => e.family === font.family)) {
-        console.log(font.family, "already loaded");
         continue;
       }
-
-      console.log(`Loading ${font.family}`);
 
       const bytes = FileUtils.base64toBytes(font.gzippedDataB64);
       const decompressed = await FileUtils.decompressData(bytes);
@@ -425,14 +422,11 @@ export class FileUtils {
       const loadedFont = loadedList[i];
 
       if (!fontsToLoad.some((e) => e.family === loadedFont.family)) {
-        console.log(`Removing font ${loadedFont.family}`);
         document.fonts.delete(loadedFont);
         loadedList.splice(i, 1);
       }
     }
 
     loadedFonts.set(loadedList);
-
-    console.log("Loaded:", [...document.fonts]);
   }
 }
