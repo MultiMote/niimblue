@@ -42,6 +42,10 @@
     ]);
   };
 
+  const removeFont = (family: string) => {
+    userFonts.update((prev) => prev.filter(e => e.family !== family));
+  }
+
   $effect(() => {
     if (show) calcUsedSpace();
   });
@@ -62,11 +66,12 @@
       {$tr("params.saved_labels.kb_used")}
     </div>
     <div>
-      <ul>
-        {#each $userFonts as font (font.family)}
-          <li>{font.family}</li>
-        {/each}
-      </ul>
+      {#each $userFonts as font (font.family)}
+        <div>
+          <span style="font-family: {font.family}">{font.family}</span>
+          <button class="btn btn-sm btn-danger" onclick={ () => removeFont(font.family)}>x</button>
+        </div>
+      {/each}
     </div>
     <div>
       <select bind:value={selectExt}>
