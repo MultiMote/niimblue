@@ -14,7 +14,7 @@ import { CustomCanvas } from "$/fabric-object/custom_canvas";
 import { Capacitor } from "@capacitor/core";
 import { CanvasUtils } from "$/utils/canvas_utils";
 import { LocalStoragePersistence } from "./persistence";
-import { csvData } from "$/stores";
+import { csvData, loadedFonts } from "$/stores";
 import { get } from "svelte/store";
 
 export class FileUtils {
@@ -236,7 +236,7 @@ export class FileUtils {
     const file: File = fileList[0];
     const ext = file.name.split(".").pop();
 
-    if (ext !== acceptExtension) {
+    if (acceptExtension !== "*" && ext !== acceptExtension) {
       throw new Error(`Only ${acceptExtension} allowed`);
     }
 
@@ -376,17 +376,42 @@ export class FileUtils {
     return ExportedLabelTemplateSchema.parse(labelObj);
   }
 
-  static async loadFonts(fonts: UserFont[]) {
-    for (const font of fonts) {
-      const fontFace = new FontFace(font.name, `url(data:${font.mimeType};base64,${font.base64data})`);
+  // fixme: remove debug messages
+  static async loadFonts(fontsToLoad: UserFont[]) {
+    const loadedList = get(loadedFonts);
+
+    for (const font of fontsToLoad) {
+      if (loadedList.some((e) => e.family === font.family)) {
+        console.log(font.family, "already loaded");
+        continue;
+      }
+
+      console.log(`Loading ${font.family}`);
+
+      const fontFace = new FontFace(font.family, `url(data:${font.mimeType};base64,${font.base64data})`);
+
       try {
-        const loaded = await fontFace.load()
+        const loaded = await fontFace.load();
+        loadedList.push(loaded);
         document.fonts.add(loaded);
       } catch (e) {
-        console.error(`Failed to load font ${font.name}:`, e);
+        console.error(`Failed to load font ${font.family}:`, e);
       }
     }
 
-    console.log("Loaded fonts:", [...document.fonts]);
+    // remove font that not exist anymore
+    for (let i = loadedList.length - 1; i >= 0; i--) {
+      const loadedFont = loadedList[i];
+
+      if (!fontsToLoad.some((e) => e.family === loadedFont.family)) {
+        console.log(`Removing font ${loadedFont.family}`);
+        document.fonts.delete(loadedFont);
+        loadedList.splice(i, 1);
+      }
+    }
+
+    loadedFonts.set(loadedList);
+
+    console.log("Loaded:", [...document.fonts]);
   }
 }

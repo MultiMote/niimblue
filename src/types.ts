@@ -117,7 +117,7 @@ export const UserIconSchema = z.object({
 
 export const UserFontSchema = z.object({
   base64data: z.string(),
-  name: z.string(),
+  family: z.string(),
   mimeType: z.string(),
 });
 
