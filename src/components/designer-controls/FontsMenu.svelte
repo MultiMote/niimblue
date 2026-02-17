@@ -72,7 +72,7 @@
       {/each}
     </div>
 
-    <div class="input-group input-group-sm mb-1">
+    <div class="input-group input-group-sm">
       <span class="input-group-text">Add font</span>
 
       <select class="form-select" bind:value={selectExt}>
@@ -85,9 +85,12 @@
       <button class="btn btn-sm btn-secondary" onclick={browseFont}> Browse... </button>
     </div>
 
-    <div class="text-secondary">
-      {usedSpace}
-      {$tr("params.saved_labels.kb_used")}
-    </div>
+    {#snippet footer()}
+      <div class="text-secondary">
+        {usedSpace}
+        {$tr("params.saved_labels.kb_used")} | <a class="text-secondary" href="https://fonts.google.com">Get fonts</a>
+      </div>
+    {/snippet}
+
   </AppModal>
 {/if}
