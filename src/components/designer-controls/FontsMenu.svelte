@@ -69,8 +69,12 @@
           <span class="input-group-text fs-5" style="font-family: {font.family}">{font.family}</span>
           <button class="btn btn-sm btn-danger" onclick={() => removeFont(font.family)}>x</button>
         </div>
+      {:else}
+        👀
       {/each}
     </div>
+
+    <hr>
 
     <div class="input-group input-group-sm">
       <span class="input-group-text">Add font</span>
@@ -81,6 +85,7 @@
       </select>
 
       <input type="text" class="form-control w-25" placeholder="Override font name" bind:value={overrideFamily} />
+
 
       <button class="btn btn-sm btn-secondary" onclick={browseFont}> Browse... </button>
     </div>
