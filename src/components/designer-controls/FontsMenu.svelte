@@ -65,7 +65,7 @@
   <AppModal title="Custom fonts" bind:show>
     <div class="mb-1">
       {#each $userFonts as font (font.family)}
-        <div class="input-group input-group-sm">
+        <div class="input-group input-group-sm mb-1">
           <span class="input-group-text fs-5" style="font-family: {font.family}">{font.family}</span>
           <button class="btn btn-sm btn-danger" onclick={() => removeFont(font.family)}>x</button>
         </div>
