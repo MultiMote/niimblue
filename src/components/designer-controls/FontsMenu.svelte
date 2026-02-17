@@ -10,44 +10,48 @@
   let show = $state<boolean>(false);
   let usedSpace = $state<number>(0);
   let selectExt = $state<"ttf" | "woff2">("ttf");
+  let overrideFamily = $state<string>("");
 
   const calcUsedSpace = () => {
     usedSpace = LocalStoragePersistence.usedSpace();
-  };
-
-  const reloadFonts = () => {
-    FileUtils.loadFonts($userFonts);
   };
 
   const browseFont = async () => {
     const fileList = await FileUtils.pickFileAsync(selectExt, false);
     const file: File = fileList[0];
     const ext = file.name.split(".").pop();
-    const basename = file.name.split(".")[0];
     const mime = `text/${selectExt}`;
+
+    let fontName = file.name.split(".")[0];
+
+    if (overrideFamily.trim() !== "") {
+      fontName = overrideFamily.trim();
+    }
+
 
     if (ext !== selectExt) {
       throw new Error(`Only ${selectExt} allowed`);
     }
 
-    if ($userFonts.some((e) => e.family == basename)) {
-      Toasts.error(`${basename} already loaded`);
+    if ($userFonts.some((e) => e.family == fontName)) {
+      Toasts.error(`${fontName} already loaded`);
       return;
     }
     const dataUrl = await FileUtils.blobToDataUrl(file);
 
     userFonts.update((prev) => [
       ...prev,
-      { base64data: dataUrl.split(";base64,")[1], family: basename, mimeType: mime },
+      { base64data: dataUrl.split(";base64,")[1], family: fontName, mimeType: mime },
     ]);
 
     calcUsedSpace();
+    overrideFamily = "";
   };
 
   const removeFont = (family: string) => {
-    userFonts.update((prev) => prev.filter(e => e.family !== family));
+    userFonts.update((prev) => prev.filter((e) => e.family !== family));
     calcUsedSpace();
-  }
+  };
 
   $effect(() => {
     if (show) calcUsedSpace();
@@ -64,29 +68,30 @@
 
 {#if show}
   <AppModal title="Custom fonts" bind:show>
-    <div>
+    <div class="mb-1">
       {usedSpace}
       {$tr("params.saved_labels.kb_used")}
     </div>
-    <div>
+    <div class="mb-1">
       {#each $userFonts as font (font.family)}
-        <div>
-          <span style="font-family: {font.family}">{font.family}</span>
-          <button class="btn btn-sm btn-danger" onclick={ () => removeFont(font.family)}>x</button>
+        <div class="input-group input-group-sm">
+          <span class="input-group-text fs-5" style="font-family: {font.family}">{font.family}</span>
+          <button class="btn btn-sm btn-danger" onclick={() => removeFont(font.family)}>x</button>
         </div>
       {/each}
     </div>
 
-    <div>
-      <select bind:value={selectExt}>
+    <div class="input-group input-group-sm">
+      <span class="input-group-text">Add font</span>
+
+      <select class="form-select" bind:value={selectExt}>
         <option value="ttf">ttf</option>
         <option value="woff2">woff2</option>
       </select>
 
+      <input type="text" class="form-control w-50" placeholder="Override font name" bind:value={overrideFamily} />
+
       <button class="btn btn-sm btn-secondary" onclick={browseFont}> Browse... </button>
-    </div>
-    <div>
-      <button class="btn btn-primary" onclick={reloadFonts}>Reload fonts</button>
     </div>
   </AppModal>
 {/if}
