@@ -54,7 +54,7 @@
 </script>
 
 <button
-  class="btn btn-secondary"
+  class="btn btn-outline-secondary"
   onclick={() => {
     show = true;
   }}>
