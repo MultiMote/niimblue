@@ -393,7 +393,6 @@ export class FileUtils {
     return ExportedLabelTemplateSchema.parse(labelObj);
   }
 
-  // fixme: remove debug messages
   static async loadFonts(fontsToLoad: UserFont[]) {
     const loadedList = get(loadedFonts);
 
