@@ -40,10 +40,13 @@
       ...prev,
       { base64data: dataUrl.split(";base64,")[1], family: basename, mimeType: mime },
     ]);
+
+    calcUsedSpace();
   };
 
   const removeFont = (family: string) => {
     userFonts.update((prev) => prev.filter(e => e.family !== family));
+    calcUsedSpace();
   }
 
   $effect(() => {
@@ -73,6 +76,7 @@
         </div>
       {/each}
     </div>
+
     <div>
       <select bind:value={selectExt}>
         <option value="ttf">ttf</option>

@@ -5,15 +5,16 @@
   import { Toasts } from "$/utils/toasts";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import { LocalStoragePersistence } from "$/utils/persistence";
-  import { fontCache } from "$/stores";
+  import { fontCache, userFonts } from "$/stores";
   import FontsMenu from "$/components/designer-controls/FontsMenu.svelte";
 
   interface Props {
+    editRevision?: number,
     value: string;
     valueUpdated: (v: string) => void;
   }
 
-  let { value, valueUpdated }: Props = $props();
+  let { value, valueUpdated, editRevision }: Props = $props();
 
   let fontQuerySupported = typeof queryLocalFonts !== "undefined";
 
@@ -41,18 +42,45 @@
   });
 </script>
 
-<div class="input-group flex-nowrap input-group-sm font-family">
+<div class="input-group flex-nowrap input-group-sm font-family-picker">
   <span class="input-group-text" title={$tr("params.text.font_family")}>
     <MdIcon icon="text_format" />
   </span>
-  {#if $fontCache.length > 1}
-    <select class="form-select" {value} onchange={(e) => valueUpdated(e.currentTarget.value)}>
-      {#each $fontCache as font (font)}
-        <option value={font} style="font-family: {font}">{font}</option>
-      {/each}
-    </select>
-  {:else}
-    <input type="text" class="form-control" {value} oninput={(e) => valueUpdated(e.currentTarget.value)} />
+
+  {#if $fontCache.length > 0 || $userFonts.length > 0}
+    <div class="input-group input-group-sm ">
+      <input
+        type="text"
+        class="form-control font-family-input"
+        data-ver={editRevision}
+        {value}
+        oninput={(e) => valueUpdated(e.currentTarget.value)} />
+      <!-- svelte-ignore a11y_consider_explicit_label -->
+      <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"></button>
+      <div class="dropdown-menu">
+        {#if $userFonts.length > 0}
+          <h6 class="dropdown-header">User fonts</h6>
+          {#each $userFonts as font (font.family)}
+            <button
+              class="dropdown-item"
+              style="font-family: {font.family}"
+              type="button"
+              onclick={() => valueUpdated(font.family)}>
+              {font.family}
+            </button>
+          {/each}
+        {/if}
+
+        {#if $fontCache.length > 0}
+          <h6 class="dropdown-header">System fonts</h6>
+          {#each $fontCache as family (family)}
+            <button class="dropdown-item" style="font-family: {family}" type="button" onclick={() => valueUpdated(family)}>
+              {family}
+            </button>
+          {/each}
+        {/if}
+      </div>
+    </div>
   {/if}
 
   {#if fontQuerySupported}
@@ -65,7 +93,16 @@
 </div>
 
 <style>
-  .font-family {
-    width: 16em;
+  .font-family-picker {
+    width: unset;
+  }
+
+  .font-family-input {
+    width: 14em;
+  }
+
+  .dropdown-menu {
+    max-height: 200px;
+    overflow-y: auto;
   }
 </style>
