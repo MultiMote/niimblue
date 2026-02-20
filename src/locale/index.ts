@@ -14,6 +14,8 @@ import lang_es from "$/locale/dicts/es.json";
 import lang_ar from "$/locale/dicts/ar.json";
 import lang_hu from "$/locale/dicts/hu.json";
 import lang_tr from "$/locale/dicts/tr.json";
+import lang_hi from "$/locale/dicts/hi.json";
+import lang_mr from "$/locale/dicts/mr.json";
 
 export type TranslationKey = keyof typeof lang_en;
 export type TranslationDict = Record<TranslationKey, string>;
@@ -51,6 +53,10 @@ export const langPack = {
   hu: lang_hu as TranslationDict,
   /** Turkish */
   tr: lang_tr as TranslationDict,
+  /** Hindi */
+  hi: lang_hi as TranslationDict,
+  /** Marathi */
+  mr: lang_mr as TranslationDict,
 } as const;
 
 export type SupportedLanguage = keyof typeof langPack;

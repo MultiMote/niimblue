@@ -127,5 +127,18 @@
     "preview.threshold": "Próg",
     "preview.title": "Podgląd druku",
     "editor.clear": "Wyczyść etykietę",
-    "editor.clear.confirm": "Wyczyścić zawartość etykiety?"
+    "editor.clear.confirm": "Wyczyścić zawartość etykiety?",
+    "config.page_delay": "Opóźnienie między stronami",
+    "config.page_delay.help": "Dodaj opóźnienie, jeśli masz problemy z drukowaniem wielu stron",
+    "editor.iconpicker.add": "Dodaj nowy",
+    "editor.iconpicker.delete_mode": "Tryb usuwania",
+    "editor.iconpicker.show": "Pokaż",
+    "editor.iconpicker.show.user": "tylko ikony użytkownika",
+    "editor.iconpicker.show.pack": "tylko ikony z pakietu",
+    "editor.iconpicker.show.both": "Ikony użytkownika i pakietu",
+    "editor.warning.load.csv": "Dane CSV zostaną również zastąpione",
+    "params.generic.arrange": "Uporządkuj",
+    "params.generic.arrange.top": "Przenieś na wierzch",
+    "params.generic.arrange.bottom": "Przenieś na tył",
+    "params.generic.position": "Pozycja"
 }
