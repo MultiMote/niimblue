@@ -34,10 +34,7 @@
     const compressed = await FileUtils.compressData(result.data);
     const b64data = await FileUtils.base64buf(compressed);
 
-    userFonts.update((prev) => [
-      ...prev,
-      { gzippedDataB64: b64data, family: fontName, mimeType: mime },
-    ]);
+    userFonts.update((prev) => [...prev, { gzippedDataB64: b64data, family: fontName, mimeType: mime }]);
 
     calcUsedSpace();
     overrideFamily = "";
@@ -62,7 +59,7 @@
 </button>
 
 {#if show}
-  <AppModal title="Custom fonts" bind:show>
+  <AppModal title={$tr("fonts.title")} bind:show>
     <div class="mb-1">
       {#each $userFonts as font (font.family)}
         <div class="input-group input-group-sm mb-1">
@@ -76,28 +73,27 @@
       {/each}
     </div>
 
-    <hr>
+    <hr />
 
     <div class="input-group input-group-sm">
-      <span class="input-group-text">Add font</span>
+      <span class="input-group-text">{$tr("fonts.add")}</span>
 
       <select class="form-select" bind:value={selectExt}>
         <option value="ttf">ttf</option>
         <option value="woff2">woff2</option>
       </select>
 
-      <input type="text" class="form-control w-25" placeholder="Override font name" bind:value={overrideFamily} />
+      <input type="text" class="form-control w-25" placeholder={$tr("fonts.title_override")} bind:value={overrideFamily} />
 
-
-      <button class="btn btn-sm btn-secondary" onclick={browseFont}> Browse... </button>
+      <button class="btn btn-sm btn-secondary" onclick={browseFont}>{$tr("fonts.browse")}</button>
     </div>
 
     {#snippet footer()}
       <div class="text-secondary">
         {usedSpace}
-        {$tr("params.saved_labels.kb_used")} | <a class="text-secondary" href="https://fonts.google.com">Get fonts</a>
+        {$tr("params.saved_labels.kb_used")} |
+        <a class="text-secondary" href="https://fonts.google.com">{$tr("fonts.gfonts")}</a>
       </div>
     {/snippet}
-
   </AppModal>
 {/if}

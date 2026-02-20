@@ -116,6 +116,8 @@
     "params.text.edit": "Edit in popup",
     "params.text.fetch_fonts": "Fetch fonts",
     "params.text.font_family": "Font family",
+    "params.text.user_fonts": "User fonts",
+    "params.text.system_fonts": "System fonts",
     "params.text.font_size.down": "Decrease font size",
     "params.text.font_size.up": "Increase font size",
     "params.text.font_size": "Font size",
@@ -169,5 +171,10 @@
     "preview.print.system": "Print with OS printer",
     "preview.print": "Print",
     "preview.threshold": "Threshold",
-    "preview.title": "Print preview"
+    "preview.title": "Print preview",
+    "fonts.title": "Custom fonts",
+    "fonts.add": "Add",
+    "fonts.browse": "Browse...",
+    "fonts.gfonts": "Get fonts",
+    "fonts.title_override": "Override name"
 }

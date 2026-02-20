@@ -60,7 +60,7 @@
 
     <div class="dropdown-menu">
       {#if $userFonts.length > 0}
-        <h6 class="dropdown-header">User fonts</h6>
+        <h6 class="dropdown-header">{$tr("params.text.user_fonts")}</h6>
         {#each $userFonts as font (font.family)}
           <button
             class="dropdown-item"
@@ -73,7 +73,7 @@
       {/if}
 
       {#if $fontCache.length > 0}
-        <h6 class="dropdown-header">System fonts</h6>
+        <h6 class="dropdown-header">{$tr("params.text.system_fonts")}</h6>
         {#each $fontCache as family (family)}
           <button
             class="dropdown-item"
@@ -106,7 +106,7 @@
   }
 
   .dropdown-menu {
-    max-height: 200px;
+    max-height: 240px;
     overflow-y: auto;
   }
 </style>
