@@ -5,7 +5,7 @@
   import { Barcode } from "$/fabric-object/barcode";
   import { QRCode } from "$/fabric-object/qrcode";
   import { iconCodepoints, type MaterialIcon } from "$/styles/mdi_icons";
-  import { automation, connectionState, csvData } from "$/stores";
+  import { automation, connectionState, csvData, loadedFonts } from "$/stores";
   import {
     type ExportedLabelTemplate,
     type FabricJson,
@@ -194,11 +194,6 @@
     undo.push(fabricCanvas!, labelProps);
   };
 
-  const onPreviewClosed = () => {
-    printNow = false;
-    previewOpened = false;
-  };
-
   const openPreview = () => {
     printNow = false;
     previewOpened = true;
@@ -291,6 +286,15 @@
     LabelDesignerObjectHelper.addText(fabricCanvas!, $tr("editor.default_text"));
   };
 
+  const renderOnFontsChanged = () => {
+    fabricCanvas?.forEachObject((o) => {
+      if (o instanceof fabric.Textbox) {
+        o.dirty = true;
+      }
+    });
+    fabricCanvas?.requestRenderAll();
+  };
+
   onMount(async () => {
     try {
       const savedLabelProps = LocalStoragePersistence.loadLastLabelProps();
@@ -330,7 +334,7 @@
       undo.push(fabricCanvas!, labelProps);
     });
 
-    fabricCanvas.on('text:changed', () => {
+    fabricCanvas.on("text:changed", () => {
       editRevision++;
     });
 
@@ -390,6 +394,8 @@
       CanvasUtils.fixFabricObjectScale(e.target);
     });
 
+    // userFonts.subscribe((e) => {console.log(e); renderOnFontsChanged();});
+
     if ($automation !== undefined) {
       if ($automation.startPrint !== undefined) {
         if ($automation.startPrint === "immediately") {
@@ -412,6 +418,18 @@
 
   $effect(() => {
     fabricCanvas?.setLabelProps(labelProps);
+  });
+
+  $effect(() => {
+    if (!previewOpened) {
+      printNow = false;
+    }
+  });
+
+  $effect(() => {
+    if ($loadedFonts) {
+      renderOnFontsChanged();
+    }
   });
 </script>
 
@@ -519,7 +537,7 @@
 
   {#if previewOpened}
     <PrintPreview
-      onClosed={onPreviewClosed}
+      bind:show={previewOpened}
       canvasCallback={getCanvasForPreview}
       {labelProps}
       {printNow}

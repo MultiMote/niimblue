@@ -21,7 +21,7 @@
 		"@capacitor/share": "^7.0.3",
 		"@fontsource-variable/noto-sans": "^5.2.10",
 		"@formatjs/intl-localematcher": "^0.6.2",
-		"@mmote/niimbluelib": "0.0.1-alpha.33",
+		"@mmote/niimbluelib": "0.0.1-alpha.36",
 		"@popperjs/core": "^2.11.8",
 		"bootstrap": "5.3.8",
 		"d3-dsv": "^3.0.1",

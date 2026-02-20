@@ -17,7 +17,7 @@
 </script>
 
 <button class="btn btn-sm btn-outline-secondary param-lock-btn" onclick={() => onClick(propName, value)}>
-  {#if savedValue}
+  {#if savedValue !== undefined}
     <MdIcon icon="lock" class="text-warning" />
   {:else}
     <MdIcon icon="lock_open" />

@@ -35,6 +35,7 @@ export class CustomCanvas extends fabric.Canvas {
   ) {
     super(el, options);
     this.setupZoom();
+    this.preserveObjectStacking = true;
   }
 
   private setupZoom() {
