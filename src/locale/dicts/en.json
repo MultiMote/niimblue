@@ -6,7 +6,6 @@
     "connector.bluetooth": "Bluetooth",
     "connector.disconnect.heartbeat": "Disconnected (printer does not respond)",
     "connector.serial": "Serial (USB)",
-    "": "Delay between pages",
     "debug.page_delay.help": "Add delay (1000, for example) if you have multi-page print problems.",
     "debug.packet_interval.help": "Override the packet interval. A page reload is required. Something can break if the value is too low.",
     "debug.title": "Debug stuff",
@@ -117,6 +116,8 @@
     "params.text.edit": "Edit in popup",
     "params.text.fetch_fonts": "Fetch fonts",
     "params.text.font_family": "Font family",
+    "params.text.user_fonts": "User fonts",
+    "params.text.system_fonts": "System fonts",
     "params.text.font_size.down": "Decrease font size",
     "params.text.font_size.up": "Increase font size",
     "params.text.font_size": "Font size",
@@ -170,5 +171,10 @@
     "preview.print.system": "Print with OS printer",
     "preview.print": "Print",
     "preview.threshold": "Threshold",
-    "preview.title": "Print preview"
+    "preview.title": "Print preview",
+    "fonts.title": "Custom fonts",
+    "fonts.add": "Add",
+    "fonts.browse": "Browse...",
+    "fonts.gfonts": "Get fonts",
+    "fonts.title_override": "Override name"
 }

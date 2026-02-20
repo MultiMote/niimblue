@@ -265,7 +265,7 @@
     oninput={(e) => lineHeightChange(e.currentTarget.valueAsNumber)} />
 </div>
 
-<FontFamilyPicker value={selectedText.fontFamily} valueUpdated={updateFontFamily} />
+<FontFamilyPicker {editRevision} value={selectedText.fontFamily} valueUpdated={updateFontFamily} />
 
 <button class="btn btn-sm btn-secondary" onclick={editInPopup} title={$tr("params.text.edit")}>
   <MdIcon icon="edit" />

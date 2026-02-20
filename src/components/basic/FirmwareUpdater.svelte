@@ -12,7 +12,7 @@
 
   const browseFw = async () => {
     const file = await FileUtils.pickAndReadBinaryFile("bin");
-    fwData = file.data;
+    fwData = new Uint8Array(file.data);
     fwName = file.name;
 
     const match = fwName.match(/(\d+\.\d+)/);

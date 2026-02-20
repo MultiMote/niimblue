@@ -162,5 +162,6 @@
     "editor.iconpicker.show.user": "samo korisničke ikone",
     "editor.iconpicker.show.pack": "samo ikone iz paketa",
     "editor.iconpicker.show.both": "korisničke + ikone iz paketa",
-    "preview.postprocess.bayer": "Dither (Bayer)"
+    "preview.postprocess.bayer": "Dither (Bayer)",
+    "params.text.autosize": "Prilagodi veličinu teksta širini polja"
 }

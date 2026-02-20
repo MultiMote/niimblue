@@ -2,6 +2,7 @@ import * as fabric from "fabric";
 import {
   ExportedLabelTemplateSchema,
   LabelPresetSchema,
+  UserFont,
   type ExportedLabelTemplate,
   type FabricJson,
   type LabelPreset,
@@ -13,7 +14,7 @@ import { CustomCanvas } from "$/fabric-object/custom_canvas";
 import { Capacitor } from "@capacitor/core";
 import { CanvasUtils } from "$/utils/canvas_utils";
 import { LocalStoragePersistence } from "./persistence";
-import { csvData } from "$/stores";
+import { csvData, loadedFonts } from "$/stores";
 import { get } from "svelte/store";
 
 export class FileUtils {
@@ -35,7 +36,39 @@ export class FileUtils {
   /** Convert object to base64 string */
   static base64obj(obj: unknown): string {
     const json: string = JSON.stringify(obj);
-    return this.base64str(json);
+    return FileUtils.base64str(json);
+  }
+
+  /** Convert object to base64 string */
+  static base64buf(buf: ArrayBuffer): Promise<string> {
+    const blob = new Blob([buf]);
+
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        const base64 = result.split(",")[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  static async decompressData(buf: BufferSource): Promise<ArrayBuffer> {
+    const ds = new DecompressionStream("gzip");
+    const writer = ds.writable.getWriter();
+    writer.write(buf);
+    writer.close();
+    return await new Response(ds.readable).arrayBuffer();
+  }
+
+  static async compressData(buf: BufferSource): Promise<ArrayBuffer> {
+    const cs = new CompressionStream("gzip");
+    const writer = cs.writable.getWriter();
+    writer.write(buf);
+    writer.close();
+    return await new Response(cs.readable).arrayBuffer();
   }
 
   /** Convert base64 string to bytes */
@@ -105,11 +138,11 @@ export class FileUtils {
 
   static async downloadBase64(filename: string, mime: string, base64Data: string) {
     if (Capacitor.getPlatform() !== "web") {
-      this.downloadBase64Capacitor(filename, base64Data);
+      FileUtils.downloadBase64Capacitor(filename, base64Data);
       return;
     }
 
-    this.downloadBase64Web(filename, mime, base64Data);
+    FileUtils.downloadBase64Web(filename, mime, base64Data);
   }
 
   static makeExportedLabel(canvas: fabric.Canvas, labelProps: LabelProps, includeCsv: boolean): ExportedLabelTemplate {
@@ -127,7 +160,7 @@ export class FileUtils {
       canvas: canvas.toJSON(),
       label: labelProps,
       thumbnailBase64,
-      timestamp: this.timestamp(),
+      timestamp: FileUtils.timestamp(),
     };
 
     if (includeCsv) {
@@ -142,19 +175,19 @@ export class FileUtils {
   /** Convert label template to JSON and download it */
   static saveLabelAsJson(label: ExportedLabelTemplate) {
     const parsed = ExportedLabelTemplateSchema.omit({ id: true }).parse(label);
-    const timestamp = label.timestamp ?? this.timestamp();
+    const timestamp = label.timestamp ?? FileUtils.timestamp();
     let filename = `label_${timestamp}.json`;
 
     if (parsed.title && parsed.title.trim().length > 0) {
       filename = `${parsed.title}.json`;
     }
 
-    this.downloadBase64(filename, "application/json", this.base64obj(parsed));
+    FileUtils.downloadBase64(filename, "application/json", FileUtils.base64obj(parsed));
   }
 
   /** Convert canvas to PNG and download it */
   static saveCanvasAsPng(canvas: fabric.Canvas) {
-    const timestamp = this.timestamp();
+    const timestamp = FileUtils.timestamp();
 
     const url = canvas.toDataURL({
       width: canvas.width,
@@ -165,13 +198,13 @@ export class FileUtils {
       multiplier: 1,
     });
 
-    this.downloadBase64(`label_${timestamp}.png`, "image/png", url.split("base64,")[1]);
+    FileUtils.downloadBase64(`label_${timestamp}.png`, "image/png", url.split("base64,")[1]);
   }
 
   /** Convert label template to JSON and download it */
   static saveLabelPresetsAsJson(presets: LabelPreset[]) {
     const parsed = z.array(LabelPresetSchema).parse(presets);
-    this.downloadBase64(`presets_${this.timestamp()}.json`, "application/json", this.base64obj(parsed));
+    FileUtils.downloadBase64(`presets_${FileUtils.timestamp()}.json`, "application/json", FileUtils.base64obj(parsed));
   }
 
   /**
@@ -202,7 +235,7 @@ export class FileUtils {
   }
 
   static async pickAndReadTextFile(acceptExtension: string, multiple: boolean): Promise<string[]> {
-    const fileList = await this.pickFileAsync(acceptExtension, multiple);
+    const fileList = await FileUtils.pickFileAsync(acceptExtension, multiple);
 
     const result: string[] = [];
 
@@ -220,7 +253,7 @@ export class FileUtils {
   }
 
   static async pickAndReadSingleTextFile(acceptExtension: string): Promise<string> {
-    const result = await this.pickAndReadTextFile(acceptExtension, false);
+    const result = await FileUtils.pickAndReadTextFile(acceptExtension, false);
     if (result.length === 0) {
       throw new Error("No files processed");
     }
@@ -230,17 +263,17 @@ export class FileUtils {
   /**
    * Open file picker and return file contents
    * */
-  static async pickAndReadBinaryFile(acceptExtension: string): Promise<{ name: string; data: Uint8Array }> {
-    const fileList = await this.pickFileAsync(acceptExtension, false);
+  static async pickAndReadBinaryFile(acceptExtension: string): Promise<{ name: string; data: ArrayBuffer }> {
+    const fileList = await FileUtils.pickFileAsync(acceptExtension, false);
     const file: File = fileList[0];
     const ext = file.name.split(".").pop();
 
-    if (ext !== acceptExtension) {
+    if (acceptExtension !== "*" && ext !== acceptExtension) {
       throw new Error(`Only ${acceptExtension} allowed`);
     }
 
     const data: ArrayBuffer = await file.arrayBuffer();
-    return { name: file.name, data: new Uint8Array(data) };
+    return { name: file.name, data };
   }
 
   static async loadCanvasState(canvas: fabric.Canvas, state: FabricJson): Promise<void> {
@@ -307,18 +340,9 @@ export class FileUtils {
       throw new Error("Label data size > 2MB");
     }
 
-    const cs = new CompressionStream("gzip");
-    const writer = cs.writable.getWriter();
-    writer.write(data);
-    writer.close();
-
-    const compressed = new Uint8Array(await new Response(cs.readable).arrayBuffer());
-    const arr = new Uint8Array(compressed);
-    const binString = String.fromCodePoint(...arr);
-    const baseUrl = location.protocol + "//" + location.host;
-    const b64data = btoa(binString);
-
-    return `${baseUrl}/#load=${b64data}`;
+    const compressed = await FileUtils.compressData(data);
+    const b64data = await FileUtils.base64buf(compressed);
+    return `${location.protocol}//${location.host}/#load=${b64data}`;
   }
 
   static urlHashParamsToDict(): Record<string, string> {
@@ -349,7 +373,7 @@ export class FileUtils {
 
     if ("uload" in params) {
       const b64data: string = params["uload"];
-      const jsonBytes = this.base64toBytes(b64data);
+      const jsonBytes = FileUtils.base64toBytes(b64data);
       const jsonStr = new TextDecoder().decode(jsonBytes);
       const labelObj = JSON.parse(jsonStr);
       return ExportedLabelTemplateSchema.parse(labelObj);
@@ -360,18 +384,48 @@ export class FileUtils {
     }
 
     const b64data: string = params["load"];
-    const bytes = this.base64toBytes(b64data);
-
-    const ds = new DecompressionStream("gzip");
-    const writer = ds.writable.getWriter();
-    writer.write(bytes);
-    writer.close();
-
-    const decompressed = await new Response(ds.readable).arrayBuffer();
+    const bytes = FileUtils.base64toBytes(b64data);
+    const decompressed = await FileUtils.decompressData(bytes);
     const decoder = new TextDecoder();
 
     const decoded = decoder.decode(decompressed);
     const labelObj = JSON.parse(decoded);
     return ExportedLabelTemplateSchema.parse(labelObj);
+  }
+
+  static async loadFonts(fontsToLoad: UserFont[]) {
+    const loadedList = get(loadedFonts);
+
+    for (const font of fontsToLoad) {
+      if (loadedList.some((e) => e.family === font.family)) {
+        continue;
+      }
+
+      const bytes = FileUtils.base64toBytes(font.gzippedDataB64);
+      const decompressed = await FileUtils.decompressData(bytes);
+      const b64 = await FileUtils.base64buf(decompressed);
+
+      const fontFace = new FontFace(font.family, `url(data:${font.mimeType};base64,${b64})`);
+
+      try {
+        const loaded = await fontFace.load();
+        loadedList.push(loaded);
+        document.fonts.add(loaded);
+      } catch (e) {
+        console.error(`Failed to load font ${font.family}:`, e);
+      }
+    }
+
+    // remove font that not exist anymore
+    for (let i = loadedList.length - 1; i >= 0; i--) {
+      const loadedFont = loadedList[i];
+
+      if (!fontsToLoad.some((e) => e.family === loadedFont.family)) {
+        document.fonts.delete(loadedFont);
+        loadedList.splice(i, 1);
+      }
+    }
+
+    loadedFonts.set(loadedList);
   }
 }

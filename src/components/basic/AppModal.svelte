@@ -18,10 +18,16 @@
   onMount(() => {
     modal = new Modal(modalEl);
     modal.show();
+
+    modalEl.addEventListener('hide.bs.modal', () => {
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    });
+
     modalEl.addEventListener("hidden.bs.modal", () => {
       if (onClose) onClose();
       show = false;
     });
+
   });
 
   onDestroy(() => {
@@ -38,7 +44,7 @@
   };
 </script>
 
-<div bind:this={modalEl} class="modal fade" tabindex="-1">
+<div bind:this={modalEl} class="modal fade" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">

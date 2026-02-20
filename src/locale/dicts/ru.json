@@ -115,6 +115,8 @@
     "params.text.edit": "Редактировать во всплывающем диалоге",
     "params.text.fetch_fonts": "Получить список шрифтов",
     "params.text.font_family": "Шрифт",
+    "params.text.user_fonts": "Шрифты пользователя",
+    "params.text.system_fonts": "Системные шрифты",
     "params.text.font_size.down": "Уменьшить размер шрифта",
     "params.text.font_size.up": "Увеличить размер шрифта",
     "params.text.font_size": "Размер шрифта",
@@ -169,5 +171,10 @@
     "preview.print": "Печать",
     "preview.threshold": "Порог",
     "preview.title": "Предпросмотр печати",
-    "params.label.mirror": "Зеркалирование объектов"
+    "params.label.mirror": "Зеркалирование объектов",
+    "fonts.title": "Пользовательские шрифты",
+    "fonts.add": "Добавить",
+    "fonts.browse": "Обзор...",
+    "fonts.gfonts": "Найти шрифты",
+    "fonts.title_override": "Своё название"
 }

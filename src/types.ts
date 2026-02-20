@@ -14,21 +14,13 @@ export type LabelSplit = "none" | "vertical" | "horizontal";
 export type TailPosition = "right" | "bottom" | "left" | "top";
 export type MirrorType = "none" | "copy" | "flip";
 
-type _Range<T extends number, R extends unknown[]> =
-  R['length'] extends T ? R[number] : _Range<T, [R['length'], ...R]>;
+type _Range<T extends number, R extends unknown[]> = R["length"] extends T ? R[number] : _Range<T, [R["length"], ...R]>;
 
 export type Range<T extends number> = number extends T ? number : _Range<T, []>;
 
 export const CsvParamsSchema = z.object({
   data: z.string(),
 });
-
-export const UserIconsListSchema = z.array(
-  z.object({
-    name: z.string(),
-    data: z.string(),
-  }),
-);
 
 /** Not validated */
 export const FabricObjectSchema = z.custom<fabric.FabricObject>((val: any): boolean => {
@@ -116,8 +108,20 @@ export const AppConfigSchema = z.object({
   packetIntervalMs: z.number().gte(0).optional(),
 });
 
+export const UserIconSchema = z.object({
+  name: z.string(),
+  data: z.string(),
+});
+
+export const UserFontSchema = z
+  .object({
+    gzippedDataB64: z.string(),
+    family: z.string(),
+    mimeType: z.string(),
+  });
+
 export type CsvParams = z.infer<typeof CsvParamsSchema>;
-export type UserIconsList = z.infer<typeof UserIconsListSchema>;
+export type UserIcon = z.infer<typeof UserIconSchema>;
 export type LabelProps = z.infer<typeof LabelPropsSchema>;
 export type LabelPreset = z.infer<typeof LabelPresetSchema>;
 export type FabricJson = z.infer<typeof FabricJsonSchema>;
@@ -126,3 +130,4 @@ export type PreviewPropsOffset = z.infer<typeof PreviewPropsOffsetSchema>;
 export type PreviewProps = z.infer<typeof PreviewPropsSchema>;
 export type AutomationProps = z.infer<typeof AutomationPropsSchema>;
 export type AppConfig = z.infer<typeof AppConfigSchema>;
+export type UserFont = z.infer<typeof UserFontSchema>;
