@@ -6,7 +6,6 @@
     "connector.bluetooth": "Bluetooth",
     "connector.disconnect.heartbeat": "Disconnected (printer does not respond)",
     "connector.serial": "Serial (USB)",
-    "": "Delay between pages",
     "debug.page_delay.help": "Add delay (1000, for example) if you have multi-page print problems.",
     "debug.packet_interval.help": "Override the packet interval. A page reload is required. Something can break if the value is too low.",
     "debug.title": "Debug stuff",
