@@ -329,8 +329,13 @@
       const parseResult = csvParse(csvData);
       const spread: DSVRowArray<string> = Object.assign([], { columns: parseResult.columns });
 
-      for (const row of parseResult) {
+      for (let row of parseResult) {
+        for (const k of Object.keys(row)) {
+          row[k] = row[k].replaceAll("\\n", "\n");
+        }
+
         let times = 1;
+        
         if ("$times" in row && row["$times"] !== "") {
           try {
             times = parseInt(row["$times"]);
