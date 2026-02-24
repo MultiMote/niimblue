@@ -6,7 +6,7 @@
     "connector.bluetooth": "ब्लूटूथ",
     "connector.disconnect.heartbeat": "कनेक्शन तुटले आहे (प्रिंटर प्रतिसाद देत नाही)",
     "connector.serial": "सिरीयल (USB)",
-    "debug.page_delay.help": "मल्टी-पेज प्रिंटमध्ये समस्या असल्यास विलंब जोडा",
+    "debug.page_delay.help": "मल्टी-पेज प्रिंटमध्ये समस्या असल्यास विलंब (उदाहरणार्थ, १०००) जोडा.",
     "editor.clear": "कॅनव्हास साफ करा",
     "editor.clear.confirm": "कॅनव्हासमधील कंटेंट साफ करायची का?",
     "editor.clone": "प्रतिलिपी तयार करा",
@@ -163,5 +163,18 @@
     "preview.label_type": "लेबल प्रकार",
     "preview.postprocess.atkinson": "डिथर (Atkinson)",
     "preview.postprocess.bayer": "डिथर (Bayer)",
-    "preview.postprocess.threshold": "थ्रेशहोल्ड"
+    "preview.postprocess.threshold": "थ्रेशहोल्ड",
+    "debug.packet_interval.help": "पॅकेट इंटरव्हल ओव्हरराइड करा. पेज पुन्हा लोड करणे आवश्यक आहे. जर मूल्य खूप कमी असेल तर काहीतरी बिघडू शकते.",
+    "debug.title": "डिबग संबंधित गोष्टी",
+    "debug.reset": "रीसेट",
+    "params.text.user_fonts": "यूझर फॉन्ट्स",
+    "params.text.system_fonts": "प्रणाली फॉन्ट्स",
+    "preview.speed": "मुद्रण गती",
+    "preview.speed.0": "कमी (उच्च गुणवत्ता)",
+    "preview.speed.1": "साधारण",
+    "fonts.title": "कस्टम फॉन्ट्स",
+    "fonts.add": "जोडा",
+    "fonts.browse": "शोधा…",
+    "fonts.gfonts": "फॉन्ट्स प्राप्त करा",
+    "fonts.title_override": "नाव ओवरराईड करा"
 }
