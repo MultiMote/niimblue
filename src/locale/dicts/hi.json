@@ -6,7 +6,7 @@
     "connector.bluetooth": "ब्लूटूथ",
     "connector.disconnect.heartbeat": "डिस्कनेक्टेड (प्रिंटर प्रतिक्रिया नहीं दे रहा है)",
     "connector.serial": "सीरियल (यूएसबी)",
-    "debug.page_delay.help": "यदि आपको बहु-पृष्ठ प्रिंट में समस्या हो रही है, तो विलंब जोड़ें",
+    "debug.page_delay.help": "यदि आपको बहु-पृष्ठ प्रिंट में समस्या हो रही है, तो विलंब (उदाहरण के लिए 1000) जोड़ें।",
     "editor.clear": "कैनवास साफ़ करें",
     "editor.clear.confirm": "क्या कैनवास का कंटेंट साफ़ करें?",
     "editor.clone": "क्लोन",
@@ -163,5 +163,18 @@
     "editor.warning.save": "सहेजा गया डेटा ओवरराइट हो जाएगा। सहेजें?",
     "params.csv.placeholders": "चर:",
     "params.label.menu_title": "लेबल गुण",
-    "params.label.save_template": "टेम्पलेट के रूप में सहेजें"
+    "params.label.save_template": "टेम्पलेट के रूप में सहेजें",
+    "debug.packet_interval.help": "पैकेट अंतराल को ओवरराइड करें। इसके लिए पेज को रीलोड करना आवश्यक है। यदि मान बहुत कम है, तो कुछ गड़बड़ हो सकती है।",
+    "debug.title": "डिबग से संबंधित चीज़ें",
+    "debug.reset": "रीसेट करें",
+    "params.text.user_fonts": "यूज़र फ़ॉन्ट्स",
+    "params.text.system_fonts": "प्रणाली फ़ॉन्ट्स",
+    "preview.speed": "प्रिंट गति",
+    "preview.speed.0": "कम (उच्च गुणवत्ता)",
+    "preview.speed.1": "साधारण",
+    "fonts.title": "कस्टम फ़ॉन्ट्स",
+    "fonts.add": "जोड़ें",
+    "fonts.browse": "खोजें…",
+    "fonts.gfonts": "फ़ॉन्ट्स प्राप्त करें",
+    "fonts.title_override": "नाम ओवरराइड करें"
 }
