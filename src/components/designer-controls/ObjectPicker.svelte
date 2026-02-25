@@ -53,6 +53,11 @@
       </button>
 
       <ZplImportButton {labelProps} onImageReady={zplImageReady} text={$tr("editor.import.zpl")} />
+      
+      <button class="btn me-1" onclick={() => onSubmit("pdf")}>
+        <MdIcon icon="picture_as_pdf" />
+        PDF
+      </button>
     </div>
   </div>
 </div>

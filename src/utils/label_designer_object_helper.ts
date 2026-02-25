@@ -158,6 +158,46 @@ export class LabelDesignerObjectHelper {
     return barcode;
   }
 
+  static async addPdf(canvas: fabric.Canvas): Promise<fabric.FabricImage> {
+    const files = await FileUtils.pickFileAsync("pdf", false);
+    const file = files[0];
+    const url = await FileUtils.blobToDataUrl(file);
+
+    const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.mjs");
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+      'pdfjs-dist/legacy/build/pdf.worker.mjs',
+      import.meta.url
+    ).href;
+
+    const loadingTask = pdfjsLib.getDocument(url);
+    const pdf = await loadingTask.promise;
+    const page = await pdf.getPage(1);
+
+
+    const el: HTMLCanvasElement = document.createElement("canvas");
+    el.width = canvas.width;
+    el.height = canvas.height;
+
+    const pdfScale = canvas.width / page.getViewport({ scale: 1 }).width;
+
+    const viewport = page.getViewport({ scale: pdfScale });
+    const renderTask = page.render({
+      canvas: el,
+      viewport,
+    });
+
+    await renderTask.promise;
+
+    const img = new fabric.FabricImage(el, {
+      left: 0,
+      top: 0,
+    })
+
+    canvas.add(img);
+    return img;
+  }
+
   static addObject(canvas: fabric.Canvas, objType: OjectType): fabric.FabricObject | undefined {
     switch (objType) {
       case "text":
@@ -175,6 +215,9 @@ export class LabelDesignerObjectHelper {
         return this.addQrCode(canvas);
       case "barcode":
         return this.addBarcode(canvas);
+      case "pdf":
+        this.addPdf(canvas);
+        return;
     }
   }
 }

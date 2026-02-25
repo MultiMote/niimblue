@@ -45,6 +45,8 @@ export default defineConfig({
               return "lib.2.zod";
             } else if (id.includes("@mmote/niimbluelib")) {
               return "lib.2.niim";
+            } else if (id.includes("pdfjs-dist")) {
+              return "lib.2.pdf";
             }
 
             return "lib.1.other";
