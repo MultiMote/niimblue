@@ -114,7 +114,7 @@
     "params.text.bold": "Bold",
     "params.text.edit.title": "Editing text",
     "params.text.edit": "Edit in popup",
-    "params.text.fetch_fonts": "Fetch fonts",
+    "params.text.fetch_fonts": "Load system fonts",
     "params.text.font_family": "Font family",
     "params.text.user_fonts": "User fonts",
     "params.text.system_fonts": "System fonts",
