@@ -55,43 +55,42 @@
     oninput={(e) => valueUpdated(e.currentTarget.value)} />
 
   <!-- svelte-ignore a11y_consider_explicit_label -->
-  {#if $fontCache.length > 0 || $userFonts.length > 0}
-    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"></button>
+  <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"></button>
 
-    <div class="dropdown-menu">
-      {#if $userFonts.length > 0}
-        <h6 class="dropdown-header">{$tr("params.text.user_fonts")}</h6>
-        {#each $userFonts as font (font.family)}
-          <button
-            class="dropdown-item"
-            style="font-family: {font.family}"
-            type="button"
-            onclick={() => valueUpdated(font.family)}>
-            {font.family}
-          </button>
-        {/each}
-      {/if}
+  <div class="dropdown-menu">
+    {#if $userFonts.length > 0}
+      <h6 class="dropdown-header">{$tr("params.text.user_fonts")}</h6>
+      {#each $userFonts as font (font.family)}
+        <button
+          class="dropdown-item"
+          style="font-family: {font.family}"
+          type="button"
+          onclick={() => valueUpdated(font.family)}>
+          {font.family}
+        </button>
+      {/each}
+    {/if}
 
-      {#if $fontCache.length > 0}
-        <h6 class="dropdown-header">{$tr("params.text.system_fonts")}</h6>
-        {#each $fontCache as family (family)}
-          <button
-            class="dropdown-item"
-            style="font-family: {family}"
-            type="button"
-            onclick={() => valueUpdated(family)}>
-            {family}
-          </button>
-        {/each}
-      {/if}
-    </div>
-  {/if}
+    {#if $fontCache.length > 0}
+      <h6 class="dropdown-header">{$tr("params.text.system_fonts")}</h6>
+      {#each $fontCache as family (family)}
+        <button
+          class="dropdown-item"
+          style="font-family: {family}"
+          type="button"
+          onclick={() => valueUpdated(family)}>
+          {family}
+        </button>
+      {/each}
+    {/if}
 
-  {#if fontQuerySupported}
-    <button class="btn btn-outline-secondary" onclick={getSystemFonts} title={$tr("params.text.fetch_fonts")}>
-      <MdIcon icon="refresh" />
-    </button>
-  {/if}
+    {#if fontQuerySupported}
+      <div class="dropdown-divider"></div>
+      <button class="dropdown-item load-system-fonts" type="button" onclick={getSystemFonts}>
+        <MdIcon icon="refresh" /> {$tr("params.text.fetch_fonts")}
+      </button>
+    {/if}
+  </div>
 
   <FontsMenu />
 </div>
@@ -108,5 +107,9 @@
   .dropdown-menu {
     max-height: 240px;
     overflow-y: auto;
+  }
+
+  .load-system-fonts {
+    color: var(--bs-primary);
   }
 </style>
