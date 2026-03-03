@@ -51,6 +51,8 @@ export const OBJECT_DEFAULTS = {
   snapAngle: 10,
   top: 10,
   left: 10,
+  originX: "left" as fabric.TOriginX,
+  originY: "top" as fabric.TOriginY,
 } as fabric.FabricObjectProps;
 
 /** Newly created Fabric vector object properties */
