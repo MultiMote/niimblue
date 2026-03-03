@@ -51,7 +51,7 @@ export const OBJECT_DEFAULTS = {
   snapAngle: 10,
   top: 10,
   left: 10,
-};
+} as fabric.FabricObjectProps;
 
 /** Newly created Fabric vector object properties */
 export const OBJECT_DEFAULTS_VECTOR = {
@@ -60,18 +60,18 @@ export const OBJECT_DEFAULTS_VECTOR = {
   stroke: "black",
   strokeWidth: 3,
   strokeUniform: true,
-};
+} as fabric.FabricObjectProps;
 
 /** Newly created Fabric text object properties */
 export const OBJECT_DEFAULTS_TEXT = {
   ...OBJECT_DEFAULTS,
   fill: "black",
   fontFamily: "Noto Sans Variable",
-  textAlign: "center" as CanvasTextAlign,
+  textAlign: "center" as fabric.TextboxProps["textAlign"],
   originX: "center" as fabric.TOriginX,
   originY: "center" as fabric.TOriginY,
   lineHeight: 1,
-};
+} as fabric.TextboxProps;
 
 /** Scale image to this height when making a label thumbnail */
 export const THUMBNAIL_HEIGHT = 48;
