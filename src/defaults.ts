@@ -16,6 +16,14 @@ export const configureFabric = () => {
     mb: false,
   });
 
+  fabric.Polyline.prototype.setControlsVisibility({
+    tl: false,
+    bl: false,
+    tr: false,
+    br: false,
+    mt: false,
+    mb: false,
+  });
 };
 
 /** Default presets for LabelPropsEditor */

@@ -102,13 +102,11 @@ export class LabelDesignerObjectHelper {
     return obj;
   }
 
-  static addHLine(canvas: fabric.Canvas): fabric.Line {
-    const obj = new fabric.Line(
+  static addHLine(canvas: fabric.Canvas): fabric.Polyline {
+    const obj = new fabric.Polyline(
       [
-        OBJECT_DEFAULTS.left,
-        OBJECT_DEFAULTS.top,
-        OBJECT_DEFAULTS.left + OBJECT_SIZE_DEFAULTS.width,
-        OBJECT_DEFAULTS.top,
+        { x: OBJECT_DEFAULTS.left, y: OBJECT_DEFAULTS.top },
+        { x: OBJECT_DEFAULTS.left + OBJECT_SIZE_DEFAULTS.width, y: OBJECT_DEFAULTS.top },
       ],
       { ...OBJECT_DEFAULTS_VECTOR },
     );
