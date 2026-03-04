@@ -11,8 +11,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
-    name: Deploy
+  build:
+    name: Build dist
     runs-on: ubuntu-latest
     if: gitea.repository == 'MultiMote/niimblue'
 
@@ -26,16 +26,6 @@ jobs:
           node-version: "22"
           cache: npm
           cache-dependency-path: ./package-lock.json
-
-      - name: Setup rsync
-        run: sudo apt-get update && sudo apt-get install -y rsync
-
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H -p ${{ secrets.SSH_PORT || 22 }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
       - name: Install dependencies
         run: npm ci
@@ -61,8 +51,63 @@ jobs:
           DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
           LAST_MODIFIED: ${{ gitea.event.repository.updated_at }}
 
+      - name: Upload Artifact
+        uses: https://github.com/christopherHX/gitea-upload-artifact@v4
+        with:
+          name: niimblue-dist
+          path: dist/
+
+  deploy-server-1:
+    name: Deploy to Main Server
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Build
+        uses: https://github.com/christopherHX/gitea-download-artifact@v4
+        with:
+          name: niimblue-dist
+          path: dist/
+
+      - name: Setup rsync
+        run: sudo apt-get update && sudo apt-get install -y rsync
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H -p ${{ secrets.SSH_PORT || 22 }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
       - name: Deploy with Rsync
         run: |
           rsync -avz --delete \
                 -e "ssh -p ${{ secrets.SSH_PORT || 22 }}" \
                 ./dist/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/${{ gitea.head_ref || gitea.ref_name }}/
+
+  deploy-server-2:
+    name: Deploy to Second Server
+    needs: build
+    runs-on: ubuntu-latest
+    if: gitea.ref_name == 'main'
+    steps:
+      - name: Download Build
+        uses: https://github.com/christopherHX/gitea-download-artifact@v4
+        with:
+          name: niimblue-dist
+          path: dist/
+
+      - name: Setup rsync
+        run: sudo apt-get update && sudo apt-get install -y rsync
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H -p ${{ secrets.SSH_PORT_2 || 22 }} ${{ secrets.SSH_HOST_2 }} >> ~/.ssh/known_hosts
+
+      - name: Deploy with Rsync
+        run: |
+          rsync -avz --delete \
+                -e "ssh -p ${{ secrets.SSH_PORT_2 || 22 }}" \
+                ./dist/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST_2 }}:${{ secrets.DEPLOY_PATH_2 }}/${{ gitea.head_ref || gitea.ref_name }}/
