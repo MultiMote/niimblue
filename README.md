@@ -10,6 +10,11 @@ Design and print labels right from your browser
 
 [NiimBlueLib](https://github.com/MultiMote/niimbluelib) is used for communication
 
+Deployments:
+
+[niim.blue](https://niim.blue) ![de](https://github.com/user-attachments/assets/07e72fdf-dd32-47a6-9071-43e77e9be7fa) main | [dev.niim.blue](https://dev.niim.blue) ![de](https://github.com/user-attachments/assets/07e72fdf-dd32-47a6-9071-43e77e9be7fa) dev | [2.niim.blue](https://2.niim.blue) ![ru](https://github.com/user-attachments/assets/b85647b0-4fb3-4b39-9da0-c31ec171067c) main
+
+
 </div>
 
 ## Features
