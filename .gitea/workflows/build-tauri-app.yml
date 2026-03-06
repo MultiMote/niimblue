@@ -1,0 +1,86 @@
+name: Build Windows Tauri app
+
+on:
+  schedule:
+    # Two times per month
+    - cron: '0 0 1,15 * *'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  TAURI_PROJECT_DIR: ./standalone-apps/tauri-windows
+
+jobs:
+  build-tauri-app:
+    runs-on: ubuntu-latest
+    if: github.repository == 'MultiMote/niimblue'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: ./package-lock.json
+
+      - name: Setup GitHub CLI
+        uses: dev-hanz-ops/install-gh-cli-action@v0.2.1
+        with:
+          gh-cli-version: 2.72.0
+
+      - name: Install build dependencies
+        run: sudo apt update && sudo apt install -y lld llvm clang
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Add cargo-xwin
+        run: cargo install --locked cargo-xwin
+
+      - name: Restore xwin windows-msvc-sysroot cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/cargo-xwin/windows-msvc-sysroot/
+          key: ${{ runner.os }}-cargo-xwin-windows-msvc-sysroot
+
+      - name: Cache windows-msvc-sysroot
+        run: cargo xwin cache windows-msvc-sysroot
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Tauri node dependencies
+        working-directory: ${{ env.TAURI_PROJECT_DIR }}
+        run: npm ci
+
+      - name: Build niimblue www
+        working-directory: ${{ env.TAURI_PROJECT_DIR }}
+        run: npm run build-www
+
+      - name: Write version
+        working-directory: ${{ env.TAURI_PROJECT_DIR }}
+        run: |
+          VER=$(date +'%Y.%-m').$RUN_N
+          echo "{\"version\": \"$VER\"}" > ./version.json
+        env:
+          RUN_N: ${{ gitea.run_number }}
+
+      - name: Build app
+        working-directory: ${{ env.TAURI_PROJECT_DIR }}
+        run: npm run tauri build -- --runner cargo-xwin --target x86_64-pc-windows-msvc --config ./version.json
+        env:
+          XWIN_CROSS_COMPILER: clang
+
+      - name: Update GitHub release
+        run: gh release upload snapshot ${{ env.TAURI_PROJECT_DIR }}/src-tauri/target/x86_64-pc-windows-msvc/release/niimblues.exe -R MultiMote/niimblue --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
+
+
+

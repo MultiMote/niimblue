@@ -12,6 +12,9 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  CAPACITOR_PROJECT_DIR: ./standalone-apps/capacitor
+
 jobs:
   build-android-app:
     runs-on: ubuntu-latest
@@ -57,7 +60,7 @@ jobs:
         run: npm ci
 
       - name: Install capacitor dependencies
-        working-directory: ./capacitor
+        working-directory: ${{ env.CAPACITOR_PROJECT_DIR }}
         run: npm ci
 
       - name: Gradle cache
@@ -71,7 +74,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Build niimblue www
-        working-directory: ./capacitor
+        working-directory: ${{ env.CAPACITOR_PROJECT_DIR }}
         run: npm run build-www
 
       - name: Gradle cache
@@ -85,7 +88,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Build and sign capacitor app
-        working-directory: ./capacitor
+        working-directory: ${{ env.CAPACITOR_PROJECT_DIR }}
         run: npm run build-android
         env:
           KEYSTORE_PATH: ${{ gitea.workspace }}/.keystore/keystore.jks
@@ -95,7 +98,7 @@ jobs:
           APP_VERSION_CODE: ${{ gitea.run_number }}
 
       - name: Copy release apk
-        run: cp ./capacitor/android/app/build/outputs/apk/release/app-release-signed.apk $RUNNER_TEMP/niimblues.apk
+        run: cp ${{ env.CAPACITOR_PROJECT_DIR }}/android/app/build/outputs/apk/release/app-release-signed.apk $RUNNER_TEMP/niimblues.apk
 
       - name: Update GitHub release
         run: gh release upload snapshot $RUNNER_TEMP/niimblues.apk -R MultiMote/niimblue --clobber

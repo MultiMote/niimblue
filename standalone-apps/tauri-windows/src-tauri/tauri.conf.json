@@ -1,0 +1,25 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "niimblues",
+  "version": "1.0.0",
+  "identifier": "ru.mmote.niimblues",
+  "build": {
+    "frontendDist": "../www"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "NiimBlues",
+        "width": 1280,
+        "height": 720
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": false
+  }
+}
