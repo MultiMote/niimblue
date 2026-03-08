@@ -115,6 +115,7 @@
     "params.text.edit": "Редактировать во всплывающем диалоге",
     "params.text.fetch_fonts": "Получить список шрифтов",
     "params.text.font_family": "Шрифт",
+    "params.text.font_family.search": "Поиск",
     "params.text.user_fonts": "Шрифты пользователя",
     "params.text.system_fonts": "Системные шрифты",
     "params.text.font_size.down": "Уменьшить размер шрифта",

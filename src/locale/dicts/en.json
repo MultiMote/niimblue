@@ -116,6 +116,7 @@
     "params.text.edit": "Edit in popup",
     "params.text.fetch_fonts": "Load system fonts",
     "params.text.font_family": "Font family",
+    "params.text.font_family.search": "Search",
     "params.text.user_fonts": "User fonts",
     "params.text.system_fonts": "System fonts",
     "params.text.font_size.down": "Decrease font size",

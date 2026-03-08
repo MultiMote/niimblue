@@ -17,6 +17,15 @@
   let { value, valueUpdated, editRevision }: Props = $props();
 
   let fontQuerySupported = typeof queryLocalFonts !== "undefined";
+  let searchString = $state<string>("");
+
+  let systemFontsFiltered = $derived.by<string[]>(() => {
+    return $fontCache.filter((e) => e.toLowerCase().includes(searchString.toLowerCase()));
+  });
+
+  let userFontsFiltered = $derived.by<string[]>(() => {
+    return $userFonts.map((e) => e.family).filter((e) => e.toLowerCase().includes(searchString.toLowerCase()));
+  });
 
   const getSystemFonts = async () => {
     try {
@@ -27,6 +36,11 @@
     } catch (e) {
       Toasts.error(e);
     }
+  };
+
+  const fontClick = (family: string) => {
+    searchString = "";
+    valueUpdated(family);
   };
 
   onMount(() => {
@@ -58,27 +72,27 @@
   <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"></button>
 
   <div class="dropdown-menu">
-    {#if $userFonts.length > 0}
+    <div class="px-3 py-1">
+      <input
+        type="text"
+        class="form-control form-control-sm"
+        placeholder={$tr("params.text.font_family.search")}
+        bind:value={searchString} />
+    </div>
+
+    {#if userFontsFiltered.length > 0}
       <h6 class="dropdown-header">{$tr("params.text.user_fonts")}</h6>
-      {#each $userFonts as font (font.family)}
-        <button
-          class="dropdown-item"
-          style="font-family: {font.family}"
-          type="button"
-          onclick={() => valueUpdated(font.family)}>
-          {font.family}
+      {#each userFontsFiltered as family (family)}
+        <button class="dropdown-item" style="font-family: {family}" type="button" onclick={() => fontClick(family)}>
+          {family}
         </button>
       {/each}
     {/if}
 
-    {#if $fontCache.length > 0}
+    {#if systemFontsFiltered.length > 0}
       <h6 class="dropdown-header">{$tr("params.text.system_fonts")}</h6>
-      {#each $fontCache as family (family)}
-        <button
-          class="dropdown-item"
-          style="font-family: {family}"
-          type="button"
-          onclick={() => valueUpdated(family)}>
+      {#each systemFontsFiltered as family (family)}
+        <button class="dropdown-item" style="font-family: {family}" type="button" onclick={() => fontClick(family)}>
           {family}
         </button>
       {/each}
@@ -87,7 +101,8 @@
     {#if fontQuerySupported}
       <div class="dropdown-divider"></div>
       <button class="dropdown-item load-system-fonts" type="button" onclick={getSystemFonts}>
-        <MdIcon icon="refresh" /> {$tr("params.text.fetch_fonts")}
+        <MdIcon icon="refresh" />
+        {$tr("params.text.fetch_fonts")}
       </button>
     {/if}
   </div>
