@@ -92,7 +92,7 @@
     "params.text.bold": "Podebljano",
     "params.text.edit.title": "Uređivanje teksta",
     "params.text.edit": "Uredi u iskočnom prozoru",
-    "params.text.fetch_fonts": "Dohvati fontove",
+    "params.text.fetch_fonts": "Učitaj fontove sustava",
     "params.text.font_family": "Obitelj fontova",
     "params.text.font_size.up": "Povećaj font",
     "params.text.font_size.down": "Smanji font",
