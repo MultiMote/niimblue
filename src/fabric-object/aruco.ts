@@ -84,8 +84,12 @@ function decodeBits(dict: ArUcoDictionary, markerId: number): number[][] {
 
   const bytes = info.data[markerId];
   const bits: number[] = [];
+  const bitsCount = info.size * info.size;
+
   for (const byte of bytes) {
-    for (let i = 7; i >= 0; i--) {
+    const remaining = bitsCount - bits.length;
+    const start = Math.min(7, remaining - 1);
+    for (let i = start; i >= 0; i--) {
       bits.push((byte >> i) & 1);
     }
   }
@@ -188,22 +192,24 @@ export class ArUcoMarker<
     }
 
     ctx.save();
-    ctx.translate(-markerWidth / 2, -markerWidth / 2);
-    ctx.translate(-0.5, -0.5);
+    ctx.translate(-Math.floor(markerWidth / 2), -Math.floor(markerWidth / 2));
+    ctx.translate(-0.5, -0.5); // blurry rendering fix
 
     // black background (border + black cells)
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, markerWidth, markerWidth);
 
-    // white cells
+    // white cells — build a single path to avoid anti-aliasing seams between adjacent cells
     ctx.fillStyle = "white";
+    ctx.beginPath();
     for (let r = 0; r < innerSize; r++) {
       for (let c = 0; c < innerSize; c++) {
         if (grid[r][c] === 1) {
-          ctx.fillRect((c + 1) * cellSize, (r + 1) * cellSize, cellSize, cellSize);
+          ctx.rect((c + 1) * cellSize, (r + 1) * cellSize, cellSize, cellSize);
         }
       }
     }
+    ctx.fill();
 
     ctx.restore();
     super._render(ctx);
