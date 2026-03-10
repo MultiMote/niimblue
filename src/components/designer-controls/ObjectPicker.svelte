@@ -47,6 +47,10 @@
         <MdIcon icon="qr_code_2" />
         {$tr("editor.objectpicker.qrcode")}
       </button>
+      <button class="btn me-1" onclick={() => onSubmit("aruco")}>
+        <MdIcon icon="grid_on" />
+        {$tr("editor.objectpicker.aruco")}
+      </button>
       <button class="btn me-1" onclick={() => onSubmit("barcode")}>
         <MdIcon icon="view_week" />
         {$tr("editor.objectpicker.barcode")}

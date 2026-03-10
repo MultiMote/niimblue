@@ -6,7 +6,7 @@ export type ConnectionState = "connecting" | "connected" | "disconnected";
 export type ConnectionType = "bluetooth" | "serial" | "capacitor-ble";
 
 export type LabelUnit = "mm" | "px";
-export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qrcode" | "barcode";
+export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qrcode" | "barcode" | "aruco";
 export type PostProcessType = "threshold" | "dither" | "bayer";
 export type MoveDirection = "up" | "down" | "left" | "right";
 export type LabelShape = "rect" | "rounded_rect" | "circle";
