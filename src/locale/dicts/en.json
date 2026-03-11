@@ -25,6 +25,7 @@
     "editor.iconpicker.mdi_link_title": "See detailed list here",
     "editor.iconpicker.title": "Add icon",
     "editor.import.zpl": "Import ZPL",
+    "editor.objectpicker.aruco": "ArUco",
     "editor.objectpicker.barcode": "Barcode",
     "editor.objectpicker.circle": "Circle",
     "editor.objectpicker.image": "Image",

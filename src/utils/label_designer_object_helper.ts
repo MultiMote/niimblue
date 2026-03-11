@@ -1,5 +1,6 @@
 import * as fabric from "fabric";
 import { OBJECT_DEFAULTS, OBJECT_DEFAULTS_TEXT, OBJECT_DEFAULTS_VECTOR, OBJECT_SIZE_DEFAULTS } from "$/defaults";
+import { ArUcoMarker } from "$/fabric-object/aruco";
 import Barcode from "$/fabric-object/barcode";
 import { QRCode } from "$/fabric-object/qrcode";
 import type { OjectType } from "$/types";
@@ -145,6 +146,15 @@ export class LabelDesignerObjectHelper {
     return qr;
   }
 
+  static addArUco(canvas: fabric.Canvas): ArUcoMarker {
+    const aruco = new ArUcoMarker({
+      ...OBJECT_SIZE_DEFAULTS,
+      ...OBJECT_DEFAULTS,
+    });
+    canvas.add(aruco);
+    return aruco;
+  }
+
   static addBarcode(canvas: fabric.Canvas): Barcode {
     const barcode = new Barcode({
       ...OBJECT_DEFAULTS,
@@ -171,6 +181,8 @@ export class LabelDesignerObjectHelper {
         return;
       case "qrcode":
         return this.addQrCode(canvas);
+      case "aruco":
+        return this.addArUco(canvas);
       case "barcode":
         return this.addBarcode(canvas);
     }

@@ -1,4 +1,5 @@
 import * as fabric from "fabric";
+import ArUcoMarker from "$/fabric-object/aruco";
 import Barcode from "$/fabric-object/barcode";
 import QRCode from "$/fabric-object/qrcode";
 
@@ -24,7 +25,7 @@ export class CanvasUtils {
   }
 
   static fixFabricObjectScale(obj: fabric.FabricObject) {
-    const isNotScalable = obj instanceof Barcode || obj instanceof fabric.Rect || obj instanceof QRCode;
+    const isNotScalable = obj instanceof Barcode || obj instanceof fabric.Rect || obj instanceof QRCode || obj instanceof ArUcoMarker;
 
     if (isNotScalable) {
       obj.set({
@@ -36,8 +37,7 @@ export class CanvasUtils {
         top: Math.round(obj.top),
       });
 
-      // todo: move to QRCode maybe
-      if (obj instanceof QRCode) {
+      if (obj instanceof QRCode || obj instanceof ArUcoMarker) {
         const qrMin = 42;
         const size = Math.max(obj.width + (obj.width % 2), qrMin);
         obj.set({
