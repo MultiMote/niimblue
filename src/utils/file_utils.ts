@@ -8,7 +8,7 @@ import {
   type LabelPreset,
   type LabelProps,
 } from "$/types";
-import { OBJECT_DEFAULTS, THUMBNAIL_HEIGHT, THUMBNAIL_QUALITY } from "$/defaults";
+import { OBJECT_DEFAULTS, OBJECT_DEFAULTS_VECTOR, THUMBNAIL_HEIGHT, THUMBNAIL_QUALITY } from "$/defaults";
 import { z } from "zod";
 import { CustomCanvas } from "$/fabric-object/custom_canvas";
 import { Capacitor } from "@capacitor/core";
@@ -277,15 +277,47 @@ export class FileUtils {
   }
 
   static async loadCanvasState(canvas: fabric.Canvas, state: FabricJson): Promise<void> {
+    const deprecatedLines: fabric.Line[] = [];
+
     await canvas.loadFromJSON(state, (_, obj) => {
       if (obj instanceof fabric.FabricObject) {
         obj.set({ snapAngle: OBJECT_DEFAULTS.snapAngle });
         CanvasUtils.fixFabricObjectScale(obj);
+
+        if (obj instanceof fabric.Line) {
+          deprecatedLines.push(obj);
+        }
       }
     });
+
+    // convert deprecated Line to Polyline
+    for (const line of deprecatedLines) {
+      const poly = new fabric.Polyline(
+        [
+          { x: line.x1, y: line.y1 },
+          { x: line.x2, y: line.y2 },
+        ],
+        {
+          ...OBJECT_DEFAULTS_VECTOR,
+          left: line.left,
+          top: line.top,
+          angle: line.angle,
+          scaleX: line.scaleX,
+          scaleY: line.scaleY,
+          fill: line.fill,
+          stroke: line.stroke,
+          strokeWidth: line.strokeWidth,
+        },
+      );
+
+      canvas.remove(line);
+      canvas.add(poly);
+    }
+
     if (canvas instanceof CustomCanvas) {
       canvas.virtualZoom(canvas.getVirtualZoom());
     }
+
     canvas.requestRenderAll();
   }
 

@@ -48,7 +48,7 @@
   </div>
 {/if}
 
-{#if selectedObject instanceof fabric.Rect || selectedObject instanceof fabric.Circle || selectedObject instanceof fabric.Line}
+{#if selectedObject instanceof fabric.Rect || selectedObject instanceof fabric.Circle || selectedObject instanceof fabric.Line || selectedObject instanceof fabric.Polyline}
   <div class="input-group flex-nowrap input-group-sm">
     <span class="input-group-text" title={$tr("params.vector.stroke_width")}>
       <MdIcon icon="line_weight" />
