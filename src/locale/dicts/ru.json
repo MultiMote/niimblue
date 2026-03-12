@@ -180,5 +180,6 @@
     "fonts.add": "Добавить",
     "fonts.browse": "Обзор...",
     "fonts.gfonts": "Найти шрифты",
-    "fonts.title_override": "Своё название"
+    "fonts.title_override": "Своё название",
+    "editor.objectpicker.aruco": "ArUco"
 }
