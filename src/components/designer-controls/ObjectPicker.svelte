@@ -3,14 +3,16 @@
   import { tr } from "$/utils/i18n";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import ZplImportButton from "$/components/designer-controls/ZplImportButton.svelte";
+  import PdfImportButton from "$/components/designer-controls/PdfImportButton.svelte";
 
   interface Props {
     onSubmit: (i: OjectType) => void;
     labelProps: LabelProps;
     zplImageReady: (img: Blob) => void;
+    pdfImageReady: (img: HTMLCanvasElement) => void;
   }
 
-  let { onSubmit, labelProps, zplImageReady }: Props = $props();
+  let { onSubmit, labelProps, zplImageReady, pdfImageReady }: Props = $props();
 </script>
 
 <div class="dropdown">
@@ -56,7 +58,9 @@
         {$tr("editor.objectpicker.barcode")}
       </button>
 
-      <ZplImportButton {labelProps} onImageReady={zplImageReady} text={$tr("editor.import.zpl")} />
+      <ZplImportButton {labelProps} onImageReady={zplImageReady} />
+
+      <PdfImportButton {labelProps} onImageReady={pdfImageReady} />
     </div>
   </div>
 </div>

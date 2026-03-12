@@ -24,6 +24,7 @@
     "editor.iconpicker.show.both": "user + pack icons",
     "editor.iconpicker.mdi_link_title": "See detailed list here",
     "editor.iconpicker.title": "Add icon",
+    "editor.import.pdf": "Import PDF",
     "editor.import.zpl": "Import ZPL",
     "editor.objectpicker.aruco": "ArUco",
     "editor.objectpicker.barcode": "Barcode",

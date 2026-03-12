@@ -32,7 +32,7 @@
   import QrCodeParamsPanel from "$/components/designer-controls/QRCodeParamsControls.svelte";
   import TextParamsControls from "$/components/designer-controls/TextParamsControls.svelte";
   import VariableInsertControl from "$/components/designer-controls/VariableInsertControl.svelte";
-  import { DEFAULT_LABEL_PROPS, GRID_SIZE } from "$/defaults";
+  import { DEFAULT_LABEL_PROPS, GRID_SIZE, OBJECT_DEFAULTS } from "$/defaults";
   import { LabelDesignerUtils } from "$/utils/label_designer_utils";
   import SavedLabelsMenu from "$/components/designer-controls/SavedLabelsMenu.svelte";
   import { CustomCanvas } from "$/fabric-object/custom_canvas";
@@ -171,6 +171,18 @@
 
   const zplImageReady = async (img: Blob) => {
     await LabelDesignerObjectHelper.addImageBlob(fabricCanvas!, img);
+    undo.push(fabricCanvas!, labelProps);
+  };
+
+  const pdfImageReady = async (el: HTMLCanvasElement) => {
+    const img = new fabric.FabricImage(el, {
+      ...OBJECT_DEFAULTS,
+      left: 0,
+      top: 0,
+    });
+
+    fabricCanvas!.add(img);
+    fabricCanvas!.setActiveObject(img);
     undo.push(fabricCanvas!, labelProps);
   };
 
@@ -480,7 +492,8 @@
         <CsvControl bind:enabled={csvEnabled} onPlaceholderPicked={onCsvPlaceholderPicked} />
 
         <IconPicker onSubmit={onIconPicked} onSubmitSvg={onSvgIconPicked} />
-        <ObjectPicker onSubmit={onObjectPicked} {labelProps} {zplImageReady} />
+
+        <ObjectPicker onSubmit={onObjectPicked} {labelProps} {zplImageReady} {pdfImageReady}  />
 
         <button class="btn btn-sm btn-primary ms-1" onclick={openPreview}>
           <MdIcon icon="visibility" />

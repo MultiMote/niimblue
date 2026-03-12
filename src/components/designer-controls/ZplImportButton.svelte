@@ -2,14 +2,15 @@
   import type { LabelProps } from "$/types";
   import { FileUtils } from "$/utils/file_utils";
   import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { tr } from "$/utils/i18n";
+  import { Toasts } from "$/utils/toasts";
 
   interface Props {
-    text: string;
     labelProps: LabelProps;
     onImageReady: (img: Blob) => void;
   }
 
-  let { text, labelProps, onImageReady }: Props = $props();
+  let { labelProps, onImageReady }: Props = $props();
   let importState = $state<"idle" | "processing" | "error">("idle");
 
   const onImportClicked = async () => {
@@ -44,14 +45,16 @@
       }
     } catch (e) {
       importState = "error";
-      console.error(e);
+      Toasts.error(e);
     }
   };
 </script>
 
 <button class="btn btn-sm" onclick={onImportClicked}>
-  <MdIcon icon="receipt_long" />
-  {text}
+  <MdIcon icon="picture_as_pdf" />
+
+  {$tr("editor.import.zpl")}
+
   {#if importState === "processing"}
     <MdIcon icon="hourglass_top" />
   {:else if importState === "error"}
