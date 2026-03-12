@@ -87,6 +87,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - name: Fix permissions
+        working-directory: ${{ env.CAPACITOR_PROJECT_DIR }}
+        run: chmod +x ./android/gradlew
+
       - name: Build and sign capacitor app
         working-directory: ${{ env.CAPACITOR_PROJECT_DIR }}
         run: npm run build-android
