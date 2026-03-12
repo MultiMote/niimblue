@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "build-www": "cd ../.. && vite build --outDir ./standalone-apps/capacitor/www",
-    "build-android": "cap sync && cap build android",
-    "run-android": "cap sync && cap run android",
-    "build-ios": "cap sync && cap open ios",
-    "run-ios": "cap sync && cap run ios"
+    "build-android": "cap sync android && cap build android",
+    "run-android": "cap sync android && cap run android",
+    "build-ios": "cap sync ios && cap open ios",
+    "run-ios": "cap sync ios && cap run ios"
   },
   "dependencies": {
     "@capacitor-community/bluetooth-le": "^7.1.0",
