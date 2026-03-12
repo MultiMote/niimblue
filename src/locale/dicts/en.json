@@ -43,6 +43,8 @@
     "editor.warning.save": "Saved data will be overwritten. Save?",
     "main.built": "built at",
     "main.code": "Code",
+    "params.aruco.marker_id": "Marker ID",
+    "params.aruco.dict": "Dictionary",
     "params.barcode.content": "Content",
     "params.barcode.enable_caption": "Enable caption",
     "params.barcode.encoding": "Encoding",

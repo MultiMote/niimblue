@@ -1,6 +1,7 @@
 <script lang="ts">
   import { ArUcoMarker, type ArUcoDictionary } from "$/fabric-object/aruco";
   import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { tr } from "$/utils/i18n";
 
   interface Props {
     selectedArUco: ArUcoMarker;
@@ -22,7 +23,7 @@
 <input type="hidden" value={editRevision}>
 
 <div class="input-group input-group-sm flex-nowrap">
-  <span class="input-group-text" title="Dictionary">
+  <span class="input-group-text" title={$tr("params.aruco.dict")}>
     <MdIcon icon="grid_on" />
   </span>
   <select
@@ -36,14 +37,14 @@
       }
       valueUpdated();
     }}>
-    {#each dictOptions as opt}
+    {#each dictOptions as opt (opt.value)}
       <option value={opt.value}>{opt.label}</option>
     {/each}
   </select>
 </div>
 
 <div class="input-group input-group-sm flex-nowrap">
-  <span class="input-group-text" title="Marker ID">
+  <span class="input-group-text" title={$tr("params.aruco.marker_id")}>
     <MdIcon icon="tag" />
   </span>
   <input

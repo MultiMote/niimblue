@@ -42,6 +42,8 @@
     "editor.warning.save": "Сохранённые данные будут перезаписаны. Сохранить?",
     "main.built": "собрано",
     "main.code": "Исходный код",
+    "params.aruco.marker_id": "ID маркера",
+    "params.aruco.dict": "Словарь",
     "params.barcode.content": "Содержимое",
     "params.barcode.enable_caption": "Показывать надпись",
     "params.barcode.encoding": "Тип",
