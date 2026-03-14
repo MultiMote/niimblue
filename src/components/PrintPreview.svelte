@@ -105,19 +105,29 @@
     printState = "sending";
     error = "";
 
-    // do it in a stupid way (multi-page print not finished yet)
+    $printerClient.stopHeartbeat();
+
+    const totalPhysicalPages = pagesTotal * quantity;
+
+    currentPrintTask = $printerClient.abstraction.newPrintTask(printTaskName, {
+      totalPages: totalPhysicalPages,
+      density,
+      speed,
+      labelType,
+      statusPollIntervalMs: 100,
+      statusTimeoutMs: 8_000,
+    });
+
+    try {
+      await currentPrintTask.printInit();
+    } catch (e) {
+      error = `${e}`;
+      console.error(e);
+      await endPrint();
+      return;
+    }
+
     for (let curPage = 0; curPage < pagesTotal; curPage++) {
-      $printerClient.stopHeartbeat();
-
-      currentPrintTask = $printerClient.abstraction.newPrintTask(printTaskName, {
-        totalPages: quantity,
-        density,
-        speed,
-        labelType,
-        statusPollIntervalMs: 100,
-        statusTimeoutMs: 8_000,
-      });
-
       page = curPage;
       console.log("Printing page", page);
 
@@ -125,32 +135,13 @@
 
       try {
         const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, labelProps.printDirection);
-        await currentPrintTask.printInit();
         await currentPrintTask.printPage(encoded, quantity);
       } catch (e) {
         error = `${e}`;
         console.error(e);
+        await endPrint();
         return;
       }
-
-      printState = "printing";
-
-      const listener = (e: PrintProgressEvent) => {
-        printProgress = Math.floor((e.page / quantity) * ((e.pagePrintProgress + e.pageFeedProgress) / 2));
-      };
-
-      $printerClient.on("printprogress", listener);
-
-      try {
-        await currentPrintTask.waitForFinished();
-      } catch (e) {
-        error = `${e}`;
-        console.error(e);
-      }
-
-      $printerClient.off("printprogress", listener);
-
-      await endPrint();
 
       if (
         $appConfig.pageDelay !== undefined &&
@@ -162,8 +153,24 @@
       }
     }
 
-    printState = "idle";
-    $printerClient.startHeartbeat();
+    printState = "printing";
+
+    const listener = (e: PrintProgressEvent) => {
+      printProgress = Math.floor((e.page / totalPhysicalPages) * ((e.pagePrintProgress + e.pageFeedProgress) / 2));
+    };
+
+    $printerClient.on("printprogress", listener);
+
+    try {
+      await currentPrintTask.waitForFinished();
+    } catch (e) {
+      error = `${e}`;
+      console.error(e);
+    }
+
+    $printerClient.off("printprogress", listener);
+
+    await endPrint();
 
     if (printNow && !error) {
       modalRef.hide();
