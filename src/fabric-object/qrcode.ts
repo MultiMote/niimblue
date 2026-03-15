@@ -2,6 +2,9 @@ import QRCodeFactory from "qrcode-generator";
 import * as fabric from "fabric";
 import { OBJECT_DEFAULTS_TEXT, OBJECT_SIZE_DEFAULTS } from "$/defaults";
 import { Range } from "$/types";
+import { toUTF8Array } from "$/utils/qrcode";
+
+QRCodeFactory.stringToBytes = toUTF8Array;
 
 export type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
 export type Mode = "Numeric" | "Alphanumeric" | "Byte" /* Default */ | "Kanji";
@@ -84,6 +87,8 @@ export class QRCode<
       tr: false,
       bl: false,
     });
+    // QRCodeFactory.stringToBytes = QRCodeFactory.stringToBytesFuncs["UTF-8"];
+
   }
 
   override _set(key: string, value: any): this {
@@ -102,7 +107,6 @@ export class QRCode<
     ctx.translate(-0.5, -0.5); // blurry rendering fix
     ctx.fillRect(0, 0, this.width + 1, this.height + 1);
     ctx.restore();
-
     ctx.save();
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
