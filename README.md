@@ -27,7 +27,9 @@ Support project:
 * Support for both Bluetooth and USB connections.
 * Rich label editor. Label saving, import/export.
 * Print preview. You can see how your label will look like after post-processing. Several post-processing algorithms are available.
-* Android App (Capacitor based).
+* [Standalone apps](https://github.com/MultiMote/niimblue/releases):
+    - Android (Capacitor based)
+    - Windows (Tauri based, uses Edge backed)
 * Most complete implementation of [NIIMBOT protocol](https://printers.niim.blue/interfacing/proto/).
 
 You can see more complete list of implemented and planned features [on the Wiki](https://github.com/MultiMote/niimblue/wiki#features).
