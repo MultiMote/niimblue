@@ -111,3 +111,25 @@ jobs:
           rsync -avz --delete \
                 -e "ssh -p ${{ secrets.SSH_PORT_2 || 22 }}" \
                 ./dist/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST_2 }}:${{ secrets.DEPLOY_PATH_2 }}/${{ gitea.head_ref || gitea.ref_name }}/
+
+  upload-dist-to-github:
+    name: Update GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: gitea.ref_name == 'main'
+    steps:
+      - name: Download Build
+        uses: https://github.com/christopherHX/gitea-download-artifact@v4
+        with:
+          name: niimblue-dist
+          path: niimblue-dist/
+
+      - name: Zip niimblue-dist
+        working-directory: niimblue-dist
+        run: zip -r ../niimblue-dist.zip *
+
+      - name: Update GitHub release
+        run: gh release upload snapshot niimblue-dist.zip -R MultiMote/niimblue --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
+

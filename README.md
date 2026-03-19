@@ -137,8 +137,15 @@ Skip steps you have done.
 
 ### Deployment
 
-To run own instance, build static files (`npm run build`) and host on yor web server (HTTPS required),
-or use [Docker Image](https://github.com/MultiMote/niimblue/wiki/Running-own-instance-with-Docker).
+Here are some options. HTTPS is required for non-localhost deployments.
+
+#### Serving static files
+
+To get static files run `npm run build` (result builds to `dist`) or download `niimblue-dist.zip` from [Releases](https://github.com/MultiMote/niimblue/releases).
+
+#### Using Docker Image
+
+Follow the instructions in the [wiki](https://github.com/MultiMote/niimblue/wiki/Running-own-instance-with-Docker).
 
 ### IDE setup
 
