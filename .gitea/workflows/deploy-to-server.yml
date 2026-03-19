@@ -128,6 +128,11 @@ jobs:
         working-directory: niimblue-dist
         run: zip -r ../niimblue-dist.zip *
 
+      - name: Setup GitHub CLI
+        uses: dev-hanz-ops/install-gh-cli-action@v0.2.1
+        with:
+          gh-cli-version: 2.72.0
+
       - name: Update GitHub release
         run: gh release upload snapshot niimblue-dist.zip -R MultiMote/niimblue --clobber
         env:
