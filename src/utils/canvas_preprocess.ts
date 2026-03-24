@@ -36,9 +36,7 @@ export const canvasPreprocess = (canvas: fabric.Canvas, variables?: { [key: stri
       } else {
         obj.set({ text });
       }
-    } else if (obj instanceof QRCode) {
-      obj.set({ text: preprocessString(obj.text ?? "", variables) });
-    } else if (obj instanceof Barcode && obj.encoding === "CODE128B") {
+    } else if (obj instanceof QRCode || obj instanceof Barcode) {
       obj.set({ text: preprocessString(obj.text ?? "", variables) });
     }
   });

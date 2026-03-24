@@ -1,5 +1,6 @@
 import * as fabric from "fabric";
-import { OBJECT_DEFAULTS_TEXT, OBJECT_SIZE_DEFAULTS } from "$/defaults";
+import { OBJECT_SIZE_DEFAULTS } from "$/defaults";
+import { CanvasUtils } from "$/utils/canvas_utils";
 
 export type ArUcoDictionary = "4x4" | "5x5" | "6x6";
 
@@ -156,26 +157,10 @@ export class ArUcoMarker<
     return this;
   }
 
-  renderError(ctx: CanvasRenderingContext2D): void {
-    ctx.save();
-    ctx.fillStyle = "black";
-    ctx.translate(-this.width / 2, -this.height / 2);
-    ctx.translate(-0.5, -0.5);
-    ctx.fillRect(0, 0, this.width + 1, this.height + 1);
-    ctx.restore();
-
-    ctx.save();
-    ctx.fillStyle = "white";
-    ctx.textAlign = "center";
-    ctx.font = `16px ${OBJECT_DEFAULTS_TEXT.fontFamily}`;
-    ctx.fillText("ERR", 0, 0);
-    ctx.restore();
-  }
-
   override _render(ctx: CanvasRenderingContext2D): void {
     const grid = decodeBits(this.dictionary, this.markerId);
     if (grid.length === 0) {
-      this.renderError(ctx);
+      CanvasUtils.renderError(ctx, this.width, this.height);
       super._render(ctx);
       return;
     }
@@ -186,7 +171,7 @@ export class ArUcoMarker<
     const markerWidth = cellSize * totalCells;
 
     if (cellSize < 1 || markerWidth > this.width) {
-      this.renderError(ctx);
+      CanvasUtils.renderError(ctx, this.width, this.height);
       super._render(ctx);
       return;
     }

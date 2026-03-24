@@ -1,8 +1,9 @@
 import QRCodeFactory from "qrcode-generator";
 import * as fabric from "fabric";
-import { OBJECT_DEFAULTS_TEXT, OBJECT_SIZE_DEFAULTS } from "$/defaults";
+import { OBJECT_SIZE_DEFAULTS } from "$/defaults";
 import { Range } from "$/types";
 import { toUTF8Array } from "$/utils/qrcode";
+import { CanvasUtils } from "$/utils/canvas_utils";
 
 QRCodeFactory.stringToBytes = toUTF8Array;
 
@@ -100,24 +101,9 @@ export class QRCode<
     return this;
   }
 
-  renderError(ctx: CanvasRenderingContext2D): void {
-    ctx.save();
-    ctx.fillStyle = "black";
-    ctx.translate(-this.width / 2, -this.height / 2); // make top-left origin
-    ctx.translate(-0.5, -0.5); // blurry rendering fix
-    ctx.fillRect(0, 0, this.width + 1, this.height + 1);
-    ctx.restore();
-    ctx.save();
-    ctx.fillStyle = "white";
-    ctx.textAlign = "center";
-    ctx.font = `16px ${OBJECT_DEFAULTS_TEXT.fontFamily}`;
-    ctx.fillText("ERR", 0, 0);
-    ctx.restore();
-  }
-
   override _render(ctx: CanvasRenderingContext2D): void {
     if (!this.text) {
-      this.renderError(ctx);
+      CanvasUtils.renderError(ctx, this.width, this.height);
       super._render(ctx);
       return;
     }
@@ -129,7 +115,7 @@ export class QRCode<
       qr.make();
     } catch (e) {
       console.error(e);
-      this.renderError(ctx);
+      CanvasUtils.renderError(ctx, this.width, this.height);
       super._render(ctx);
       return;
     }
@@ -139,7 +125,7 @@ export class QRCode<
     qrWidth -= qrWidth % 2; // avoid half-pixel rendering
 
     if (qrScale < 1 || qrWidth > this.width) {
-      this.renderError(ctx);
+      CanvasUtils.renderError(ctx, this.width, this.height);
       super._render(ctx);
       return;
     }

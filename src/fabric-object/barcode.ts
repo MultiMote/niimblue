@@ -3,9 +3,7 @@ import { code128b, ean13 } from "$/utils/barcode";
 import { CanvasUtils } from "$/utils/canvas_utils";
 import { OBJECT_DEFAULTS_TEXT } from "$/defaults";
 
-const EAN13_LONG_BAR_INDEXES: number[] = [
-  0, 1, 2, 45, 46, 47, 48, 49, 92, 93, 94,
-];
+const EAN13_LONG_BAR_INDEXES: Set<number> = new Set([0, 1, 2, 45, 46, 47, 48, 49, 92, 93, 94]);
 export type BarcodeCoding = "EAN13" | "CODE128B";
 
 export const barcodeDefaultValues: Partial<fabric.TClassProperties<Barcode>> = {
@@ -25,20 +23,9 @@ interface UniqueBarcodeProps {
   fontSize: number;
   fontFamily: string;
 }
-export interface BarcodeProps
-  extends fabric.FabricObjectProps,
-    UniqueBarcodeProps {}
-export interface SerializedBarcodeProps
-  extends fabric.SerializedObjectProps,
-    UniqueBarcodeProps {}
-const BARCODE_PROPS = [
-  "text",
-  "encoding",
-  "printText",
-  "scaleFactor",
-  "fontSize",
-  "fontFamily",
-] as const;
+export interface BarcodeProps extends fabric.FabricObjectProps, UniqueBarcodeProps {}
+export interface SerializedBarcodeProps extends fabric.SerializedObjectProps, UniqueBarcodeProps {}
+const BARCODE_PROPS = ["text", "encoding", "printText", "scaleFactor", "fontSize", "fontFamily"] as const;
 
 export class Barcode<
     Props extends fabric.TOptions<BarcodeProps> = Partial<BarcodeProps>,
@@ -90,6 +77,8 @@ export class Barcode<
   private barcodeEncoded: string = "";
   private displayText: string = "";
 
+  private error: boolean = false;
+
   constructor(options?: Props) {
     super();
     Object.assign(this, barcodeDefaultValues);
@@ -116,10 +105,7 @@ export class Barcode<
       this._createBandCode();
     }
 
-    if (
-      this.barcodeEncoded &&
-      (BARCODE_PROPS.includes(key as any) || key == "canvas")
-    ) {
+    if (this.barcodeEncoded && (BARCODE_PROPS.includes(key as any) || key == "canvas")) {
       const letterWidth = this._measureLetterWidth();
       let barcodeWidth = (this.scaleFactor ?? 1) * this.barcodeEncoded.length;
 
@@ -134,13 +120,19 @@ export class Barcode<
   }
 
   _createBandCode() {
-    if (this.encoding === "EAN13") {
-      const { text, bandcode } = ean13(this.text);
-      this.displayText = text;
-      this.barcodeEncoded = bandcode;
-    } else {
-      this.displayText = this.text;
-      this.barcodeEncoded = code128b(this.text);
+    try {
+      this.error = false;
+      if (this.encoding === "EAN13") {
+        const { text, bandcode } = ean13(this.text);
+        this.displayText = text;
+        this.barcodeEncoded = bandcode;
+      } else {
+        this.displayText = this.text;
+        this.barcodeEncoded = code128b(this.text);
+      }
+    } catch (e) {
+      console.error(e);
+      this.error = true;
     }
   }
 
@@ -163,6 +155,12 @@ export class Barcode<
   }
 
   override _render(ctx: CanvasRenderingContext2D) {
+    if (this.error) {
+      CanvasUtils.renderError(ctx, this.width, this.height);
+      super._render(ctx);
+      return;
+    }
+
     if (this.barcodeEncoded === "") {
       super._render(ctx);
       return;
@@ -203,7 +201,7 @@ export class Barcode<
           blackStartPosition = xPos;
         }
 
-        if (this.encoding === "EAN13" && EAN13_LONG_BAR_INDEXES.includes(i)) {
+        if (this.encoding === "EAN13" && EAN13_LONG_BAR_INDEXES.has(i)) {
           isLongBar = true;
         }
 
@@ -217,12 +215,7 @@ export class Barcode<
           );
         }
       } else {
-        ctx.fillRect(
-          blackStartPosition,
-          0,
-          this.scaleFactor * blackCount,
-          isLongBar ? longBarHeight : shortBarHeight,
-        );
+        ctx.fillRect(blackStartPosition, 0, this.scaleFactor * blackCount, isLongBar ? longBarHeight : shortBarHeight);
         blackStartPosition = -1;
         blackCount = 0;
         isLongBar = false;
@@ -232,12 +225,7 @@ export class Barcode<
     // render text
     if (this.printText) {
       if (this.encoding === "EAN13") {
-        const parts = [
-          this.displayText[0],
-          this.displayText.slice(1, 7),
-          this.displayText.slice(7, 13),
-          ">",
-        ];
+        const parts = [this.displayText[0], this.displayText.slice(1, 7), this.displayText.slice(7, 13), ">"];
         const midPartWidth = 40;
         const longBars1End = 4;
         const longBars2End = 50;
@@ -262,13 +250,7 @@ export class Barcode<
 
         ctx.fillText(parts[3], this.width - letterWidth, this.height); // last digit
       } else {
-        CanvasUtils.equalSpacingFillText(
-          ctx,
-          this.displayText,
-          barcodeStartPos,
-          this.height,
-          this.width,
-        );
+        CanvasUtils.equalSpacingFillText(ctx, this.displayText, barcodeStartPos, this.height, this.width);
       }
     }
 

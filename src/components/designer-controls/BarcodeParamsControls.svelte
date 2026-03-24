@@ -68,27 +68,14 @@
     }} />
 </div>
 
-{#if selectedBarcode.encoding === "EAN13"}
-  <div class="input-group input-group-sm flex-nowrap">
-    <span class="input-group-text" title={$tr("params.barcode.content")}><MdIcon icon="view_week" /></span>
-    <input
-      class="barcode-content form-control"
-      maxlength="12"
-      value={selectedBarcode.text}
-      oninput={(e) => {
-        selectedBarcode?.set("text", e.currentTarget.value);
-        valueUpdated();
-      }} />
-  </div>
-{:else}
-  <textarea
-    class="barcode-content form-control"
-    value={selectedBarcode.text}
-    oninput={(e) => {
-      selectedBarcode?.set("text", e.currentTarget.value);
-      valueUpdated();
-    }}></textarea>
-{/if}
+<textarea
+  class="barcode-content form-control"
+  value={selectedBarcode.text}
+  oninput={(e) => {
+    selectedBarcode?.set("text", e.currentTarget.value);
+    valueUpdated();
+  }}></textarea>
+
 
 <style>
   .input-group {
