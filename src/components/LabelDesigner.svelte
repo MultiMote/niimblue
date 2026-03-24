@@ -273,17 +273,26 @@
     fabricCanvas!.clear();
   };
 
-  const loadDefaultLabel = async () => {
+  const loadLabelFromUrl = async () => {
     try {
       const urlTemplate = await FileUtils.readLabelFromUrl();
 
       if (urlTemplate !== null && confirm($tr("params.saved_labels.load.url.warn"))) {
         onLoadRequested(urlTemplate);
         Toasts.message($tr("params.saved_labels.load.url.loaded"));
-        return;
+        return true;
       }
     } catch (e) {
       Toasts.error(e);
+    }
+    return false;
+  }
+
+  const loadDefaultLabel = async () => {
+    const urlLoaded = await loadLabelFromUrl();
+
+    if (urlLoaded) {
+      return;
     }
 
     try {
@@ -327,7 +336,7 @@
 
     await loadDefaultLabel();
 
-    window.addEventListener("hashchange", handleHashChange);
+    window.addEventListener("hashchange", loadLabelFromUrl);
 
     undo.push(fabricCanvas, labelProps);
 
@@ -428,21 +437,9 @@
     }
   });
 
-  const handleHashChange = async () => {
-    try {
-      const urlTemplate = await FileUtils.readLabelFromUrl();
-      if (urlTemplate !== null && confirm($tr("params.saved_labels.load.url.warn"))) {
-        onLoadRequested(urlTemplate);
-        Toasts.message($tr("params.saved_labels.load.url.loaded"));
-      }
-    } catch (e) {
-      Toasts.error(e);
-    }
-  };
-
   onDestroy(() => {
     fabricCanvas!.dispose();
-    window.removeEventListener("hashchange", handleHashChange);
+    window.removeEventListener("hashchange", loadLabelFromUrl);
   });
 
   $effect(() => {
