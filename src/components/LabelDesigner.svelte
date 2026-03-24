@@ -327,6 +327,8 @@
 
     await loadDefaultLabel();
 
+    window.addEventListener("hashchange", handleHashChange);
+
     undo.push(fabricCanvas, labelProps);
 
     // force close dropdowns on touch devices
@@ -426,8 +428,21 @@
     }
   });
 
+  const handleHashChange = async () => {
+    try {
+      const urlTemplate = await FileUtils.readLabelFromUrl();
+      if (urlTemplate !== null && confirm($tr("params.saved_labels.load.url.warn"))) {
+        onLoadRequested(urlTemplate);
+        Toasts.message($tr("params.saved_labels.load.url.loaded"));
+      }
+    } catch (e) {
+      Toasts.error(e);
+    }
+  };
+
   onDestroy(() => {
     fabricCanvas!.dispose();
+    window.removeEventListener("hashchange", handleHashChange);
   });
 
   $effect(() => {
