@@ -2,10 +2,10 @@ import QRCodeFactory from "qrcode-generator";
 import * as fabric from "fabric";
 import { OBJECT_SIZE_DEFAULTS } from "$/defaults";
 import { Range } from "$/types";
-import { toUTF8Array } from "$/utils/qrcode";
+import { stringToBytes } from "$/utils/qrcode";
 import { CanvasUtils } from "$/utils/canvas_utils";
 
-QRCodeFactory.stringToBytes = toUTF8Array;
+QRCodeFactory.stringToBytes = stringToBytes;
 
 export type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
 export type Mode = "Numeric" | "Alphanumeric" | "Byte" /* Default */ | "Kanji";
@@ -28,12 +28,8 @@ interface UniqueQRCodeProps {
   mode: Mode;
   qrVersion: QrVersion;
 }
-export interface QRCodeProps
-  extends fabric.FabricObjectProps,
-    UniqueQRCodeProps {}
-export interface SerializedQRCodeProps
-  extends fabric.SerializedObjectProps,
-    UniqueQRCodeProps {}
+export interface QRCodeProps extends fabric.FabricObjectProps, UniqueQRCodeProps {}
+export interface SerializedQRCodeProps extends fabric.SerializedObjectProps, UniqueQRCodeProps {}
 const QRCODE_PROPS = ["text", "ecl", "size", "mode", "qrVersion"] as const;
 
 export class QRCode<
@@ -48,29 +44,21 @@ export class QRCode<
 
   /**
    * QRCode text
-   * @type string
-   * @default "Text"
    */
   declare text: string;
 
   /**
    * Error Correction Level
-   * @type ErrorCorrectionLevel
-   * @default "M"
    */
   declare ecl: ErrorCorrectionLevel;
 
   /**
    * Mode
-   * @type Mode
-   * @default "M"
    */
   declare mode: Mode;
 
   /**
    * Version
-   * @type Mode
-   * @default "M"
    */
   declare qrVersion: QrVersion;
 
@@ -88,8 +76,6 @@ export class QRCode<
       tr: false,
       bl: false,
     });
-    // QRCodeFactory.stringToBytes = QRCodeFactory.stringToBytesFuncs["UTF-8"];
-
   }
 
   override _set(key: string, value: any): this {

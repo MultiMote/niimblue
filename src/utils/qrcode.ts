@@ -1,6 +1,7 @@
+import { Utils } from "@mmote/niimbluelib";
 
 // copied from node_modules/qrcode-generator/dist/qrcode_UTF8.mjs (not sure how to import it from TS)
-export const toUTF8Array = (str: string) => {
+export const toUTF8Array = (str: string): number[] => {
   const utf8 = [];
   for (let i = 0; i < str.length; i++) {
     let charcode = str.charCodeAt(i);
@@ -26,4 +27,19 @@ export const toUTF8Array = (str: string) => {
     }
   }
   return utf8;
+};
+
+export const stringToBytes = (str: string): number[] => {
+  if (str.startsWith("hex:")) {
+    const input = str.slice(4).replaceAll(" ", "").toLowerCase();
+    
+    if (input.length % 2 !== 0 || !/^[a-f0-9]+$/.test(input)) {
+      throw new Error("Invalid hex input");
+    }
+
+    const buf = Utils.hexToBuf(input);
+    return Array.from(buf);
+  }
+
+  return toUTF8Array(str);
 };
