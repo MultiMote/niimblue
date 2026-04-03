@@ -1,5 +1,6 @@
 import * as fabric from "fabric";
 import QRCode from "$/fabric-object/qrcode";
+import { DataMatrix } from "$/fabric-object/datamatrix";
 import Barcode from "$/fabric-object/barcode";
 import dayjs from "dayjs";
 import { TextboxExt } from "$/fabric-object/textbox-ext";
@@ -36,7 +37,7 @@ export const canvasPreprocess = (canvas: fabric.Canvas, variables?: { [key: stri
       } else {
         obj.set({ text });
       }
-    } else if (obj instanceof QRCode || obj instanceof Barcode) {
+    } else if (obj instanceof QRCode || obj instanceof Barcode || obj instanceof DataMatrix) {
       obj.set({ text: preprocessString(obj.text ?? "", variables) });
     }
   });

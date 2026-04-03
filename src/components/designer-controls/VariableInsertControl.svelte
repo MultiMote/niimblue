@@ -2,6 +2,7 @@
   import * as fabric from "fabric";
   import { tr } from "$/utils/i18n";
   import QRCode from "$/fabric-object/qrcode";
+  import { DataMatrix } from "$/fabric-object/datamatrix";
   import Barcode from "$/fabric-object/barcode";
   import MdIcon from "$/components/basic/MdIcon.svelte";
 
@@ -21,7 +22,7 @@
     if (selectedObject instanceof fabric.IText) {
       selectedObject.exitEditing();
       selectedObject.set({ text: `${selectedObject.text}${value}` });
-    } else if (selectedObject instanceof QRCode) {
+    } else if (selectedObject instanceof QRCode || selectedObject instanceof DataMatrix) {
       selectedObject.set({ text: `${selectedObject.text}${value}` });
     } else if (selectedObject instanceof Barcode) {
       selectedObject.set({ text: `${selectedObject.text}${value}` });
