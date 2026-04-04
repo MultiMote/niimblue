@@ -17,6 +17,7 @@
     "editor.objectpicker.image": "Grafik",
     "editor.objectpicker.line": "Linie",
     "editor.objectpicker.qrcode": "QR-Code",
+    "editor.objectpicker.datamatrix": "DataMatrix",
     "editor.objectpicker.rectangle": "Rechteck",
     "editor.objectpicker.text": "Text",
     "editor.objectpicker.title": "Objekt hinzufügen",

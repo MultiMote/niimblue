@@ -3,6 +3,7 @@ import { OBJECT_DEFAULTS, OBJECT_DEFAULTS_TEXT, OBJECT_DEFAULTS_VECTOR, OBJECT_S
 import { ArUcoMarker } from "$/fabric-object/aruco";
 import Barcode from "$/fabric-object/barcode";
 import { QRCode } from "$/fabric-object/qrcode";
+import { DataMatrix } from "$/fabric-object/datamatrix";
 import type { OjectType } from "$/types";
 import { Toasts } from "$/utils/toasts";
 import { FileUtils } from "$/utils/file_utils";
@@ -146,6 +147,16 @@ export class LabelDesignerObjectHelper {
     return qr;
   }
 
+  static addDataMatrix(canvas: fabric.Canvas): DataMatrix {
+    const dm = new DataMatrix({
+      text: "NiimBlue",
+      ...OBJECT_SIZE_DEFAULTS,
+      ...OBJECT_DEFAULTS,
+    });
+    canvas.add(dm);
+    return dm;
+  }
+
   static addArUco(canvas: fabric.Canvas): ArUcoMarker {
     const aruco = new ArUcoMarker({
       ...OBJECT_SIZE_DEFAULTS,
@@ -181,6 +192,8 @@ export class LabelDesignerObjectHelper {
         return;
       case "qrcode":
         return this.addQrCode(canvas);
+      case "datamatrix":
+        return this.addDataMatrix(canvas);
       case "aruco":
         return this.addArUco(canvas);
       case "barcode":

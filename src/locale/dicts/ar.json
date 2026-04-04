@@ -20,6 +20,7 @@
     "editor.objectpicker.image": "صورة",
     "editor.objectpicker.line": "خط",
     "editor.objectpicker.qrcode": "QR Code",
+    "editor.objectpicker.datamatrix": "DataMatrix",
     "editor.objectpicker.rectangle": "مستطيل",
     "editor.objectpicker.text": "نص",
     "editor.objectpicker.title": "أضف عنصر",

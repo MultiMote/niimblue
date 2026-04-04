@@ -5,6 +5,7 @@
   import { ArUcoMarker } from "$/fabric-object/aruco";
   import { Barcode } from "$/fabric-object/barcode";
   import { QRCode } from "$/fabric-object/qrcode";
+  import { DataMatrix } from "$/fabric-object/datamatrix";
   import { iconCodepoints, type MaterialIcon } from "$/styles/mdi_icons";
   import { automation, connectionState, csvData, loadedFonts } from "$/stores";
   import {
@@ -30,6 +31,7 @@
   import PrintPreview from "$/components/PrintPreview.svelte";
   import ArUcoParamsPanel from "$/components/designer-controls/ArUcoParamsControls.svelte";
   import QrCodeParamsPanel from "$/components/designer-controls/QRCodeParamsControls.svelte";
+  import DataMatrixParamsPanel from "$/components/designer-controls/DataMatrixParamsControls.svelte";
   import TextParamsControls from "$/components/designer-controls/TextParamsControls.svelte";
   import VariableInsertControl from "$/components/designer-controls/VariableInsertControl.svelte";
   import { DEFAULT_LABEL_PROPS, GRID_SIZE, OBJECT_DEFAULTS } from "$/defaults";
@@ -550,6 +552,10 @@
         {#if selectedObject instanceof QRCode}
           <QrCodeParamsPanel selectedQRCode={selectedObject} {editRevision} valueUpdated={controlValueUpdated} />
         {/if}
+        
+        {#if selectedObject instanceof DataMatrix}
+          <DataMatrixParamsPanel selectedDataMatrix={selectedObject} {editRevision} valueUpdated={controlValueUpdated} />
+        {/if}
 
         {#if selectedObject instanceof ArUcoMarker}
           <ArUcoParamsPanel selectedArUco={selectedObject} {editRevision} valueUpdated={controlValueUpdated} />
@@ -559,7 +565,7 @@
           <BarcodeParamsPanel selectedBarcode={selectedObject} {editRevision} valueUpdated={controlValueUpdated} />
         {/if}
 
-        {#if selectedObject instanceof fabric.IText || selectedObject instanceof QRCode || (selectedObject instanceof Barcode && selectedObject.encoding === "CODE128B")}
+        {#if selectedObject instanceof fabric.IText || selectedObject instanceof QRCode || selectedObject instanceof DataMatrix || (selectedObject instanceof Barcode && selectedObject.encoding === "CODE128B")}
           <VariableInsertControl {selectedObject} valueUpdated={controlValueUpdated} />
         {/if}
       </div>

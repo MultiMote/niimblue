@@ -20,6 +20,7 @@
     "editor.objectpicker.image": "Kép",
     "editor.objectpicker.line": "Vonal",
     "editor.objectpicker.qrcode": "QR-kód",
+    "editor.objectpicker.datamatrix": "DataMatrix",
     "editor.objectpicker.rectangle": "Négyzet",
     "editor.objectpicker.text": "Szöveg",
     "editor.objectpicker.title": "Elem beszúrása",

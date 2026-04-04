@@ -17,6 +17,7 @@
     "editor.objectpicker.image": "图片",
     "editor.objectpicker.line": "线条",
     "editor.objectpicker.qrcode": "二维码",
+    "editor.objectpicker.datamatrix": "DataMatrix",
     "editor.objectpicker.rectangle": "矩形",
     "editor.objectpicker.text": "文字",
     "editor.objectpicker.title": "添加元素",

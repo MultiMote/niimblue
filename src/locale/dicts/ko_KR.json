@@ -20,6 +20,7 @@
     "editor.objectpicker.image": "이미지",
     "editor.objectpicker.line": "선",
     "editor.objectpicker.qrcode": "QR 코드",
+    "editor.objectpicker.datamatrix": "DataMatrix",
     "editor.objectpicker.rectangle": "사각형",
     "editor.objectpicker.text": "텍스트",
     "editor.objectpicker.title": "개체 추가",
