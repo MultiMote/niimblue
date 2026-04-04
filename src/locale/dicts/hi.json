@@ -27,6 +27,7 @@
     "editor.objectpicker.image": "इमेज",
     "editor.objectpicker.line": "लाइन",
     "editor.objectpicker.qrcode": "क्यूआर कोड",
+    "editor.objectpicker.datamatrix": "DataMatrix",
     "editor.objectpicker.rectangle": "आयत (Rectangle)",
     "editor.objectpicker.text": "टेक्स्ट",
     "editor.objectpicker.title": "ऑब्जेक्ट जोड़ें",

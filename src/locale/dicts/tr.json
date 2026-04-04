@@ -20,6 +20,7 @@
     "editor.objectpicker.image": "Resim",
     "editor.objectpicker.line": "Çizgi",
     "editor.objectpicker.qrcode": "QR Kod",
+    "editor.objectpicker.datamatrix": "DataMatrix",
     "editor.objectpicker.rectangle": "Dikdörtgen",
     "editor.objectpicker.text": "Metin",
     "editor.objectpicker.title": "Nesne ekle",

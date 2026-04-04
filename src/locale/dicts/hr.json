@@ -18,6 +18,7 @@
     "editor.objectpicker.image": "Slika",
     "editor.objectpicker.line": "Linija",
     "editor.objectpicker.qrcode": "QR kod",
+    "editor.objectpicker.datamatrix": "DataMatrix",
     "editor.objectpicker.rectangle": "Pravokutnik",
     "editor.objectpicker.text": "Tekst",
     "editor.objectpicker.title": "Dodaj objekt",

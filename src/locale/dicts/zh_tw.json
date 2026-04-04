@@ -20,6 +20,7 @@
     "editor.objectpicker.image": "圖片",
     "editor.objectpicker.line": "線條",
     "editor.objectpicker.qrcode": "QR Code",
+    "editor.objectpicker.datamatrix": "DataMatrix",
     "editor.objectpicker.rectangle": "矩形",
     "editor.objectpicker.text": "文字",
     "editor.objectpicker.title": "新增物件",

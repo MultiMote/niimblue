@@ -17,6 +17,7 @@
     "editor.objectpicker.image": "Obrázek",
     "editor.objectpicker.line": "Čára",
     "editor.objectpicker.qrcode": "QR Kód",
+    "editor.objectpicker.datamatrix": "DataMatrix",
     "editor.objectpicker.rectangle": "Obdélník",
     "editor.objectpicker.text": "Text",
     "editor.objectpicker.title": "Přidat objekt",

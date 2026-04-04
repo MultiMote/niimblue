@@ -20,6 +20,7 @@
     "editor.objectpicker.image": "Imagen",
     "editor.objectpicker.line": "Línea",
     "editor.objectpicker.qrcode": "Código QR",
+    "editor.objectpicker.datamatrix": "DataMatrix",
     "editor.objectpicker.rectangle": "Rectángulo",
     "editor.objectpicker.text": "Texto",
     "editor.objectpicker.title": "Añadir objeto",

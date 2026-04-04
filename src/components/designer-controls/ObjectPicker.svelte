@@ -51,7 +51,7 @@
       </button>
       <button class="btn me-1" onclick={() => onSubmit("datamatrix")}>
         <MdIcon icon="qr_code_2" />
-        DataMatrix
+        {$tr("editor.objectpicker.datamatrix")}
       </button>      
       <button class="btn me-1" onclick={() => onSubmit("aruco")}>
         <MdIcon icon="grid_on" />

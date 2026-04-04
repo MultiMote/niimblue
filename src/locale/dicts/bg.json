@@ -30,6 +30,7 @@
     "editor.objectpicker.image": "Изображение",
     "editor.objectpicker.line": "Ред",
     "editor.objectpicker.qrcode": "Код на QR",
+    "editor.objectpicker.datamatrix": "DataMatrix",
     "editor.objectpicker.rectangle": "Правоъгълник",
     "editor.objectpicker.text": "Текст",
     "editor.objectpicker.title": "Добавяне на обект",
