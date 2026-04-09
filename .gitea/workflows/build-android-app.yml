@@ -49,7 +49,10 @@ jobs:
           log-accepted-android-sdk-licenses: false
 
       - name: Add build tools to PATH for apksigner
-        run: echo "$ANDROID_HOME/build-tools/34.0.0" >> $GITEA_PATH
+        run: |
+          LATEST_BUILD_TOOLS=$(ls -1 "$ANDROID_HOME/build-tools" | sort -V | tail -n 1)
+          echo "Adding build-tools $LATEST_BUILD_TOOLS to PATH"
+          echo "$ANDROID_HOME/build-tools/$LATEST_BUILD_TOOLS" >> $GITEA_PATH
 
       - name: Decode Keystore
         run: mkdir -p .keystore && echo $KEYSTORE_BASE_64 | base64 -d > .keystore/keystore.jks
