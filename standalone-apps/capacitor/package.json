@@ -11,19 +11,22 @@
     "run-ios": "cap sync ios && cap run ios"
   },
   "dependencies": {
-    "@capacitor-community/bluetooth-le": "^7.1.0",
-    "@capacitor/android": "^7.4.5",
-    "@capacitor/core": "^7.4.5",
-    "@capacitor/filesystem": "^7.1.6",
-    "@capacitor/ios": "^7.4.5",
-    "@capacitor/share": "^7.0.3",
-    "@capacitor/splash-screen": "^7.0.4"
+    "@capacitor-community/bluetooth-le": "^8.1.3",
+    "@capacitor/android": "^8.3.0",
+    "@capacitor/core": "^8.3.0",
+    "@capacitor/filesystem": "^8.1.2",
+    "@capacitor/ios": "^8.3.0",
+    "@capacitor/share": "^8.0.1",
+    "@capacitor/splash-screen": "^8.0.1"
   },
   "devDependencies": {
-    "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "^7.4.5"
+    "@capacitor/cli": "^8.3.0"
   },
-
+  "overrides": {
+    "@capacitor/cli": {
+      "tar": "^7.5.11"
+    }
+  },
   "author": "MultiMote",
   "license": "MIT"
 }
