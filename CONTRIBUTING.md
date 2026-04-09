@@ -11,3 +11,5 @@ Thank you for your interest in contributing to NiimBlue!
 - Do not submit "format all files" pull requests.
 
 - Avoid Mobile-Only UI changes. If you want to make UI changes, please make sure they work well on both desktop and mobile.
+
+- Run `npm run sv-check` and `npm run lint` before submitting pull request.
