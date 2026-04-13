@@ -82,5 +82,6 @@
     "params.label.shape": "Etikettform",
     "params.label.size": "Storlek",
     "params.label.split": "Etikettindelning",
-    "params.label.split.count": "Dela upp delar"
+    "params.label.split.count": "Dela upp delar",
+    "debug.packet_interval.help": "Åsidosätt paketintervallet. En uppdatering av sidan krävs. Något kan gå sönder om värdet är för lågt."
 }
