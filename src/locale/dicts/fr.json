@@ -127,5 +127,13 @@
     "preview.print.system": "Imprimer avec l'imprimante du système",
     "preview.print": "Imprimer",
     "preview.threshold": "Seuil",
-    "preview.title": "Aperçu d'impression"
+    "preview.title": "Aperçu d'impression",
+    "browser_warning.fingerprinting": "Attention ! Il semble que votre navigateur déforme le canvas pour se protéger contre le fingerprinting. Veuillez désactiver cette protection, car elle peut causer des défauts d'affichage sur les étiquettes.",
+    "debug.page_delay.help": "Ajoutez un délai (1000, par exemple) si vous avez des problèmes d'impression multi-pages.",
+    "debug.packet_interval.help": "Remplacez l'intervalle des paquets. Un rechargement de la page est requis. Certains éléments peuvent ne pas fonctionner correctement si la valeur est trop faible.",
+    "editor.warning.load.csv": "Les données CSV seront également remplacées",
+    "params.generic.arrange.top": "Mettre en avant",
+    "params.generic.arrange.bottom": "Mettre en arrière plan",
+    "params.label.warning.div8": "La largeur de l'étiquette en pixels doit être divisible par 8",
+    "params.saved_labels.save.withcsv": "Les données dynamiques (CSV) sont activées, elles seront donc incluses dans l'étiquette sauvegardée"
 }
