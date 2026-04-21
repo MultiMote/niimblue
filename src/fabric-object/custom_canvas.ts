@@ -29,6 +29,7 @@ export class CustomCanvas extends fabric.Canvas {
   private highlightMirror: boolean = true;
   private gridEnabled: boolean = false;
   private virtualZoomRatio: number = 1;
+  onZoomChange?: (zoom: number) => void;
 
   constructor(
     el?: string | HTMLCanvasElement,
@@ -69,6 +70,9 @@ export class CustomCanvas extends fabric.Canvas {
       },
       { cssOnly: true },
     );
+    if (this.onZoomChange) {
+      this.onZoomChange(this.virtualZoomRatio);
+    }
   }
 
   public virtualZoomIn() {

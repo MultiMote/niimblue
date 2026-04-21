@@ -51,6 +51,7 @@
   let csvEnabled = $state<boolean>(false);
   let windowWidth = $state<number>(0);
   let undoState = $state<UndoState>({ undoDisabled: false, redoDisabled: false });
+  let zoomText = $state<string>("100%");
 
   const undo = new UndoRedo();
 
@@ -339,6 +340,9 @@
       height: labelProps.size.height,
     });
     fabricCanvas.setLabelProps(labelProps);
+    fabricCanvas.onZoomChange = (z) => {
+      zoomText = Math.round(z * 100) + "%";
+    };
     fabricCanvas.setGridEnabled($appConfig.gridEnabled ?? false);
 
     await loadDefaultLabel();
@@ -513,6 +517,13 @@
           onclick={toggleGrid}
           title={$tr("editor.grid")}>
           <MdIcon icon="grid_on" />
+        </button>
+
+        <button
+          class="btn btn-sm btn-secondary"
+          onclick={() => fabricCanvas?.resetVirtualZoom()}
+          title="Reset zoom">
+          {zoomText}
         </button>
 
         <CsvControl bind:enabled={csvEnabled} onPlaceholderPicked={onCsvPlaceholderPicked} />
