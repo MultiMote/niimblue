@@ -1,5 +1,5 @@
 import * as fabric from "fabric";
-import { DEFAULT_LABEL_PROPS } from "$/defaults";
+import { DEFAULT_LABEL_PROPS, GRID_SIZE } from "$/defaults";
 import type { LabelProps } from "$/types";
 
 type LabelBounds = {
@@ -27,6 +27,7 @@ export class CustomCanvas extends fabric.Canvas {
   private readonly MIRROR_GHOST_COLOR = "rgba(0, 0, 0, 0.3)";
   private customBackground: boolean = true;
   private highlightMirror: boolean = true;
+  private gridEnabled: boolean = false;
   private virtualZoomRatio: number = 1;
 
   constructor(
@@ -97,6 +98,11 @@ export class CustomCanvas extends fabric.Canvas {
 
   setHighlightMirror(value: boolean) {
     this.highlightMirror = value;
+  }
+
+  setGridEnabled(value: boolean) {
+    this.gridEnabled = value;
+    this.requestRenderAll();
   }
 
   /** Get label bounds without tail */
@@ -301,6 +307,25 @@ export class CustomCanvas extends fabric.Canvas {
     }
 
     ctx.stroke();
+
+    // Draw grid
+    if (this.gridEnabled) {
+      ctx.setLineDash([]);
+      ctx.strokeStyle = "rgba(100, 100, 255, 0.25)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+
+      const step = GRID_SIZE * 5;
+      for (let x = bb.startX + step; x < bb.endX; x += step) {
+        ctx.moveTo(x, bb.startY);
+        ctx.lineTo(x, bb.endY);
+      }
+      for (let y = bb.startY + step; y < bb.endY; y += step) {
+        ctx.moveTo(bb.startX, y);
+        ctx.lineTo(bb.endX, y);
+      }
+      ctx.stroke();
+    }
 
     ctx.restore();
   }
