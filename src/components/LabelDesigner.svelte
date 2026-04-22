@@ -275,7 +275,7 @@
   };
 
   const toggleGrid = () => {
-    const newVal = !($appConfig.gridEnabled ?? false);
+    const newVal = !$appConfig.gridEnabled;
     appConfig.update((cfg) => ({ ...cfg, gridEnabled: newVal }));
     fabricCanvas?.setGridEnabled(newVal);
   };
@@ -343,7 +343,7 @@
     fabricCanvas.onZoomChange = (z) => {
       zoomText = Math.round(z * 100) + "%";
     };
-    fabricCanvas.setGridEnabled($appConfig.gridEnabled ?? false);
+    fabricCanvas.setGridEnabled($appConfig.gridEnabled);
 
     await loadDefaultLabel();
 
