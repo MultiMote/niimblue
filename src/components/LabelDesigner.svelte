@@ -343,7 +343,7 @@
     fabricCanvas.onZoomChange = (z) => {
       zoomText = Math.round(z * 100) + "%";
     };
-    fabricCanvas.setGridEnabled($appConfig.gridEnabled);
+    fabricCanvas.setGridEnabled(!!$appConfig.gridEnabled);
 
     await loadDefaultLabel();
 
