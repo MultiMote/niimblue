@@ -6,7 +6,7 @@
   import { Barcode } from "$/fabric-object/barcode";
   import { QRCode } from "$/fabric-object/qrcode";
   import { iconCodepoints, type MaterialIcon } from "$/styles/mdi_icons";
-  import { automation, connectionState, csvData, loadedFonts } from "$/stores";
+  import { appConfig, automation, connectionState, csvData, loadedFonts } from "$/stores";
   import {
     type ExportedLabelTemplate,
     type FabricJson,
@@ -51,6 +51,7 @@
   let csvEnabled = $state<boolean>(false);
   let windowWidth = $state<number>(0);
   let undoState = $state<UndoState>({ undoDisabled: false, redoDisabled: false });
+  let zoomText = $state<string>("100%");
 
   const undo = new UndoRedo();
 
@@ -273,6 +274,12 @@
     fabricCanvas!.clear();
   };
 
+  const toggleGrid = () => {
+    const newVal = !$appConfig.gridEnabled;
+    appConfig.update((cfg) => ({ ...cfg, gridEnabled: newVal }));
+    fabricCanvas?.setGridEnabled(newVal);
+  };
+
   const loadLabelFromUrl = async () => {
     try {
       const urlTemplate = await FileUtils.readLabelFromUrl();
@@ -333,6 +340,10 @@
       height: labelProps.size.height,
     });
     fabricCanvas.setLabelProps(labelProps);
+    fabricCanvas.onZoomChange = (z) => {
+      zoomText = Math.round(z * 100) + "%";
+    };
+    fabricCanvas.setGridEnabled(!!$appConfig.gridEnabled);
 
     await loadDefaultLabel();
 
@@ -499,6 +510,20 @@
           onclick={() => undo.redo()}
           title={$tr("editor.redo")}>
           <MdIcon icon="redo" />
+        </button>
+
+        <button
+          class="btn btn-sm {$appConfig.gridEnabled ? 'btn-primary' : 'btn-secondary'}"
+          onclick={toggleGrid}
+          title={$tr("editor.grid")}>
+          <MdIcon icon="grid_on" />
+        </button>
+
+        <button
+          class="btn btn-sm btn-secondary"
+          onclick={() => fabricCanvas?.resetVirtualZoom()}
+          title="Reset zoom">
+          {zoomText}
         </button>
 
         <CsvControl bind:enabled={csvEnabled} onPlaceholderPicked={onCsvPlaceholderPicked} />
