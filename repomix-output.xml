@@ -115,6 +115,7 @@ standalone-apps/capacitor/android/app/capacitor.build.gradle
 standalone-apps/capacitor/android/app/proguard-rules.pro
 standalone-apps/capacitor/android/app/src/main/AndroidManifest.xml
 standalone-apps/capacitor/android/app/src/main/java/ru/mmote/niimblues/MainActivity.java
+standalone-apps/capacitor/android/app/src/main/java/ru/mmote/niimblues/PdfIntentPlugin.java
 standalone-apps/capacitor/android/build.gradle
 standalone-apps/capacitor/android/capacitor.settings.gradle
 standalone-apps/capacitor/android/gradle.properties
@@ -164,54 +165,6 @@ CLAUDE.md
   "useTabs": false,
   "plugins": ["prettier-plugin-svelte"]
 }
-</file>
-
-<file path=".repomixignore">
-# --- Lockfiles & Dependencies ---
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-
-# --- Media & Images (LLMs can't read code from images) ---
-*.png
-*.jpg
-*.jpeg
-*.ico
-*.svg
-*.webmanifest
-*.lnk
-
-# --- Translations / Locales (Usually massive and irrelevant to logic) ---
-src/locale/dicts/
-
-# --- Generated / Asset Lists ---
-# Assuming this is a massive list of Material Design Icons
-src/styles/mdi_icons.ts 
-gen-mdi-list.mjs
-
-# --- CI/CD & Repository Metadata ---
-.gitea/
-.github/
-.dockerignore
-LICENSE
-
-# --- iOS Boilerplate & Assets ---
-standalone-apps/capacitor/ios/App/App/Assets.xcassets/
-standalone-apps/capacitor/ios/App/App.xcodeproj/
-standalone-apps/capacitor/ios/App/App.xcworkspace/
-standalone-apps/capacitor/ios/App/App/Base.lproj/
-
-# --- Android Boilerplate & Assets ---
-standalone-apps/capacitor/android/app/src/main/res/
-standalone-apps/capacitor/android/gradle/
-standalone-apps/capacitor/android/gradlew
-standalone-apps/capacitor/android/gradlew.bat
-*.jar
-
-# --- Build Outputs (Just in case you generated them locally) ---
-dist/
-build/
-.svelte-kit/
 </file>
 
 <file path="eslint.config.js">
@@ -2046,6 +1999,54 @@ export default config;
 }
 </file>
 
+<file path=".repomixignore">
+# --- Lockfiles & Dependencies ---
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# --- Media & Images (LLMs can't read code from images) ---
+*.png
+*.jpg
+*.jpeg
+*.ico
+*.svg
+*.webmanifest
+*.lnk
+
+# --- Translations / Locales (Usually massive and irrelevant to logic) ---
+src/locale/dicts/
+
+# --- Generated / Asset Lists ---
+# Assuming this is a massive list of Material Design Icons
+src/styles/mdi_icons.ts 
+gen-mdi-list.mjs
+
+# --- CI/CD & Repository Metadata ---
+.gitea/
+.github/
+.dockerignore
+LICENSE
+
+# --- iOS Boilerplate & Assets ---
+standalone-apps/capacitor/ios/App/App/Assets.xcassets/
+standalone-apps/capacitor/ios/App/App.xcodeproj/
+standalone-apps/capacitor/ios/App/App.xcworkspace/
+standalone-apps/capacitor/ios/App/App/Base.lproj/
+
+# --- Android Boilerplate & Assets ---
+standalone-apps/capacitor/android/app/src/main/res/
+standalone-apps/capacitor/android/gradle/
+standalone-apps/capacitor/android/gradlew
+standalone-apps/capacitor/android/gradlew.bat
+*.jar
+
+# --- Build Outputs (Just in case you generated them locally) ---
+dist/
+build/
+.svelte-kit/
+</file>
+
 <file path="Dockerfile">
 FROM node:25-alpine AS builder
 
@@ -2064,45 +2065,6 @@ FROM nginx:1.27-alpine AS server
 COPY --from=builder /app/dist/ /usr/share/nginx/html/
 
 EXPOSE 80
-</file>
-
-<file path="src/App.svelte">
-<script lang="ts">
-  import { onMount } from "svelte";
-  import MainPage from "$/components/MainPage.svelte";
-
-  // This variable will hold our rendered PDF image
-  let pdfImageSrc: string | null = null;
-
-  onMount(() => {
-    // Listen for the custom event sent from our Java code!
-    window.addEventListener('pdfReceived', (event: any) => {
-      console.log("PDF intercept triggered in Svelte!");
-      
-      // Grab the Base64 image string from the event detail
-      pdfImageSrc = event.detail;
-    });
-  });
-</script>
-
-<!-- The main NiimBlue application -->
-<MainPage />
-
-<!-- TEST UI: If we receive a PDF, show it in a massive box so we know it worked! -->
-{#if pdfImageSrc}
-  <div style="position: absolute; top: 50px; left: 50px; right: 50px; z-index: 9999; background: white; padding: 20px; border: 4px solid green; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
-    <h3 style="color: black; margin-top: 0;">Success! PDF Received:</h3>
-    <img src={pdfImageSrc} alt="PDF converted to image" style="width: 100%; border: 1px solid #ccc; margin-bottom: 15px;" />
-    
-    <div style="display: flex; gap: 10px;">
-      <button 
-        style="padding: 10px; background: red; color: white; border: none; flex: 1;" 
-        on:click={() => pdfImageSrc = null}>
-        Close
-      </button>
-    </div>
-  </div>
-{/if}
 </file>
 
 <file path="src/components/basic/FirmwareUpdater.svelte">
@@ -4204,6 +4166,114 @@ if (hasProperty('postBuildExtras')) {
 #-renamesourcefileattribute SourceFile
 </file>
 
+<file path="standalone-apps/capacitor/android/app/src/main/java/ru/mmote/niimblues/PdfIntentPlugin.java">
+package ru.mmote.niimblues;
+
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.pdf.PdfRenderer;
+import android.net.Uri;
+import android.os.ParcelFileDescriptor;
+import android.util.Base64;
+import android.util.Log;
+
+import com.getcapacitor.JSObject;
+import com.getcapacitor.Plugin;
+import com.getcapacitor.PluginCall;
+import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.CapacitorPlugin;
+
+import java.io.ByteArrayOutputStream;
+
+@CapacitorPlugin(name = "PdfIntent")
+public class PdfIntentPlugin extends Plugin {
+
+    // 1. Svelte explicitly calls this when it finishes loading
+    @PluginMethod
+    public void checkIntent(PluginCall call) {
+        Intent intent = getActivity().getIntent();
+        processAndResolve(intent, call, null);
+    }
+
+    // 2. Android calls this if the app is already open in the background
+    @Override
+    protected void handleOnNewIntent(Intent intent) {
+        super.handleOnNewIntent(intent);
+        getActivity().setIntent(intent); // Update the activity's intent
+        processAndResolve(intent, null, "onPdfReceived");
+    }
+
+    private void processAndResolve(Intent intent, PluginCall call, String eventName) {
+        if (intent == null) {
+            if (call != null) call.resolve(new JSObject());
+            return;
+        }
+
+        String action = intent.getAction();
+        Uri pdfUri = null;
+
+        // Safely extract the URI depending on the intent type
+        if (Intent.ACTION_SEND.equals(action)) {
+            pdfUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        } else if (Intent.ACTION_VIEW.equals(action)) {
+            pdfUri = intent.getData();
+        }
+
+        if (pdfUri == null) {
+            if (call != null) call.resolve(new JSObject());
+            return;
+        }
+
+        Uri finalUri = pdfUri;
+        
+        // 3. Process the PDF in a background thread so we don't freeze the app
+        new Thread(() -> {
+            try {
+                ParcelFileDescriptor fd = getContext().getContentResolver().openFileDescriptor(finalUri, "r");
+                if (fd == null) throw new Exception("Android returned a null file descriptor for the PDF.");
+                
+                PdfRenderer renderer = new PdfRenderer(fd);
+                if (renderer.getPageCount() == 0) throw new Exception("The PDF file has 0 pages.");
+                
+                PdfRenderer.Page page = renderer.openPage(0);
+
+                // 800px width for decent print quality
+                int width = 800;
+                int height = (int) (width * ((float) page.getHeight() / page.getWidth()));
+                Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+                bitmap.eraseColor(Color.WHITE);
+                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT);
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                String base64Image = "data:image/png;base64," + Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP);
+
+                page.close();
+                renderer.close();
+                fd.close();
+
+                // Clear the intent so refreshing the webview doesn't process it again
+                getActivity().setIntent(new Intent());
+
+                JSObject ret = new JSObject();
+                ret.put("image", base64Image);
+
+                if (call != null) call.resolve(ret);
+                if (eventName != null) notifyListeners(eventName, ret);
+
+            } catch (Exception e) {
+                Log.e("PdfIntentPlugin", "PDF Error", e);
+                if (call != null) {
+                    call.reject(e.getMessage() != null ? e.getMessage() : "Unknown PDF processing error");
+                }
+            }
+        }).start();
+    }
+}
+</file>
+
 <file path="standalone-apps/capacitor/android/capacitor.settings.gradle">
 // DO NOT EDIT THIS FILE! IT IS GENERATED EACH TIME "capacitor update" IS RUN
 include ':capacitor-android'
@@ -4693,6 +4763,68 @@ Thank you for your interest in contributing to NiimBlue!
 - Run `npm run sv-check` and `npm run lint` before submitting pull request.
 </file>
 
+<file path="src/App.svelte">
+<script lang="ts">
+  import { onMount } from "svelte";
+  import MainPage from "$/components/MainPage.svelte";
+  import { registerPlugin, Capacitor } from "@capacitor/core";
+
+  const PdfIntent = registerPlugin('PdfIntent');
+
+  let pdfImageSrc: string | null = null;
+  let debugError: string | null = null;
+
+  onMount(async () => {
+    if (Capacitor.getPlatform() === 'android') {
+      
+      // 1. Listen for PDFs if the app is already open in the background
+      PdfIntent.addListener('onPdfReceived', (info: any) => {
+        if (info && info.image) {
+          pdfImageSrc = info.image;
+        }
+      });
+
+      // 2. Explicitly ask Java: "Did a PDF launch this app?"
+      try {
+        const result = await PdfIntent.checkIntent();
+        if (result && result.image) {
+          pdfImageSrc = result.image;
+        }
+      } catch (e: any) {
+        debugError = e.message || String(e);
+        console.error("PDF Intent Error:", e);
+      }
+    }
+  });
+</script>
+
+<MainPage />
+
+<!-- Display the PDF if successful -->
+{#if pdfImageSrc}
+  <div style="position: absolute; top: 50px; left: 50px; right: 50px; z-index: 9999; background: white; padding: 20px; border: 4px solid green; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+    <h3 style="color: black; margin-top: 0;">Success! PDF Received:</h3>
+    <img src={pdfImageSrc} alt="PDF converted to image" style="width: 100%; border: 1px solid #ccc; margin-bottom: 15px;" />
+    <div style="display: flex; gap: 10px;">
+      <button style="padding: 10px; background: red; color: white; border: none; flex: 1;" onclick={() => pdfImageSrc = null}>
+        Close
+      </button>
+    </div>
+  </div>
+{/if}
+
+<!-- Display the ERROR if it failed -->
+{#if debugError}
+  <div style="position: absolute; top: 50px; left: 50px; right: 50px; z-index: 9999; background: white; padding: 20px; border: 4px solid red; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+    <h3 style="color: red; margin-top: 0;">PDF Import Failed:</h3>
+    <p style="color: black; word-wrap: break-word;">{debugError}</p>
+    <button style="padding: 10px; background: black; color: white; border: none; width: 100%;" onclick={() => debugError = null}>
+      Close
+    </button>
+  </div>
+{/if}
+</file>
+
 <file path="src/components/basic/AppModal.svelte">
 <script lang="ts">
   import Modal from "bootstrap/js/dist/modal";
@@ -4870,6 +5002,161 @@ Thank you for your interest in contributing to NiimBlue!
 <style>
   .input-group {
     width: fit-content;
+  }
+</style>
+</file>
+
+<file path="src/components/designer-controls/IconPicker.svelte">
+<script lang="ts">
+  import { onDestroy, onMount } from "svelte";
+  import { tr } from "$/utils/i18n";
+  import { iconCodepoints, type MaterialIcon } from "$/styles/mdi_icons";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { appConfig, userIcons } from "$/stores";
+  import { FileUtils } from "$/utils/file_utils";
+  import { Toasts } from "$/utils/toasts";
+
+  interface Props {
+    onSubmit: (i: MaterialIcon) => void;
+    onSubmitSvg: (i: string) => void;
+  }
+
+  let { onSubmit, onSubmitSvg }: Props = $props();
+
+  let iconNames = $state<MaterialIcon[]>([]);
+  let search = $state<string>("");
+  let deleteMode = $state<boolean>(false);
+  let dropdown: HTMLDivElement;
+
+  const onShow = () => {
+    if (iconNames.length === 0) {
+      iconNames = Object.keys(iconCodepoints) as MaterialIcon[];
+    }
+  };
+
+  const addOwn = async () => {
+    try {
+      let counter = 0;
+      const xmls = await FileUtils.pickAndReadTextFile("svg", true);
+      const iconsToAdd = xmls.map((xml) => ({
+        name: `i_${FileUtils.timestampFloat()}_${counter++}`,
+        data: xml,
+      }));
+
+      userIcons.update((prev) => [...prev, ...iconsToAdd]);
+    } catch (e) {
+      Toasts.error(e);
+    }
+  };
+
+  const svgClicked = (name: string, data: string) => {
+    if (deleteMode) {
+      userIcons.update((prev) => prev.filter((e) => e.name !== name));
+      return;
+    }
+
+    onSubmitSvg(data);
+  };
+
+  const iconClicked = (i: MaterialIcon) => {
+    if (deleteMode) {
+      return;
+    }
+
+    onSubmit(i);
+  };
+
+  onMount(() => {
+    dropdown?.addEventListener("show.bs.dropdown", onShow);
+  });
+
+  onDestroy(() => {
+    dropdown?.removeEventListener("show.bs.dropdown", onShow);
+  });
+</script>
+
+<div class="dropdown" bind:this={dropdown}>
+  <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+    <MdIcon icon="emoji_emotions" />
+    <MdIcon icon="add" />
+  </button>
+
+  <div class="dropdown-menu">
+    <h6 class="dropdown-header">{$tr("editor.iconpicker.title")}</h6>
+    <div class="p-3">
+      <input
+        disabled={$appConfig.iconListMode === "user"}
+        type="text"
+        class="form-control mb-1"
+        placeholder={$tr("editor.iconpicker.search")}
+        bind:value={search} />
+
+      <div class="input-group input-group-sm mb-1">
+        <span class="input-group-text">{$tr("editor.iconpicker.show")}</span>
+        <select class="form-select form-select-sm" bind:value={$appConfig.iconListMode}>
+          <option value="both">{$tr("editor.iconpicker.show.both")}</option>
+          <option value="user">{$tr("editor.iconpicker.show.user")}</option>
+          <option value="pack">{$tr("editor.iconpicker.show.pack")}</option>
+        </select>
+      </div>
+
+      <div class="icons mb-1">
+        {#if $appConfig.iconListMode === "both" || $appConfig.iconListMode === "user"}
+          {#each $userIcons as { name, data } (name)}
+            <button
+              class="btn {deleteMode ? 'btn-danger' : 'btn-light'} me-1 mb-1 user-icon"
+              onclick={() => svgClicked(name, data)}>
+              <img src="data:image/svg+xml;base64,{FileUtils.base64str(data)}" alt="user-svg" />
+            </button>
+          {/each}
+        {/if}
+
+        {#if $appConfig.iconListMode === "both" || $appConfig.iconListMode === "pack"}
+          {#each iconNames as name (name)}
+            {#if !search || name.includes(search.toLowerCase())}
+              <button class="btn me-1" title={name} onclick={() => iconClicked(name)}>
+                <MdIcon icon={name} />
+              </button>
+            {/if}
+          {/each}
+        {/if}
+      </div>
+
+      <div class="input-group input-group-sm mb-1">
+        <button class="btn btn-outline-secondary" onclick={addOwn}>
+          <MdIcon icon="add" />
+
+          {$tr("editor.iconpicker.add")}
+        </button>
+        <button
+          class="btn {deleteMode ? 'btn-danger' : 'btn-outline-secondary'}"
+          onclick={() => (deleteMode = !deleteMode)}>
+          <MdIcon icon="delete" />
+          {$tr("editor.iconpicker.delete_mode")}
+        </button>
+      </div>
+
+      <a
+        href="https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Filled"
+        target="_blank"
+        class="text-secondary">
+        {$tr("editor.iconpicker.mdi_link_title")}
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .dropdown-menu {
+    width: 100vw;
+    max-width: 450px;
+  }
+  .icons {
+    max-height: 400px;
+    overflow-y: scroll;
+  }
+  .user-icon img {
+    width: 24px;
   }
 </style>
 </file>
@@ -5599,6 +5886,168 @@ fabric.classRegistry.setClass(Barcode, "Barcode");
 export default Barcode;
 </file>
 
+<file path="src/stores.ts">
+import { get, readable, writable } from "svelte/store";
+import {
+  AppConfigSchema,
+  CsvParamsSchema,
+  UserFontSchema,
+  UserIconSchema,
+  type CsvParams,
+  type UserFont,
+  type UserIcon,
+  type AppConfig,
+  type AutomationProps,
+  type ConnectionState,
+  type ConnectionType,
+} from "$/types";
+import {
+  NiimbotBluetoothClient,
+  NiimbotCapacitorBleClient,
+  NiimbotSerialClient,
+  RequestCommandId,
+  ResponseCommandId,
+  Utils,
+  instantiateClient,
+  type HeartbeatData,
+  type NiimbotAbstractClient,
+  type PrinterInfo,
+  type PrinterModelMeta,
+  type RfidInfo,
+} from "@mmote/niimbluelib";
+import { Toasts } from "$/utils/toasts";
+import { tr } from "$/utils/i18n";
+import { LocalStoragePersistence, writablePersisted } from "$/utils/persistence";
+import { APP_CONFIG_DEFAULTS, CSV_DEFAULT, OBJECT_DEFAULTS_TEXT } from "$/defaults";
+import z from "zod";
+import { FileUtils } from "$/utils/file_utils";
+
+export const fontCache = writable<string[]>([OBJECT_DEFAULTS_TEXT.fontFamily]);
+export const appConfig = writablePersisted<AppConfig>("config", AppConfigSchema, APP_CONFIG_DEFAULTS);
+export const userIcons = writablePersisted<UserIcon[]>("user_icons", z.array(UserIconSchema), []);
+export const userFonts = writablePersisted<UserFont[]>("user_fonts", z.array(UserFontSchema), []);
+export const loadedFonts = writable<FontFace[]>([]);
+
+export const connectionState = writable<ConnectionState>("disconnected");
+export const connectedPrinterName = writable<string>("");
+export const printerClient = writable<NiimbotAbstractClient>();
+export const heartbeatData = writable<HeartbeatData>();
+export const printerInfo = writable<PrinterInfo>();
+export const rfidInfo = writable<RfidInfo | undefined>();
+export const ribbonRfidInfo = writable<RfidInfo | undefined>();
+export const printerMeta = writable<PrinterModelMeta | undefined>();
+export const heartbeatFails = writable<number>(0);
+export const csvData = writablePersisted<CsvParams>("csv_params", CsvParamsSchema, { data: CSV_DEFAULT });
+
+userFonts.subscribe(FileUtils.loadFonts);
+
+export const automation = readable<AutomationProps | undefined>(
+  (() => {
+    try {
+      return LocalStoragePersistence.loadAutomation() ?? undefined;
+    } catch (e) {
+      console.error(e);
+    }
+    return undefined;
+  })(),
+);
+
+export const refreshRfidInfo = () => {
+  const client = get(printerClient);
+
+  if (!client) {
+    return;
+  }
+
+  client.abstraction.rfidInfo().then(rfidInfo.set).catch(console.error);
+
+  client.abstraction
+    .rfidInfo2()
+    .then(ribbonRfidInfo.set)
+    .catch(() => {});
+};
+
+export const initClient = (connectionType: ConnectionType) => {
+  printerClient.update((prevClient: NiimbotAbstractClient) => {
+    let newClient: NiimbotAbstractClient = prevClient;
+
+    if (
+      prevClient === undefined ||
+      (connectionType !== "bluetooth" && prevClient instanceof NiimbotBluetoothClient) ||
+      (connectionType !== "serial" && prevClient instanceof NiimbotSerialClient) ||
+      (connectionType !== "capacitor-ble" && prevClient instanceof NiimbotCapacitorBleClient)
+    ) {
+      if (prevClient !== undefined) {
+        prevClient.disconnect();
+      }
+
+      newClient = instantiateClient(connectionType);
+
+      const conf = get(appConfig);
+
+      if (conf.packetIntervalMs !== undefined) {
+        newClient.setPacketInterval(conf.packetIntervalMs);
+      }
+
+      newClient.on("packetsent", (e) => {
+        console.log(`>> ${Utils.bufToHex(e.packet.toBytes())} (${RequestCommandId[e.packet.command]})`);
+      });
+
+      newClient.on("packetreceived", (e) => {
+        console.log(`<< ${Utils.bufToHex(e.packet.toBytes())} (${ResponseCommandId[e.packet.command]})`);
+      });
+
+      newClient.on("connect", (e) => {
+        console.log("onConnect");
+        heartbeatFails.set(0);
+        connectionState.set("connected");
+        connectedPrinterName.set(e.info.deviceName ?? "unknown");
+      });
+
+      newClient.on("printerinfofetched", (e) => {
+        console.log("printerInfoFetched");
+        printerInfo.set(e.info);
+        printerMeta.set(newClient.getModelMetadata());
+      });
+
+      newClient.on("disconnect", () => {
+        console.log("onDisconnect");
+        connectionState.set("disconnected");
+        connectedPrinterName.set("");
+        printerInfo.set({});
+        printerMeta.set(undefined);
+      });
+
+      newClient.on("heartbeat", (e) => {
+        heartbeatFails.set(0);
+        heartbeatData.update((prev) => {
+          if (
+            prev?.paperRfidSuccess !== e.data?.paperRfidSuccess ||
+            prev?.ribbonRfidSuccess !== e.data?.ribbonRfidSuccess
+          ) {
+            refreshRfidInfo();
+          }
+          return e.data;
+        });
+      });
+
+      newClient.on("heartbeatfailed", (e) => {
+        const maxFails = 5;
+        heartbeatFails.set(e.failedAttempts);
+
+        console.warn(`Heartbeat failed ${e.failedAttempts}/${maxFails}`);
+        if (e.failedAttempts >= maxFails) {
+          Toasts.error(get(tr)("connector.disconnect.heartbeat"));
+          newClient.disconnect();
+        }
+      });
+    }
+
+    return newClient;
+  });
+};
+</file>
+
 <file path="src/utils/qrcode.ts">
 import { Utils } from "@mmote/niimbluelib";
 
@@ -5704,90 +6153,6 @@ try {
     }
 } catch(Exception e) {
     logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
-}
-</file>
-
-<file path="standalone-apps/capacitor/android/app/src/main/java/ru/mmote/niimblues/MainActivity.java">
-package ru.mmote.niimblues;
-
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.pdf.PdfRenderer;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
-import android.util.Base64;
-import android.util.Log;
-
-import com.getcapacitor.BridgeActivity;
-
-import java.io.ByteArrayOutputStream;
-
-public class MainActivity extends BridgeActivity {
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        handleIntent(getIntent());
-    }
-
-    @Override
-    public void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent);
-        handleIntent(intent);
-    }
-
-    private void handleIntent(Intent intent) {
-        // 1. Check if the app was opened via the "Share" menu with a PDF
-        if (Intent.ACTION_SEND.equals(intent.getAction()) && "application/pdf".equals(intent.getType())) {
-            Uri pdfUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
-            if (pdfUri != null) {
-                try {
-                    // 2. Open the PDF file natively in Android
-                    ParcelFileDescriptor fd = getContentResolver().openFileDescriptor(pdfUri, "r");
-                    PdfRenderer renderer = new PdfRenderer(fd);
-                    
-                    // Grab the first page (Page 0)
-                    PdfRenderer.Page page = renderer.openPage(0);
-                    
-                    // 3. Convert the PDF page to a Bitmap Image
-                    // The B1 printer is 203 DPI (roughly 400 pixels wide for standard labels)
-                    int width = 400; 
-                    int height = (int) (width * ((float) page.getHeight() / page.getWidth()));
-                    Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-                    
-                    // Fill the background with white (otherwise it might be transparent/black)
-                    bitmap.eraseColor(Color.WHITE);
-                    page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT);
-                    
-                    // 4. Compress the image to a Base64 String so JavaScript can read it
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-                    byte[] imageBytes = baos.toByteArray();
-                    String base64Image = "data:image/png;base64," + Base64.encodeToString(imageBytes, Base64.NO_WRAP);
-                    
-                    // 5. Inject the image into the Javascript Frontend
-                    if (bridge != null && bridge.getWebView() != null) {
-                        String js = "window.dispatchEvent(new CustomEvent('pdfReceived', { detail: '" + base64Image + "' }));";
-                        bridge.getWebView().evaluateJavascript(js, null);
-                    }
-                    
-                    // Clean up memory
-                    page.close();
-                    renderer.close();
-                    fd.close();
-                    
-                    // Remove the intent so it doesn't process twice
-                    setIntent(new Intent());
-
-                } catch (Exception e) {
-                    Log.e("NiimBlue PDF", "Error converting PDF to Image", e);
-                }
-            }
-        }
-    }
 }
 </file>
 
@@ -6031,161 +6396,6 @@ end
 
   .load-system-fonts {
     color: var(--bs-primary);
-  }
-</style>
-</file>
-
-<file path="src/components/designer-controls/IconPicker.svelte">
-<script lang="ts">
-  import { onDestroy, onMount } from "svelte";
-  import { tr } from "$/utils/i18n";
-  import { iconCodepoints, type MaterialIcon } from "$/styles/mdi_icons";
-  import MdIcon from "$/components/basic/MdIcon.svelte";
-  import { appConfig, userIcons } from "$/stores";
-  import { FileUtils } from "$/utils/file_utils";
-  import { Toasts } from "$/utils/toasts";
-
-  interface Props {
-    onSubmit: (i: MaterialIcon) => void;
-    onSubmitSvg: (i: string) => void;
-  }
-
-  let { onSubmit, onSubmitSvg }: Props = $props();
-
-  let iconNames = $state<MaterialIcon[]>([]);
-  let search = $state<string>("");
-  let deleteMode = $state<boolean>(false);
-  let dropdown: HTMLDivElement;
-
-  const onShow = () => {
-    if (iconNames.length === 0) {
-      iconNames = Object.keys(iconCodepoints) as MaterialIcon[];
-    }
-  };
-
-  const addOwn = async () => {
-    try {
-      let counter = 0;
-      const xmls = await FileUtils.pickAndReadTextFile("svg", true);
-      const iconsToAdd = xmls.map((xml) => ({
-        name: `i_${FileUtils.timestampFloat()}_${counter++}`,
-        data: xml,
-      }));
-
-      userIcons.update((prev) => [...prev, ...iconsToAdd]);
-    } catch (e) {
-      Toasts.error(e);
-    }
-  };
-
-  const svgClicked = (name: string, data: string) => {
-    if (deleteMode) {
-      userIcons.update((prev) => prev.filter((e) => e.name !== name));
-      return;
-    }
-
-    onSubmitSvg(data);
-  };
-
-  const iconClicked = (i: MaterialIcon) => {
-    if (deleteMode) {
-      return;
-    }
-
-    onSubmit(i);
-  };
-
-  onMount(() => {
-    dropdown?.addEventListener("show.bs.dropdown", onShow);
-  });
-
-  onDestroy(() => {
-    dropdown?.removeEventListener("show.bs.dropdown", onShow);
-  });
-</script>
-
-<div class="dropdown" bind:this={dropdown}>
-  <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-    <MdIcon icon="emoji_emotions" />
-    <MdIcon icon="add" />
-  </button>
-
-  <div class="dropdown-menu">
-    <h6 class="dropdown-header">{$tr("editor.iconpicker.title")}</h6>
-    <div class="p-3">
-      <input
-        disabled={$appConfig.iconListMode === "user"}
-        type="text"
-        class="form-control mb-1"
-        placeholder={$tr("editor.iconpicker.search")}
-        bind:value={search} />
-
-      <div class="input-group input-group-sm mb-1">
-        <span class="input-group-text">{$tr("editor.iconpicker.show")}</span>
-        <select class="form-select form-select-sm" bind:value={$appConfig.iconListMode}>
-          <option value="both">{$tr("editor.iconpicker.show.both")}</option>
-          <option value="user">{$tr("editor.iconpicker.show.user")}</option>
-          <option value="pack">{$tr("editor.iconpicker.show.pack")}</option>
-        </select>
-      </div>
-
-      <div class="icons mb-1">
-        {#if $appConfig.iconListMode === "both" || $appConfig.iconListMode === "user"}
-          {#each $userIcons as { name, data } (name)}
-            <button
-              class="btn {deleteMode ? 'btn-danger' : 'btn-light'} me-1 mb-1 user-icon"
-              onclick={() => svgClicked(name, data)}>
-              <img src="data:image/svg+xml;base64,{FileUtils.base64str(data)}" alt="user-svg" />
-            </button>
-          {/each}
-        {/if}
-
-        {#if $appConfig.iconListMode === "both" || $appConfig.iconListMode === "pack"}
-          {#each iconNames as name (name)}
-            {#if !search || name.includes(search.toLowerCase())}
-              <button class="btn me-1" title={name} onclick={() => iconClicked(name)}>
-                <MdIcon icon={name} />
-              </button>
-            {/if}
-          {/each}
-        {/if}
-      </div>
-
-      <div class="input-group input-group-sm mb-1">
-        <button class="btn btn-outline-secondary" onclick={addOwn}>
-          <MdIcon icon="add" />
-
-          {$tr("editor.iconpicker.add")}
-        </button>
-        <button
-          class="btn {deleteMode ? 'btn-danger' : 'btn-outline-secondary'}"
-          onclick={() => (deleteMode = !deleteMode)}>
-          <MdIcon icon="delete" />
-          {$tr("editor.iconpicker.delete_mode")}
-        </button>
-      </div>
-
-      <a
-        href="https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Filled"
-        target="_blank"
-        class="text-secondary">
-        {$tr("editor.iconpicker.mdi_link_title")}
-      </a>
-    </div>
-  </div>
-</div>
-
-<style>
-  .dropdown-menu {
-    width: 100vw;
-    max-width: 450px;
-  }
-  .icons {
-    max-height: 400px;
-    overflow-y: scroll;
-  }
-  .user-icon img {
-    width: 24px;
   }
 </style>
 </file>
@@ -7312,168 +7522,6 @@ export const languageNames = Object.assign(
 ) as Record<SupportedLanguage, string>;
 </file>
 
-<file path="src/stores.ts">
-import { get, readable, writable } from "svelte/store";
-import {
-  AppConfigSchema,
-  CsvParamsSchema,
-  UserFontSchema,
-  UserIconSchema,
-  type CsvParams,
-  type UserFont,
-  type UserIcon,
-  type AppConfig,
-  type AutomationProps,
-  type ConnectionState,
-  type ConnectionType,
-} from "$/types";
-import {
-  NiimbotBluetoothClient,
-  NiimbotCapacitorBleClient,
-  NiimbotSerialClient,
-  RequestCommandId,
-  ResponseCommandId,
-  Utils,
-  instantiateClient,
-  type HeartbeatData,
-  type NiimbotAbstractClient,
-  type PrinterInfo,
-  type PrinterModelMeta,
-  type RfidInfo,
-} from "@mmote/niimbluelib";
-import { Toasts } from "$/utils/toasts";
-import { tr } from "$/utils/i18n";
-import { LocalStoragePersistence, writablePersisted } from "$/utils/persistence";
-import { APP_CONFIG_DEFAULTS, CSV_DEFAULT, OBJECT_DEFAULTS_TEXT } from "$/defaults";
-import z from "zod";
-import { FileUtils } from "$/utils/file_utils";
-
-export const fontCache = writable<string[]>([OBJECT_DEFAULTS_TEXT.fontFamily]);
-export const appConfig = writablePersisted<AppConfig>("config", AppConfigSchema, APP_CONFIG_DEFAULTS);
-export const userIcons = writablePersisted<UserIcon[]>("user_icons", z.array(UserIconSchema), []);
-export const userFonts = writablePersisted<UserFont[]>("user_fonts", z.array(UserFontSchema), []);
-export const loadedFonts = writable<FontFace[]>([]);
-
-export const connectionState = writable<ConnectionState>("disconnected");
-export const connectedPrinterName = writable<string>("");
-export const printerClient = writable<NiimbotAbstractClient>();
-export const heartbeatData = writable<HeartbeatData>();
-export const printerInfo = writable<PrinterInfo>();
-export const rfidInfo = writable<RfidInfo | undefined>();
-export const ribbonRfidInfo = writable<RfidInfo | undefined>();
-export const printerMeta = writable<PrinterModelMeta | undefined>();
-export const heartbeatFails = writable<number>(0);
-export const csvData = writablePersisted<CsvParams>("csv_params", CsvParamsSchema, { data: CSV_DEFAULT });
-
-userFonts.subscribe(FileUtils.loadFonts);
-
-export const automation = readable<AutomationProps | undefined>(
-  (() => {
-    try {
-      return LocalStoragePersistence.loadAutomation() ?? undefined;
-    } catch (e) {
-      console.error(e);
-    }
-    return undefined;
-  })(),
-);
-
-export const refreshRfidInfo = () => {
-  const client = get(printerClient);
-
-  if (!client) {
-    return;
-  }
-
-  client.abstraction.rfidInfo().then(rfidInfo.set).catch(console.error);
-
-  client.abstraction
-    .rfidInfo2()
-    .then(ribbonRfidInfo.set)
-    .catch(() => {});
-};
-
-export const initClient = (connectionType: ConnectionType) => {
-  printerClient.update((prevClient: NiimbotAbstractClient) => {
-    let newClient: NiimbotAbstractClient = prevClient;
-
-    if (
-      prevClient === undefined ||
-      (connectionType !== "bluetooth" && prevClient instanceof NiimbotBluetoothClient) ||
-      (connectionType !== "serial" && prevClient instanceof NiimbotSerialClient) ||
-      (connectionType !== "capacitor-ble" && prevClient instanceof NiimbotCapacitorBleClient)
-    ) {
-      if (prevClient !== undefined) {
-        prevClient.disconnect();
-      }
-
-      newClient = instantiateClient(connectionType);
-
-      const conf = get(appConfig);
-
-      if (conf.packetIntervalMs !== undefined) {
-        newClient.setPacketInterval(conf.packetIntervalMs);
-      }
-
-      newClient.on("packetsent", (e) => {
-        console.log(`>> ${Utils.bufToHex(e.packet.toBytes())} (${RequestCommandId[e.packet.command]})`);
-      });
-
-      newClient.on("packetreceived", (e) => {
-        console.log(`<< ${Utils.bufToHex(e.packet.toBytes())} (${ResponseCommandId[e.packet.command]})`);
-      });
-
-      newClient.on("connect", (e) => {
-        console.log("onConnect");
-        heartbeatFails.set(0);
-        connectionState.set("connected");
-        connectedPrinterName.set(e.info.deviceName ?? "unknown");
-      });
-
-      newClient.on("printerinfofetched", (e) => {
-        console.log("printerInfoFetched");
-        printerInfo.set(e.info);
-        printerMeta.set(newClient.getModelMetadata());
-      });
-
-      newClient.on("disconnect", () => {
-        console.log("onDisconnect");
-        connectionState.set("disconnected");
-        connectedPrinterName.set("");
-        printerInfo.set({});
-        printerMeta.set(undefined);
-      });
-
-      newClient.on("heartbeat", (e) => {
-        heartbeatFails.set(0);
-        heartbeatData.update((prev) => {
-          if (
-            prev?.paperRfidSuccess !== e.data?.paperRfidSuccess ||
-            prev?.ribbonRfidSuccess !== e.data?.ribbonRfidSuccess
-          ) {
-            refreshRfidInfo();
-          }
-          return e.data;
-        });
-      });
-
-      newClient.on("heartbeatfailed", (e) => {
-        const maxFails = 5;
-        heartbeatFails.set(e.failedAttempts);
-
-        console.warn(`Heartbeat failed ${e.failedAttempts}/${maxFails}`);
-        if (e.failedAttempts >= maxFails) {
-          Toasts.error(get(tr)("connector.disconnect.heartbeat"));
-          newClient.disconnect();
-        }
-      });
-    }
-
-    return newClient;
-  });
-};
-</file>
-
 <file path="standalone-apps/capacitor/android/app/src/main/AndroidManifest.xml">
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
@@ -7539,6 +7587,22 @@ export const initClient = (connectionType: ConnectionType) => {
         tools:targetApi="s"
     />
 </manifest>
+</file>
+
+<file path="standalone-apps/capacitor/android/app/src/main/java/ru/mmote/niimblues/MainActivity.java">
+package ru.mmote.niimblues;
+
+import android.os.Bundle;
+import com.getcapacitor.BridgeActivity;
+
+public class MainActivity extends BridgeActivity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        // Register our custom local plugin
+        registerPlugin(PdfIntentPlugin.class);
+        super.onCreate(savedInstanceState);
+    }
+}
 </file>
 
 <file path="README.md">
@@ -8275,86 +8339,6 @@ export const canvasPreprocess = (canvas: fabric.Canvas, variables?: { [key: stri
 }
 </file>
 
-<file path="src/utils/canvas_utils.ts">
-import * as fabric from "fabric";
-import ArUcoMarker from "$/fabric-object/aruco";
-import Barcode from "$/fabric-object/barcode";
-import QRCode from "$/fabric-object/qrcode";
-import { OBJECT_DEFAULTS_TEXT } from "$/defaults";
-
-export class CanvasUtils {
-  static equalSpacingFillText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, printWidth: number) {
-    // calculate every character width, and spacing
-    const widths = [];
-    for (let i = 0; i < text.length; i++) {
-      const char = text.charAt(i);
-      const metrics = ctx.measureText(char);
-      widths.push(metrics.width);
-    }
-    const totalWidth = widths.reduce((a, b) => a + b, 0);
-    const spacing = (printWidth - totalWidth) / (text.length - 1);
-
-    // print every character with calculated spacing
-    let offset = 0;
-    for (let i = 0; i < text.length; i++) {
-      const char = text.charAt(i);
-      ctx.fillText(char, x + offset, y);
-      offset += widths[i] + spacing;
-    }
-  }
-
-  static fixFabricObjectScale(obj: fabric.FabricObject) {
-    const isNotScalable = obj instanceof Barcode || obj instanceof fabric.Rect || obj instanceof QRCode || obj instanceof ArUcoMarker;
-
-    if (isNotScalable) {
-      obj.set({
-        width: Math.round(obj.width * (obj.scaleX ?? 1)),
-        height: Math.round(obj.height * (obj.scaleY ?? 1)),
-        scaleX: 1,
-        scaleY: 1,
-        left: Math.round(obj.left),
-        top: Math.round(obj.top),
-      });
-
-      if (obj instanceof QRCode || obj instanceof ArUcoMarker) {
-        const qrMin = 42;
-        const size = Math.max(obj.width + (obj.width % 2), qrMin);
-        obj.set({
-          width: size,
-          height: size,
-        });
-      }
-    }
-  }
-
-  static fitObjectIntoCanvas(canvas: fabric.Canvas, obj: fabric.FabricObject, xMargin: number, yMarin: number) {
-    const widthRatio = canvas.width / (obj.width + xMargin * 2);
-    const heightRatio = canvas.height / (obj.height + yMarin * 2);
-    const scaleFactor = Math.min(widthRatio, heightRatio);
-    obj.set({ left: xMargin, top: yMarin });
-    obj.scale(scaleFactor);
-    canvas.centerObjectV(obj);
-    canvas.centerObjectH(obj);
-  }
-
-  static renderError(ctx: CanvasRenderingContext2D, width: number, height: number): void {
-      ctx.save();
-      ctx.fillStyle = "black";
-      ctx.translate(-width / 2, -height / 2); // make top-left origin
-      ctx.translate(-0.5, -0.5); // blurry rendering fix
-      ctx.fillRect(0, 0, width + 1, height + 1);
-      ctx.restore();
-      
-      ctx.save();
-      ctx.fillStyle = "white";
-      ctx.textAlign = "center";
-      ctx.font = `16px ${OBJECT_DEFAULTS_TEXT.fontFamily}`;
-      ctx.fillText("ERR", 0, 0);
-      ctx.restore();
-    }
-}
-</file>
-
 <file path="src/types.ts">
 import { LabelType, printTaskNames } from "@mmote/niimbluelib";
 import * as fabric from "fabric";
@@ -8490,6 +8474,86 @@ export type PreviewProps = z.infer<typeof PreviewPropsSchema>;
 export type AutomationProps = z.infer<typeof AutomationPropsSchema>;
 export type AppConfig = z.infer<typeof AppConfigSchema>;
 export type UserFont = z.infer<typeof UserFontSchema>;
+</file>
+
+<file path="src/utils/canvas_utils.ts">
+import * as fabric from "fabric";
+import ArUcoMarker from "$/fabric-object/aruco";
+import Barcode from "$/fabric-object/barcode";
+import QRCode from "$/fabric-object/qrcode";
+import { OBJECT_DEFAULTS_TEXT } from "$/defaults";
+
+export class CanvasUtils {
+  static equalSpacingFillText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, printWidth: number) {
+    // calculate every character width, and spacing
+    const widths = [];
+    for (let i = 0; i < text.length; i++) {
+      const char = text.charAt(i);
+      const metrics = ctx.measureText(char);
+      widths.push(metrics.width);
+    }
+    const totalWidth = widths.reduce((a, b) => a + b, 0);
+    const spacing = (printWidth - totalWidth) / (text.length - 1);
+
+    // print every character with calculated spacing
+    let offset = 0;
+    for (let i = 0; i < text.length; i++) {
+      const char = text.charAt(i);
+      ctx.fillText(char, x + offset, y);
+      offset += widths[i] + spacing;
+    }
+  }
+
+  static fixFabricObjectScale(obj: fabric.FabricObject) {
+    const isNotScalable = obj instanceof Barcode || obj instanceof fabric.Rect || obj instanceof QRCode || obj instanceof ArUcoMarker;
+
+    if (isNotScalable) {
+      obj.set({
+        width: Math.round(obj.width * (obj.scaleX ?? 1)),
+        height: Math.round(obj.height * (obj.scaleY ?? 1)),
+        scaleX: 1,
+        scaleY: 1,
+        left: Math.round(obj.left),
+        top: Math.round(obj.top),
+      });
+
+      if (obj instanceof QRCode || obj instanceof ArUcoMarker) {
+        const qrMin = 42;
+        const size = Math.max(obj.width + (obj.width % 2), qrMin);
+        obj.set({
+          width: size,
+          height: size,
+        });
+      }
+    }
+  }
+
+  static fitObjectIntoCanvas(canvas: fabric.Canvas, obj: fabric.FabricObject, xMargin: number, yMarin: number) {
+    const widthRatio = canvas.width / (obj.width + xMargin * 2);
+    const heightRatio = canvas.height / (obj.height + yMarin * 2);
+    const scaleFactor = Math.min(widthRatio, heightRatio);
+    obj.set({ left: xMargin, top: yMarin });
+    obj.scale(scaleFactor);
+    canvas.centerObjectV(obj);
+    canvas.centerObjectH(obj);
+  }
+
+  static renderError(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+      ctx.save();
+      ctx.fillStyle = "black";
+      ctx.translate(-width / 2, -height / 2); // make top-left origin
+      ctx.translate(-0.5, -0.5); // blurry rendering fix
+      ctx.fillRect(0, 0, width + 1, height + 1);
+      ctx.restore();
+      
+      ctx.save();
+      ctx.fillStyle = "white";
+      ctx.textAlign = "center";
+      ctx.font = `16px ${OBJECT_DEFAULTS_TEXT.fontFamily}`;
+      ctx.fillText("ERR", 0, 0);
+      ctx.restore();
+    }
+}
 </file>
 
 <file path="src/utils/file_utils.ts">

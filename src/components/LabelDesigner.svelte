@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { registerPlugin, Capacitor } from "@capacitor/core";
+  const PdfIntent = registerPlugin('PdfIntent');
   import Dropdown from "bootstrap/js/dist/dropdown";
   import * as fabric from "fabric";
   import { onDestroy, onMount, tick } from "svelte";
@@ -349,6 +351,51 @@
 
     window.addEventListener("hashchange", loadLabelFromUrl);
 
+    // --- PDF INTENT LOGIC START ---
+    if (Capacitor.getPlatform() === 'android') {
+      const processPdfImage = async (base64Image: string) => {
+        try {
+          // 1. Clear the canvas
+          fabricCanvas!.clear();
+          
+          // 2. Load the base64 string directly into a Fabric Image object
+          const img = await fabric.FabricImage.fromURL(base64Image);
+          img.set({ 
+            left: 0, 
+            top: 0, 
+            snapAngle: OBJECT_DEFAULTS.snapAngle 
+          });
+
+          // 3. Fit the image to the currently selected label size
+          CanvasUtils.fitObjectIntoCanvas(fabricCanvas!, img, 0, 0);
+          
+          // 4. Add to canvas and update history
+          fabricCanvas!.add(img);
+          fabricCanvas!.setActiveObject(img);
+          undo.push(fabricCanvas!, labelProps);
+
+          // 5. Automatically open the Print Dialog
+          openPreviewAndPrint();
+        } catch (e) {
+          Toasts.error("Failed to load PDF to canvas: " + e);
+        }
+      };
+
+      // Listen for PDFs sent while app is already open in background
+      PdfIntent.addListener('onPdfReceived', (info: any) => {
+        if (info && info.image) processPdfImage(info.image);
+      });
+
+      // Check for PDFs sent when the app was completely closed (Cold Boot)
+      try {
+        const result = await PdfIntent.checkIntent();
+        if (result && result.image) processPdfImage(result.image);
+      } catch (e: any) {
+        Toasts.error("PDF Intent Error: " + (e.message || String(e)));
+      }
+    }
+    // --- PDF INTENT LOGIC END ---
+    
     undo.push(fabricCanvas, labelProps);
 
     // force close dropdowns on touch devices
