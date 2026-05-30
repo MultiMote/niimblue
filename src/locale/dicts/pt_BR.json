@@ -157,5 +157,8 @@
     "editor.iconpicker.delete_mode": "Modo Deletar",
     "editor.grid": "Grade",
     "params.aruco.dict": "Dicionário",
-    "editor.warning.load.csv": "Os dados CSV também serão substituídos"
+    "editor.warning.load.csv": "Os dados CSV também serão substituídos",
+    "browser_warning.fingerprinting": "Eita! Parece que seu navegador está distorcendo a tela para proteger manchas de dedo. Porfavor, desative essa proteção, já que pode causar erros na impressão de etiquetas.",
+    "debug.page_delay.help": "Adicionar atraso (1000, por exemplo) se tiver problemas em imprimir multiplas páginas.",
+    "debug.packet_interval.help": "Sobreescrever o intervalo por pacote. Necessário recarregar a página. Algo pode deixar de funcionar se o valor for muito baixo."
 }
