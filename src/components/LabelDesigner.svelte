@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { get } from "svelte/store";
   import { registerPlugin, Capacitor } from "@capacitor/core";
   const PdfIntent = registerPlugin('PdfIntent');
   import Dropdown from "bootstrap/js/dist/dropdown";
@@ -360,6 +361,7 @@
           
           // 2. Load the base64 string directly into a Fabric Image object
           const img = await fabric.FabricImage.fromURL(base64Image);
+<<<<<<< Updated upstream
           img.set({ 
             left: 0, 
             top: 0, 
@@ -368,6 +370,32 @@
 
           // 3. Fit the image to the currently selected label size
           CanvasUtils.fitObjectIntoCanvas(fabricCanvas!, img, 0, 0);
+=======
+          
+          const qt = get(appConfig).pdfQuickTransform;
+          if (qt) {
+            // Apply your saved Quick Transform!
+            img.set({ 
+              originX: qt.originX as fabric.TOriginX,
+              originY: qt.originY as fabric.TOriginY,
+              left: qt.left, 
+              top: qt.top,
+              scaleX: qt.scaleX,
+              scaleY: qt.scaleY,
+              angle: qt.angle,
+              snapAngle: OBJECT_DEFAULTS.snapAngle 
+            });
+          } else {
+            // Default: If nothing is saved, fit it neatly into the canvas
+            img.set({ ...OBJECT_DEFAULTS });
+            CanvasUtils.fitObjectIntoCanvas(
+              fabricCanvas!, 
+              img, 
+              OBJECT_DEFAULTS.left as number, 
+              OBJECT_DEFAULTS.top as number
+            );
+          }
+>>>>>>> Stashed changes
           
           // 4. Add to canvas and update history
           fabricCanvas!.add(img);
@@ -663,4 +691,8 @@
   .canvas-wrapper canvas {
     image-rendering: pixelated;
   }
+<<<<<<< Updated upstream
 </style>
+=======
+</style>
+>>>>>>> Stashed changes

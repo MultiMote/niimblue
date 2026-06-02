@@ -551,6 +551,161 @@ export default defineConfig(
 </style>
 </file>
 
+<file path="src/components/designer-controls/IconPicker.svelte">
+<script lang="ts">
+  import { onDestroy, onMount } from "svelte";
+  import { tr } from "$/utils/i18n";
+  import { iconCodepoints, type MaterialIcon } from "$/styles/mdi_icons";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { appConfig, userIcons } from "$/stores";
+  import { FileUtils } from "$/utils/file_utils";
+  import { Toasts } from "$/utils/toasts";
+
+  interface Props {
+    onSubmit: (i: MaterialIcon) => void;
+    onSubmitSvg: (i: string) => void;
+  }
+
+  let { onSubmit, onSubmitSvg }: Props = $props();
+
+  let iconNames = $state<MaterialIcon[]>([]);
+  let search = $state<string>("");
+  let deleteMode = $state<boolean>(false);
+  let dropdown: HTMLDivElement;
+
+  const onShow = () => {
+    if (iconNames.length === 0) {
+      iconNames = Object.keys(iconCodepoints) as MaterialIcon[];
+    }
+  };
+
+  const addOwn = async () => {
+    try {
+      let counter = 0;
+      const xmls = await FileUtils.pickAndReadTextFile("svg", true);
+      const iconsToAdd = xmls.map((xml) => ({
+        name: `i_${FileUtils.timestampFloat()}_${counter++}`,
+        data: xml,
+      }));
+
+      userIcons.update((prev) => [...prev, ...iconsToAdd]);
+    } catch (e) {
+      Toasts.error(e);
+    }
+  };
+
+  const svgClicked = (name: string, data: string) => {
+    if (deleteMode) {
+      userIcons.update((prev) => prev.filter((e) => e.name !== name));
+      return;
+    }
+
+    onSubmitSvg(data);
+  };
+
+  const iconClicked = (i: MaterialIcon) => {
+    if (deleteMode) {
+      return;
+    }
+
+    onSubmit(i);
+  };
+
+  onMount(() => {
+    dropdown?.addEventListener("show.bs.dropdown", onShow);
+  });
+
+  onDestroy(() => {
+    dropdown?.removeEventListener("show.bs.dropdown", onShow);
+  });
+</script>
+
+<div class="dropdown" bind:this={dropdown}>
+  <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+    <MdIcon icon="emoji_emotions" />
+    <MdIcon icon="add" />
+  </button>
+
+  <div class="dropdown-menu">
+    <h6 class="dropdown-header">{$tr("editor.iconpicker.title")}</h6>
+    <div class="p-3">
+      <input
+        disabled={$appConfig.iconListMode === "user"}
+        type="text"
+        class="form-control mb-1"
+        placeholder={$tr("editor.iconpicker.search")}
+        bind:value={search} />
+
+      <div class="input-group input-group-sm mb-1">
+        <span class="input-group-text">{$tr("editor.iconpicker.show")}</span>
+        <select class="form-select form-select-sm" bind:value={$appConfig.iconListMode}>
+          <option value="both">{$tr("editor.iconpicker.show.both")}</option>
+          <option value="user">{$tr("editor.iconpicker.show.user")}</option>
+          <option value="pack">{$tr("editor.iconpicker.show.pack")}</option>
+        </select>
+      </div>
+
+      <div class="icons mb-1">
+        {#if $appConfig.iconListMode === "both" || $appConfig.iconListMode === "user"}
+          {#each $userIcons as { name, data } (name)}
+            <button
+              class="btn {deleteMode ? 'btn-danger' : 'btn-light'} me-1 mb-1 user-icon"
+              onclick={() => svgClicked(name, data)}>
+              <img src="data:image/svg+xml;base64,{FileUtils.base64str(data)}" alt="user-svg" />
+            </button>
+          {/each}
+        {/if}
+
+        {#if $appConfig.iconListMode === "both" || $appConfig.iconListMode === "pack"}
+          {#each iconNames as name (name)}
+            {#if !search || name.includes(search.toLowerCase())}
+              <button class="btn me-1" title={name} onclick={() => iconClicked(name)}>
+                <MdIcon icon={name} />
+              </button>
+            {/if}
+          {/each}
+        {/if}
+      </div>
+
+      <div class="input-group input-group-sm mb-1">
+        <button class="btn btn-outline-secondary" onclick={addOwn}>
+          <MdIcon icon="add" />
+
+          {$tr("editor.iconpicker.add")}
+        </button>
+        <button
+          class="btn {deleteMode ? 'btn-danger' : 'btn-outline-secondary'}"
+          onclick={() => (deleteMode = !deleteMode)}>
+          <MdIcon icon="delete" />
+          {$tr("editor.iconpicker.delete_mode")}
+        </button>
+      </div>
+
+      <a
+        href="https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Filled"
+        target="_blank"
+        class="text-secondary">
+        {$tr("editor.iconpicker.mdi_link_title")}
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .dropdown-menu {
+    width: 100vw;
+    max-width: 450px;
+  }
+  .icons {
+    max-height: 400px;
+    overflow-y: scroll;
+  }
+  .user-icon img {
+    width: 24px;
+  }
+</style>
+</file>
+
 <file path="src/components/designer-controls/LabelPresetsBrowser.svelte">
 <script lang="ts">
   import type { LabelPreset } from "$/types";
@@ -672,6 +827,518 @@ export default defineConfig(
   }
   .card.print-start-top {
     border-top: 2px solid #ff4646;
+  }
+</style>
+</file>
+
+<file path="src/components/designer-controls/LabelPropsEditor.svelte">
+<script lang="ts">
+  import {
+    LabelPresetSchema,
+    type LabelPreset,
+    type LabelProps,
+    type LabelShape,
+    type LabelSplit,
+    type LabelUnit,
+    type MirrorType,
+    type TailPosition,
+  } from "$/types";
+  import LabelPresetsBrowser from "$/components/designer-controls/LabelPresetsBrowser.svelte";
+  import { printerMeta } from "$/stores";
+  import { tr } from "$/utils/i18n";
+  import { DEFAULT_LABEL_PRESETS } from "$/defaults";
+  import { onMount, tick } from "svelte";
+  import { LocalStoragePersistence } from "$/utils/persistence";
+  import type { PrintDirection } from "@mmote/niimbluelib";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { Toasts } from "$/utils/toasts";
+  import { FileUtils } from "$/utils/file_utils";
+  import { z } from "zod";
+  import DpiSelector from "$/components/designer-controls/DpiSelector.svelte";
+
+  interface Props {
+    labelProps: LabelProps;
+    onChange: (newProps: LabelProps) => void;
+  }
+
+  let { labelProps, onChange }: Props = $props();
+
+  const tailPositions: TailPosition[] = ["right", "bottom", "left", "top"];
+  const printDirections: PrintDirection[] = ["left", "top"];
+  const labelShapes: LabelShape[] = ["rect", "rounded_rect", "circle"];
+  const labelSplits: LabelSplit[] = ["none", "vertical", "horizontal"];
+  const mirrorTypes: MirrorType[] = ["none", "flip", "copy"];
+
+  let labelPresets = $state<LabelPreset[]>(DEFAULT_LABEL_PRESETS);
+
+  let title = $state<string | undefined>("");
+  let prevUnit: LabelUnit = "mm";
+  let unit = $state<LabelUnit>("mm");
+  let dpmm = $state<number>(8);
+  let width = $state<number>(0);
+  let height = $state<number>(0);
+  let printDirection = $state<PrintDirection>("left");
+  let shape = $state<LabelShape>("rect");
+  let split = $state<LabelSplit>("none");
+  let splitParts = $state<number>(2);
+  let tailLength = $state<number>(0);
+  let tailPos = $state<TailPosition>("right");
+  let mirror = $state<MirrorType>("none");
+
+  let error = $derived.by<string>(() => {
+    let error = "";
+
+    const headSize = labelProps.printDirection == "left" ? labelProps.size.height : labelProps.size.width;
+    if ($printerMeta !== undefined) {
+      if (headSize > $printerMeta.printheadPixels) {
+        error += $tr("params.label.warning.width") + " ";
+        error += `(${headSize} > ${$printerMeta.printheadPixels})`;
+        error += "\n";
+      }
+
+      if ($printerMeta.printDirection !== labelProps.printDirection) {
+        error += $tr("params.label.warning.direction") + " ";
+        if ($printerMeta.printDirection == "left") {
+          error += $tr("params.label.direction.left");
+        } else {
+          error += $tr("params.label.direction.top");
+        }
+      }
+    }
+
+    if (headSize % 8 !== 0) {
+      error += $tr("params.label.warning.div8");
+    }
+
+    return error;
+  });
+
+  const onApply = () => {
+    let newWidth = width;
+    let newHeight = height;
+    let newTailLength = tailLength;
+
+    // mm to px
+    if (unit === "mm") {
+      newWidth *= dpmm;
+      newHeight *= dpmm;
+      newTailLength *= dpmm;
+    }
+
+    // limit min size
+    newWidth = newWidth < dpmm ? dpmm : newWidth;
+    newHeight = newHeight < dpmm ? dpmm : newHeight;
+
+    // width must me multiple of 8
+    if (printDirection === "left") {
+      newHeight -= newHeight % 8;
+    } else {
+      newWidth -= newWidth % 8;
+    }
+
+    onChange({
+      printDirection: printDirection,
+      size: {
+        width: Math.floor(newWidth),
+        height: Math.floor(newHeight),
+      },
+      shape,
+      split,
+      splitParts,
+      tailPos,
+      tailLength: Math.floor(newTailLength),
+      mirror,
+    });
+  };
+
+  const onLabelPresetSelected = (index: number) => {
+    const preset = labelPresets[index];
+
+    if (preset !== undefined) {
+      dpmm = preset.dpmm;
+      prevUnit = preset.unit;
+      unit = preset.unit;
+      printDirection = preset.printDirection;
+      width = preset.width;
+      height = preset.height;
+      title = preset.title ?? "";
+      shape = preset.shape ?? "rect";
+      split = preset.split ?? "none";
+      splitParts = preset.splitParts ?? 2;
+      tailPos = preset.tailPos ?? "right";
+      tailLength = preset.tailLength ?? 0;
+      mirror = preset.mirror ?? "none";
+    }
+
+    onApply();
+  };
+
+  const onLabelPresetDelete = (idx: number) => {
+    const result = [...labelPresets];
+    result.splice(idx, 1);
+    labelPresets = result;
+    LocalStoragePersistence.saveLabelPresets(labelPresets);
+  };
+
+  const onLabelPresetAdd = () => {
+    const newPreset: LabelPreset = {
+      dpmm,
+      printDirection,
+      unit,
+      width,
+      height,
+      title,
+      shape,
+      split,
+      splitParts,
+      tailPos,
+      tailLength,
+      mirror,
+    };
+    const newPresets = [...labelPresets, newPreset];
+    try {
+      LocalStoragePersistence.saveLabelPresets(newPresets);
+      labelPresets = newPresets;
+    } catch (e) {
+      Toasts.zodErrors(e, "Presets save error:");
+    }
+  };
+
+  const onFlip = () => {
+    let widthTmp = width;
+    width = height;
+    height = widthTmp;
+    printDirection = printDirection === "top" ? "left" : "top";
+  };
+
+  const onUnitChange = () => {
+    if (prevUnit === "mm" && unit === "px") {
+      width = Math.floor(width * dpmm);
+      height = Math.floor(height * dpmm);
+      tailLength = Math.floor(tailLength * dpmm);
+    } else if (prevUnit === "px" && unit === "mm") {
+      width = Math.floor(width / dpmm);
+      height = Math.floor(height / dpmm);
+      tailLength = Math.floor(tailLength / dpmm);
+    }
+    prevUnit = unit;
+  };
+
+  const fillWithCurrentParams = () => {
+    prevUnit = "px";
+    width = labelProps.size.width;
+    height = labelProps.size.height;
+    printDirection = labelProps.printDirection;
+    shape = labelProps.shape ?? "rect";
+    split = labelProps.split ?? "none";
+    splitParts = labelProps.splitParts ?? 2;
+    tailPos = labelProps.tailPos ?? "right";
+    tailLength = labelProps.tailLength ?? 0;
+    mirror = labelProps.mirror ?? "none";
+    onUnitChange();
+  };
+
+  const onImportClicked = async () => {
+    const contents = await FileUtils.pickAndReadSingleTextFile("json");
+    const rawData = JSON.parse(contents);
+
+    if (!confirm($tr("params.label.warning.import"))) {
+      return;
+    }
+
+    try {
+      const presets = z.array(LabelPresetSchema).parse(rawData);
+      LocalStoragePersistence.saveLabelPresets(presets);
+      labelPresets = presets;
+    } catch (e) {
+      Toasts.zodErrors(e, "Presets load error:");
+    }
+  };
+
+  const onExportClicked = () => {
+    try {
+      FileUtils.saveLabelPresetsAsJson(labelPresets);
+    } catch (e) {
+      Toasts.zodErrors(e, "Presets save error:");
+    }
+  };
+
+  onMount(() => {
+    const defaultPreset: LabelPreset = DEFAULT_LABEL_PRESETS[0];
+    width = defaultPreset.width;
+    height = defaultPreset.height;
+    prevUnit = defaultPreset.unit;
+    unit = defaultPreset.unit;
+    printDirection = defaultPreset.printDirection;
+    shape = defaultPreset.shape ?? "rect";
+    split = defaultPreset.split ?? "none";
+    tailPos = defaultPreset.tailPos ?? "right";
+    tailLength = defaultPreset.tailLength ?? 0;
+    mirror = defaultPreset.mirror ?? "none";
+
+    try {
+      const savedPresets: LabelPreset[] | null = LocalStoragePersistence.loadLabelPresets();
+      if (savedPresets !== null) {
+        labelPresets = savedPresets;
+      }
+    } catch (e) {
+      Toasts.zodErrors(e, "Presets load error:");
+    }
+
+    tick().then(() => fillWithCurrentParams());
+  });
+
+  $effect(() => {
+    if (shape === "circle" && split !== "none") split = "none";
+  });
+
+  $effect(() => {
+    if (split === "none" || tailLength < 0) tailLength = 0;
+  });
+
+  $effect(() => {
+    if (mirror === "flip" && splitParts !== 2) mirror = "copy";
+  });
+</script>
+
+<div class="dropdown">
+  <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+    <MdIcon icon="settings" />
+  </button>
+  <div class="dropdown-menu">
+    <h6 class="dropdown-header">{$tr("params.label.menu_title")}</h6>
+
+    <div class="px-3">
+      <div class="p-1">
+        <button class="btn btn-sm btn-outline-secondary" onclick={onImportClicked}>
+          <MdIcon icon="data_object" />
+          {$tr("params.label.import")}
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" onclick={onExportClicked}>
+          <MdIcon icon="data_object" />
+          {$tr("params.label.export")}
+        </button>
+      </div>
+      <div class="mb-3 {error ? 'cursor-help text-warning' : 'text-secondary'}" title={error}>
+        {$tr("params.label.current")}
+        {labelProps.size.width}x{labelProps.size.height}
+        {$tr("params.label.px")}
+        {#if labelProps.printDirection === "top"}
+          ({$tr("params.label.direction")} {$tr("params.label.direction.top")})
+        {:else if labelProps.printDirection === "left"}
+          ({$tr("params.label.direction")} {$tr("params.label.direction.left")})
+        {/if}
+        <button class="btn btn-sm" onclick={fillWithCurrentParams}><MdIcon icon="arrow_downward" /></button>
+      </div>
+
+      <LabelPresetsBrowser
+        class="mb-1"
+        presets={labelPresets}
+        onItemSelected={onLabelPresetSelected}
+        onItemDelete={onLabelPresetDelete} />
+
+      <div class="input-group flex-nowrap input-group-sm mb-2">
+        <span class="input-group-text">{$tr("params.label.size")}</span>
+        <input class="form-control" type="number" min="1" step={unit === "px" ? 8 : 1} bind:value={width} />
+        <button class="btn btn-sm btn-secondary" onclick={onFlip}><MdIcon icon="swap_horiz" /></button>
+        <input class="form-control" type="number" min="1" step={unit === "px" ? 8 : 1} bind:value={height} />
+        <select class="form-select" bind:value={unit} onchange={onUnitChange}>
+          <option value="mm"> {$tr("params.label.mm")}</option>
+          <option value="px"> {$tr("params.label.px")}</option>
+        </select>
+      </div>
+
+      {#if unit !== "px"}
+        <DpiSelector bind:value={dpmm} />
+      {/if}
+
+      <div class="input-group flex-nowrap input-group-sm print-dir-switch mb-2" role="group">
+        <span class="input-group-text w-100">{$tr("params.label.direction")}</span>
+        {#each printDirections as v (v)}
+          <input
+            type="radio"
+            class="btn-check"
+            name="print-dir"
+            id="print-dir-{v}"
+            autocomplete="off"
+            bind:group={printDirection}
+            value={v} />
+          <label class="btn btn-outline-secondary px-3" for="print-dir-{v}">
+            <div class="svg-icon"></div>
+          </label>
+        {/each}
+      </div>
+
+      <div class="input-group flex-nowrap input-group-sm label-shape-switch mb-2" role="group">
+        <span class="input-group-text w-100">{$tr("params.label.shape")}</span>
+        {#each labelShapes as v (v)}
+          <input
+            type="radio"
+            class="btn-check"
+            name="label-shape"
+            id="label-shape-{v}"
+            autocomplete="off"
+            bind:group={shape}
+            value={v} />
+          <label class="btn btn-outline-secondary px-3" for="label-shape-{v}">
+            <div class="svg-icon"></div>
+          </label>
+        {/each}
+      </div>
+
+      {#if shape !== "circle"}
+        <div class="input-group flex-nowrap input-group-sm label-split-switch mb-2" role="group">
+          <span class="input-group-text w-100">{$tr("params.label.split")}</span>
+          {#each labelSplits as v (v)}
+            <input
+              type="radio"
+              class="btn-check"
+              name="label-split"
+              id="label-split-{v}"
+              autocomplete="off"
+              bind:group={split}
+              value={v} />
+            <label class="btn btn-outline-secondary px-3" for="label-split-{v}">
+              <div class="svg-icon"></div>
+            </label>
+          {/each}
+        </div>
+
+        {#if split !== "none"}
+          <div class="input-group flex-nowrap input-group-sm mb-2">
+            <span class="input-group-text">{$tr("params.label.split.count")}</span>
+            <input class="form-control" type="number" min="1" bind:value={splitParts} />
+          </div>
+        {/if}
+      {/if}
+
+      {#if split !== "none"}
+        <div class="input-group flex-nowrap input-group-sm mirror-switch mb-2" role="group">
+          <span class="input-group-text w-100">{$tr("params.label.mirror")}</span>
+          {#each mirrorTypes as v (v)}
+            <input
+              type="radio"
+              class="btn-check"
+              name="mirror"
+              id="mirror-{v}"
+              autocomplete="off"
+              bind:group={mirror}
+              value={v} />
+            <label class="btn btn-outline-secondary px-3" for="mirror-{v}">
+              <div class="svg-icon"></div>
+            </label>
+          {/each}
+        </div>
+
+        <div class="input-group flex-nowrap input-group-sm tail-pos-switch mb-2" role="group">
+          <span class="input-group-text w-100">{$tr("params.label.tail.position")}</span>
+          {#each tailPositions as v (v)}
+            <input
+              type="radio"
+              class="btn-check"
+              name="tail-pos"
+              id="tail-{v}"
+              autocomplete="off"
+              bind:group={tailPos}
+              value={v} />
+            <label class="btn btn-outline-secondary px-3" for="tail-{v}">
+              <div class="svg-icon"></div>
+            </label>
+          {/each}
+        </div>
+
+        <div class="input-group flex-nowrap input-group-sm mb-2">
+          <span class="input-group-text">{$tr("params.label.tail.length")}</span>
+          <input class="form-control" type="number" min="1" bind:value={tailLength} />
+          <span class="input-group-text">
+            {#if unit === "mm"}{$tr("params.label.mm")}{/if}
+            {#if unit === "px"}{$tr("params.label.px")}{/if}
+          </span>
+        </div>
+      {/if}
+
+      <div class="input-group flex-nowrap input-group-sm mb-2">
+        <span class="input-group-text">{$tr("params.label.label_title")}</span>
+        <input class="form-control" type="text" bind:value={title} />
+      </div>
+
+      <div class="text-end">
+        <button class="btn btn-sm btn-secondary" onclick={onLabelPresetAdd}>
+          {$tr("params.label.save_template")}
+        </button>
+        <button class="btn btn-sm btn-primary" onclick={onApply}>{$tr("params.label.apply")}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .dropdown-menu {
+    width: 100vw;
+    max-width: 450px;
+  }
+
+  .cursor-help {
+    cursor: help;
+  }
+
+  .svg-icon {
+    height: 1.5em;
+    width: 1.5em;
+    background-size: cover;
+  }
+
+  .tail-pos-switch .svg-icon {
+    background-image: url("../assets/tail-pos.svg");
+  }
+  .tail-pos-switch label[for="tail-bottom"] .svg-icon {
+    transform: rotate(90deg);
+  }
+  .tail-pos-switch label[for="tail-bottom"] .svg-icon {
+    transform: rotate(90deg);
+  }
+  .tail-pos-switch label[for="tail-left"] .svg-icon {
+    transform: rotate(180deg);
+  }
+  .tail-pos-switch label[for="tail-top"] .svg-icon {
+    transform: rotate(270deg);
+  }
+  .print-dir-switch .svg-icon {
+    background-image: url("../assets/print-dir.svg");
+  }
+  .print-dir-switch label[for="print-dir-top"] .svg-icon {
+    transform: rotate(90deg);
+  }
+
+  .label-shape-switch label[for="label-shape-rect"] .svg-icon {
+    background-image: url("../assets/shape-rect.svg");
+  }
+  .label-shape-switch label[for="label-shape-rounded_rect"] .svg-icon {
+    background-image: url("../assets/shape-rrect.svg");
+  }
+  .label-shape-switch label[for="label-shape-circle"] .svg-icon {
+    background-image: url("../assets/shape-circle.svg");
+  }
+
+  .label-split-switch label[for="label-split-none"] .svg-icon {
+    background-image: url("../assets/shape-rrect.svg");
+  }
+  .label-split-switch label[for="label-split-vertical"] .svg-icon {
+    background-image: url("../assets/split-vertical.svg");
+    transform: rotate(90deg);
+  }
+  .label-split-switch label[for="label-split-horizontal"] .svg-icon {
+    background-image: url("../assets/split-vertical.svg");
+  }
+
+  .mirror-switch label[for="mirror-none"] .svg-icon {
+    background-image: url("../assets/mirror-none.svg");
+  }
+  .mirror-switch label[for="mirror-copy"] .svg-icon {
+    background-image: url("../assets/mirror-copy.svg");
+  }
+  .mirror-switch label[for="mirror-flip"] .svg-icon {
+    background-image: url("../assets/mirror-flip.svg");
   }
 </style>
 </file>
@@ -915,6 +1582,319 @@ export default defineConfig(
 </style>
 </file>
 
+<file path="src/components/designer-controls/SavedLabelsMenu.svelte">
+<script lang="ts">
+  import { tr } from "$/utils/i18n";
+  import { onMount } from "svelte";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import SavedLabelsBrowser from "$/components/designer-controls/SavedLabelsBrowser.svelte";
+  import { ExportedLabelTemplateSchema, type ExportedLabelTemplate } from "$/types";
+  import { LocalStoragePersistence } from "$/utils/persistence";
+  import { Toasts } from "$/utils/toasts";
+  import Dropdown from "bootstrap/js/dist/dropdown";
+  import { FileUtils } from "$/utils/file_utils";
+  import * as fabric from "fabric";
+  import { Utils } from "@mmote/niimbluelib";
+
+  interface Props {
+    onRequestLabelTemplate: () => ExportedLabelTemplate;
+    onLoadRequested: (label: ExportedLabelTemplate) => void;
+    canvas: fabric.Canvas;
+    csvEnabled: boolean;
+  }
+
+  let { onRequestLabelTemplate, onLoadRequested, canvas, csvEnabled }: Props = $props();
+
+  let dropdownRef: HTMLDivElement;
+  let savedLabels = $state<ExportedLabelTemplate[]>([]);
+  let selectedIndex = $state<number>(-1);
+  let title = $state<string>("");
+  let usedSpace = $state<number>(0);
+  let customDefaultTemplate = $state<boolean>(LocalStoragePersistence.hasCustomDefaultTemplate());
+  let isStandalone = Utils.getAvailableTransports().capacitorBle;
+
+  const calcUsedSpace = () => {
+    usedSpace = LocalStoragePersistence.usedSpace();
+  };
+
+  const onLabelSelected = (index: number) => {
+    selectedIndex = index;
+    title = savedLabels[index]?.title ?? "";
+  };
+
+  const onLabelExport = (idx: number) => {
+    try {
+      FileUtils.saveLabelAsJson(savedLabels[idx]);
+    } catch (e) {
+      Toasts.zodErrors(e, "Canvas save error:");
+    }
+  };
+
+  const onLabelDelete = (idx: number) => {
+    selectedIndex = -1;
+    const result = [...savedLabels];
+    result.splice(idx, 1);
+    LocalStoragePersistence.saveLabels(result);
+
+    savedLabels = result;
+    title = "";
+    calcUsedSpace();
+  };
+
+  const saveLabels = (labels: ExportedLabelTemplate[]) => {
+    const { zodErrors, otherErrors } = LocalStoragePersistence.saveLabels(labels);
+    zodErrors.forEach((e) => Toasts.zodErrors(e, "Label save error"));
+    otherErrors.forEach((e) => Toasts.error(e));
+
+    if (zodErrors.length === 0 && otherErrors.length === 0) {
+      savedLabels = labels;
+    }
+
+    calcUsedSpace();
+  };
+
+  const onSaveReplaceClicked = () => {
+    if (selectedIndex === -1) {
+      return;
+    }
+
+    if (!confirm($tr("editor.warning.save"))) {
+      return;
+    }
+
+    const label = onRequestLabelTemplate();
+    label.title = title;
+
+    const result = [...savedLabels];
+    result[selectedIndex] = label;
+
+    saveLabels(result);
+  };
+
+  const onMakeDefaultClicked = () => {
+    const label = onRequestLabelTemplate();
+    label.title = title;
+    label.thumbnailBase64 = undefined;
+    LocalStoragePersistence.saveDefaultTemplate(label);
+    customDefaultTemplate = true;
+    calcUsedSpace();
+  };
+
+  const onRemoveDefaultClicked = () => {
+    LocalStoragePersistence.saveDefaultTemplate(undefined);
+    customDefaultTemplate = false;
+    calcUsedSpace();
+  };
+
+  const onSaveClicked = () => {
+    const label = onRequestLabelTemplate();
+    label.title = title;
+    const result = [...savedLabels, label];
+    saveLabels(result);
+  };
+
+  const onLoadClicked = () => {
+    if (selectedIndex === -1) {
+      return;
+    }
+
+    const label = savedLabels[selectedIndex];
+
+    let message = $tr("editor.warning.load");
+
+    if (label.csv) {
+      message += "\n" + $tr("editor.warning.load.csv");
+    }
+
+    if (!confirm(message)) {
+      return;
+    }
+
+    onLoadRequested(label);
+    new Dropdown(dropdownRef).hide();
+  };
+
+  const onImportClicked = async () => {
+    const contents = await FileUtils.pickAndReadSingleTextFile("json");
+    const rawData = JSON.parse(contents);
+
+
+    try {
+      const label = ExportedLabelTemplateSchema.parse(rawData);
+
+      let message = $tr("editor.warning.load");
+
+      if (label.csv) {
+        message += "\n" + $tr("editor.warning.load.csv");
+      }
+
+      if (!confirm(message)) {
+        return;
+      }
+
+      onLoadRequested(label);
+
+      if (label.title) {
+        title = label.title;
+      }
+
+      new Dropdown(dropdownRef).hide();
+    } catch (e) {
+      Toasts.zodErrors(e, "Canvas load error:");
+    }
+  };
+
+  const onExportClicked = () => {
+    try {
+      const label = onRequestLabelTemplate();
+      if (title) {
+        label.title = title.replaceAll(/[\\/:*?"<>|]/g, "_");
+      }
+      FileUtils.saveLabelAsJson(label);
+    } catch (e) {
+      Toasts.zodErrors(e, "Canvas save error:");
+    }
+  };
+
+  const onExportPngClicked = () => {
+    try {
+      FileUtils.saveCanvasAsPng(canvas);
+    } catch (e) {
+      Toasts.zodErrors(e, "Canvas save error:");
+    }
+  };
+
+  const onExportUrlClicked = async () => {
+    try {
+      const label = onRequestLabelTemplate();
+      const url = await FileUtils.makeLabelUrl(label);
+
+      if (url.length > 2000 && !confirm($tr("params.saved_labels.save.url.warn"))) {
+        return;
+      }
+
+      navigator.clipboard.writeText(url);
+      Toasts.message($tr("params.saved_labels.save.url.copied"));
+    } catch (e) {
+      Toasts.error(e);
+    }
+  };
+
+  onMount(() => {
+    savedLabels = LocalStoragePersistence.loadLabels();
+    calcUsedSpace();
+  });
+</script>
+
+<div class="dropdown">
+  <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+    <MdIcon icon="sd_storage" />
+  </button>
+  <div class="saved-labels dropdown-menu" bind:this={dropdownRef}>
+    <h6 class="dropdown-header text-wrap">
+      {$tr("params.saved_labels.menu_title")} - {usedSpace}
+      {$tr("params.saved_labels.kb_used")}
+
+      {#if csvEnabled}
+        <div class="pt-3 text-warning">
+            {$tr("params.saved_labels.save.withcsv")}
+        </div>
+      {/if}
+    </h6>
+
+
+    <div class="px-3">
+      <div class="p-1">
+        <button class="btn btn-sm btn-outline-secondary" onclick={onImportClicked}>
+          <MdIcon icon="data_object" />
+          {$tr("params.saved_labels.load.json")}
+        </button>
+        <div class="btn-group btn-group-sm">
+          <button class="btn btn-outline-secondary" onclick={onExportClicked}>
+            <MdIcon icon="data_object" />
+            {$tr("params.saved_labels.save.json")}
+          </button>
+          <button
+            type="button"
+            aria-label="dropdown"
+            class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
+            data-bs-toggle="dropdown">
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <button class="dropdown-item" onclick={onExportPngClicked}>PNG</button>
+            </li>
+            {#if !isStandalone}
+              <li>
+                <button class="dropdown-item" onclick={onExportUrlClicked}
+                  >{$tr("params.saved_labels.save.url")}</button>
+              </li>
+            {/if}
+          </ul>
+        </div>
+      </div>
+
+      <SavedLabelsBrowser
+        class="mb-1"
+        {selectedIndex}
+        labels={savedLabels}
+        onItemClicked={onLabelSelected}
+        onItemDelete={onLabelDelete}
+        onItemExport={onLabelExport} />
+
+      <div class="input-group flex-nowrap input-group-sm mb-3">
+        <span class="input-group-text">{$tr("params.saved_labels.label_title")}</span>
+        <input
+          class="form-control"
+          type="text"
+          placeholder={$tr("params.saved_labels.label_title.placeholder")}
+          bind:value={title} />
+      </div>
+
+      <div class="d-flex gap-1 flex-wrap justify-content-end">
+        <div class="btn-group btn-group-sm make-default">
+          <button class="btn text-secondary" onclick={onMakeDefaultClicked}>
+            {$tr("params.saved_labels.make_default")}
+          </button>
+          {#if customDefaultTemplate}
+            <button class="btn text-secondary" onclick={onRemoveDefaultClicked}>
+              <MdIcon icon="close" />
+            </button>
+          {/if}
+        </div>
+
+        <button class="btn btn-sm btn-secondary" onclick={onSaveClicked}>
+          <MdIcon icon="save" />
+          {$tr("params.saved_labels.save.browser")}
+        </button>
+
+        {#if selectedIndex !== -1}
+          <button class="btn btn-sm btn-secondary" onclick={onSaveReplaceClicked}>
+            <MdIcon icon="edit_note" />
+            {$tr("params.saved_labels.save.browser.replace")}
+          </button>
+
+          <button class="btn btn-sm btn-primary" onclick={onLoadClicked}>
+            <MdIcon icon="folder" />
+            {$tr("params.saved_labels.load.browser")}
+          </button>
+        {/if}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .saved-labels.dropdown-menu {
+    width: 100vw;
+    max-width: 450px;
+  }
+  .make-default {
+    margin-right: auto;
+  }
+</style>
+</file>
+
 <file path="src/components/designer-controls/VariableInsertControl.svelte">
 <script lang="ts">
   import * as fabric from "fabric";
@@ -971,308 +1951,6 @@ export default defineConfig(
     </div>
   </div>
 </div>
-</file>
-
-<file path="src/components/PrinterConnector.svelte">
-<script lang="ts">
-  import { NiimbotCapacitorBleClient, SoundSettingsItemType, Utils, type AvailableTransports } from "@mmote/niimbluelib";
-  import {
-    printerClient,
-    connectedPrinterName,
-    connectionState,
-    initClient,
-    heartbeatData,
-    printerInfo,
-    printerMeta,
-    heartbeatFails,
-    automation,
-    rfidInfo,
-    ribbonRfidInfo,
-    refreshRfidInfo,
-  } from "$/stores";
-  import type { ConnectionType } from "$/types";
-  import { tr } from "$/utils/i18n";
-  import MdIcon from "$/components/basic/MdIcon.svelte";
-  import { Toasts } from "$/utils/toasts";
-  import { onMount } from "svelte";
-  import { LocalStoragePersistence } from "$/utils/persistence";
-  import type { MaterialIcon } from "material-icons";
-  import FirmwareUpdater from "$/components/basic/FirmwareUpdater.svelte";
-
-  let connectionType = $state<ConnectionType>("bluetooth");
-  let featureSupport = $state<AvailableTransports>({ webBluetooth: false, webSerial: false, capacitorBle: false });
-
-  const onConnectClicked = async () => {
-    initClient(connectionType);
-    connectionState.set("connecting");
-
-    try {
-      if ($printerClient instanceof NiimbotCapacitorBleClient && $automation?.autoConnectDeviceId !== undefined) {
-        await $printerClient.connect({ deviceId: $automation.autoConnectDeviceId });
-      } else {
-        await $printerClient.connect();
-      }
-    } catch (e) {
-      connectionState.set("disconnected");
-      Toasts.error(e);
-    }
-  };
-
-  const onDisconnectClicked = () => {
-    $printerClient.disconnect();
-  };
-
-  const startHeartbeat = async () => {
-    $printerClient.startHeartbeat();
-  };
-
-  const stopHeartbeat = async () => {
-    $printerClient.stopHeartbeat();
-  };
-
-  const soundOn = async () => {
-    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.BluetoothConnectionSound, true);
-    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.PowerSound, true);
-  };
-
-  const soundOff = async () => {
-    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.BluetoothConnectionSound, false);
-    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.PowerSound, false);
-  };
-
-  const fetchInfo = async () => {
-    await $printerClient.fetchPrinterInfo();
-  };
-
-  const reset = async () => {
-    await $printerClient.abstraction.printerReset();
-  };
-
-  const switchConnectionType = (c: ConnectionType) => {
-    LocalStoragePersistence.saveLastConnectionType(c);
-    connectionType = c;
-  };
-
-  const batteryIcon = (value: number): MaterialIcon => {
-    if (value > 4) {
-      value = Math.min(4, Math.max(1, Math.ceil(value / 25)));
-    }
-
-    if (value === 4) {
-      return "battery_full";
-    } else if (value === 3) {
-      return "battery_5_bar";
-    } else if (value === 2) {
-      return "battery_3_bar";
-    } else if (value === 1) {
-      return "battery_2_bar";
-    }
-    return "battery_0_bar";
-  };
-
-  onMount(() => {
-    featureSupport = Utils.getAvailableTransports();
-
-    connectionType = LocalStoragePersistence.loadLastConnectionType() ?? "bluetooth";
-
-    if (!featureSupport.capacitorBle && connectionType === "capacitor-ble") {
-      connectionType = "bluetooth";
-    }
-    if (!featureSupport.webSerial && connectionType === "serial") {
-      connectionType = "bluetooth";
-    }
-    if (!featureSupport.webBluetooth && connectionType === "bluetooth" && featureSupport.capacitorBle) {
-      connectionType = "capacitor-ble";
-    }
-
-    if ($automation !== undefined && $automation.autoConnect && connectionType === "capacitor-ble") {
-      onConnectClicked();
-    }
-  });
-</script>
-
-<div class="input-group w-auto input-group-sm flex-nowrap justify-content-end">
-  {#if $connectionState === "connected"}
-    <button class="btn btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-      <MdIcon icon="settings" />
-    </button>
-    <div class="dropdown-menu p-1">
-      {#if $printerInfo}
-        <div>
-          Printer info:
-          <ul>
-            {#each Object.entries($printerInfo) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-
-      {#if $printerMeta}
-        <button
-          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#modelMeta">
-          Model metadata <MdIcon icon="expand_more" />
-        </button>
-
-        <div class="collapse" id="modelMeta">
-          <ul>
-            {#each Object.entries($printerMeta) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-
-      {#if $rfidInfo}
-        <button
-          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#rfidInfo">
-          RFID info <MdIcon icon="expand_more" />
-        </button>
-
-        <div class="collapse" id="rfidInfo">
-          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
-
-          <ul>
-            {#each Object.entries($rfidInfo) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-
-      {#if $ribbonRfidInfo}
-        <button
-          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#ribbonRfidInfo">
-          Ribbon RFID info <MdIcon icon="expand_more" />
-        </button>
-
-        <div class="collapse" id="ribbonRfidInfo">
-          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
-
-          <ul>
-            {#each Object.entries($ribbonRfidInfo) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-
-      {#if $heartbeatData}
-        <button
-          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#heartbeatData">
-          Heartbeat data <MdIcon icon="expand_more" />
-        </button>
-
-        <div class="collapse" id="heartbeatData">
-          <ul>
-            {#each Object.entries($heartbeatData) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-
-      <FirmwareUpdater />
-
-      <button
-        class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#tests">
-        Tests <MdIcon icon="expand_more" />
-      </button>
-
-      <div class="collapse" id="tests">
-        <div class="d-flex flex-wrap gap-1 mt-1">
-          <button class="btn btn-sm btn-primary" onclick={startHeartbeat}>Heartbeat on</button>
-          <button class="btn btn-sm btn-primary" onclick={stopHeartbeat}>Heartbeat off</button>
-          <button class="btn btn-sm btn-primary" onclick={soundOn}>Sound on</button>
-          <button class="btn btn-sm btn-primary" onclick={soundOff}>Sound off</button>
-          <button class="btn btn-sm btn-primary" onclick={fetchInfo}>Fetch info again</button>
-          <button class="btn btn-sm btn-primary" onclick={reset}>Reset</button>
-        </div>
-      </div>
-    </div>
-    <span class="input-group-text">
-      {#if connectionType === "serial"}
-        <MdIcon icon="usb" />
-      {:else}
-        <MdIcon icon="bluetooth" />
-      {/if}
-    </span>
-    <span class="input-group-text {$heartbeatFails > 0 ? 'text-warning' : ''}">
-      {$printerMeta?.model ?? $connectedPrinterName}
-    </span>
-    {#if $heartbeatData?.chargeLevel}
-      <span class="input-group-text">
-        <MdIcon icon={batteryIcon($heartbeatData.chargeLevel)} class="r-90"></MdIcon>
-      </span>
-    {/if}
-  {:else}
-    {#if featureSupport.webBluetooth}
-      <button
-        disabled={$connectionState === "connecting"}
-        class="btn text-nowrap {connectionType === 'bluetooth' ? 'btn-light' : 'btn-outline-secondary'}"
-        onclick={() => switchConnectionType("bluetooth")}>
-        <MdIcon icon="bluetooth" />
-        {$tr("connector.bluetooth")}
-      </button>
-    {/if}
-    {#if featureSupport.webSerial}
-      <button
-        disabled={$connectionState === "connecting"}
-        class="btn text-nowrap {connectionType === 'serial' ? 'btn-light' : 'btn-outline-secondary'}"
-        onclick={() => switchConnectionType((connectionType = "serial"))}>
-        <MdIcon icon="usb" />
-        {$tr("connector.serial")}
-      </button>
-    {/if}
-    {#if featureSupport.capacitorBle}
-      <button
-        disabled={$connectionState === "connecting"}
-        class="btn text-nowrap {connectionType === 'capacitor-ble' ? 'btn-light' : 'btn-outline-secondary'}"
-        onclick={() => switchConnectionType((connectionType = "capacitor-ble"))}>
-        <MdIcon icon="usb" />
-        Capacitor BLE
-      </button>
-    {/if}
-  {/if}
-
-  {#if $connectionState !== "connected"}
-    <button
-      class="btn btn-primary"
-      disabled={$connectionState === "connecting" ||
-        (!featureSupport.capacitorBle && !featureSupport.webBluetooth && !featureSupport.webSerial)}
-      onclick={onConnectClicked}>
-      <MdIcon icon="power" />
-    </button>
-  {/if}
-
-  {#if $connectionState === "connected"}
-    <button class="btn btn-danger" onclick={onDisconnectClicked}>
-      <MdIcon icon="power_off" />
-    </button>
-  {/if}
-</div>
-
-<style>
-  .dropdown-menu {
-    width: 100vw;
-    max-width: 300px;
-  }
-</style>
 </file>
 
 <file path="src/styles/font.scss">
@@ -2382,518 +3060,6 @@ EXPOSE 80
 {/if}
 </file>
 
-<file path="src/components/designer-controls/LabelPropsEditor.svelte">
-<script lang="ts">
-  import {
-    LabelPresetSchema,
-    type LabelPreset,
-    type LabelProps,
-    type LabelShape,
-    type LabelSplit,
-    type LabelUnit,
-    type MirrorType,
-    type TailPosition,
-  } from "$/types";
-  import LabelPresetsBrowser from "$/components/designer-controls/LabelPresetsBrowser.svelte";
-  import { printerMeta } from "$/stores";
-  import { tr } from "$/utils/i18n";
-  import { DEFAULT_LABEL_PRESETS } from "$/defaults";
-  import { onMount, tick } from "svelte";
-  import { LocalStoragePersistence } from "$/utils/persistence";
-  import type { PrintDirection } from "@mmote/niimbluelib";
-  import MdIcon from "$/components/basic/MdIcon.svelte";
-  import { Toasts } from "$/utils/toasts";
-  import { FileUtils } from "$/utils/file_utils";
-  import { z } from "zod";
-  import DpiSelector from "$/components/designer-controls/DpiSelector.svelte";
-
-  interface Props {
-    labelProps: LabelProps;
-    onChange: (newProps: LabelProps) => void;
-  }
-
-  let { labelProps, onChange }: Props = $props();
-
-  const tailPositions: TailPosition[] = ["right", "bottom", "left", "top"];
-  const printDirections: PrintDirection[] = ["left", "top"];
-  const labelShapes: LabelShape[] = ["rect", "rounded_rect", "circle"];
-  const labelSplits: LabelSplit[] = ["none", "vertical", "horizontal"];
-  const mirrorTypes: MirrorType[] = ["none", "flip", "copy"];
-
-  let labelPresets = $state<LabelPreset[]>(DEFAULT_LABEL_PRESETS);
-
-  let title = $state<string | undefined>("");
-  let prevUnit: LabelUnit = "mm";
-  let unit = $state<LabelUnit>("mm");
-  let dpmm = $state<number>(8);
-  let width = $state<number>(0);
-  let height = $state<number>(0);
-  let printDirection = $state<PrintDirection>("left");
-  let shape = $state<LabelShape>("rect");
-  let split = $state<LabelSplit>("none");
-  let splitParts = $state<number>(2);
-  let tailLength = $state<number>(0);
-  let tailPos = $state<TailPosition>("right");
-  let mirror = $state<MirrorType>("none");
-
-  let error = $derived.by<string>(() => {
-    let error = "";
-
-    const headSize = labelProps.printDirection == "left" ? labelProps.size.height : labelProps.size.width;
-    if ($printerMeta !== undefined) {
-      if (headSize > $printerMeta.printheadPixels) {
-        error += $tr("params.label.warning.width") + " ";
-        error += `(${headSize} > ${$printerMeta.printheadPixels})`;
-        error += "\n";
-      }
-
-      if ($printerMeta.printDirection !== labelProps.printDirection) {
-        error += $tr("params.label.warning.direction") + " ";
-        if ($printerMeta.printDirection == "left") {
-          error += $tr("params.label.direction.left");
-        } else {
-          error += $tr("params.label.direction.top");
-        }
-      }
-    }
-
-    if (headSize % 8 !== 0) {
-      error += $tr("params.label.warning.div8");
-    }
-
-    return error;
-  });
-
-  const onApply = () => {
-    let newWidth = width;
-    let newHeight = height;
-    let newTailLength = tailLength;
-
-    // mm to px
-    if (unit === "mm") {
-      newWidth *= dpmm;
-      newHeight *= dpmm;
-      newTailLength *= dpmm;
-    }
-
-    // limit min size
-    newWidth = newWidth < dpmm ? dpmm : newWidth;
-    newHeight = newHeight < dpmm ? dpmm : newHeight;
-
-    // width must me multiple of 8
-    if (printDirection === "left") {
-      newHeight -= newHeight % 8;
-    } else {
-      newWidth -= newWidth % 8;
-    }
-
-    onChange({
-      printDirection: printDirection,
-      size: {
-        width: Math.floor(newWidth),
-        height: Math.floor(newHeight),
-      },
-      shape,
-      split,
-      splitParts,
-      tailPos,
-      tailLength: Math.floor(newTailLength),
-      mirror,
-    });
-  };
-
-  const onLabelPresetSelected = (index: number) => {
-    const preset = labelPresets[index];
-
-    if (preset !== undefined) {
-      dpmm = preset.dpmm;
-      prevUnit = preset.unit;
-      unit = preset.unit;
-      printDirection = preset.printDirection;
-      width = preset.width;
-      height = preset.height;
-      title = preset.title ?? "";
-      shape = preset.shape ?? "rect";
-      split = preset.split ?? "none";
-      splitParts = preset.splitParts ?? 2;
-      tailPos = preset.tailPos ?? "right";
-      tailLength = preset.tailLength ?? 0;
-      mirror = preset.mirror ?? "none";
-    }
-
-    onApply();
-  };
-
-  const onLabelPresetDelete = (idx: number) => {
-    const result = [...labelPresets];
-    result.splice(idx, 1);
-    labelPresets = result;
-    LocalStoragePersistence.saveLabelPresets(labelPresets);
-  };
-
-  const onLabelPresetAdd = () => {
-    const newPreset: LabelPreset = {
-      dpmm,
-      printDirection,
-      unit,
-      width,
-      height,
-      title,
-      shape,
-      split,
-      splitParts,
-      tailPos,
-      tailLength,
-      mirror,
-    };
-    const newPresets = [...labelPresets, newPreset];
-    try {
-      LocalStoragePersistence.saveLabelPresets(newPresets);
-      labelPresets = newPresets;
-    } catch (e) {
-      Toasts.zodErrors(e, "Presets save error:");
-    }
-  };
-
-  const onFlip = () => {
-    let widthTmp = width;
-    width = height;
-    height = widthTmp;
-    printDirection = printDirection === "top" ? "left" : "top";
-  };
-
-  const onUnitChange = () => {
-    if (prevUnit === "mm" && unit === "px") {
-      width = Math.floor(width * dpmm);
-      height = Math.floor(height * dpmm);
-      tailLength = Math.floor(tailLength * dpmm);
-    } else if (prevUnit === "px" && unit === "mm") {
-      width = Math.floor(width / dpmm);
-      height = Math.floor(height / dpmm);
-      tailLength = Math.floor(tailLength / dpmm);
-    }
-    prevUnit = unit;
-  };
-
-  const fillWithCurrentParams = () => {
-    prevUnit = "px";
-    width = labelProps.size.width;
-    height = labelProps.size.height;
-    printDirection = labelProps.printDirection;
-    shape = labelProps.shape ?? "rect";
-    split = labelProps.split ?? "none";
-    splitParts = labelProps.splitParts ?? 2;
-    tailPos = labelProps.tailPos ?? "right";
-    tailLength = labelProps.tailLength ?? 0;
-    mirror = labelProps.mirror ?? "none";
-    onUnitChange();
-  };
-
-  const onImportClicked = async () => {
-    const contents = await FileUtils.pickAndReadSingleTextFile("json");
-    const rawData = JSON.parse(contents);
-
-    if (!confirm($tr("params.label.warning.import"))) {
-      return;
-    }
-
-    try {
-      const presets = z.array(LabelPresetSchema).parse(rawData);
-      LocalStoragePersistence.saveLabelPresets(presets);
-      labelPresets = presets;
-    } catch (e) {
-      Toasts.zodErrors(e, "Presets load error:");
-    }
-  };
-
-  const onExportClicked = () => {
-    try {
-      FileUtils.saveLabelPresetsAsJson(labelPresets);
-    } catch (e) {
-      Toasts.zodErrors(e, "Presets save error:");
-    }
-  };
-
-  onMount(() => {
-    const defaultPreset: LabelPreset = DEFAULT_LABEL_PRESETS[0];
-    width = defaultPreset.width;
-    height = defaultPreset.height;
-    prevUnit = defaultPreset.unit;
-    unit = defaultPreset.unit;
-    printDirection = defaultPreset.printDirection;
-    shape = defaultPreset.shape ?? "rect";
-    split = defaultPreset.split ?? "none";
-    tailPos = defaultPreset.tailPos ?? "right";
-    tailLength = defaultPreset.tailLength ?? 0;
-    mirror = defaultPreset.mirror ?? "none";
-
-    try {
-      const savedPresets: LabelPreset[] | null = LocalStoragePersistence.loadLabelPresets();
-      if (savedPresets !== null) {
-        labelPresets = savedPresets;
-      }
-    } catch (e) {
-      Toasts.zodErrors(e, "Presets load error:");
-    }
-
-    tick().then(() => fillWithCurrentParams());
-  });
-
-  $effect(() => {
-    if (shape === "circle" && split !== "none") split = "none";
-  });
-
-  $effect(() => {
-    if (split === "none" || tailLength < 0) tailLength = 0;
-  });
-
-  $effect(() => {
-    if (mirror === "flip" && splitParts !== 2) mirror = "copy";
-  });
-</script>
-
-<div class="dropdown">
-  <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-    <MdIcon icon="settings" />
-  </button>
-  <div class="dropdown-menu">
-    <h6 class="dropdown-header">{$tr("params.label.menu_title")}</h6>
-
-    <div class="px-3">
-      <div class="p-1">
-        <button class="btn btn-sm btn-outline-secondary" onclick={onImportClicked}>
-          <MdIcon icon="data_object" />
-          {$tr("params.label.import")}
-        </button>
-        <button class="btn btn-sm btn-outline-secondary" onclick={onExportClicked}>
-          <MdIcon icon="data_object" />
-          {$tr("params.label.export")}
-        </button>
-      </div>
-      <div class="mb-3 {error ? 'cursor-help text-warning' : 'text-secondary'}" title={error}>
-        {$tr("params.label.current")}
-        {labelProps.size.width}x{labelProps.size.height}
-        {$tr("params.label.px")}
-        {#if labelProps.printDirection === "top"}
-          ({$tr("params.label.direction")} {$tr("params.label.direction.top")})
-        {:else if labelProps.printDirection === "left"}
-          ({$tr("params.label.direction")} {$tr("params.label.direction.left")})
-        {/if}
-        <button class="btn btn-sm" onclick={fillWithCurrentParams}><MdIcon icon="arrow_downward" /></button>
-      </div>
-
-      <LabelPresetsBrowser
-        class="mb-1"
-        presets={labelPresets}
-        onItemSelected={onLabelPresetSelected}
-        onItemDelete={onLabelPresetDelete} />
-
-      <div class="input-group flex-nowrap input-group-sm mb-2">
-        <span class="input-group-text">{$tr("params.label.size")}</span>
-        <input class="form-control" type="number" min="1" step={unit === "px" ? 8 : 1} bind:value={width} />
-        <button class="btn btn-sm btn-secondary" onclick={onFlip}><MdIcon icon="swap_horiz" /></button>
-        <input class="form-control" type="number" min="1" step={unit === "px" ? 8 : 1} bind:value={height} />
-        <select class="form-select" bind:value={unit} onchange={onUnitChange}>
-          <option value="mm"> {$tr("params.label.mm")}</option>
-          <option value="px"> {$tr("params.label.px")}</option>
-        </select>
-      </div>
-
-      {#if unit !== "px"}
-        <DpiSelector bind:value={dpmm} />
-      {/if}
-
-      <div class="input-group flex-nowrap input-group-sm print-dir-switch mb-2" role="group">
-        <span class="input-group-text w-100">{$tr("params.label.direction")}</span>
-        {#each printDirections as v (v)}
-          <input
-            type="radio"
-            class="btn-check"
-            name="print-dir"
-            id="print-dir-{v}"
-            autocomplete="off"
-            bind:group={printDirection}
-            value={v} />
-          <label class="btn btn-outline-secondary px-3" for="print-dir-{v}">
-            <div class="svg-icon"></div>
-          </label>
-        {/each}
-      </div>
-
-      <div class="input-group flex-nowrap input-group-sm label-shape-switch mb-2" role="group">
-        <span class="input-group-text w-100">{$tr("params.label.shape")}</span>
-        {#each labelShapes as v (v)}
-          <input
-            type="radio"
-            class="btn-check"
-            name="label-shape"
-            id="label-shape-{v}"
-            autocomplete="off"
-            bind:group={shape}
-            value={v} />
-          <label class="btn btn-outline-secondary px-3" for="label-shape-{v}">
-            <div class="svg-icon"></div>
-          </label>
-        {/each}
-      </div>
-
-      {#if shape !== "circle"}
-        <div class="input-group flex-nowrap input-group-sm label-split-switch mb-2" role="group">
-          <span class="input-group-text w-100">{$tr("params.label.split")}</span>
-          {#each labelSplits as v (v)}
-            <input
-              type="radio"
-              class="btn-check"
-              name="label-split"
-              id="label-split-{v}"
-              autocomplete="off"
-              bind:group={split}
-              value={v} />
-            <label class="btn btn-outline-secondary px-3" for="label-split-{v}">
-              <div class="svg-icon"></div>
-            </label>
-          {/each}
-        </div>
-
-        {#if split !== "none"}
-          <div class="input-group flex-nowrap input-group-sm mb-2">
-            <span class="input-group-text">{$tr("params.label.split.count")}</span>
-            <input class="form-control" type="number" min="1" bind:value={splitParts} />
-          </div>
-        {/if}
-      {/if}
-
-      {#if split !== "none"}
-        <div class="input-group flex-nowrap input-group-sm mirror-switch mb-2" role="group">
-          <span class="input-group-text w-100">{$tr("params.label.mirror")}</span>
-          {#each mirrorTypes as v (v)}
-            <input
-              type="radio"
-              class="btn-check"
-              name="mirror"
-              id="mirror-{v}"
-              autocomplete="off"
-              bind:group={mirror}
-              value={v} />
-            <label class="btn btn-outline-secondary px-3" for="mirror-{v}">
-              <div class="svg-icon"></div>
-            </label>
-          {/each}
-        </div>
-
-        <div class="input-group flex-nowrap input-group-sm tail-pos-switch mb-2" role="group">
-          <span class="input-group-text w-100">{$tr("params.label.tail.position")}</span>
-          {#each tailPositions as v (v)}
-            <input
-              type="radio"
-              class="btn-check"
-              name="tail-pos"
-              id="tail-{v}"
-              autocomplete="off"
-              bind:group={tailPos}
-              value={v} />
-            <label class="btn btn-outline-secondary px-3" for="tail-{v}">
-              <div class="svg-icon"></div>
-            </label>
-          {/each}
-        </div>
-
-        <div class="input-group flex-nowrap input-group-sm mb-2">
-          <span class="input-group-text">{$tr("params.label.tail.length")}</span>
-          <input class="form-control" type="number" min="1" bind:value={tailLength} />
-          <span class="input-group-text">
-            {#if unit === "mm"}{$tr("params.label.mm")}{/if}
-            {#if unit === "px"}{$tr("params.label.px")}{/if}
-          </span>
-        </div>
-      {/if}
-
-      <div class="input-group flex-nowrap input-group-sm mb-2">
-        <span class="input-group-text">{$tr("params.label.label_title")}</span>
-        <input class="form-control" type="text" bind:value={title} />
-      </div>
-
-      <div class="text-end">
-        <button class="btn btn-sm btn-secondary" onclick={onLabelPresetAdd}>
-          {$tr("params.label.save_template")}
-        </button>
-        <button class="btn btn-sm btn-primary" onclick={onApply}>{$tr("params.label.apply")}</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<style>
-  .dropdown-menu {
-    width: 100vw;
-    max-width: 450px;
-  }
-
-  .cursor-help {
-    cursor: help;
-  }
-
-  .svg-icon {
-    height: 1.5em;
-    width: 1.5em;
-    background-size: cover;
-  }
-
-  .tail-pos-switch .svg-icon {
-    background-image: url("../assets/tail-pos.svg");
-  }
-  .tail-pos-switch label[for="tail-bottom"] .svg-icon {
-    transform: rotate(90deg);
-  }
-  .tail-pos-switch label[for="tail-bottom"] .svg-icon {
-    transform: rotate(90deg);
-  }
-  .tail-pos-switch label[for="tail-left"] .svg-icon {
-    transform: rotate(180deg);
-  }
-  .tail-pos-switch label[for="tail-top"] .svg-icon {
-    transform: rotate(270deg);
-  }
-  .print-dir-switch .svg-icon {
-    background-image: url("../assets/print-dir.svg");
-  }
-  .print-dir-switch label[for="print-dir-top"] .svg-icon {
-    transform: rotate(90deg);
-  }
-
-  .label-shape-switch label[for="label-shape-rect"] .svg-icon {
-    background-image: url("../assets/shape-rect.svg");
-  }
-  .label-shape-switch label[for="label-shape-rounded_rect"] .svg-icon {
-    background-image: url("../assets/shape-rrect.svg");
-  }
-  .label-shape-switch label[for="label-shape-circle"] .svg-icon {
-    background-image: url("../assets/shape-circle.svg");
-  }
-
-  .label-split-switch label[for="label-split-none"] .svg-icon {
-    background-image: url("../assets/shape-rrect.svg");
-  }
-  .label-split-switch label[for="label-split-vertical"] .svg-icon {
-    background-image: url("../assets/split-vertical.svg");
-    transform: rotate(90deg);
-  }
-  .label-split-switch label[for="label-split-horizontal"] .svg-icon {
-    background-image: url("../assets/split-vertical.svg");
-  }
-
-  .mirror-switch label[for="mirror-none"] .svg-icon {
-    background-image: url("../assets/mirror-none.svg");
-  }
-  .mirror-switch label[for="mirror-copy"] .svg-icon {
-    background-image: url("../assets/mirror-copy.svg");
-  }
-  .mirror-switch label[for="mirror-flip"] .svg-icon {
-    background-image: url("../assets/mirror-flip.svg");
-  }
-</style>
-</file>
-
 <file path="src/components/designer-controls/ObjectPositionControls.svelte">
 <script lang="ts">
   import MdIcon from "$/components/basic/MdIcon.svelte";
@@ -3121,319 +3287,6 @@ EXPOSE 80
 </button>
 </file>
 
-<file path="src/components/designer-controls/SavedLabelsMenu.svelte">
-<script lang="ts">
-  import { tr } from "$/utils/i18n";
-  import { onMount } from "svelte";
-  import MdIcon from "$/components/basic/MdIcon.svelte";
-  import SavedLabelsBrowser from "$/components/designer-controls/SavedLabelsBrowser.svelte";
-  import { ExportedLabelTemplateSchema, type ExportedLabelTemplate } from "$/types";
-  import { LocalStoragePersistence } from "$/utils/persistence";
-  import { Toasts } from "$/utils/toasts";
-  import Dropdown from "bootstrap/js/dist/dropdown";
-  import { FileUtils } from "$/utils/file_utils";
-  import * as fabric from "fabric";
-  import { Utils } from "@mmote/niimbluelib";
-
-  interface Props {
-    onRequestLabelTemplate: () => ExportedLabelTemplate;
-    onLoadRequested: (label: ExportedLabelTemplate) => void;
-    canvas: fabric.Canvas;
-    csvEnabled: boolean;
-  }
-
-  let { onRequestLabelTemplate, onLoadRequested, canvas, csvEnabled }: Props = $props();
-
-  let dropdownRef: HTMLDivElement;
-  let savedLabels = $state<ExportedLabelTemplate[]>([]);
-  let selectedIndex = $state<number>(-1);
-  let title = $state<string>("");
-  let usedSpace = $state<number>(0);
-  let customDefaultTemplate = $state<boolean>(LocalStoragePersistence.hasCustomDefaultTemplate());
-  let isStandalone = Utils.getAvailableTransports().capacitorBle;
-
-  const calcUsedSpace = () => {
-    usedSpace = LocalStoragePersistence.usedSpace();
-  };
-
-  const onLabelSelected = (index: number) => {
-    selectedIndex = index;
-    title = savedLabels[index]?.title ?? "";
-  };
-
-  const onLabelExport = (idx: number) => {
-    try {
-      FileUtils.saveLabelAsJson(savedLabels[idx]);
-    } catch (e) {
-      Toasts.zodErrors(e, "Canvas save error:");
-    }
-  };
-
-  const onLabelDelete = (idx: number) => {
-    selectedIndex = -1;
-    const result = [...savedLabels];
-    result.splice(idx, 1);
-    LocalStoragePersistence.saveLabels(result);
-
-    savedLabels = result;
-    title = "";
-    calcUsedSpace();
-  };
-
-  const saveLabels = (labels: ExportedLabelTemplate[]) => {
-    const { zodErrors, otherErrors } = LocalStoragePersistence.saveLabels(labels);
-    zodErrors.forEach((e) => Toasts.zodErrors(e, "Label save error"));
-    otherErrors.forEach((e) => Toasts.error(e));
-
-    if (zodErrors.length === 0 && otherErrors.length === 0) {
-      savedLabels = labels;
-    }
-
-    calcUsedSpace();
-  };
-
-  const onSaveReplaceClicked = () => {
-    if (selectedIndex === -1) {
-      return;
-    }
-
-    if (!confirm($tr("editor.warning.save"))) {
-      return;
-    }
-
-    const label = onRequestLabelTemplate();
-    label.title = title;
-
-    const result = [...savedLabels];
-    result[selectedIndex] = label;
-
-    saveLabels(result);
-  };
-
-  const onMakeDefaultClicked = () => {
-    const label = onRequestLabelTemplate();
-    label.title = title;
-    label.thumbnailBase64 = undefined;
-    LocalStoragePersistence.saveDefaultTemplate(label);
-    customDefaultTemplate = true;
-    calcUsedSpace();
-  };
-
-  const onRemoveDefaultClicked = () => {
-    LocalStoragePersistence.saveDefaultTemplate(undefined);
-    customDefaultTemplate = false;
-    calcUsedSpace();
-  };
-
-  const onSaveClicked = () => {
-    const label = onRequestLabelTemplate();
-    label.title = title;
-    const result = [...savedLabels, label];
-    saveLabels(result);
-  };
-
-  const onLoadClicked = () => {
-    if (selectedIndex === -1) {
-      return;
-    }
-
-    const label = savedLabels[selectedIndex];
-
-    let message = $tr("editor.warning.load");
-
-    if (label.csv) {
-      message += "\n" + $tr("editor.warning.load.csv");
-    }
-
-    if (!confirm(message)) {
-      return;
-    }
-
-    onLoadRequested(label);
-    new Dropdown(dropdownRef).hide();
-  };
-
-  const onImportClicked = async () => {
-    const contents = await FileUtils.pickAndReadSingleTextFile("json");
-    const rawData = JSON.parse(contents);
-
-
-    try {
-      const label = ExportedLabelTemplateSchema.parse(rawData);
-
-      let message = $tr("editor.warning.load");
-
-      if (label.csv) {
-        message += "\n" + $tr("editor.warning.load.csv");
-      }
-
-      if (!confirm(message)) {
-        return;
-      }
-
-      onLoadRequested(label);
-
-      if (label.title) {
-        title = label.title;
-      }
-
-      new Dropdown(dropdownRef).hide();
-    } catch (e) {
-      Toasts.zodErrors(e, "Canvas load error:");
-    }
-  };
-
-  const onExportClicked = () => {
-    try {
-      const label = onRequestLabelTemplate();
-      if (title) {
-        label.title = title.replaceAll(/[\\/:*?"<>|]/g, "_");
-      }
-      FileUtils.saveLabelAsJson(label);
-    } catch (e) {
-      Toasts.zodErrors(e, "Canvas save error:");
-    }
-  };
-
-  const onExportPngClicked = () => {
-    try {
-      FileUtils.saveCanvasAsPng(canvas);
-    } catch (e) {
-      Toasts.zodErrors(e, "Canvas save error:");
-    }
-  };
-
-  const onExportUrlClicked = async () => {
-    try {
-      const label = onRequestLabelTemplate();
-      const url = await FileUtils.makeLabelUrl(label);
-
-      if (url.length > 2000 && !confirm($tr("params.saved_labels.save.url.warn"))) {
-        return;
-      }
-
-      navigator.clipboard.writeText(url);
-      Toasts.message($tr("params.saved_labels.save.url.copied"));
-    } catch (e) {
-      Toasts.error(e);
-    }
-  };
-
-  onMount(() => {
-    savedLabels = LocalStoragePersistence.loadLabels();
-    calcUsedSpace();
-  });
-</script>
-
-<div class="dropdown">
-  <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-    <MdIcon icon="sd_storage" />
-  </button>
-  <div class="saved-labels dropdown-menu" bind:this={dropdownRef}>
-    <h6 class="dropdown-header text-wrap">
-      {$tr("params.saved_labels.menu_title")} - {usedSpace}
-      {$tr("params.saved_labels.kb_used")}
-
-      {#if csvEnabled}
-        <div class="pt-3 text-warning">
-            {$tr("params.saved_labels.save.withcsv")}
-        </div>
-      {/if}
-    </h6>
-
-
-    <div class="px-3">
-      <div class="p-1">
-        <button class="btn btn-sm btn-outline-secondary" onclick={onImportClicked}>
-          <MdIcon icon="data_object" />
-          {$tr("params.saved_labels.load.json")}
-        </button>
-        <div class="btn-group btn-group-sm">
-          <button class="btn btn-outline-secondary" onclick={onExportClicked}>
-            <MdIcon icon="data_object" />
-            {$tr("params.saved_labels.save.json")}
-          </button>
-          <button
-            type="button"
-            aria-label="dropdown"
-            class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
-            data-bs-toggle="dropdown">
-          </button>
-          <ul class="dropdown-menu">
-            <li>
-              <button class="dropdown-item" onclick={onExportPngClicked}>PNG</button>
-            </li>
-            {#if !isStandalone}
-              <li>
-                <button class="dropdown-item" onclick={onExportUrlClicked}
-                  >{$tr("params.saved_labels.save.url")}</button>
-              </li>
-            {/if}
-          </ul>
-        </div>
-      </div>
-
-      <SavedLabelsBrowser
-        class="mb-1"
-        {selectedIndex}
-        labels={savedLabels}
-        onItemClicked={onLabelSelected}
-        onItemDelete={onLabelDelete}
-        onItemExport={onLabelExport} />
-
-      <div class="input-group flex-nowrap input-group-sm mb-3">
-        <span class="input-group-text">{$tr("params.saved_labels.label_title")}</span>
-        <input
-          class="form-control"
-          type="text"
-          placeholder={$tr("params.saved_labels.label_title.placeholder")}
-          bind:value={title} />
-      </div>
-
-      <div class="d-flex gap-1 flex-wrap justify-content-end">
-        <div class="btn-group btn-group-sm make-default">
-          <button class="btn text-secondary" onclick={onMakeDefaultClicked}>
-            {$tr("params.saved_labels.make_default")}
-          </button>
-          {#if customDefaultTemplate}
-            <button class="btn text-secondary" onclick={onRemoveDefaultClicked}>
-              <MdIcon icon="close" />
-            </button>
-          {/if}
-        </div>
-
-        <button class="btn btn-sm btn-secondary" onclick={onSaveClicked}>
-          <MdIcon icon="save" />
-          {$tr("params.saved_labels.save.browser")}
-        </button>
-
-        {#if selectedIndex !== -1}
-          <button class="btn btn-sm btn-secondary" onclick={onSaveReplaceClicked}>
-            <MdIcon icon="edit_note" />
-            {$tr("params.saved_labels.save.browser.replace")}
-          </button>
-
-          <button class="btn btn-sm btn-primary" onclick={onLoadClicked}>
-            <MdIcon icon="folder" />
-            {$tr("params.saved_labels.load.browser")}
-          </button>
-        {/if}
-      </div>
-    </div>
-  </div>
-</div>
-
-<style>
-  .saved-labels.dropdown-menu {
-    width: 100vw;
-    max-width: 450px;
-  }
-  .make-default {
-    margin-right: auto;
-  }
-</style>
-</file>
-
 <file path="src/components/designer-controls/VectorParamsControls.svelte">
 <script lang="ts">
   import { tr } from "$/utils/i18n";
@@ -3521,6 +3374,413 @@ EXPOSE 80
   }
   .input-group.fill {
     width: 12em;
+  }
+</style>
+</file>
+
+<file path="src/components/designer-controls/ZplImportButton.svelte">
+<script lang="ts">
+  import type { LabelProps } from "$/types";
+  import { FileUtils } from "$/utils/file_utils";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { tr } from "$/utils/i18n";
+  import { Toasts } from "$/utils/toasts";
+
+  interface Props {
+    labelProps: LabelProps;
+    onImageReady: (img: Blob) => void;
+  }
+
+  let { labelProps, onImageReady }: Props = $props();
+  let importState = $state<"idle" | "processing" | "error">("idle");
+
+  const onImportClicked = async () => {
+    const mmToInchCoeff = 25.4;
+    const dpmm = 8; // todo: may vary, make it configurable
+    const widthInches = labelProps.size.width / dpmm / mmToInchCoeff;
+    const heightInches = labelProps.size.height / dpmm / mmToInchCoeff;
+
+    const contents = await FileUtils.pickAndReadSingleTextFile("zpl");
+
+    importState = "processing";
+
+    try {
+      const response = await fetch(
+        `https://api.labelary.com/v1/printers/${dpmm}dpmm/labels/${widthInches}x${heightInches}/0/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Accept: "image/png",
+            "X-Quality": "bitonal",
+          },
+          body: contents,
+        },
+      );
+      if (response.ok) {
+        const img = await response.blob();
+        onImageReady(img);
+        importState = "idle";
+      } else {
+        importState = "error";
+      }
+    } catch (e) {
+      importState = "error";
+      Toasts.error(e);
+    }
+  };
+</script>
+
+<button class="btn btn-sm" onclick={onImportClicked}>
+  <MdIcon icon="picture_as_pdf" />
+
+  {$tr("editor.import.zpl")}
+
+  {#if importState === "processing"}
+    <MdIcon icon="hourglass_top" />
+  {:else if importState === "error"}
+    <MdIcon icon="warning" class="text-warning" />
+  {/if}
+</button>
+</file>
+
+<file path="src/components/PrinterConnector.svelte">
+<script lang="ts">
+  import { NiimbotCapacitorBleClient, SoundSettingsItemType, Utils, type AvailableTransports } from "@mmote/niimbluelib";
+  import {
+    printerClient,
+    connectedPrinterName,
+    connectionState,
+    initClient,
+    heartbeatData,
+    printerInfo,
+    printerMeta,
+    heartbeatFails,
+    automation,
+    rfidInfo,
+    ribbonRfidInfo,
+    refreshRfidInfo,
+  } from "$/stores";
+  import type { ConnectionType } from "$/types";
+  import { tr } from "$/utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { Toasts } from "$/utils/toasts";
+  import { onMount } from "svelte";
+  import { LocalStoragePersistence } from "$/utils/persistence";
+  import type { MaterialIcon } from "material-icons";
+  import FirmwareUpdater from "$/components/basic/FirmwareUpdater.svelte";
+
+  let connectionType = $state<ConnectionType>("bluetooth");
+  let featureSupport = $state<AvailableTransports>({ webBluetooth: false, webSerial: false, capacitorBle: false });
+
+  const onConnectClicked = async (autoScanB1 = false) => {
+    initClient(connectionType);
+    connectionState.set("connecting");
+
+    try {
+      if ($printerClient instanceof NiimbotCapacitorBleClient) {
+        if (autoScanB1) {
+          try {
+            const { BleClient } = await import("@capacitor-community/bluetooth-le");
+            await BleClient.initialize();
+            let foundId: string | undefined = undefined;
+
+            await BleClient.requestLEScan({}, (result) => {
+              if (result.device.name && result.device.name.includes("B1")) {
+                foundId = result.device.deviceId;
+              }
+            });
+
+            // Wait up to 3 seconds for scan
+            for (let i = 0; i < 30; i++) {
+              await new Promise(r => setTimeout(r, 100));
+              if (foundId) break;
+            }
+            await BleClient.stopLEScan();
+
+            if (foundId) {
+              await $printerClient.connect({ deviceId: foundId });
+              return;
+            } else {
+              connectionState.set("disconnected");
+              return;
+            }
+          } catch (e) {
+            console.error("Auto-scan error", e);
+            connectionState.set("disconnected");
+            return;
+          }
+        }
+
+        if ($automation?.autoConnectDeviceId !== undefined) {
+          await $printerClient.connect({ deviceId: $automation.autoConnectDeviceId });
+        } else {
+          await $printerClient.connect();
+        }
+      } else {
+        await $printerClient.connect();
+      }
+    } catch (e) {
+      connectionState.set("disconnected");
+      if (!autoScanB1) Toasts.error(e);
+    }
+  };
+
+  const onDisconnectClicked = () => {
+    $printerClient.disconnect();
+  };
+
+  const startHeartbeat = async () => {
+    $printerClient.startHeartbeat();
+  };
+
+  const stopHeartbeat = async () => {
+    $printerClient.stopHeartbeat();
+  };
+
+  const soundOn = async () => {
+    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.BluetoothConnectionSound, true);
+    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.PowerSound, true);
+  };
+
+  const soundOff = async () => {
+    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.BluetoothConnectionSound, false);
+    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.PowerSound, false);
+  };
+
+  const fetchInfo = async () => {
+    await $printerClient.fetchPrinterInfo();
+  };
+
+  const reset = async () => {
+    await $printerClient.abstraction.printerReset();
+  };
+
+  const switchConnectionType = (c: ConnectionType) => {
+    LocalStoragePersistence.saveLastConnectionType(c);
+    connectionType = c;
+  };
+
+  const batteryIcon = (value: number): MaterialIcon => {
+    if (value > 4) {
+      value = Math.min(4, Math.max(1, Math.ceil(value / 25)));
+    }
+
+    if (value === 4) {
+      return "battery_full";
+    } else if (value === 3) {
+      return "battery_5_bar";
+    } else if (value === 2) {
+      return "battery_3_bar";
+    } else if (value === 1) {
+      return "battery_2_bar";
+    }
+    return "battery_0_bar";
+  };
+
+  onMount(() => {
+    featureSupport = Utils.getAvailableTransports();
+
+    connectionType = LocalStoragePersistence.loadLastConnectionType() ?? "bluetooth";
+
+    if (!featureSupport.capacitorBle && connectionType === "capacitor-ble") {
+      connectionType = "bluetooth";
+    }
+    if (!featureSupport.webSerial && connectionType === "serial") {
+      connectionType = "bluetooth";
+    }
+    if (!featureSupport.webBluetooth && connectionType === "bluetooth" && featureSupport.capacitorBle) {
+      connectionType = "capacitor-ble";
+    }
+
+    if (connectionType === "capacitor-ble") {
+      onConnectClicked(true);
+    } else if ($automation !== undefined && $automation.autoConnect && connectionType === "capacitor-ble") {
+      onConnectClicked(false);
+    }
+  });
+</script>
+
+<div class="input-group w-auto input-group-sm flex-nowrap justify-content-end">
+  {#if $connectionState === "connected"}
+    <button class="btn btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+      <MdIcon icon="settings" />
+    </button>
+    <div class="dropdown-menu p-1">
+      {#if $printerInfo}
+        <div>
+          Printer info:
+          <ul>
+            {#each Object.entries($printerInfo) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
+
+      {#if $printerMeta}
+        <button
+          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#modelMeta">
+          Model metadata <MdIcon icon="expand_more" />
+        </button>
+
+        <div class="collapse" id="modelMeta">
+          <ul>
+            {#each Object.entries($printerMeta) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
+
+      {#if $rfidInfo}
+        <button
+          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#rfidInfo">
+          RFID info <MdIcon icon="expand_more" />
+        </button>
+
+        <div class="collapse" id="rfidInfo">
+          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
+
+          <ul>
+            {#each Object.entries($rfidInfo) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
+
+      {#if $ribbonRfidInfo}
+        <button
+          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#ribbonRfidInfo">
+          Ribbon RFID info <MdIcon icon="expand_more" />
+        </button>
+
+        <div class="collapse" id="ribbonRfidInfo">
+          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
+
+          <ul>
+            {#each Object.entries($ribbonRfidInfo) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
+
+      {#if $heartbeatData}
+        <button
+          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#heartbeatData">
+          Heartbeat data <MdIcon icon="expand_more" />
+        </button>
+
+        <div class="collapse" id="heartbeatData">
+          <ul>
+            {#each Object.entries($heartbeatData) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
+
+      <FirmwareUpdater />
+
+      <button
+        class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#tests">
+        Tests <MdIcon icon="expand_more" />
+      </button>
+
+      <div class="collapse" id="tests">
+        <div class="d-flex flex-wrap gap-1 mt-1">
+          <button class="btn btn-sm btn-primary" onclick={startHeartbeat}>Heartbeat on</button>
+          <button class="btn btn-sm btn-primary" onclick={stopHeartbeat}>Heartbeat off</button>
+          <button class="btn btn-sm btn-primary" onclick={soundOn}>Sound on</button>
+          <button class="btn btn-sm btn-primary" onclick={soundOff}>Sound off</button>
+          <button class="btn btn-sm btn-primary" onclick={fetchInfo}>Fetch info again</button>
+          <button class="btn btn-sm btn-primary" onclick={reset}>Reset</button>
+        </div>
+      </div>
+    </div>
+    <span class="input-group-text">
+      {#if connectionType === "serial"}
+        <MdIcon icon="usb" />
+      {:else}
+        <MdIcon icon="bluetooth" />
+      {/if}
+    </span>
+    <span class="input-group-text {$heartbeatFails > 0 ? 'text-warning' : ''}">
+      {$printerMeta?.model ?? $connectedPrinterName}
+    </span>
+    {#if $heartbeatData?.chargeLevel}
+      <span class="input-group-text">
+        <MdIcon icon={batteryIcon($heartbeatData.chargeLevel)} class="r-90"></MdIcon>
+      </span>
+    {/if}
+  {:else}
+    {#if featureSupport.webBluetooth}
+      <button
+        disabled={$connectionState === "connecting"}
+        class="btn text-nowrap {connectionType === 'bluetooth' ? 'btn-light' : 'btn-outline-secondary'}"
+        onclick={() => switchConnectionType("bluetooth")}>
+        <MdIcon icon="bluetooth" />
+        {$tr("connector.bluetooth")}
+      </button>
+    {/if}
+    {#if featureSupport.webSerial}
+      <button
+        disabled={$connectionState === "connecting"}
+        class="btn text-nowrap {connectionType === 'serial' ? 'btn-light' : 'btn-outline-secondary'}"
+        onclick={() => switchConnectionType((connectionType = "serial"))}>
+        <MdIcon icon="usb" />
+        {$tr("connector.serial")}
+      </button>
+    {/if}
+    {#if featureSupport.capacitorBle}
+      <button
+        disabled={$connectionState === "connecting"}
+        class="btn text-nowrap {connectionType === 'capacitor-ble' ? 'btn-light' : 'btn-outline-secondary'}"
+        onclick={() => switchConnectionType((connectionType = "capacitor-ble"))}>
+        <MdIcon icon="usb" />
+        Capacitor BLE
+      </button>
+    {/if}
+  {/if}
+
+  {#if $connectionState !== "connected"}
+    <button
+      class="btn btn-primary"
+      disabled={$connectionState === "connecting" ||
+        (!featureSupport.capacitorBle && !featureSupport.webBluetooth && !featureSupport.webSerial)}
+      onclick={() => onConnectClicked(false)}>
+      <MdIcon icon="power" />
+    </button>
+  {/if}
+
+  {#if $connectionState === "connected"}
+    <button class="btn btn-danger" onclick={onDisconnectClicked}>
+      <MdIcon icon="power_off" />
+    </button>
+  {/if}
+</div>
+
+<style>
+  .dropdown-menu {
+    width: 100vw;
+    max-width: 300px;
   }
 </style>
 </file>
@@ -4836,161 +5096,6 @@ Thank you for your interest in contributing to NiimBlue!
 </style>
 </file>
 
-<file path="src/components/designer-controls/IconPicker.svelte">
-<script lang="ts">
-  import { onDestroy, onMount } from "svelte";
-  import { tr } from "$/utils/i18n";
-  import { iconCodepoints, type MaterialIcon } from "$/styles/mdi_icons";
-  import MdIcon from "$/components/basic/MdIcon.svelte";
-  import { appConfig, userIcons } from "$/stores";
-  import { FileUtils } from "$/utils/file_utils";
-  import { Toasts } from "$/utils/toasts";
-
-  interface Props {
-    onSubmit: (i: MaterialIcon) => void;
-    onSubmitSvg: (i: string) => void;
-  }
-
-  let { onSubmit, onSubmitSvg }: Props = $props();
-
-  let iconNames = $state<MaterialIcon[]>([]);
-  let search = $state<string>("");
-  let deleteMode = $state<boolean>(false);
-  let dropdown: HTMLDivElement;
-
-  const onShow = () => {
-    if (iconNames.length === 0) {
-      iconNames = Object.keys(iconCodepoints) as MaterialIcon[];
-    }
-  };
-
-  const addOwn = async () => {
-    try {
-      let counter = 0;
-      const xmls = await FileUtils.pickAndReadTextFile("svg", true);
-      const iconsToAdd = xmls.map((xml) => ({
-        name: `i_${FileUtils.timestampFloat()}_${counter++}`,
-        data: xml,
-      }));
-
-      userIcons.update((prev) => [...prev, ...iconsToAdd]);
-    } catch (e) {
-      Toasts.error(e);
-    }
-  };
-
-  const svgClicked = (name: string, data: string) => {
-    if (deleteMode) {
-      userIcons.update((prev) => prev.filter((e) => e.name !== name));
-      return;
-    }
-
-    onSubmitSvg(data);
-  };
-
-  const iconClicked = (i: MaterialIcon) => {
-    if (deleteMode) {
-      return;
-    }
-
-    onSubmit(i);
-  };
-
-  onMount(() => {
-    dropdown?.addEventListener("show.bs.dropdown", onShow);
-  });
-
-  onDestroy(() => {
-    dropdown?.removeEventListener("show.bs.dropdown", onShow);
-  });
-</script>
-
-<div class="dropdown" bind:this={dropdown}>
-  <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-    <MdIcon icon="emoji_emotions" />
-    <MdIcon icon="add" />
-  </button>
-
-  <div class="dropdown-menu">
-    <h6 class="dropdown-header">{$tr("editor.iconpicker.title")}</h6>
-    <div class="p-3">
-      <input
-        disabled={$appConfig.iconListMode === "user"}
-        type="text"
-        class="form-control mb-1"
-        placeholder={$tr("editor.iconpicker.search")}
-        bind:value={search} />
-
-      <div class="input-group input-group-sm mb-1">
-        <span class="input-group-text">{$tr("editor.iconpicker.show")}</span>
-        <select class="form-select form-select-sm" bind:value={$appConfig.iconListMode}>
-          <option value="both">{$tr("editor.iconpicker.show.both")}</option>
-          <option value="user">{$tr("editor.iconpicker.show.user")}</option>
-          <option value="pack">{$tr("editor.iconpicker.show.pack")}</option>
-        </select>
-      </div>
-
-      <div class="icons mb-1">
-        {#if $appConfig.iconListMode === "both" || $appConfig.iconListMode === "user"}
-          {#each $userIcons as { name, data } (name)}
-            <button
-              class="btn {deleteMode ? 'btn-danger' : 'btn-light'} me-1 mb-1 user-icon"
-              onclick={() => svgClicked(name, data)}>
-              <img src="data:image/svg+xml;base64,{FileUtils.base64str(data)}" alt="user-svg" />
-            </button>
-          {/each}
-        {/if}
-
-        {#if $appConfig.iconListMode === "both" || $appConfig.iconListMode === "pack"}
-          {#each iconNames as name (name)}
-            {#if !search || name.includes(search.toLowerCase())}
-              <button class="btn me-1" title={name} onclick={() => iconClicked(name)}>
-                <MdIcon icon={name} />
-              </button>
-            {/if}
-          {/each}
-        {/if}
-      </div>
-
-      <div class="input-group input-group-sm mb-1">
-        <button class="btn btn-outline-secondary" onclick={addOwn}>
-          <MdIcon icon="add" />
-
-          {$tr("editor.iconpicker.add")}
-        </button>
-        <button
-          class="btn {deleteMode ? 'btn-danger' : 'btn-outline-secondary'}"
-          onclick={() => (deleteMode = !deleteMode)}>
-          <MdIcon icon="delete" />
-          {$tr("editor.iconpicker.delete_mode")}
-        </button>
-      </div>
-
-      <a
-        href="https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Filled"
-        target="_blank"
-        class="text-secondary">
-        {$tr("editor.iconpicker.mdi_link_title")}
-      </a>
-    </div>
-  </div>
-</div>
-
-<style>
-  .dropdown-menu {
-    width: 100vw;
-    max-width: 450px;
-  }
-  .icons {
-    max-height: 400px;
-    overflow-y: scroll;
-  }
-  .user-icon img {
-    width: 24px;
-  }
-</style>
-</file>
-
 <file path="src/components/designer-controls/ObjectPicker.svelte">
 <script lang="ts">
   import { type LabelProps, type OjectType } from "$/types";
@@ -5065,72 +5170,6 @@ Thank you for your interest in contributing to NiimBlue!
     max-width: 450px;
   }
 </style>
-</file>
-
-<file path="src/components/designer-controls/ZplImportButton.svelte">
-<script lang="ts">
-  import type { LabelProps } from "$/types";
-  import { FileUtils } from "$/utils/file_utils";
-  import MdIcon from "$/components/basic/MdIcon.svelte";
-  import { tr } from "$/utils/i18n";
-  import { Toasts } from "$/utils/toasts";
-
-  interface Props {
-    labelProps: LabelProps;
-    onImageReady: (img: Blob) => void;
-  }
-
-  let { labelProps, onImageReady }: Props = $props();
-  let importState = $state<"idle" | "processing" | "error">("idle");
-
-  const onImportClicked = async () => {
-    const mmToInchCoeff = 25.4;
-    const dpmm = 8; // todo: may vary, make it configurable
-    const widthInches = labelProps.size.width / dpmm / mmToInchCoeff;
-    const heightInches = labelProps.size.height / dpmm / mmToInchCoeff;
-
-    const contents = await FileUtils.pickAndReadSingleTextFile("zpl");
-
-    importState = "processing";
-
-    try {
-      const response = await fetch(
-        `https://api.labelary.com/v1/printers/${dpmm}dpmm/labels/${widthInches}x${heightInches}/0/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            Accept: "image/png",
-            "X-Quality": "bitonal",
-          },
-          body: contents,
-        },
-      );
-      if (response.ok) {
-        const img = await response.blob();
-        onImageReady(img);
-        importState = "idle";
-      } else {
-        importState = "error";
-      }
-    } catch (e) {
-      importState = "error";
-      Toasts.error(e);
-    }
-  };
-</script>
-
-<button class="btn btn-sm" onclick={onImportClicked}>
-  <MdIcon icon="picture_as_pdf" />
-
-  {$tr("editor.import.zpl")}
-
-  {#if importState === "processing"}
-    <MdIcon icon="hourglass_top" />
-  {:else if importState === "error"}
-    <MdIcon icon="warning" class="text-warning" />
-  {/if}
-</button>
 </file>
 
 <file path="src/components/MainPage.svelte">
@@ -8247,273 +8286,6 @@ export const canvasPreprocess = (canvas: fabric.Canvas, variables?: { [key: stri
 };
 </file>
 
-<file path="standalone-apps/capacitor/android/app/src/main/java/ru/mmote/niimblues/MainActivity.java">
-package ru.mmote.niimblues;
-
-import android.os.Bundle;
-import com.getcapacitor.BridgeActivity;
-
-public class MainActivity extends BridgeActivity {
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        registerPlugin(PdfIntentPlugin.class);
-        super.onCreate(savedInstanceState);
-    }
-}
-</file>
-
-<file path="standalone-apps/capacitor/package.json">
-{
-  "name": "niimblues",
-  "version": "1.0.0",
-  "description": "NiimBlue standalone app",
-  "type": "module",
-  "scripts": {
-    "build-www": "cd ../.. && vite build --outDir ./standalone-apps/capacitor/www",
-    "build-android": "cap sync android && cap build android",
-    "run-android": "cap sync android && cap run android",
-    "build-ios": "cap sync ios && cap open ios",
-    "run-ios": "cap sync ios && cap run ios"
-  },
-  "dependencies": {
-    "@capacitor-community/bluetooth-le": "^8.1.3",
-    "@capacitor/android": "^8.3.0",
-    "@capacitor/core": "^8.3.0",
-    "@capacitor/filesystem": "^8.1.2",
-    "@capacitor/ios": "^8.3.0",
-    "@capacitor/share": "^8.0.1",
-    "@capacitor/splash-screen": "^8.0.1"
-  },
-  "devDependencies": {
-    "@capacitor/cli": "^8.3.0"
-  },
-  "overrides": {
-    "@capacitor/cli": {
-      "tar": "^7.5.11"
-    }
-  },
-  "author": "MultiMote",
-  "license": "MIT"
-}
-</file>
-
-<file path="src/types.ts">
-import { LabelType, printTaskNames } from "@mmote/niimbluelib";
-import * as fabric from "fabric";
-import { z } from "zod";
-
-export type ConnectionState = "connecting" | "connected" | "disconnected";
-export type ConnectionType = "bluetooth" | "serial" | "capacitor-ble";
-
-export type LabelUnit = "mm" | "px";
-export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qrcode" | "barcode" | "aruco" | "pdf";
-export type PostProcessType = "threshold" | "dither" | "bayer";
-export type MoveDirection = "up" | "down" | "left" | "right";
-export type LabelShape = "rect" | "rounded_rect" | "circle";
-export type LabelSplit = "none" | "vertical" | "horizontal";
-export type TailPosition = "right" | "bottom" | "left" | "top";
-export type MirrorType = "none" | "copy" | "flip";
-
-type _Range<T extends number, R extends unknown[]> = R["length"] extends T ? R[number] : _Range<T, [R["length"], ...R]>;
-
-export type Range<T extends number> = number extends T ? number : _Range<T, []>;
-
-export const CsvParamsSchema = z.object({
-  data: z.string(),
-});
-
-/** Not validated */
-export const FabricObjectSchema = z.custom<fabric.FabricObject>((val: any): boolean => {
-  return typeof val === "object";
-});
-
-export const LabelPropsSchema = z.object({
-  printDirection: z.enum(["left", "top"]),
-  size: z.object({
-    width: z.number().positive(),
-    height: z.number().positive(),
-  }),
-  shape: z.enum(["rect", "rounded_rect", "circle"]).default("rect").optional(),
-  split: z.enum(["none", "vertical", "horizontal"]).default("none").optional(),
-  splitParts: z.number().min(1).default(2).optional(),
-  tailPos: z.enum(["right", "bottom", "left", "top"]).default("right").optional(),
-  tailLength: z.number().default(0).optional(),
-  mirror: z.enum(["none", "copy", "flip"]).default("none").optional(),
-});
-
-export const LabelPresetSchema = z.object({
-  width: z.number().positive(),
-  height: z.number().positive(),
-  unit: z.enum(["mm", "px"]),
-  dpmm: z.number().positive(),
-  printDirection: z.enum(["left", "top"]),
-  title: z.string().optional(),
-  shape: z.enum(["rect", "rounded_rect", "circle"]).default("rect").optional(),
-  split: z.enum(["none", "vertical", "horizontal"]).default("none").optional(),
-  splitParts: z.number().min(1).default(2).optional(),
-  tailPos: z.enum(["right", "bottom", "left", "top"]).default("right").optional(),
-  tailLength: z.number().default(0).optional(),
-  mirror: z.enum(["none", "copy", "flip"]).default("none").optional(),
-});
-
-export const FabricJsonSchema = z.object({
-  version: z.string(),
-  objects: z.array(FabricObjectSchema),
-});
-
-export const ExportedLabelTemplateSchema = z.object({
-  canvas: FabricJsonSchema,
-  label: LabelPropsSchema,
-  thumbnailBase64: z.string().optional(),
-  title: z.string().optional(),
-  timestamp: z.number().positive().optional(),
-  id: z.string().optional(), // filled with localStorage key, not exported
-  csv: CsvParamsSchema.optional(),
-});
-
-const [firstTask, ...otherTasks] = printTaskNames;
-
-export const PreviewPropsOffsetSchema = z.object({
-  x: z.number(),
-  y: z.number(),
-  offsetType: z.enum(["inner", "outer"]),
-});
-
-export const PreviewPropsSchema = z.object({
-  postProcess: z.enum(["threshold", "dither", "bayer"]).optional(),
-  postProcessInvert: z.boolean().optional(),
-  threshold: z.number().gte(1).lte(255).optional(),
-  quantity: z.number().gte(1).optional(),
-  density: z.number().gte(1).optional(),
-  speed: z.union([z.literal(0), z.literal(1)]).optional(),
-  labelType: z.enum(LabelType).optional(),
-  printTaskName: z.enum([firstTask, ...otherTasks]).optional(),
-  offset: PreviewPropsOffsetSchema.optional(),
-});
-
-export const AutomationPropsSchema = z.object({
-  /** Request device connect on page load. Works only for Capacitor BLE connection. */
-  autoConnect: z.boolean().optional(),
-  /** Connect to MAC or device id. Works only for Capacitor BLE connection. */
-  autoConnectDeviceId: z.string().optional(),
-  /** immediately - just open print preview dialog */
-  startPrint: z.enum(["after_connect", "immediately"]).optional(),
-});
-
-export const AppConfigSchema = z.object({
-  /** Keep image aspect ration when using "fit" button */
-  fitMode: z.enum(["stretch", "ratio_min", "ratio_max"]),
-  pageDelay: z.number().gte(0).optional(),
-  iconListMode: z.enum(["user", "pack", "both"]),
-  packetIntervalMs: z.number().gte(0).optional(),
-  gridEnabled: z.boolean().optional(),
-});
-
-export const UserIconSchema = z.object({
-  name: z.string(),
-  data: z.string(),
-});
-
-export const UserFontSchema = z
-  .object({
-    gzippedDataB64: z.string(),
-    family: z.string(),
-    mimeType: z.string(),
-  });
-
-export type CsvParams = z.infer<typeof CsvParamsSchema>;
-export type UserIcon = z.infer<typeof UserIconSchema>;
-export type LabelProps = z.infer<typeof LabelPropsSchema>;
-export type LabelPreset = z.infer<typeof LabelPresetSchema>;
-export type FabricJson = z.infer<typeof FabricJsonSchema>;
-export type ExportedLabelTemplate = z.infer<typeof ExportedLabelTemplateSchema>;
-export type PreviewPropsOffset = z.infer<typeof PreviewPropsOffsetSchema>;
-export type PreviewProps = z.infer<typeof PreviewPropsSchema>;
-export type AutomationProps = z.infer<typeof AutomationPropsSchema>;
-export type AppConfig = z.infer<typeof AppConfigSchema>;
-export type UserFont = z.infer<typeof UserFontSchema>;
-</file>
-
-<file path="src/utils/canvas_utils.ts">
-import * as fabric from "fabric";
-import ArUcoMarker from "$/fabric-object/aruco";
-import Barcode from "$/fabric-object/barcode";
-import QRCode from "$/fabric-object/qrcode";
-import { OBJECT_DEFAULTS_TEXT } from "$/defaults";
-
-export class CanvasUtils {
-  static equalSpacingFillText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, printWidth: number) {
-    // calculate every character width, and spacing
-    const widths = [];
-    for (let i = 0; i < text.length; i++) {
-      const char = text.charAt(i);
-      const metrics = ctx.measureText(char);
-      widths.push(metrics.width);
-    }
-    const totalWidth = widths.reduce((a, b) => a + b, 0);
-    const spacing = (printWidth - totalWidth) / (text.length - 1);
-
-    // print every character with calculated spacing
-    let offset = 0;
-    for (let i = 0; i < text.length; i++) {
-      const char = text.charAt(i);
-      ctx.fillText(char, x + offset, y);
-      offset += widths[i] + spacing;
-    }
-  }
-
-  static fixFabricObjectScale(obj: fabric.FabricObject) {
-    const isNotScalable = obj instanceof Barcode || obj instanceof fabric.Rect || obj instanceof QRCode || obj instanceof ArUcoMarker;
-
-    if (isNotScalable) {
-      obj.set({
-        width: Math.round(obj.width * (obj.scaleX ?? 1)),
-        height: Math.round(obj.height * (obj.scaleY ?? 1)),
-        scaleX: 1,
-        scaleY: 1,
-        left: Math.round(obj.left),
-        top: Math.round(obj.top),
-      });
-
-      if (obj instanceof QRCode || obj instanceof ArUcoMarker) {
-        const qrMin = 42;
-        const size = Math.max(obj.width + (obj.width % 2), qrMin);
-        obj.set({
-          width: size,
-          height: size,
-        });
-      }
-    }
-  }
-
-  static fitObjectIntoCanvas(canvas: fabric.Canvas, obj: fabric.FabricObject, xMargin: number, yMarin: number) {
-    const widthRatio = canvas.width / (obj.width + xMargin * 2);
-    const heightRatio = canvas.height / (obj.height + yMarin * 2);
-    const scaleFactor = Math.min(widthRatio, heightRatio);
-    obj.set({ left: xMargin, top: yMarin });
-    obj.scale(scaleFactor);
-    canvas.centerObjectV(obj);
-    canvas.centerObjectH(obj);
-  }
-
-  static renderError(ctx: CanvasRenderingContext2D, width: number, height: number): void {
-      ctx.save();
-      ctx.fillStyle = "black";
-      ctx.translate(-width / 2, -height / 2); // make top-left origin
-      ctx.translate(-0.5, -0.5); // blurry rendering fix
-      ctx.fillRect(0, 0, width + 1, height + 1);
-      ctx.restore();
-      
-      ctx.save();
-      ctx.fillStyle = "white";
-      ctx.textAlign = "center";
-      ctx.font = `16px ${OBJECT_DEFAULTS_TEXT.fontFamily}`;
-      ctx.fillText("ERR", 0, 0);
-      ctx.restore();
-    }
-}
-</file>
-
 <file path="src/utils/file_utils.ts">
 import * as fabric from "fabric";
 import {
@@ -8977,6 +8749,273 @@ export class FileUtils {
 
     loadedFonts.set(loadedList);
   }
+}
+</file>
+
+<file path="standalone-apps/capacitor/android/app/src/main/java/ru/mmote/niimblues/MainActivity.java">
+package ru.mmote.niimblues;
+
+import android.os.Bundle;
+import com.getcapacitor.BridgeActivity;
+
+public class MainActivity extends BridgeActivity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        registerPlugin(PdfIntentPlugin.class);
+        super.onCreate(savedInstanceState);
+    }
+}
+</file>
+
+<file path="standalone-apps/capacitor/package.json">
+{
+  "name": "niimblues",
+  "version": "1.0.0",
+  "description": "NiimBlue standalone app",
+  "type": "module",
+  "scripts": {
+    "build-www": "cd ../.. && vite build --outDir ./standalone-apps/capacitor/www",
+    "build-android": "cap sync android && cap build android",
+    "run-android": "cap sync android && cap run android",
+    "build-ios": "cap sync ios && cap open ios",
+    "run-ios": "cap sync ios && cap run ios"
+  },
+  "dependencies": {
+    "@capacitor-community/bluetooth-le": "^8.1.3",
+    "@capacitor/android": "^8.3.0",
+    "@capacitor/core": "^8.3.0",
+    "@capacitor/filesystem": "^8.1.2",
+    "@capacitor/ios": "^8.3.0",
+    "@capacitor/share": "^8.0.1",
+    "@capacitor/splash-screen": "^8.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.3.0"
+  },
+  "overrides": {
+    "@capacitor/cli": {
+      "tar": "^7.5.11"
+    }
+  },
+  "author": "MultiMote",
+  "license": "MIT"
+}
+</file>
+
+<file path="src/types.ts">
+import { LabelType, printTaskNames } from "@mmote/niimbluelib";
+import * as fabric from "fabric";
+import { z } from "zod";
+
+export type ConnectionState = "connecting" | "connected" | "disconnected";
+export type ConnectionType = "bluetooth" | "serial" | "capacitor-ble";
+
+export type LabelUnit = "mm" | "px";
+export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qrcode" | "barcode" | "aruco" | "pdf";
+export type PostProcessType = "threshold" | "dither" | "bayer";
+export type MoveDirection = "up" | "down" | "left" | "right";
+export type LabelShape = "rect" | "rounded_rect" | "circle";
+export type LabelSplit = "none" | "vertical" | "horizontal";
+export type TailPosition = "right" | "bottom" | "left" | "top";
+export type MirrorType = "none" | "copy" | "flip";
+
+type _Range<T extends number, R extends unknown[]> = R["length"] extends T ? R[number] : _Range<T, [R["length"], ...R]>;
+
+export type Range<T extends number> = number extends T ? number : _Range<T, []>;
+
+export const CsvParamsSchema = z.object({
+  data: z.string(),
+});
+
+/** Not validated */
+export const FabricObjectSchema = z.custom<fabric.FabricObject>((val: any): boolean => {
+  return typeof val === "object";
+});
+
+export const LabelPropsSchema = z.object({
+  printDirection: z.enum(["left", "top"]),
+  size: z.object({
+    width: z.number().positive(),
+    height: z.number().positive(),
+  }),
+  shape: z.enum(["rect", "rounded_rect", "circle"]).default("rect").optional(),
+  split: z.enum(["none", "vertical", "horizontal"]).default("none").optional(),
+  splitParts: z.number().min(1).default(2).optional(),
+  tailPos: z.enum(["right", "bottom", "left", "top"]).default("right").optional(),
+  tailLength: z.number().default(0).optional(),
+  mirror: z.enum(["none", "copy", "flip"]).default("none").optional(),
+});
+
+export const LabelPresetSchema = z.object({
+  width: z.number().positive(),
+  height: z.number().positive(),
+  unit: z.enum(["mm", "px"]),
+  dpmm: z.number().positive(),
+  printDirection: z.enum(["left", "top"]),
+  title: z.string().optional(),
+  shape: z.enum(["rect", "rounded_rect", "circle"]).default("rect").optional(),
+  split: z.enum(["none", "vertical", "horizontal"]).default("none").optional(),
+  splitParts: z.number().min(1).default(2).optional(),
+  tailPos: z.enum(["right", "bottom", "left", "top"]).default("right").optional(),
+  tailLength: z.number().default(0).optional(),
+  mirror: z.enum(["none", "copy", "flip"]).default("none").optional(),
+});
+
+export const FabricJsonSchema = z.object({
+  version: z.string(),
+  objects: z.array(FabricObjectSchema),
+});
+
+export const ExportedLabelTemplateSchema = z.object({
+  canvas: FabricJsonSchema,
+  label: LabelPropsSchema,
+  thumbnailBase64: z.string().optional(),
+  title: z.string().optional(),
+  timestamp: z.number().positive().optional(),
+  id: z.string().optional(), // filled with localStorage key, not exported
+  csv: CsvParamsSchema.optional(),
+});
+
+const [firstTask, ...otherTasks] = printTaskNames;
+
+export const PreviewPropsOffsetSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+  offsetType: z.enum(["inner", "outer"]),
+});
+
+export const PreviewPropsSchema = z.object({
+  postProcess: z.enum(["threshold", "dither", "bayer"]).optional(),
+  postProcessInvert: z.boolean().optional(),
+  threshold: z.number().gte(1).lte(255).optional(),
+  quantity: z.number().gte(1).optional(),
+  density: z.number().gte(1).optional(),
+  speed: z.union([z.literal(0), z.literal(1)]).optional(),
+  labelType: z.enum(LabelType).optional(),
+  printTaskName: z.enum([firstTask, ...otherTasks]).optional(),
+  offset: PreviewPropsOffsetSchema.optional(),
+});
+
+export const AutomationPropsSchema = z.object({
+  /** Request device connect on page load. Works only for Capacitor BLE connection. */
+  autoConnect: z.boolean().optional(),
+  /** Connect to MAC or device id. Works only for Capacitor BLE connection. */
+  autoConnectDeviceId: z.string().optional(),
+  /** immediately - just open print preview dialog */
+  startPrint: z.enum(["after_connect", "immediately"]).optional(),
+});
+
+export const AppConfigSchema = z.object({
+  /** Keep image aspect ration when using "fit" button */
+  fitMode: z.enum(["stretch", "ratio_min", "ratio_max"]),
+  pageDelay: z.number().gte(0).optional(),
+  iconListMode: z.enum(["user", "pack", "both"]),
+  packetIntervalMs: z.number().gte(0).optional(),
+  gridEnabled: z.boolean().optional(),
+});
+
+export const UserIconSchema = z.object({
+  name: z.string(),
+  data: z.string(),
+});
+
+export const UserFontSchema = z
+  .object({
+    gzippedDataB64: z.string(),
+    family: z.string(),
+    mimeType: z.string(),
+  });
+
+export type CsvParams = z.infer<typeof CsvParamsSchema>;
+export type UserIcon = z.infer<typeof UserIconSchema>;
+export type LabelProps = z.infer<typeof LabelPropsSchema>;
+export type LabelPreset = z.infer<typeof LabelPresetSchema>;
+export type FabricJson = z.infer<typeof FabricJsonSchema>;
+export type ExportedLabelTemplate = z.infer<typeof ExportedLabelTemplateSchema>;
+export type PreviewPropsOffset = z.infer<typeof PreviewPropsOffsetSchema>;
+export type PreviewProps = z.infer<typeof PreviewPropsSchema>;
+export type AutomationProps = z.infer<typeof AutomationPropsSchema>;
+export type AppConfig = z.infer<typeof AppConfigSchema>;
+export type UserFont = z.infer<typeof UserFontSchema>;
+</file>
+
+<file path="src/utils/canvas_utils.ts">
+import * as fabric from "fabric";
+import ArUcoMarker from "$/fabric-object/aruco";
+import Barcode from "$/fabric-object/barcode";
+import QRCode from "$/fabric-object/qrcode";
+import { OBJECT_DEFAULTS_TEXT } from "$/defaults";
+
+export class CanvasUtils {
+  static equalSpacingFillText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, printWidth: number) {
+    // calculate every character width, and spacing
+    const widths = [];
+    for (let i = 0; i < text.length; i++) {
+      const char = text.charAt(i);
+      const metrics = ctx.measureText(char);
+      widths.push(metrics.width);
+    }
+    const totalWidth = widths.reduce((a, b) => a + b, 0);
+    const spacing = (printWidth - totalWidth) / (text.length - 1);
+
+    // print every character with calculated spacing
+    let offset = 0;
+    for (let i = 0; i < text.length; i++) {
+      const char = text.charAt(i);
+      ctx.fillText(char, x + offset, y);
+      offset += widths[i] + spacing;
+    }
+  }
+
+  static fixFabricObjectScale(obj: fabric.FabricObject) {
+    const isNotScalable = obj instanceof Barcode || obj instanceof fabric.Rect || obj instanceof QRCode || obj instanceof ArUcoMarker;
+
+    if (isNotScalable) {
+      obj.set({
+        width: Math.round(obj.width * (obj.scaleX ?? 1)),
+        height: Math.round(obj.height * (obj.scaleY ?? 1)),
+        scaleX: 1,
+        scaleY: 1,
+        left: Math.round(obj.left),
+        top: Math.round(obj.top),
+      });
+
+      if (obj instanceof QRCode || obj instanceof ArUcoMarker) {
+        const qrMin = 42;
+        const size = Math.max(obj.width + (obj.width % 2), qrMin);
+        obj.set({
+          width: size,
+          height: size,
+        });
+      }
+    }
+  }
+
+  static fitObjectIntoCanvas(canvas: fabric.Canvas, obj: fabric.FabricObject, xMargin: number, yMarin: number) {
+    const widthRatio = canvas.width / (obj.width + xMargin * 2);
+    const heightRatio = canvas.height / (obj.height + yMarin * 2);
+    const scaleFactor = Math.min(widthRatio, heightRatio);
+    obj.set({ left: xMargin, top: yMarin });
+    obj.scale(scaleFactor);
+    canvas.centerObjectV(obj);
+    canvas.centerObjectH(obj);
+  }
+
+  static renderError(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+      ctx.save();
+      ctx.fillStyle = "black";
+      ctx.translate(-width / 2, -height / 2); // make top-left origin
+      ctx.translate(-0.5, -0.5); // blurry rendering fix
+      ctx.fillRect(0, 0, width + 1, height + 1);
+      ctx.restore();
+      
+      ctx.save();
+      ctx.fillStyle = "white";
+      ctx.textAlign = "center";
+      ctx.font = `16px ${OBJECT_DEFAULTS_TEXT.fontFamily}`;
+      ctx.fillText("ERR", 0, 0);
+      ctx.restore();
+    }
 }
 </file>
 
@@ -9522,8 +9561,12 @@ export class LabelDesignerObjectHelper {
   const pdfImageReady = async (el: HTMLCanvasElement) => {
     const img = new fabric.FabricImage(el, {
       ...OBJECT_DEFAULTS,
+      originX: "left",
+      originY: "bottom",
       left: 0,
-      top: 0,
+      top: fabricCanvas!.height,
+      scaleX: 4,
+      scaleY: 4,
     });
 
     fabricCanvas!.add(img);
@@ -9703,20 +9746,21 @@ export class LabelDesignerObjectHelper {
           // 2. Load the base64 string directly into a Fabric Image object
           const img = await fabric.FabricImage.fromURL(base64Image);
           img.set({ 
+            originX: "left",
+            originY: "bottom",
             left: 0, 
-            top: 0, 
+            top: fabricCanvas!.height,
+            scaleX: 4,
+            scaleY: 4,
             snapAngle: OBJECT_DEFAULTS.snapAngle 
           });
-
-          // 3. Fit the image to the currently selected label size
-          CanvasUtils.fitObjectIntoCanvas(fabricCanvas!, img, 0, 0);
           
-          // 4. Add to canvas and update history
+          // 3. Add to canvas and update history
           fabricCanvas!.add(img);
           fabricCanvas!.setActiveObject(img);
           undo.push(fabricCanvas!, labelProps);
 
-          // 5. Automatically open the Print Dialog
+          // 4. Automatically open the Print Dialog
           openPreviewAndPrint();
         } catch (e) {
           Toasts.error("Failed to load PDF to canvas: " + e);

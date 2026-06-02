@@ -296,4 +296,8 @@
     width: 100vw;
     max-width: 300px;
   }
+<<<<<<< Updated upstream
 </style>
+=======
+</style>
+>>>>>>> Stashed changes
