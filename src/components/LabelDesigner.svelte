@@ -680,8 +680,4 @@
   .canvas-wrapper canvas {
     image-rendering: pixelated;
   }
-<<<<<<< Updated upstream
 </style>
-=======
-</style>
->>>>>>> Stashed changes

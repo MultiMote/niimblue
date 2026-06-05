@@ -3464,312 +3464,6 @@ EXPOSE 80
 </button>
 </file>
 
-<file path="src/components/PrinterConnector.svelte">
-<script lang="ts">
-  import { NiimbotCapacitorBleClient, SoundSettingsItemType, Utils, type AvailableTransports } from "@mmote/niimbluelib";
-  import {
-    printerClient,
-    connectedPrinterName,
-    connectionState,
-    initClient,
-    heartbeatData,
-    printerInfo,
-    printerMeta,
-    heartbeatFails,
-    automation,
-    rfidInfo,
-    ribbonRfidInfo,
-    refreshRfidInfo,
-  } from "$/stores";
-  import type { ConnectionType } from "$/types";
-  import { tr } from "$/utils/i18n";
-  import MdIcon from "$/components/basic/MdIcon.svelte";
-  import { Toasts } from "$/utils/toasts";
-  import { onMount } from "svelte";
-  import { LocalStoragePersistence } from "$/utils/persistence";
-  import type { MaterialIcon } from "material-icons";
-  import FirmwareUpdater from "$/components/basic/FirmwareUpdater.svelte";
-
-  let connectionType = $state<ConnectionType>("bluetooth");
-  let featureSupport = $state<AvailableTransports>({ webBluetooth: false, webSerial: false, capacitorBle: false });
-
-  const onConnectClicked = async () => {
-    initClient(connectionType);
-    connectionState.set("connecting");
-
-    try {
-      if ($printerClient instanceof NiimbotCapacitorBleClient && $automation?.autoConnectDeviceId !== undefined) {
-        await $printerClient.connect({ deviceId: $automation.autoConnectDeviceId });
-      } else {
-        await $printerClient.connect();
-      }
-    } catch (e) {
-      connectionState.set("disconnected");
-      Toasts.error(e);
-    }
-  };
-
-  const onDisconnectClicked = () => {
-    $printerClient.disconnect();
-  };
-
-  const startHeartbeat = async () => {
-    $printerClient.startHeartbeat();
-  };
-
-  const stopHeartbeat = async () => {
-    $printerClient.stopHeartbeat();
-  };
-
-  const soundOn = async () => {
-    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.BluetoothConnectionSound, true);
-    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.PowerSound, true);
-  };
-
-  const soundOff = async () => {
-    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.BluetoothConnectionSound, false);
-    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.PowerSound, false);
-  };
-
-  const fetchInfo = async () => {
-    await $printerClient.fetchPrinterInfo();
-  };
-
-  const reset = async () => {
-    await $printerClient.abstraction.printerReset();
-  };
-
-  const switchConnectionType = (c: ConnectionType) => {
-    LocalStoragePersistence.saveLastConnectionType(c);
-    connectionType = c;
-  };
-
-  const batteryIcon = (value: number): MaterialIcon => {
-    if (value > 4) {
-      value = Math.min(4, Math.max(1, Math.ceil(value / 25)));
-    }
-
-    if (value === 4) {
-      return "battery_full";
-    } else if (value === 3) {
-      return "battery_5_bar";
-    } else if (value === 2) {
-      return "battery_3_bar";
-    } else if (value === 1) {
-      return "battery_2_bar";
-    }
-    return "battery_0_bar";
-  };
-
-  onMount(() => {
-    featureSupport = Utils.getAvailableTransports();
-
-    connectionType = LocalStoragePersistence.loadLastConnectionType() ?? "bluetooth";
-
-    if (!featureSupport.capacitorBle && connectionType === "capacitor-ble") {
-      connectionType = "bluetooth";
-    }
-    if (!featureSupport.webSerial && connectionType === "serial") {
-      connectionType = "bluetooth";
-    }
-    if (!featureSupport.webBluetooth && connectionType === "bluetooth" && featureSupport.capacitorBle) {
-      connectionType = "capacitor-ble";
-    }
-
-    if ($automation !== undefined && $automation.autoConnect && connectionType === "capacitor-ble") {
-      onConnectClicked();
-    }
-  });
-</script>
-
-<div class="input-group w-auto input-group-sm flex-nowrap justify-content-end">
-  {#if $connectionState === "connected"}
-    <button class="btn btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-      <MdIcon icon="settings" />
-    </button>
-    <div class="dropdown-menu p-1">
-      {#if $printerInfo}
-        <div>
-          Printer info:
-          <ul>
-            {#each Object.entries($printerInfo) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-
-      {#if $printerMeta}
-        <button
-          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#modelMeta">
-          Model metadata <MdIcon icon="expand_more" />
-        </button>
-
-        <div class="collapse" id="modelMeta">
-          <ul>
-            {#each Object.entries($printerMeta) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-
-      {#if $rfidInfo}
-        <button
-          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#rfidInfo">
-          RFID info <MdIcon icon="expand_more" />
-        </button>
-
-        <div class="collapse" id="rfidInfo">
-          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
-
-          <ul>
-            {#each Object.entries($rfidInfo) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-
-      {#if $ribbonRfidInfo}
-        <button
-          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#ribbonRfidInfo">
-          Ribbon RFID info <MdIcon icon="expand_more" />
-        </button>
-
-        <div class="collapse" id="ribbonRfidInfo">
-          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
-
-          <ul>
-            {#each Object.entries($ribbonRfidInfo) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-
-      {#if $heartbeatData}
-        <button
-          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#heartbeatData">
-          Heartbeat data <MdIcon icon="expand_more" />
-        </button>
-
-        <div class="collapse" id="heartbeatData">
-          <ul>
-            {#each Object.entries($heartbeatData) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-
-      <FirmwareUpdater />
-
-      <button
-        class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#tests">
-        Tests <MdIcon icon="expand_more" />
-      </button>
-
-      <div class="collapse" id="tests">
-        <div class="d-flex flex-wrap gap-1 mt-1">
-          <button class="btn btn-sm btn-primary" onclick={startHeartbeat}>Heartbeat on</button>
-          <button class="btn btn-sm btn-primary" onclick={stopHeartbeat}>Heartbeat off</button>
-          <button class="btn btn-sm btn-primary" onclick={soundOn}>Sound on</button>
-          <button class="btn btn-sm btn-primary" onclick={soundOff}>Sound off</button>
-          <button class="btn btn-sm btn-primary" onclick={fetchInfo}>Fetch info again</button>
-          <button class="btn btn-sm btn-primary" onclick={reset}>Reset</button>
-        </div>
-      </div>
-    </div>
-    <span class="input-group-text">
-      {#if connectionType === "serial"}
-        <MdIcon icon="usb" />
-      {:else}
-        <MdIcon icon="bluetooth" />
-      {/if}
-    </span>
-    <span class="input-group-text {$heartbeatFails > 0 ? 'text-warning' : ''}">
-      {$printerMeta?.model ?? $connectedPrinterName}
-    </span>
-    {#if $heartbeatData?.chargeLevel}
-      <span class="input-group-text">
-        <MdIcon icon={batteryIcon($heartbeatData.chargeLevel)} class="r-90"></MdIcon>
-      </span>
-    {/if}
-  {:else}
-    {#if featureSupport.webBluetooth}
-      <button
-        disabled={$connectionState === "connecting"}
-        class="btn text-nowrap {connectionType === 'bluetooth' ? 'btn-light' : 'btn-outline-secondary'}"
-        onclick={() => switchConnectionType("bluetooth")}>
-        <MdIcon icon="bluetooth" />
-        {$tr("connector.bluetooth")}
-      </button>
-    {/if}
-    {#if featureSupport.webSerial}
-      <button
-        disabled={$connectionState === "connecting"}
-        class="btn text-nowrap {connectionType === 'serial' ? 'btn-light' : 'btn-outline-secondary'}"
-        onclick={() => switchConnectionType((connectionType = "serial"))}>
-        <MdIcon icon="usb" />
-        {$tr("connector.serial")}
-      </button>
-    {/if}
-    {#if featureSupport.capacitorBle}
-      <button
-        disabled={$connectionState === "connecting"}
-        class="btn text-nowrap {connectionType === 'capacitor-ble' ? 'btn-light' : 'btn-outline-secondary'}"
-        onclick={() => switchConnectionType((connectionType = "capacitor-ble"))}>
-        <MdIcon icon="usb" />
-        Capacitor BLE
-      </button>
-    {/if}
-  {/if}
-
-  {#if $connectionState !== "connected"}
-    <button
-      class="btn btn-primary"
-      disabled={$connectionState === "connecting" ||
-        (!featureSupport.capacitorBle && !featureSupport.webBluetooth && !featureSupport.webSerial)}
-      onclick={onConnectClicked}>
-      <MdIcon icon="power" />
-    </button>
-  {/if}
-
-  {#if $connectionState === "connected"}
-    <button class="btn btn-danger" onclick={onDisconnectClicked}>
-      <MdIcon icon="power_off" />
-    </button>
-  {/if}
-</div>
-
-<style>
-  .dropdown-menu {
-    width: 100vw;
-    max-width: 300px;
-  }
-<<<<<<< Updated upstream
-</style>
-=======
-</style>
->>>>>>> Stashed changes
-</file>
-
 <file path="src/fabric-object/textbox-ext.ts">
 import * as fabric from "fabric";
 
@@ -5255,6 +4949,333 @@ Thank you for your interest in contributing to NiimBlue!
 </style>
 </file>
 
+<file path="src/components/PrinterConnector.svelte">
+<script lang="ts">
+  import { NiimbotCapacitorBleClient, SoundSettingsItemType, Utils, type AvailableTransports } from "@mmote/niimbluelib";
+  import {
+    printerClient,
+    connectedPrinterName,
+    connectionState,
+    initClient,
+    heartbeatData,
+    printerInfo,
+    printerMeta,
+    heartbeatFails,
+    automation,
+    rfidInfo,
+    ribbonRfidInfo,
+    refreshRfidInfo,
+  } from "$/stores";
+  import type { ConnectionType } from "$/types";
+  import { tr } from "$/utils/i18n";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { Toasts } from "$/utils/toasts";
+  import { onMount } from "svelte";
+  import { LocalStoragePersistence } from "$/utils/persistence";
+  import type { MaterialIcon } from "material-icons";
+  import FirmwareUpdater from "$/components/basic/FirmwareUpdater.svelte";
+
+  let connectionType = $state<ConnectionType>("bluetooth");
+  let featureSupport = $state<AvailableTransports>({ webBluetooth: false, webSerial: false, capacitorBle: false });
+
+    // src/components/PrinterConnector.svelte (Inside the <script> block)
+
+const toggleAutoConnect = (e: Event & { currentTarget: HTMLInputElement }) => {
+  const checked = e.currentTarget.checked;
+  
+  automation.update(prev => ({
+    ...(prev || {}),
+    autoConnect: checked,
+    // Store the MAC address if enabled, otherwise clear it so you can connect to new printers later
+    autoConnectDeviceId: checked ? $printerInfo?.mac : undefined
+  }));
+};
+
+  const onConnectClicked = async () => {
+    initClient(connectionType);
+    connectionState.set("connecting");
+
+    try {
+      if ($printerClient instanceof NiimbotCapacitorBleClient && $automation?.autoConnectDeviceId !== undefined) {
+        await $printerClient.connect({ deviceId: $automation.autoConnectDeviceId });
+      } else {
+        await $printerClient.connect();
+      }
+    } catch (e) {
+      connectionState.set("disconnected");
+      Toasts.error(e);
+    }
+  };
+
+  const onDisconnectClicked = () => {
+    $printerClient.disconnect();
+  };
+
+  const startHeartbeat = async () => {
+    $printerClient.startHeartbeat();
+  };
+
+  const stopHeartbeat = async () => {
+    $printerClient.stopHeartbeat();
+  };
+
+  const soundOn = async () => {
+    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.BluetoothConnectionSound, true);
+    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.PowerSound, true);
+  };
+
+  const soundOff = async () => {
+    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.BluetoothConnectionSound, false);
+    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.PowerSound, false);
+  };
+
+  const fetchInfo = async () => {
+    await $printerClient.fetchPrinterInfo();
+  };
+
+  const reset = async () => {
+    await $printerClient.abstraction.printerReset();
+  };
+
+  const switchConnectionType = (c: ConnectionType) => {
+    LocalStoragePersistence.saveLastConnectionType(c);
+    connectionType = c;
+  };
+
+  const batteryIcon = (value: number): MaterialIcon => {
+    if (value > 4) {
+      value = Math.min(4, Math.max(1, Math.ceil(value / 25)));
+    }
+
+    if (value === 4) {
+      return "battery_full";
+    } else if (value === 3) {
+      return "battery_5_bar";
+    } else if (value === 2) {
+      return "battery_3_bar";
+    } else if (value === 1) {
+      return "battery_2_bar";
+    }
+    return "battery_0_bar";
+  };
+
+  onMount(() => {
+    featureSupport = Utils.getAvailableTransports();
+
+    connectionType = LocalStoragePersistence.loadLastConnectionType() ?? "bluetooth";
+
+    if (!featureSupport.capacitorBle && connectionType === "capacitor-ble") {
+      connectionType = "bluetooth";
+    }
+    if (!featureSupport.webSerial && connectionType === "serial") {
+      connectionType = "bluetooth";
+    }
+    if (!featureSupport.webBluetooth && connectionType === "bluetooth" && featureSupport.capacitorBle) {
+      connectionType = "capacitor-ble";
+    }
+
+    if ($automation !== undefined && $automation.autoConnect && connectionType === "capacitor-ble") {
+      onConnectClicked();
+    }
+  });
+</script>
+
+<div class="input-group w-auto input-group-sm flex-nowrap justify-content-end">
+  {#if $connectionState === "connected"}
+    <button class="btn btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+      <MdIcon icon="settings" />
+    </button>
+    <div class="dropdown-menu p-1">
+{#if $printerInfo}
+        <div>
+          Printer info:
+          <ul>
+            {#each Object.entries($printerInfo) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
+            {/each}
+          </ul>
+        </div>
+
+        <!-- Toggle is now always visible -->
+        <div class="form-check form-switch mt-2 mb-2 px-3 border-bottom pb-2">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="autoConnectSwitch"
+            checked={$automation?.autoConnect}
+            onchange={toggleAutoConnect} />
+          <label class="form-check-label" for="autoConnectSwitch">Auto-connect on launch</label>
+        </div>
+        
+      {/if}
+
+      {#if $printerMeta}
+        <button
+          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#modelMeta">
+          Model metadata <MdIcon icon="expand_more" />
+        </button>
+
+        <div class="collapse" id="modelMeta">
+          <ul>
+            {#each Object.entries($printerMeta) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
+
+      {#if $rfidInfo}
+        <button
+          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#rfidInfo">
+          RFID info <MdIcon icon="expand_more" />
+        </button>
+
+        <div class="collapse" id="rfidInfo">
+          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
+
+          <ul>
+            {#each Object.entries($rfidInfo) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
+
+      {#if $ribbonRfidInfo}
+        <button
+          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#ribbonRfidInfo">
+          Ribbon RFID info <MdIcon icon="expand_more" />
+        </button>
+
+        <div class="collapse" id="ribbonRfidInfo">
+          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
+
+          <ul>
+            {#each Object.entries($ribbonRfidInfo) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
+
+      {#if $heartbeatData}
+        <button
+          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#heartbeatData">
+          Heartbeat data <MdIcon icon="expand_more" />
+        </button>
+
+        <div class="collapse" id="heartbeatData">
+          <ul>
+            {#each Object.entries($heartbeatData) as [key, value] (key)}
+              <li>{key}: <strong>{value ?? "-"}</strong></li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
+
+      <FirmwareUpdater />
+
+      <button
+        class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#tests">
+        Tests <MdIcon icon="expand_more" />
+      </button>
+
+      <div class="collapse" id="tests">
+        <div class="d-flex flex-wrap gap-1 mt-1">
+          <button class="btn btn-sm btn-primary" onclick={startHeartbeat}>Heartbeat on</button>
+          <button class="btn btn-sm btn-primary" onclick={stopHeartbeat}>Heartbeat off</button>
+          <button class="btn btn-sm btn-primary" onclick={soundOn}>Sound on</button>
+          <button class="btn btn-sm btn-primary" onclick={soundOff}>Sound off</button>
+          <button class="btn btn-sm btn-primary" onclick={fetchInfo}>Fetch info again</button>
+          <button class="btn btn-sm btn-primary" onclick={reset}>Reset</button>
+        </div>
+      </div>
+    </div>
+    <span class="input-group-text">
+      {#if connectionType === "serial"}
+        <MdIcon icon="usb" />
+      {:else}
+        <MdIcon icon="bluetooth" />
+      {/if}
+    </span>
+    <span class="input-group-text {$heartbeatFails > 0 ? 'text-warning' : ''}">
+      {$printerMeta?.model ?? $connectedPrinterName}
+    </span>
+    {#if $heartbeatData?.chargeLevel}
+      <span class="input-group-text">
+        <MdIcon icon={batteryIcon($heartbeatData.chargeLevel)} class="r-90"></MdIcon>
+      </span>
+    {/if}
+  {:else}
+    {#if featureSupport.webBluetooth}
+      <button
+        disabled={$connectionState === "connecting"}
+        class="btn text-nowrap {connectionType === 'bluetooth' ? 'btn-light' : 'btn-outline-secondary'}"
+        onclick={() => switchConnectionType("bluetooth")}>
+        <MdIcon icon="bluetooth" />
+        {$tr("connector.bluetooth")}
+      </button>
+    {/if}
+    {#if featureSupport.webSerial}
+      <button
+        disabled={$connectionState === "connecting"}
+        class="btn text-nowrap {connectionType === 'serial' ? 'btn-light' : 'btn-outline-secondary'}"
+        onclick={() => switchConnectionType((connectionType = "serial"))}>
+        <MdIcon icon="usb" />
+        {$tr("connector.serial")}
+      </button>
+    {/if}
+    {#if featureSupport.capacitorBle}
+      <button
+        disabled={$connectionState === "connecting"}
+        class="btn text-nowrap {connectionType === 'capacitor-ble' ? 'btn-light' : 'btn-outline-secondary'}"
+        onclick={() => switchConnectionType((connectionType = "capacitor-ble"))}>
+        <MdIcon icon="usb" />
+        Capacitor BLE
+      </button>
+    {/if}
+  {/if}
+
+  {#if $connectionState !== "connected"}
+    <button
+      class="btn btn-primary"
+      disabled={$connectionState === "connecting" ||
+        (!featureSupport.capacitorBle && !featureSupport.webBluetooth && !featureSupport.webSerial)}
+      onclick={onConnectClicked}>
+      <MdIcon icon="power" />
+    </button>
+  {/if}
+
+  {#if $connectionState === "connected"}
+    <button class="btn btn-danger" onclick={onDisconnectClicked}>
+      <MdIcon icon="power_off" />
+    </button>
+  {/if}
+</div>
+
+<style>
+  .dropdown-menu {
+    width: 100vw;
+    max-width: 300px;
+  }
+</style>
+</file>
+
 <file path="src/fabric-object/aruco.ts">
 import * as fabric from "fabric";
 import { OBJECT_SIZE_DEFAULTS } from "$/defaults";
@@ -5738,168 +5759,6 @@ export class Barcode<
 fabric.classRegistry.setClass(Barcode, "Barcode");
 
 export default Barcode;
-</file>
-
-<file path="src/stores.ts">
-import { get, readable, writable } from "svelte/store";
-import {
-  AppConfigSchema,
-  CsvParamsSchema,
-  UserFontSchema,
-  UserIconSchema,
-  type CsvParams,
-  type UserFont,
-  type UserIcon,
-  type AppConfig,
-  type AutomationProps,
-  type ConnectionState,
-  type ConnectionType,
-} from "$/types";
-import {
-  NiimbotBluetoothClient,
-  NiimbotCapacitorBleClient,
-  NiimbotSerialClient,
-  RequestCommandId,
-  ResponseCommandId,
-  Utils,
-  instantiateClient,
-  type HeartbeatData,
-  type NiimbotAbstractClient,
-  type PrinterInfo,
-  type PrinterModelMeta,
-  type RfidInfo,
-} from "@mmote/niimbluelib";
-import { Toasts } from "$/utils/toasts";
-import { tr } from "$/utils/i18n";
-import { LocalStoragePersistence, writablePersisted } from "$/utils/persistence";
-import { APP_CONFIG_DEFAULTS, CSV_DEFAULT, OBJECT_DEFAULTS_TEXT } from "$/defaults";
-import z from "zod";
-import { FileUtils } from "$/utils/file_utils";
-
-export const fontCache = writable<string[]>([OBJECT_DEFAULTS_TEXT.fontFamily]);
-export const appConfig = writablePersisted<AppConfig>("config", AppConfigSchema, APP_CONFIG_DEFAULTS);
-export const userIcons = writablePersisted<UserIcon[]>("user_icons", z.array(UserIconSchema), []);
-export const userFonts = writablePersisted<UserFont[]>("user_fonts", z.array(UserFontSchema), []);
-export const loadedFonts = writable<FontFace[]>([]);
-
-export const connectionState = writable<ConnectionState>("disconnected");
-export const connectedPrinterName = writable<string>("");
-export const printerClient = writable<NiimbotAbstractClient>();
-export const heartbeatData = writable<HeartbeatData>();
-export const printerInfo = writable<PrinterInfo>();
-export const rfidInfo = writable<RfidInfo | undefined>();
-export const ribbonRfidInfo = writable<RfidInfo | undefined>();
-export const printerMeta = writable<PrinterModelMeta | undefined>();
-export const heartbeatFails = writable<number>(0);
-export const csvData = writablePersisted<CsvParams>("csv_params", CsvParamsSchema, { data: CSV_DEFAULT });
-
-userFonts.subscribe(FileUtils.loadFonts);
-
-export const automation = readable<AutomationProps | undefined>(
-  (() => {
-    try {
-      return LocalStoragePersistence.loadAutomation() ?? undefined;
-    } catch (e) {
-      console.error(e);
-    }
-    return undefined;
-  })(),
-);
-
-export const refreshRfidInfo = () => {
-  const client = get(printerClient);
-
-  if (!client) {
-    return;
-  }
-
-  client.abstraction.rfidInfo().then(rfidInfo.set).catch(console.error);
-
-  client.abstraction
-    .rfidInfo2()
-    .then(ribbonRfidInfo.set)
-    .catch(() => {});
-};
-
-export const initClient = (connectionType: ConnectionType) => {
-  printerClient.update((prevClient: NiimbotAbstractClient) => {
-    let newClient: NiimbotAbstractClient = prevClient;
-
-    if (
-      prevClient === undefined ||
-      (connectionType !== "bluetooth" && prevClient instanceof NiimbotBluetoothClient) ||
-      (connectionType !== "serial" && prevClient instanceof NiimbotSerialClient) ||
-      (connectionType !== "capacitor-ble" && prevClient instanceof NiimbotCapacitorBleClient)
-    ) {
-      if (prevClient !== undefined) {
-        prevClient.disconnect();
-      }
-
-      newClient = instantiateClient(connectionType);
-
-      const conf = get(appConfig);
-
-      if (conf.packetIntervalMs !== undefined) {
-        newClient.setPacketInterval(conf.packetIntervalMs);
-      }
-
-      newClient.on("packetsent", (e) => {
-        console.log(`>> ${Utils.bufToHex(e.packet.toBytes())} (${RequestCommandId[e.packet.command]})`);
-      });
-
-      newClient.on("packetreceived", (e) => {
-        console.log(`<< ${Utils.bufToHex(e.packet.toBytes())} (${ResponseCommandId[e.packet.command]})`);
-      });
-
-      newClient.on("connect", (e) => {
-        console.log("onConnect");
-        heartbeatFails.set(0);
-        connectionState.set("connected");
-        connectedPrinterName.set(e.info.deviceName ?? "unknown");
-      });
-
-      newClient.on("printerinfofetched", (e) => {
-        console.log("printerInfoFetched");
-        printerInfo.set(e.info);
-        printerMeta.set(newClient.getModelMetadata());
-      });
-
-      newClient.on("disconnect", () => {
-        console.log("onDisconnect");
-        connectionState.set("disconnected");
-        connectedPrinterName.set("");
-        printerInfo.set({});
-        printerMeta.set(undefined);
-      });
-
-      newClient.on("heartbeat", (e) => {
-        heartbeatFails.set(0);
-        heartbeatData.update((prev) => {
-          if (
-            prev?.paperRfidSuccess !== e.data?.paperRfidSuccess ||
-            prev?.ribbonRfidSuccess !== e.data?.ribbonRfidSuccess
-          ) {
-            refreshRfidInfo();
-          }
-          return e.data;
-        });
-      });
-
-      newClient.on("heartbeatfailed", (e) => {
-        const maxFails = 5;
-        heartbeatFails.set(e.failedAttempts);
-
-        console.warn(`Heartbeat failed ${e.failedAttempts}/${maxFails}`);
-        if (e.failedAttempts >= maxFails) {
-          Toasts.error(get(tr)("connector.disconnect.heartbeat"));
-          newClient.disconnect();
-        }
-      });
-    }
-
-    return newClient;
-  });
-};
 </file>
 
 <file path="src/utils/qrcode.ts">
@@ -7475,6 +7334,642 @@ export const languageNames = Object.assign(
 ) as Record<SupportedLanguage, string>;
 </file>
 
+<file path="src/stores.ts">
+import { get, readable, writable } from "svelte/store";
+import {
+  AppConfigSchema,
+  CsvParamsSchema,
+  UserFontSchema,
+  UserIconSchema,
+  type CsvParams,
+  type UserFont,
+  type UserIcon,
+  type AppConfig,
+  type AutomationProps,
+  type ConnectionState,
+  type ConnectionType,
+} from "$/types";
+import {
+  NiimbotBluetoothClient,
+  NiimbotCapacitorBleClient,
+  NiimbotSerialClient,
+  RequestCommandId,
+  ResponseCommandId,
+  Utils,
+  instantiateClient,
+  type HeartbeatData,
+  type NiimbotAbstractClient,
+  type PrinterInfo,
+  type PrinterModelMeta,
+  type RfidInfo,
+} from "@mmote/niimbluelib";
+import { Toasts } from "$/utils/toasts";
+import { tr } from "$/utils/i18n";
+import { LocalStoragePersistence, writablePersisted } from "$/utils/persistence";
+import { APP_CONFIG_DEFAULTS, CSV_DEFAULT, OBJECT_DEFAULTS_TEXT } from "$/defaults";
+import z from "zod";
+import { FileUtils } from "$/utils/file_utils";
+
+export const fontCache = writable<string[]>([OBJECT_DEFAULTS_TEXT.fontFamily]);
+export const appConfig = writablePersisted<AppConfig>("config", AppConfigSchema, APP_CONFIG_DEFAULTS);
+export const userIcons = writablePersisted<UserIcon[]>("user_icons", z.array(UserIconSchema), []);
+export const userFonts = writablePersisted<UserFont[]>("user_fonts", z.array(UserFontSchema), []);
+export const loadedFonts = writable<FontFace[]>([]);
+
+export const connectionState = writable<ConnectionState>("disconnected");
+export const connectedPrinterName = writable<string>("");
+export const printerClient = writable<NiimbotAbstractClient>();
+export const heartbeatData = writable<HeartbeatData>();
+export const printerInfo = writable<PrinterInfo>();
+export const rfidInfo = writable<RfidInfo | undefined>();
+export const ribbonRfidInfo = writable<RfidInfo | undefined>();
+export const printerMeta = writable<PrinterModelMeta | undefined>();
+export const heartbeatFails = writable<number>(0);
+export const csvData = writablePersisted<CsvParams>("csv_params", CsvParamsSchema, { data: CSV_DEFAULT });
+
+userFonts.subscribe(FileUtils.loadFonts);
+
+// src/stores.ts
+
+// 1. Change `readable` to `writable`
+export const automation = writable<AutomationProps | undefined>(
+  (() => {
+    try {
+      return LocalStoragePersistence.loadAutomation() ?? undefined;
+    } catch (e) {
+      console.error(e);
+    }
+    return undefined;
+  })(),
+);
+
+// 2. Automatically save to local storage whenever it changes
+automation.subscribe((value) => {
+  LocalStoragePersistence.saveAutomation(value);
+});
+
+export const refreshRfidInfo = () => {
+  const client = get(printerClient);
+
+  if (!client) {
+    return;
+  }
+
+  client.abstraction.rfidInfo().then(rfidInfo.set).catch(console.error);
+
+  client.abstraction
+    .rfidInfo2()
+    .then(ribbonRfidInfo.set)
+    .catch(() => {});
+};
+
+export const initClient = (connectionType: ConnectionType) => {
+  printerClient.update((prevClient: NiimbotAbstractClient) => {
+    let newClient: NiimbotAbstractClient = prevClient;
+
+    if (
+      prevClient === undefined ||
+      (connectionType !== "bluetooth" && prevClient instanceof NiimbotBluetoothClient) ||
+      (connectionType !== "serial" && prevClient instanceof NiimbotSerialClient) ||
+      (connectionType !== "capacitor-ble" && prevClient instanceof NiimbotCapacitorBleClient)
+    ) {
+      if (prevClient !== undefined) {
+        prevClient.disconnect();
+      }
+
+      newClient = instantiateClient(connectionType);
+
+      const conf = get(appConfig);
+
+      if (conf.packetIntervalMs !== undefined) {
+        newClient.setPacketInterval(conf.packetIntervalMs);
+      }
+
+      newClient.on("packetsent", (e) => {
+        console.log(`>> ${Utils.bufToHex(e.packet.toBytes())} (${RequestCommandId[e.packet.command]})`);
+      });
+
+      newClient.on("packetreceived", (e) => {
+        console.log(`<< ${Utils.bufToHex(e.packet.toBytes())} (${ResponseCommandId[e.packet.command]})`);
+      });
+
+      newClient.on("connect", (e) => {
+        console.log("onConnect");
+        heartbeatFails.set(0);
+        connectionState.set("connected");
+        connectedPrinterName.set(e.info.deviceName ?? "unknown");
+      });
+
+      newClient.on("printerinfofetched", (e) => {
+        console.log("printerInfoFetched");
+        printerInfo.set(e.info);
+        printerMeta.set(newClient.getModelMetadata());
+      });
+
+      newClient.on("disconnect", () => {
+        console.log("onDisconnect");
+        connectionState.set("disconnected");
+        connectedPrinterName.set("");
+        printerInfo.set({});
+        printerMeta.set(undefined);
+      });
+
+      newClient.on("heartbeat", (e) => {
+        heartbeatFails.set(0);
+        heartbeatData.update((prev) => {
+          if (
+            prev?.paperRfidSuccess !== e.data?.paperRfidSuccess ||
+            prev?.ribbonRfidSuccess !== e.data?.ribbonRfidSuccess
+          ) {
+            refreshRfidInfo();
+          }
+          return e.data;
+        });
+      });
+
+      newClient.on("heartbeatfailed", (e) => {
+        const maxFails = 5;
+        heartbeatFails.set(e.failedAttempts);
+
+        console.warn(`Heartbeat failed ${e.failedAttempts}/${maxFails}`);
+        if (e.failedAttempts >= maxFails) {
+          Toasts.error(get(tr)("connector.disconnect.heartbeat"));
+          newClient.disconnect();
+        }
+      });
+    }
+
+    return newClient;
+  });
+};
+</file>
+
+<file path="src/utils/file_utils.ts">
+import * as fabric from "fabric";
+import {
+  ExportedLabelTemplateSchema,
+  LabelPresetSchema,
+  UserFont,
+  type ExportedLabelTemplate,
+  type FabricJson,
+  type LabelPreset,
+  type LabelProps,
+} from "$/types";
+import { OBJECT_DEFAULTS, OBJECT_DEFAULTS_VECTOR, THUMBNAIL_HEIGHT, THUMBNAIL_QUALITY } from "$/defaults";
+import { z } from "zod";
+import { CustomCanvas } from "$/fabric-object/custom_canvas";
+import { Capacitor } from "@capacitor/core";
+import { CanvasUtils } from "$/utils/canvas_utils";
+import { LocalStoragePersistence } from "./persistence";
+import { csvData, loadedFonts } from "$/stores";
+import { get } from "svelte/store";
+
+export class FileUtils {
+  static timestamp(): number {
+    return Math.floor(Date.now() / 1000);
+  }
+
+  static timestampFloat(): number {
+    return Date.now() / 1000;
+  }
+
+  /** Convert string to base64 string */
+  static base64str(str: string): string {
+    const bytes = new TextEncoder().encode(str);
+    const binString = String.fromCodePoint(...bytes);
+    return btoa(binString);
+  }
+
+  /** Convert object to base64 string */
+  static base64obj(obj: unknown): string {
+    const json: string = JSON.stringify(obj);
+    return FileUtils.base64str(json);
+  }
+
+  /** Convert object to base64 string */
+  static base64buf(buf: ArrayBuffer): Promise<string> {
+    const blob = new Blob([buf]);
+
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        const base64 = result.split(",")[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  static async decompressData(buf: BufferSource): Promise<ArrayBuffer> {
+    const ds = new DecompressionStream("gzip");
+    const writer = ds.writable.getWriter();
+    writer.write(buf);
+    writer.close();
+    return await new Response(ds.readable).arrayBuffer();
+  }
+
+  static async compressData(buf: BufferSource): Promise<ArrayBuffer> {
+    const cs = new CompressionStream("gzip");
+    const writer = cs.writable.getWriter();
+    writer.write(buf);
+    writer.close();
+    return await new Response(cs.readable).arrayBuffer();
+  }
+
+  /** Convert base64 string to bytes */
+  static base64toBytes(b64str: string): Uint8Array<ArrayBuffer> {
+    const binaryString = atob(b64str);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.codePointAt(i)!;
+    }
+    return bytes;
+  }
+
+  static async blobToDataUrl(file: Blob): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
+        if (readerEvt?.target?.result) {
+          resolve(readerEvt.target.result as string);
+        }
+      };
+      reader.onerror = (readerEvt: ProgressEvent<FileReader>) => {
+        console.error(readerEvt);
+        reject(new Error("File read error"));
+      };
+    });
+  }
+
+  static async downloadBase64Web(filename: string, mime: string, base64Data: string) {
+    const byteChars = atob(base64Data);
+    const byteNumbers = new Array(byteChars.length);
+
+    for (let i = 0; i < byteChars.length; i++) {
+      byteNumbers[i] = byteChars.charCodeAt(i);
+    }
+
+    const arr = new Uint8Array(byteNumbers);
+    const blob = new Blob([arr], { type: mime });
+
+    const a = document.createElement("a");
+    a.download = filename;
+    a.href = URL.createObjectURL(blob);
+    a.click();
+
+    setTimeout(() => {
+      URL.revokeObjectURL(a.href);
+      a.remove();
+    }, 10_000);
+  }
+
+  static async downloadBase64Capacitor(filename: string, base64Data: string) {
+    const { Directory, Filesystem } = await import("@capacitor/filesystem");
+    const { Share } = await import("@capacitor/share");
+
+    const result = await Filesystem.writeFile({
+      data: base64Data,
+      path: filename,
+      directory: Directory.Cache,
+    });
+
+    await Share.share({
+      title: filename,
+      text: filename,
+      url: result.uri,
+    });
+  }
+
+  static async downloadBase64(filename: string, mime: string, base64Data: string) {
+    if (Capacitor.getPlatform() !== "web") {
+      FileUtils.downloadBase64Capacitor(filename, base64Data);
+      return;
+    }
+
+    FileUtils.downloadBase64Web(filename, mime, base64Data);
+  }
+
+  static makeExportedLabel(canvas: fabric.Canvas, labelProps: LabelProps, includeCsv: boolean): ExportedLabelTemplate {
+    const thumbnailBase64: string = canvas.toDataURL({
+      width: canvas.width,
+      height: canvas.height,
+      left: 0,
+      top: 0,
+      multiplier: THUMBNAIL_HEIGHT / (canvas.height || 1),
+      quality: THUMBNAIL_QUALITY,
+      format: "jpeg",
+    });
+
+    const tpl: ExportedLabelTemplate = {
+      canvas: canvas.toJSON(),
+      label: labelProps,
+      thumbnailBase64,
+      timestamp: FileUtils.timestamp(),
+    };
+
+    if (includeCsv) {
+      tpl.csv = get(csvData);
+    }
+
+    tpl.id = LocalStoragePersistence.createUidForLabel(tpl);
+
+    return tpl;
+  }
+
+  /** Convert label template to JSON and download it */
+  static saveLabelAsJson(label: ExportedLabelTemplate) {
+    const parsed = ExportedLabelTemplateSchema.omit({ id: true }).parse(label);
+    const timestamp = label.timestamp ?? FileUtils.timestamp();
+    let filename = `label_${timestamp}.json`;
+
+    if (parsed.title && parsed.title.trim().length > 0) {
+      filename = `${parsed.title}.json`;
+    }
+
+    FileUtils.downloadBase64(filename, "application/json", FileUtils.base64obj(parsed));
+  }
+
+  /** Convert canvas to PNG and download it */
+  static saveCanvasAsPng(canvas: fabric.Canvas) {
+    const timestamp = FileUtils.timestamp();
+
+    const url = canvas.toDataURL({
+      width: canvas.width,
+      height: canvas.height,
+      left: 0,
+      top: 0,
+      format: "png",
+      multiplier: 1,
+    });
+
+    FileUtils.downloadBase64(`label_${timestamp}.png`, "image/png", url.split("base64,")[1]);
+  }
+
+  /** Convert label template to JSON and download it */
+  static saveLabelPresetsAsJson(presets: LabelPreset[]) {
+    const parsed = z.array(LabelPresetSchema).parse(presets);
+    FileUtils.downloadBase64(`presets_${FileUtils.timestamp()}.json`, "application/json", FileUtils.base64obj(parsed));
+  }
+
+  /**
+   * Open file picker and return file contents
+   *
+   * fixme: never ends if dialog closed
+   *
+   **/
+  static async pickFileAsync(acceptExtension: string, multiple: boolean): Promise<FileList> {
+    return new Promise((resolve) => {
+      const input: HTMLInputElement = document.createElement("input");
+
+      input.type = "file";
+      input.multiple = multiple;
+
+      if (acceptExtension !== "*") {
+        input.accept = `.${acceptExtension}`;
+      }
+
+      input.onchange = (e: Event) => {
+        const target = e.target as HTMLInputElement;
+        if (target.files !== null && target.files.length > 0) {
+          resolve(target.files);
+        }
+      };
+      input.click();
+    });
+  }
+
+  static async pickAndReadTextFile(acceptExtension: string, multiple: boolean): Promise<string[]> {
+    const fileList = await FileUtils.pickFileAsync(acceptExtension, multiple);
+
+    const result: string[] = [];
+
+    for (const file of fileList) {
+      const ext = file.name.split(".").pop();
+      if (ext === acceptExtension) {
+        const data = await file.text();
+        result.push(data);
+      } else {
+        throw new Error(`Only ${acceptExtension} allowed`);
+      }
+    }
+
+    return result;
+  }
+
+  static async pickAndReadSingleTextFile(acceptExtension: string): Promise<string> {
+    const result = await FileUtils.pickAndReadTextFile(acceptExtension, false);
+    if (result.length === 0) {
+      throw new Error("No files processed");
+    }
+    return result[0];
+  }
+
+  /**
+   * Open file picker and return file contents
+   * */
+  static async pickAndReadBinaryFile(acceptExtension: string): Promise<{ name: string; data: ArrayBuffer }> {
+    const fileList = await FileUtils.pickFileAsync(acceptExtension, false);
+    const file: File = fileList[0];
+    const ext = file.name.split(".").pop();
+
+    if (acceptExtension !== "*" && ext !== acceptExtension) {
+      throw new Error(`Only ${acceptExtension} allowed`);
+    }
+
+    const data: ArrayBuffer = await file.arrayBuffer();
+    return { name: file.name, data };
+  }
+
+  static async loadCanvasState(canvas: fabric.Canvas, state: FabricJson): Promise<void> {
+    const deprecatedLines: fabric.Line[] = [];
+
+    await canvas.loadFromJSON(state, (_, obj) => {
+      if (obj instanceof fabric.FabricObject) {
+        obj.set({ snapAngle: OBJECT_DEFAULTS.snapAngle });
+        CanvasUtils.fixFabricObjectScale(obj);
+
+        if (obj instanceof fabric.Line) {
+          deprecatedLines.push(obj);
+        }
+      }
+    });
+
+    // convert deprecated Line to Polyline
+    for (const line of deprecatedLines) {
+      const poly = new fabric.Polyline(
+        [
+          { x: line.x1, y: line.y1 },
+          { x: line.x2, y: line.y2 },
+        ],
+        {
+          ...OBJECT_DEFAULTS_VECTOR,
+          left: line.left,
+          top: line.top,
+          angle: line.angle,
+          scaleX: line.scaleX,
+          scaleY: line.scaleY,
+          fill: line.fill,
+          stroke: line.stroke,
+          strokeWidth: line.strokeWidth,
+        },
+      );
+
+      canvas.remove(line);
+      canvas.add(poly);
+    }
+
+    if (canvas instanceof CustomCanvas) {
+      canvas.virtualZoom(canvas.getVirtualZoom());
+    }
+
+    canvas.requestRenderAll();
+  }
+
+  static printImageUrls(sources: string[]) {
+    const imgs = sources.map((src) => `<img src="${src}"/>`);
+
+    const html = `
+    <html>
+      <head>
+        <style>
+          html, body {
+            margin: 0;
+            padding: 0;
+          }
+          img {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            image-rendering: pixelated;
+            ${imgs.length > 1 ? "page-break-after: always;" : ""}
+          }
+        </style>
+      </head>
+      <body>
+        ${imgs.join("\n")}
+      </body>
+    </html>
+    `;
+
+    const iframe = document.createElement("iframe");
+
+    iframe.onload = () => {
+      const iframeWindow = iframe.contentWindow!;
+      iframeWindow.onafterprint = () => iframe.remove();
+      iframeWindow.print();
+    };
+
+    iframe.style.display = "none";
+    iframe.src = "about:blank";
+    iframe.srcdoc = html;
+
+    document.body.appendChild(iframe);
+  }
+
+  static async makeLabelUrl(label: ExportedLabelTemplate): Promise<string> {
+    const labelStr = JSON.stringify({ ...label, thumbnailBase64: undefined });
+
+    const encoder = new TextEncoder();
+    const data = encoder.encode(labelStr);
+
+    if (data.length > 2 * 1024 * 1024) {
+      throw new Error("Label data size > 2MB");
+    }
+
+    const compressed = await FileUtils.compressData(data);
+    const b64data = await FileUtils.base64buf(compressed);
+    return `${location.protocol}//${location.host}/#load=${b64data}`;
+  }
+
+  static urlHashParamsToDict(): Record<string, string> {
+    const anchorData = globalThis.location.hash.slice(1);
+
+    if (!anchorData) {
+      return {};
+    }
+
+    return anchorData.split("&").reduce((res: Record<string, string>, item: string) => {
+      const firstEqualsIndex = item.indexOf("=");
+
+      if (firstEqualsIndex === -1) {
+        // Handle case without value (e.g., "key" without "=value")
+        res[item] = "";
+      } else {
+        const key = item.slice(0, firstEqualsIndex);
+        const value = item.slice(firstEqualsIndex + 1);
+        res[key] = value;
+      }
+
+      return res;
+    }, {});
+  }
+
+  static async readLabelFromUrl(): Promise<ExportedLabelTemplate | null> {
+    const params = FileUtils.urlHashParamsToDict();
+
+    if ("uload" in params) {
+      const b64data: string = params["uload"];
+      const jsonBytes = FileUtils.base64toBytes(b64data);
+      const jsonStr = new TextDecoder().decode(jsonBytes);
+      const labelObj = JSON.parse(jsonStr);
+      return ExportedLabelTemplateSchema.parse(labelObj);
+    }
+
+    if (!("load" in params)) {
+      return null;
+    }
+
+    const b64data: string = params["load"];
+    const bytes = FileUtils.base64toBytes(b64data);
+    const decompressed = await FileUtils.decompressData(bytes);
+    const decoder = new TextDecoder();
+
+    const decoded = decoder.decode(decompressed);
+    const labelObj = JSON.parse(decoded);
+    return ExportedLabelTemplateSchema.parse(labelObj);
+  }
+
+  static async loadFonts(fontsToLoad: UserFont[]) {
+    const loadedList = get(loadedFonts);
+
+    for (const font of fontsToLoad) {
+      if (loadedList.some((e) => e.family === font.family)) {
+        continue;
+      }
+
+      const bytes = FileUtils.base64toBytes(font.gzippedDataB64);
+      const decompressed = await FileUtils.decompressData(bytes);
+      const b64 = await FileUtils.base64buf(decompressed);
+
+      const fontFace = new FontFace(font.family, `url(data:${font.mimeType};base64,${b64})`);
+
+      try {
+        const loaded = await fontFace.load();
+        loadedList.push(loaded);
+        document.fonts.add(loaded);
+      } catch (e) {
+        console.error(`Failed to load font ${font.family}:`, e);
+      }
+    }
+
+    // remove font that not exist anymore
+    for (let i = loadedList.length - 1; i >= 0; i--) {
+      const loadedFont = loadedList[i];
+
+      if (!fontsToLoad.some((e) => e.family === loadedFont.family)) {
+        document.fonts.delete(loadedFont);
+        loadedList.splice(i, 1);
+      }
+    }
+
+    loadedFonts.set(loadedList);
+  }
+}
+</file>
+
 <file path="standalone-apps/capacitor/android/app/src/main/AndroidManifest.xml">
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
@@ -8271,472 +8766,6 @@ export const canvasPreprocess = (canvas: fabric.Canvas, variables?: { [key: stri
 };
 </file>
 
-<file path="src/utils/file_utils.ts">
-import * as fabric from "fabric";
-import {
-  ExportedLabelTemplateSchema,
-  LabelPresetSchema,
-  UserFont,
-  type ExportedLabelTemplate,
-  type FabricJson,
-  type LabelPreset,
-  type LabelProps,
-} from "$/types";
-import { OBJECT_DEFAULTS, OBJECT_DEFAULTS_VECTOR, THUMBNAIL_HEIGHT, THUMBNAIL_QUALITY } from "$/defaults";
-import { z } from "zod";
-import { CustomCanvas } from "$/fabric-object/custom_canvas";
-import { Capacitor } from "@capacitor/core";
-import { CanvasUtils } from "$/utils/canvas_utils";
-import { LocalStoragePersistence } from "./persistence";
-import { csvData, loadedFonts } from "$/stores";
-import { get } from "svelte/store";
-
-export class FileUtils {
-  static timestamp(): number {
-    return Math.floor(Date.now() / 1000);
-  }
-
-  static timestampFloat(): number {
-    return Date.now() / 1000;
-  }
-
-  /** Convert string to base64 string */
-  static base64str(str: string): string {
-    const bytes = new TextEncoder().encode(str);
-    const binString = String.fromCodePoint(...bytes);
-    return btoa(binString);
-  }
-
-  /** Convert object to base64 string */
-  static base64obj(obj: unknown): string {
-    const json: string = JSON.stringify(obj);
-    return FileUtils.base64str(json);
-  }
-
-  /** Convert object to base64 string */
-  static base64buf(buf: ArrayBuffer): Promise<string> {
-    const blob = new Blob([buf]);
-
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        const base64 = result.split(",")[1];
-        resolve(base64);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  }
-
-  static async decompressData(buf: BufferSource): Promise<ArrayBuffer> {
-    const ds = new DecompressionStream("gzip");
-    const writer = ds.writable.getWriter();
-    writer.write(buf);
-    writer.close();
-    return await new Response(ds.readable).arrayBuffer();
-  }
-
-  static async compressData(buf: BufferSource): Promise<ArrayBuffer> {
-    const cs = new CompressionStream("gzip");
-    const writer = cs.writable.getWriter();
-    writer.write(buf);
-    writer.close();
-    return await new Response(cs.readable).arrayBuffer();
-  }
-
-  /** Convert base64 string to bytes */
-  static base64toBytes(b64str: string): Uint8Array<ArrayBuffer> {
-    const binaryString = atob(b64str);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.codePointAt(i)!;
-    }
-    return bytes;
-  }
-
-  static async blobToDataUrl(file: Blob): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (readerEvt: ProgressEvent<FileReader>) => {
-        if (readerEvt?.target?.result) {
-          resolve(readerEvt.target.result as string);
-        }
-      };
-      reader.onerror = (readerEvt: ProgressEvent<FileReader>) => {
-        console.error(readerEvt);
-        reject(new Error("File read error"));
-      };
-    });
-  }
-
-  static async downloadBase64Web(filename: string, mime: string, base64Data: string) {
-    const byteChars = atob(base64Data);
-    const byteNumbers = new Array(byteChars.length);
-
-    for (let i = 0; i < byteChars.length; i++) {
-      byteNumbers[i] = byteChars.charCodeAt(i);
-    }
-
-    const arr = new Uint8Array(byteNumbers);
-    const blob = new Blob([arr], { type: mime });
-
-    const a = document.createElement("a");
-    a.download = filename;
-    a.href = URL.createObjectURL(blob);
-    a.click();
-
-    setTimeout(() => {
-      URL.revokeObjectURL(a.href);
-      a.remove();
-    }, 10_000);
-  }
-
-  static async downloadBase64Capacitor(filename: string, base64Data: string) {
-    const { Directory, Filesystem } = await import("@capacitor/filesystem");
-    const { Share } = await import("@capacitor/share");
-
-    const result = await Filesystem.writeFile({
-      data: base64Data,
-      path: filename,
-      directory: Directory.Cache,
-    });
-
-    await Share.share({
-      title: filename,
-      text: filename,
-      url: result.uri,
-    });
-  }
-
-  static async downloadBase64(filename: string, mime: string, base64Data: string) {
-    if (Capacitor.getPlatform() !== "web") {
-      FileUtils.downloadBase64Capacitor(filename, base64Data);
-      return;
-    }
-
-    FileUtils.downloadBase64Web(filename, mime, base64Data);
-  }
-
-  static makeExportedLabel(canvas: fabric.Canvas, labelProps: LabelProps, includeCsv: boolean): ExportedLabelTemplate {
-    const thumbnailBase64: string = canvas.toDataURL({
-      width: canvas.width,
-      height: canvas.height,
-      left: 0,
-      top: 0,
-      multiplier: THUMBNAIL_HEIGHT / (canvas.height || 1),
-      quality: THUMBNAIL_QUALITY,
-      format: "jpeg",
-    });
-
-    const tpl: ExportedLabelTemplate = {
-      canvas: canvas.toJSON(),
-      label: labelProps,
-      thumbnailBase64,
-      timestamp: FileUtils.timestamp(),
-    };
-
-    if (includeCsv) {
-      tpl.csv = get(csvData);
-    }
-
-    tpl.id = LocalStoragePersistence.createUidForLabel(tpl);
-
-    return tpl;
-  }
-
-  /** Convert label template to JSON and download it */
-  static saveLabelAsJson(label: ExportedLabelTemplate) {
-    const parsed = ExportedLabelTemplateSchema.omit({ id: true }).parse(label);
-    const timestamp = label.timestamp ?? FileUtils.timestamp();
-    let filename = `label_${timestamp}.json`;
-
-    if (parsed.title && parsed.title.trim().length > 0) {
-      filename = `${parsed.title}.json`;
-    }
-
-    FileUtils.downloadBase64(filename, "application/json", FileUtils.base64obj(parsed));
-  }
-
-  /** Convert canvas to PNG and download it */
-  static saveCanvasAsPng(canvas: fabric.Canvas) {
-    const timestamp = FileUtils.timestamp();
-
-    const url = canvas.toDataURL({
-      width: canvas.width,
-      height: canvas.height,
-      left: 0,
-      top: 0,
-      format: "png",
-      multiplier: 1,
-    });
-
-    FileUtils.downloadBase64(`label_${timestamp}.png`, "image/png", url.split("base64,")[1]);
-  }
-
-  /** Convert label template to JSON and download it */
-  static saveLabelPresetsAsJson(presets: LabelPreset[]) {
-    const parsed = z.array(LabelPresetSchema).parse(presets);
-    FileUtils.downloadBase64(`presets_${FileUtils.timestamp()}.json`, "application/json", FileUtils.base64obj(parsed));
-  }
-
-  /**
-   * Open file picker and return file contents
-   *
-   * fixme: never ends if dialog closed
-   *
-   **/
-  static async pickFileAsync(acceptExtension: string, multiple: boolean): Promise<FileList> {
-    return new Promise((resolve) => {
-      const input: HTMLInputElement = document.createElement("input");
-
-      input.type = "file";
-      input.multiple = multiple;
-
-      if (acceptExtension !== "*") {
-        input.accept = `.${acceptExtension}`;
-      }
-
-      input.onchange = (e: Event) => {
-        const target = e.target as HTMLInputElement;
-        if (target.files !== null && target.files.length > 0) {
-          resolve(target.files);
-        }
-      };
-      input.click();
-    });
-  }
-
-  static async pickAndReadTextFile(acceptExtension: string, multiple: boolean): Promise<string[]> {
-    const fileList = await FileUtils.pickFileAsync(acceptExtension, multiple);
-
-    const result: string[] = [];
-
-    for (const file of fileList) {
-      const ext = file.name.split(".").pop();
-      if (ext === acceptExtension) {
-        const data = await file.text();
-        result.push(data);
-      } else {
-        throw new Error(`Only ${acceptExtension} allowed`);
-      }
-    }
-
-    return result;
-  }
-
-  static async pickAndReadSingleTextFile(acceptExtension: string): Promise<string> {
-    const result = await FileUtils.pickAndReadTextFile(acceptExtension, false);
-    if (result.length === 0) {
-      throw new Error("No files processed");
-    }
-    return result[0];
-  }
-
-  /**
-   * Open file picker and return file contents
-   * */
-  static async pickAndReadBinaryFile(acceptExtension: string): Promise<{ name: string; data: ArrayBuffer }> {
-    const fileList = await FileUtils.pickFileAsync(acceptExtension, false);
-    const file: File = fileList[0];
-    const ext = file.name.split(".").pop();
-
-    if (acceptExtension !== "*" && ext !== acceptExtension) {
-      throw new Error(`Only ${acceptExtension} allowed`);
-    }
-
-    const data: ArrayBuffer = await file.arrayBuffer();
-    return { name: file.name, data };
-  }
-
-  static async loadCanvasState(canvas: fabric.Canvas, state: FabricJson): Promise<void> {
-    const deprecatedLines: fabric.Line[] = [];
-
-    await canvas.loadFromJSON(state, (_, obj) => {
-      if (obj instanceof fabric.FabricObject) {
-        obj.set({ snapAngle: OBJECT_DEFAULTS.snapAngle });
-        CanvasUtils.fixFabricObjectScale(obj);
-
-        if (obj instanceof fabric.Line) {
-          deprecatedLines.push(obj);
-        }
-      }
-    });
-
-    // convert deprecated Line to Polyline
-    for (const line of deprecatedLines) {
-      const poly = new fabric.Polyline(
-        [
-          { x: line.x1, y: line.y1 },
-          { x: line.x2, y: line.y2 },
-        ],
-        {
-          ...OBJECT_DEFAULTS_VECTOR,
-          left: line.left,
-          top: line.top,
-          angle: line.angle,
-          scaleX: line.scaleX,
-          scaleY: line.scaleY,
-          fill: line.fill,
-          stroke: line.stroke,
-          strokeWidth: line.strokeWidth,
-        },
-      );
-
-      canvas.remove(line);
-      canvas.add(poly);
-    }
-
-    if (canvas instanceof CustomCanvas) {
-      canvas.virtualZoom(canvas.getVirtualZoom());
-    }
-
-    canvas.requestRenderAll();
-  }
-
-  static printImageUrls(sources: string[]) {
-    const imgs = sources.map((src) => `<img src="${src}"/>`);
-
-    const html = `
-    <html>
-      <head>
-        <style>
-          html, body {
-            margin: 0;
-            padding: 0;
-          }
-          img {
-            display: block;
-            width: 100vw;
-            height: 100vh;
-            image-rendering: pixelated;
-            ${imgs.length > 1 ? "page-break-after: always;" : ""}
-          }
-        </style>
-      </head>
-      <body>
-        ${imgs.join("\n")}
-      </body>
-    </html>
-    `;
-
-    const iframe = document.createElement("iframe");
-
-    iframe.onload = () => {
-      const iframeWindow = iframe.contentWindow!;
-      iframeWindow.onafterprint = () => iframe.remove();
-      iframeWindow.print();
-    };
-
-    iframe.style.display = "none";
-    iframe.src = "about:blank";
-    iframe.srcdoc = html;
-
-    document.body.appendChild(iframe);
-  }
-
-  static async makeLabelUrl(label: ExportedLabelTemplate): Promise<string> {
-    const labelStr = JSON.stringify({ ...label, thumbnailBase64: undefined });
-
-    const encoder = new TextEncoder();
-    const data = encoder.encode(labelStr);
-
-    if (data.length > 2 * 1024 * 1024) {
-      throw new Error("Label data size > 2MB");
-    }
-
-    const compressed = await FileUtils.compressData(data);
-    const b64data = await FileUtils.base64buf(compressed);
-    return `${location.protocol}//${location.host}/#load=${b64data}`;
-  }
-
-  static urlHashParamsToDict(): Record<string, string> {
-    const anchorData = globalThis.location.hash.slice(1);
-
-    if (!anchorData) {
-      return {};
-    }
-
-    return anchorData.split("&").reduce((res: Record<string, string>, item: string) => {
-      const firstEqualsIndex = item.indexOf("=");
-
-      if (firstEqualsIndex === -1) {
-        // Handle case without value (e.g., "key" without "=value")
-        res[item] = "";
-      } else {
-        const key = item.slice(0, firstEqualsIndex);
-        const value = item.slice(firstEqualsIndex + 1);
-        res[key] = value;
-      }
-
-      return res;
-    }, {});
-  }
-
-  static async readLabelFromUrl(): Promise<ExportedLabelTemplate | null> {
-    const params = FileUtils.urlHashParamsToDict();
-
-    if ("uload" in params) {
-      const b64data: string = params["uload"];
-      const jsonBytes = FileUtils.base64toBytes(b64data);
-      const jsonStr = new TextDecoder().decode(jsonBytes);
-      const labelObj = JSON.parse(jsonStr);
-      return ExportedLabelTemplateSchema.parse(labelObj);
-    }
-
-    if (!("load" in params)) {
-      return null;
-    }
-
-    const b64data: string = params["load"];
-    const bytes = FileUtils.base64toBytes(b64data);
-    const decompressed = await FileUtils.decompressData(bytes);
-    const decoder = new TextDecoder();
-
-    const decoded = decoder.decode(decompressed);
-    const labelObj = JSON.parse(decoded);
-    return ExportedLabelTemplateSchema.parse(labelObj);
-  }
-
-  static async loadFonts(fontsToLoad: UserFont[]) {
-    const loadedList = get(loadedFonts);
-
-    for (const font of fontsToLoad) {
-      if (loadedList.some((e) => e.family === font.family)) {
-        continue;
-      }
-
-      const bytes = FileUtils.base64toBytes(font.gzippedDataB64);
-      const decompressed = await FileUtils.decompressData(bytes);
-      const b64 = await FileUtils.base64buf(decompressed);
-
-      const fontFace = new FontFace(font.family, `url(data:${font.mimeType};base64,${b64})`);
-
-      try {
-        const loaded = await fontFace.load();
-        loadedList.push(loaded);
-        document.fonts.add(loaded);
-      } catch (e) {
-        console.error(`Failed to load font ${font.family}:`, e);
-      }
-    }
-
-    // remove font that not exist anymore
-    for (let i = loadedList.length - 1; i >= 0; i--) {
-      const loadedFont = loadedList[i];
-
-      if (!fontsToLoad.some((e) => e.family === loadedFont.family)) {
-        document.fonts.delete(loadedFont);
-        loadedList.splice(i, 1);
-      }
-    }
-
-    loadedFonts.set(loadedList);
-  }
-}
-</file>
-
 <file path="standalone-apps/capacitor/android/app/src/main/java/ru/mmote/niimblues/MainActivity.java">
 package ru.mmote.niimblues;
 
@@ -8784,6 +8813,86 @@ public class MainActivity extends BridgeActivity {
   },
   "author": "MultiMote",
   "license": "MIT"
+}
+</file>
+
+<file path="src/utils/canvas_utils.ts">
+import * as fabric from "fabric";
+import ArUcoMarker from "$/fabric-object/aruco";
+import Barcode from "$/fabric-object/barcode";
+import QRCode from "$/fabric-object/qrcode";
+import { OBJECT_DEFAULTS_TEXT } from "$/defaults";
+
+export class CanvasUtils {
+  static equalSpacingFillText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, printWidth: number) {
+    // calculate every character width, and spacing
+    const widths = [];
+    for (let i = 0; i < text.length; i++) {
+      const char = text.charAt(i);
+      const metrics = ctx.measureText(char);
+      widths.push(metrics.width);
+    }
+    const totalWidth = widths.reduce((a, b) => a + b, 0);
+    const spacing = (printWidth - totalWidth) / (text.length - 1);
+
+    // print every character with calculated spacing
+    let offset = 0;
+    for (let i = 0; i < text.length; i++) {
+      const char = text.charAt(i);
+      ctx.fillText(char, x + offset, y);
+      offset += widths[i] + spacing;
+    }
+  }
+
+  static fixFabricObjectScale(obj: fabric.FabricObject) {
+    const isNotScalable = obj instanceof Barcode || obj instanceof fabric.Rect || obj instanceof QRCode || obj instanceof ArUcoMarker;
+
+    if (isNotScalable) {
+      obj.set({
+        width: Math.round(obj.width * (obj.scaleX ?? 1)),
+        height: Math.round(obj.height * (obj.scaleY ?? 1)),
+        scaleX: 1,
+        scaleY: 1,
+        left: Math.round(obj.left),
+        top: Math.round(obj.top),
+      });
+
+      if (obj instanceof QRCode || obj instanceof ArUcoMarker) {
+        const qrMin = 42;
+        const size = Math.max(obj.width + (obj.width % 2), qrMin);
+        obj.set({
+          width: size,
+          height: size,
+        });
+      }
+    }
+  }
+
+  static fitObjectIntoCanvas(canvas: fabric.Canvas, obj: fabric.FabricObject, xMargin: number, yMarin: number) {
+    const widthRatio = canvas.width / (obj.width + xMargin * 2);
+    const heightRatio = canvas.height / (obj.height + yMarin * 2);
+    const scaleFactor = Math.min(widthRatio, heightRatio);
+    obj.set({ left: xMargin, top: yMarin });
+    obj.scale(scaleFactor);
+    canvas.centerObjectV(obj);
+    canvas.centerObjectH(obj);
+  }
+
+  static renderError(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+      ctx.save();
+      ctx.fillStyle = "black";
+      ctx.translate(-width / 2, -height / 2); // make top-left origin
+      ctx.translate(-0.5, -0.5); // blurry rendering fix
+      ctx.fillRect(0, 0, width + 1, height + 1);
+      ctx.restore();
+      
+      ctx.save();
+      ctx.fillStyle = "white";
+      ctx.textAlign = "center";
+      ctx.font = `16px ${OBJECT_DEFAULTS_TEXT.fontFamily}`;
+      ctx.fillText("ERR", 0, 0);
+      ctx.restore();
+    }
 }
 </file>
 
@@ -8890,6 +8999,16 @@ export const AutomationPropsSchema = z.object({
   startPrint: z.enum(["after_connect", "immediately"]).optional(),
 });
 
+export const PdfQuickTransformSchema = z.object({
+  scaleX: z.number(),
+  scaleY: z.number(),
+  left: z.number(),
+  top: z.number(),
+  angle: z.number(),
+  originX: z.string(),
+  originY: z.string(),
+});
+
 export const AppConfigSchema = z.object({
   /** Keep image aspect ration when using "fit" button */
   fitMode: z.enum(["stretch", "ratio_min", "ratio_max"]),
@@ -8897,6 +9016,15 @@ export const AppConfigSchema = z.object({
   iconListMode: z.enum(["user", "pack", "both"]),
   packetIntervalMs: z.number().gte(0).optional(),
   gridEnabled: z.boolean().optional(),
+  pdfQuickTransform: z.object({
+    scaleX: z.number(),
+    scaleY: z.number(),
+    left: z.number(),
+    top: z.number(),
+    angle: z.number(),
+    originX: z.string(),
+    originY: z.string()
+  }).optional()
 });
 
 export const UserIconSchema = z.object({
@@ -8922,86 +9050,6 @@ export type PreviewProps = z.infer<typeof PreviewPropsSchema>;
 export type AutomationProps = z.infer<typeof AutomationPropsSchema>;
 export type AppConfig = z.infer<typeof AppConfigSchema>;
 export type UserFont = z.infer<typeof UserFontSchema>;
-</file>
-
-<file path="src/utils/canvas_utils.ts">
-import * as fabric from "fabric";
-import ArUcoMarker from "$/fabric-object/aruco";
-import Barcode from "$/fabric-object/barcode";
-import QRCode from "$/fabric-object/qrcode";
-import { OBJECT_DEFAULTS_TEXT } from "$/defaults";
-
-export class CanvasUtils {
-  static equalSpacingFillText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, printWidth: number) {
-    // calculate every character width, and spacing
-    const widths = [];
-    for (let i = 0; i < text.length; i++) {
-      const char = text.charAt(i);
-      const metrics = ctx.measureText(char);
-      widths.push(metrics.width);
-    }
-    const totalWidth = widths.reduce((a, b) => a + b, 0);
-    const spacing = (printWidth - totalWidth) / (text.length - 1);
-
-    // print every character with calculated spacing
-    let offset = 0;
-    for (let i = 0; i < text.length; i++) {
-      const char = text.charAt(i);
-      ctx.fillText(char, x + offset, y);
-      offset += widths[i] + spacing;
-    }
-  }
-
-  static fixFabricObjectScale(obj: fabric.FabricObject) {
-    const isNotScalable = obj instanceof Barcode || obj instanceof fabric.Rect || obj instanceof QRCode || obj instanceof ArUcoMarker;
-
-    if (isNotScalable) {
-      obj.set({
-        width: Math.round(obj.width * (obj.scaleX ?? 1)),
-        height: Math.round(obj.height * (obj.scaleY ?? 1)),
-        scaleX: 1,
-        scaleY: 1,
-        left: Math.round(obj.left),
-        top: Math.round(obj.top),
-      });
-
-      if (obj instanceof QRCode || obj instanceof ArUcoMarker) {
-        const qrMin = 42;
-        const size = Math.max(obj.width + (obj.width % 2), qrMin);
-        obj.set({
-          width: size,
-          height: size,
-        });
-      }
-    }
-  }
-
-  static fitObjectIntoCanvas(canvas: fabric.Canvas, obj: fabric.FabricObject, xMargin: number, yMarin: number) {
-    const widthRatio = canvas.width / (obj.width + xMargin * 2);
-    const heightRatio = canvas.height / (obj.height + yMarin * 2);
-    const scaleFactor = Math.min(widthRatio, heightRatio);
-    obj.set({ left: xMargin, top: yMarin });
-    obj.scale(scaleFactor);
-    canvas.centerObjectV(obj);
-    canvas.centerObjectH(obj);
-  }
-
-  static renderError(ctx: CanvasRenderingContext2D, width: number, height: number): void {
-      ctx.save();
-      ctx.fillStyle = "black";
-      ctx.translate(-width / 2, -height / 2); // make top-left origin
-      ctx.translate(-0.5, -0.5); // blurry rendering fix
-      ctx.fillRect(0, 0, width + 1, height + 1);
-      ctx.restore();
-      
-      ctx.save();
-      ctx.fillStyle = "white";
-      ctx.textAlign = "center";
-      ctx.font = `16px ${OBJECT_DEFAULTS_TEXT.fontFamily}`;
-      ctx.fillText("ERR", 0, 0);
-      ctx.restore();
-    }
-}
 </file>
 
 <file path="package.json">
@@ -9727,16 +9775,6 @@ export class LabelDesignerObjectHelper {
           
           // 2. Load the base64 string directly into a Fabric Image object
           const img = await fabric.FabricImage.fromURL(base64Image);
-<<<<<<< Updated upstream
-          img.set({ 
-            left: 0, 
-            top: 0, 
-            snapAngle: OBJECT_DEFAULTS.snapAngle 
-          });
-
-          // 3. Fit the image to the currently selected label size
-          CanvasUtils.fitObjectIntoCanvas(fabricCanvas!, img, 0, 0);
-=======
           
           const qt = get(appConfig).pdfQuickTransform;
           if (qt) {
@@ -9761,7 +9799,6 @@ export class LabelDesignerObjectHelper {
               OBJECT_DEFAULTS.top as number
             );
           }
->>>>>>> Stashed changes
           
           // 4. Add to canvas and update history
           fabricCanvas!.add(img);
@@ -10057,11 +10094,7 @@ export class LabelDesignerObjectHelper {
   .canvas-wrapper canvas {
     image-rendering: pixelated;
   }
-<<<<<<< Updated upstream
 </style>
-=======
-</style>
->>>>>>> Stashed changes
 </file>
 
 </files>

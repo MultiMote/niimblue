@@ -26,28 +26,43 @@
   let connectionType = $state<ConnectionType>("bluetooth");
   let featureSupport = $state<AvailableTransports>({ webBluetooth: false, webSerial: false, capacitorBle: false });
 
-    // src/components/PrinterConnector.svelte (Inside the <script> block)
+  const toggleAutoConnect = (e: Event & { currentTarget: HTMLInputElement }) => {
+    const checked = e.currentTarget.checked;
+    
+    automation.update(prev => {
+      const newState = { ...(prev || {}), autoConnect: checked };
+      if (checked) {
+        // Grab the reliable internal device ID from the connected client
+        const client = $printerClient as any;
+        const deviceId = client?.device?.deviceId || client?.deviceId || $printerInfo?.mac;
+        newState.autoConnectDeviceId = deviceId;
+      } else {
+        newState.autoConnectDeviceId = undefined;
+      }
+      return newState;
+    });
+  };
 
-const toggleAutoConnect = (e: Event & { currentTarget: HTMLInputElement }) => {
-  const checked = e.currentTarget.checked;
-  
-  automation.update(prev => ({
-    ...(prev || {}),
-    autoConnect: checked,
-    // Store the MAC address if enabled, otherwise clear it so you can connect to new printers later
-    autoConnectDeviceId: checked ? $printerInfo?.mac : undefined
-  }));
-};
-
-  const onConnectClicked = async () => {
+  const onConnectClicked = async (isAutoConnect: boolean = false) => {
     initClient(connectionType);
     connectionState.set("connecting");
 
     try {
-      if ($printerClient instanceof NiimbotCapacitorBleClient && $automation?.autoConnectDeviceId !== undefined) {
+      if (isAutoConnect && $printerClient instanceof NiimbotCapacitorBleClient && $automation?.autoConnectDeviceId !== undefined) {
+        // Background auto-connection on app startup
         await $printerClient.connect({ deviceId: $automation.autoConnectDeviceId });
       } else {
+        // Manual connection: ALWAYS open the scanner to prevent getting locked out
         await $printerClient.connect();
+        
+        // If auto-connect is enabled, refresh the saved ID with the one we just successfully scanned
+        if ($automation?.autoConnect && $printerClient instanceof NiimbotCapacitorBleClient) {
+          const client = $printerClient as any;
+          const deviceId = client?.device?.deviceId || client?.deviceId || $printerInfo?.mac;
+          if (deviceId) {
+            automation.update(prev => ({ ...prev, autoConnectDeviceId: deviceId }));
+          }
+        }
       }
     } catch (e) {
       connectionState.set("disconnected");
@@ -123,7 +138,7 @@ const toggleAutoConnect = (e: Event & { currentTarget: HTMLInputElement }) => {
     }
 
     if ($automation !== undefined && $automation.autoConnect && connectionType === "capacitor-ble") {
-      onConnectClicked();
+      onConnectClicked(true);
     }
   });
 </script>
@@ -144,18 +159,16 @@ const toggleAutoConnect = (e: Event & { currentTarget: HTMLInputElement }) => {
           </ul>
         </div>
 
-         {#if connectionType === "capacitor-ble"}
-          <div class="form-check form-switch mt-2 mb-2 px-3 border-bottom pb-2">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="autoConnectSwitch"
-              checked={$automation?.autoConnect}
-              onchange={toggleAutoConnect} />
-            <label class="form-check-label" for="autoConnectSwitch">Auto-connect on launch</label>
-          </div>
-        {/if}
-        
+        <!-- Toggle is now always visible -->
+        <div class="form-check form-switch mt-2 mb-2 px-3 border-bottom pb-2">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="autoConnectSwitch"
+            checked={$automation?.autoConnect}
+            onchange={toggleAutoConnect} />
+          <label class="form-check-label" for="autoConnectSwitch">Auto-connect on launch</label>
+        </div>
       {/if}
 
       {#if $printerMeta}
@@ -305,7 +318,7 @@ const toggleAutoConnect = (e: Event & { currentTarget: HTMLInputElement }) => {
       class="btn btn-primary"
       disabled={$connectionState === "connecting" ||
         (!featureSupport.capacitorBle && !featureSupport.webBluetooth && !featureSupport.webSerial)}
-      onclick={onConnectClicked}>
+      onclick={() => onConnectClicked(false)}>
       <MdIcon icon="power" />
     </button>
   {/if}
