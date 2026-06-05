@@ -100,6 +100,26 @@ export const AutomationPropsSchema = z.object({
   startPrint: z.enum(["after_connect", "immediately"]).optional(),
 });
 
+export const PdfQuickTransformSchema = z.object({
+  scaleX: z.number(),
+  scaleY: z.number(),
+  left: z.number(),
+  top: z.number(),
+  angle: z.number(),
+  originX: z.string(),
+  originY: z.string(),
+});
+
+export const AppConfigSchema = z.object({
+  /** Keep image aspect ration when using "fit" button */
+  fitMode: z.enum(["stretch", "ratio_min", "ratio_max"]),
+  pageDelay: z.number().gte(0).optional(),
+  iconListMode: z.enum(["user", "pack", "both"]),
+  packetIntervalMs: z.number().gte(0).optional(),
+  gridEnabled: z.boolean().optional(),
+  pdfQuickTransform: PdfQuickTransformSchema.optional(), // <-- Add this line
+});
+
 export const AppConfigSchema = z.object({
   /** Keep image aspect ration when using "fit" button */
   fitMode: z.enum(["stretch", "ratio_min", "ratio_max"]),

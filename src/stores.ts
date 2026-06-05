@@ -52,7 +52,10 @@ export const csvData = writablePersisted<CsvParams>("csv_params", CsvParamsSchem
 
 userFonts.subscribe(FileUtils.loadFonts);
 
-export const automation = readable<AutomationProps | undefined>(
+// src/stores.ts
+
+// 1. Change `readable` to `writable`
+export const automation = writable<AutomationProps | undefined>(
   (() => {
     try {
       return LocalStoragePersistence.loadAutomation() ?? undefined;
@@ -62,6 +65,11 @@ export const automation = readable<AutomationProps | undefined>(
     return undefined;
   })(),
 );
+
+// 2. Automatically save to local storage whenever it changes
+automation.subscribe((value) => {
+  LocalStoragePersistence.saveAutomation(value);
+});
 
 export const refreshRfidInfo = () => {
   const client = get(printerClient);

@@ -361,16 +361,6 @@
           
           // 2. Load the base64 string directly into a Fabric Image object
           const img = await fabric.FabricImage.fromURL(base64Image);
-<<<<<<< Updated upstream
-          img.set({ 
-            left: 0, 
-            top: 0, 
-            snapAngle: OBJECT_DEFAULTS.snapAngle 
-          });
-
-          // 3. Fit the image to the currently selected label size
-          CanvasUtils.fitObjectIntoCanvas(fabricCanvas!, img, 0, 0);
-=======
           
           const qt = get(appConfig).pdfQuickTransform;
           if (qt) {
@@ -395,7 +385,6 @@
               OBJECT_DEFAULTS.top as number
             );
           }
->>>>>>> Stashed changes
           
           // 4. Add to canvas and update history
           fabricCanvas!.add(img);

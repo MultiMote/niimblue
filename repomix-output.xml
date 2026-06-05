@@ -425,132 +425,6 @@ export default defineConfig(
 </div>
 </file>
 
-<file path="src/components/designer-controls/GenericObjectParamsControls.svelte">
-<script lang="ts">
-  import * as fabric from "fabric";
-  import { tr } from "$/utils/i18n";
-  import { appConfig } from "$/stores";
-  import MdIcon from "$/components/basic/MdIcon.svelte";
-  import ObjectPositionControls from "$/components/designer-controls/ObjectPositionControls.svelte";
-
-
-  interface Props {
-    selectedObject: fabric.FabricObject;
-    editRevision: number;
-    valueUpdated: () => void;
-  }
-
-  let { selectedObject, editRevision, valueUpdated }: Props = $props();
-
-  const putToCenterV = () => {
-    selectedObject.canvas!.centerObjectV(selectedObject);
-    valueUpdated();
-  };
-
-  const putToCenterH = () => {
-    selectedObject.canvas!.centerObjectH(selectedObject);
-    valueUpdated();
-  };
-
-  const bringTo = (to: "top" | "bottom") => {
-    if (to === "top") {
-      selectedObject.canvas?.bringObjectToFront(selectedObject);
-    } else if (to === "bottom") {
-      selectedObject.canvas?.sendObjectToBack(selectedObject);
-    }
-  };
-
-  const fit = () => {
-    const imageRatio = selectedObject.width / selectedObject.height;
-    const canvasRatio = selectedObject.canvas!.width / selectedObject.canvas!.height;
-
-    if ($appConfig.fitMode === "ratio_min") {
-      if (imageRatio > canvasRatio) {
-        selectedObject.scaleToWidth(selectedObject.canvas!.width);
-      } else {
-        selectedObject.scaleToHeight(selectedObject.canvas!.height);
-      }
-      selectedObject.canvas!.centerObject(selectedObject);
-    } else if ($appConfig.fitMode === "ratio_max") {
-      if (imageRatio > canvasRatio) {
-        selectedObject.scaleToHeight(selectedObject.canvas!.height);
-      } else {
-        selectedObject.scaleToWidth(selectedObject.canvas!.width);
-      }
-      selectedObject.canvas!.centerObject(selectedObject);
-    } else {
-      selectedObject.set({
-        left: 0,
-        top: 0,
-        scaleX: selectedObject.canvas!.width / selectedObject.width,
-        scaleY: selectedObject.canvas!.height / selectedObject.height,
-      });
-    }
-    valueUpdated();
-  };
-
-  const fitModeChanged = (e: Event & { currentTarget: HTMLSelectElement }) => {
-    const fitMode = e.currentTarget.value as "stretch" | "ratio_min" | "ratio_max";
-    appConfig.update((v) => ({ ...v, fitMode: fitMode }));
-  };
-</script>
-
-<input type="hidden" value={editRevision}>
-
-<button class="btn btn-sm btn-secondary" onclick={putToCenterV} title={$tr("params.generic.center.vertical")}>
-  <MdIcon icon="vertical_distribute" />
-</button>
-<button class="btn btn-sm btn-secondary" onclick={putToCenterH} title={$tr("params.generic.center.horizontal")}>
-  <MdIcon icon="horizontal_distribute" />
-</button>
-
-<ObjectPositionControls {selectedObject} />
-
-<div class="dropdown">
-  <button
-    class="btn btn-sm btn-secondary dropdown-toggle"
-    type="button"
-    data-bs-toggle="dropdown"
-    title={$tr("params.generic.arrange")}>
-    <MdIcon icon="segment" />
-  </button>
-  <div class="dropdown-menu arrangement p-2">
-    <button class="btn btn-sm" onclick={() => bringTo("top")}>
-      {$tr("params.generic.arrange.top")}
-    </button>
-    <button class="btn btn-sm" onclick={() => bringTo("bottom")}>
-      {$tr("params.generic.arrange.bottom")}
-    </button>
-  </div>
-</div>
-
-{#if selectedObject instanceof fabric.FabricImage}
-  <div class="btn-group btn-group-sm">
-    <button type="button" class="btn btn-secondary" onclick={fit} title={$tr("params.generic.fit")}>
-      <MdIcon icon="fit_screen" />
-    </button>
-    <button
-      aria-label="Toggle"
-      type="button"
-      class="btn btn-secondary dropdown-toggle dropdown-toggle-split px-1"
-      data-bs-toggle="dropdown"></button>
-    <div class="dropdown-menu p-1">
-      <select class="form-select form-select-sm" value={$appConfig.fitMode ?? "stretch"} onchange={fitModeChanged}>
-        <option value="stretch">{$tr("params.generic.fit.mode.stretch")}</option>
-        <option value="ratio_min">{$tr("params.generic.fit.mode.ratio_min")}</option>
-        <option value="ratio_max">{$tr("params.generic.fit.mode.ratio_max")}</option>
-      </select>
-    </div>
-  </div>
-{/if}
-
-<style>
-  .dropdown-menu.arrangement {
-    text-align: center;
-  }
-</style>
-</file>
-
 <file path="src/components/designer-controls/IconPicker.svelte">
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
@@ -3060,6 +2934,152 @@ EXPOSE 80
 {/if}
 </file>
 
+<file path="src/components/designer-controls/GenericObjectParamsControls.svelte">
+<script lang="ts">
+  import * as fabric from "fabric";
+  import { tr } from "$/utils/i18n";
+  import { appConfig } from "$/stores";
+  import MdIcon from "$/components/basic/MdIcon.svelte";
+  import ObjectPositionControls from "$/components/designer-controls/ObjectPositionControls.svelte";
+  import { Toasts } from "$/utils/toasts";
+
+  interface Props {
+    selectedObject: fabric.FabricObject;
+    editRevision: number;
+    valueUpdated: () => void;
+  }
+
+  let { selectedObject, editRevision, valueUpdated }: Props = $props();
+
+  const saveQuickTransform = () => {
+    appConfig.update((cfg) => ({
+      ...cfg,
+      pdfQuickTransform: {
+        scaleX: selectedObject.scaleX ?? 1,
+        scaleY: selectedObject.scaleY ?? 1,
+        left: selectedObject.left ?? 0,
+        top: selectedObject.top ?? 0,
+        angle: selectedObject.angle ?? 0,
+        originX: selectedObject.originX,
+        originY: selectedObject.originY,
+      }
+    }));
+    Toasts.message("Saved as Quick Transform for incoming PDFs");
+  };
+
+  const putToCenterV = () => {
+    selectedObject.canvas!.centerObjectV(selectedObject);
+    valueUpdated();
+  };
+
+  const putToCenterH = () => {
+    selectedObject.canvas!.centerObjectH(selectedObject);
+    valueUpdated();
+  };
+
+  const bringTo = (to: "top" | "bottom") => {
+    if (to === "top") {
+      selectedObject.canvas?.bringObjectToFront(selectedObject);
+    } else if (to === "bottom") {
+      selectedObject.canvas?.sendObjectToBack(selectedObject);
+    }
+  };
+
+  const fit = () => {
+    const imageRatio = selectedObject.width / selectedObject.height;
+    const canvasRatio = selectedObject.canvas!.width / selectedObject.canvas!.height;
+
+    if ($appConfig.fitMode === "ratio_min") {
+      if (imageRatio > canvasRatio) {
+        selectedObject.scaleToWidth(selectedObject.canvas!.width);
+      } else {
+        selectedObject.scaleToHeight(selectedObject.canvas!.height);
+      }
+      selectedObject.canvas!.centerObject(selectedObject);
+    } else if ($appConfig.fitMode === "ratio_max") {
+      if (imageRatio > canvasRatio) {
+        selectedObject.scaleToHeight(selectedObject.canvas!.height);
+      } else {
+        selectedObject.scaleToWidth(selectedObject.canvas!.width);
+      }
+      selectedObject.canvas!.centerObject(selectedObject);
+    } else {
+      selectedObject.set({
+        left: 0,
+        top: 0,
+        scaleX: selectedObject.canvas!.width / selectedObject.width,
+        scaleY: selectedObject.canvas!.height / selectedObject.height,
+      });
+    }
+    valueUpdated();
+  };
+
+  const fitModeChanged = (e: Event & { currentTarget: HTMLSelectElement }) => {
+    const fitMode = e.currentTarget.value as "stretch" | "ratio_min" | "ratio_max";
+    appConfig.update((v) => ({ ...v, fitMode: fitMode }));
+  };
+</script>
+
+<input type="hidden" value={editRevision}>
+
+<button class="btn btn-sm btn-secondary" onclick={putToCenterV} title={$tr("params.generic.center.vertical")}>
+  <MdIcon icon="vertical_distribute" />
+</button>
+<button class="btn btn-sm btn-secondary" onclick={putToCenterH} title={$tr("params.generic.center.horizontal")}>
+  <MdIcon icon="horizontal_distribute" />
+</button>
+
+<ObjectPositionControls {selectedObject} />
+
+<div class="dropdown">
+  <button
+    class="btn btn-sm btn-secondary dropdown-toggle"
+    type="button"
+    data-bs-toggle="dropdown"
+    title={$tr("params.generic.arrange")}>
+    <MdIcon icon="segment" />
+  </button>
+  <div class="dropdown-menu arrangement p-2">
+    <button class="btn btn-sm" onclick={() => bringTo("top")}>
+      {$tr("params.generic.arrange.top")}
+    </button>
+    <button class="btn btn-sm" onclick={() => bringTo("bottom")}>
+      {$tr("params.generic.arrange.bottom")}
+    </button>
+  </div>
+</div>
+
+{#if selectedObject instanceof fabric.FabricImage}
+  <div class="btn-group btn-group-sm">
+    <button type="button" class="btn btn-secondary" onclick={fit} title={$tr("params.generic.fit")}>
+      <MdIcon icon="fit_screen" />
+    </button>
+    <button
+      aria-label="Toggle"
+      type="button"
+      class="btn btn-secondary dropdown-toggle dropdown-toggle-split px-1"
+      data-bs-toggle="dropdown"></button>
+    <div class="dropdown-menu p-1">
+      <select class="form-select form-select-sm" value={$appConfig.fitMode ?? "stretch"} onchange={fitModeChanged}>
+        <option value="stretch">{$tr("params.generic.fit.mode.stretch")}</option>
+        <option value="ratio_min">{$tr("params.generic.fit.mode.ratio_min")}</option>
+        <option value="ratio_max">{$tr("params.generic.fit.mode.ratio_max")}</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="btn btn-sm btn-outline-warning ms-1" onclick={saveQuickTransform} title="Save as PDF Quick Transform">
+    <MdIcon icon="save" /> Quick Transform
+  </button>
+{/if}
+
+<style>
+  .dropdown-menu.arrangement {
+    text-align: center;
+  }
+</style>
+</file>
+
 <file path="src/components/designer-controls/ObjectPositionControls.svelte">
 <script lang="ts">
   import MdIcon from "$/components/basic/MdIcon.svelte";
@@ -3473,56 +3493,19 @@ EXPOSE 80
   let connectionType = $state<ConnectionType>("bluetooth");
   let featureSupport = $state<AvailableTransports>({ webBluetooth: false, webSerial: false, capacitorBle: false });
 
-  const onConnectClicked = async (autoScanB1 = false) => {
+  const onConnectClicked = async () => {
     initClient(connectionType);
     connectionState.set("connecting");
 
     try {
-      if ($printerClient instanceof NiimbotCapacitorBleClient) {
-        if (autoScanB1) {
-          try {
-            const { BleClient } = await import("@capacitor-community/bluetooth-le");
-            await BleClient.initialize();
-            let foundId: string | undefined = undefined;
-
-            await BleClient.requestLEScan({}, (result) => {
-              if (result.device.name && result.device.name.includes("B1")) {
-                foundId = result.device.deviceId;
-              }
-            });
-
-            // Wait up to 3 seconds for scan
-            for (let i = 0; i < 30; i++) {
-              await new Promise(r => setTimeout(r, 100));
-              if (foundId) break;
-            }
-            await BleClient.stopLEScan();
-
-            if (foundId) {
-              await $printerClient.connect({ deviceId: foundId });
-              return;
-            } else {
-              connectionState.set("disconnected");
-              return;
-            }
-          } catch (e) {
-            console.error("Auto-scan error", e);
-            connectionState.set("disconnected");
-            return;
-          }
-        }
-
-        if ($automation?.autoConnectDeviceId !== undefined) {
-          await $printerClient.connect({ deviceId: $automation.autoConnectDeviceId });
-        } else {
-          await $printerClient.connect();
-        }
+      if ($printerClient instanceof NiimbotCapacitorBleClient && $automation?.autoConnectDeviceId !== undefined) {
+        await $printerClient.connect({ deviceId: $automation.autoConnectDeviceId });
       } else {
         await $printerClient.connect();
       }
     } catch (e) {
       connectionState.set("disconnected");
-      if (!autoScanB1) Toasts.error(e);
+      Toasts.error(e);
     }
   };
 
@@ -3593,10 +3576,8 @@ EXPOSE 80
       connectionType = "capacitor-ble";
     }
 
-    if (connectionType === "capacitor-ble") {
-      onConnectClicked(true);
-    } else if ($automation !== undefined && $automation.autoConnect && connectionType === "capacitor-ble") {
-      onConnectClicked(false);
+    if ($automation !== undefined && $automation.autoConnect && connectionType === "capacitor-ble") {
+      onConnectClicked();
     }
   });
 </script>
@@ -3765,7 +3746,7 @@ EXPOSE 80
       class="btn btn-primary"
       disabled={$connectionState === "connecting" ||
         (!featureSupport.capacitorBle && !featureSupport.webBluetooth && !featureSupport.webSerial)}
-      onclick={() => onConnectClicked(false)}>
+      onclick={onConnectClicked}>
       <MdIcon icon="power" />
     </button>
   {/if}
@@ -3782,7 +3763,11 @@ EXPOSE 80
     width: 100vw;
     max-width: 300px;
   }
+<<<<<<< Updated upstream
 </style>
+=======
+</style>
+>>>>>>> Stashed changes
 </file>
 
 <file path="src/fabric-object/textbox-ext.ts">
@@ -9380,6 +9365,7 @@ export class LabelDesignerObjectHelper {
 
 <file path="src/components/LabelDesigner.svelte">
 <script lang="ts">
+  import { get } from "svelte/store";
   import { registerPlugin, Capacitor } from "@capacitor/core";
   const PdfIntent = registerPlugin('PdfIntent');
   import Dropdown from "bootstrap/js/dist/dropdown";
@@ -9561,12 +9547,8 @@ export class LabelDesignerObjectHelper {
   const pdfImageReady = async (el: HTMLCanvasElement) => {
     const img = new fabric.FabricImage(el, {
       ...OBJECT_DEFAULTS,
-      originX: "left",
-      originY: "bottom",
       left: 0,
-      top: fabricCanvas!.height,
-      scaleX: 4,
-      scaleY: 4,
+      top: 0,
     });
 
     fabricCanvas!.add(img);
@@ -9745,22 +9727,48 @@ export class LabelDesignerObjectHelper {
           
           // 2. Load the base64 string directly into a Fabric Image object
           const img = await fabric.FabricImage.fromURL(base64Image);
+<<<<<<< Updated upstream
           img.set({ 
-            originX: "left",
-            originY: "bottom",
             left: 0, 
-            top: fabricCanvas!.height,
-            scaleX: 4,
-            scaleY: 4,
+            top: 0, 
             snapAngle: OBJECT_DEFAULTS.snapAngle 
           });
+
+          // 3. Fit the image to the currently selected label size
+          CanvasUtils.fitObjectIntoCanvas(fabricCanvas!, img, 0, 0);
+=======
           
-          // 3. Add to canvas and update history
+          const qt = get(appConfig).pdfQuickTransform;
+          if (qt) {
+            // Apply your saved Quick Transform!
+            img.set({ 
+              originX: qt.originX as fabric.TOriginX,
+              originY: qt.originY as fabric.TOriginY,
+              left: qt.left, 
+              top: qt.top,
+              scaleX: qt.scaleX,
+              scaleY: qt.scaleY,
+              angle: qt.angle,
+              snapAngle: OBJECT_DEFAULTS.snapAngle 
+            });
+          } else {
+            // Default: If nothing is saved, fit it neatly into the canvas
+            img.set({ ...OBJECT_DEFAULTS });
+            CanvasUtils.fitObjectIntoCanvas(
+              fabricCanvas!, 
+              img, 
+              OBJECT_DEFAULTS.left as number, 
+              OBJECT_DEFAULTS.top as number
+            );
+          }
+>>>>>>> Stashed changes
+          
+          // 4. Add to canvas and update history
           fabricCanvas!.add(img);
           fabricCanvas!.setActiveObject(img);
           undo.push(fabricCanvas!, labelProps);
 
-          // 4. Automatically open the Print Dialog
+          // 5. Automatically open the Print Dialog
           openPreviewAndPrint();
         } catch (e) {
           Toasts.error("Failed to load PDF to canvas: " + e);
@@ -10049,7 +10057,11 @@ export class LabelDesignerObjectHelper {
   .canvas-wrapper canvas {
     image-rendering: pixelated;
   }
+<<<<<<< Updated upstream
 </style>
+=======
+</style>
+>>>>>>> Stashed changes
 </file>
 
 </files>

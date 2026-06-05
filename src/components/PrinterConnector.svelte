@@ -26,6 +26,19 @@
   let connectionType = $state<ConnectionType>("bluetooth");
   let featureSupport = $state<AvailableTransports>({ webBluetooth: false, webSerial: false, capacitorBle: false });
 
+    // src/components/PrinterConnector.svelte (Inside the <script> block)
+
+const toggleAutoConnect = (e: Event & { currentTarget: HTMLInputElement }) => {
+  const checked = e.currentTarget.checked;
+  
+  automation.update(prev => ({
+    ...(prev || {}),
+    autoConnect: checked,
+    // Store the MAC address if enabled, otherwise clear it so you can connect to new printers later
+    autoConnectDeviceId: checked ? $printerInfo?.mac : undefined
+  }));
+};
+
   const onConnectClicked = async () => {
     initClient(connectionType);
     connectionState.set("connecting");
@@ -130,6 +143,19 @@
             {/each}
           </ul>
         </div>
+
+         {#if connectionType === "capacitor-ble"}
+          <div class="form-check form-switch mt-2 mb-2 px-3 border-bottom pb-2">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="autoConnectSwitch"
+              checked={$automation?.autoConnect}
+              onchange={toggleAutoConnect} />
+            <label class="form-check-label" for="autoConnectSwitch">Auto-connect on launch</label>
+          </div>
+        {/if}
+        
       {/if}
 
       {#if $printerMeta}
@@ -296,8 +322,4 @@
     width: 100vw;
     max-width: 300px;
   }
-<<<<<<< Updated upstream
 </style>
-=======
-</style>
->>>>>>> Stashed changes
