@@ -36,22 +36,109 @@ export class CustomCanvas extends fabric.Canvas {
     options?: fabric.TOptions<fabric.CanvasOptions>,
   ) {
     super(el, options);
-    this.setupZoom();
+    this.setupZoomAndPan();
     this.preserveObjectStacking = true;
   }
 
-  private setupZoom() {
+  private setupZoomAndPan() {
     this.on("mouse:wheel", (opt) => {
       const event = opt.e as WheelEvent;
-      event.preventDefault();
 
-      const delta = event.deltaY;
-      if (delta > 0) {
-        this.virtualZoomOut();
-      } else {
-        this.virtualZoomIn();
+      if (event.ctrlKey) {
+        event.preventDefault();
+
+        const delta = event.deltaY;
+        if (delta > 0) {
+          this.virtualZoomOut();
+        } else {
+          this.virtualZoomIn();
+        }
       }
     });
+
+    const container = this.getElement().parentElement;
+    if (!container) return;
+
+    let initialPinchDistance = 0;
+    let initialZoom = 1;
+    let lastMidPoint = { x: 0, y: 0 };
+
+    container.addEventListener(
+        "touchstart",
+        (e: TouchEvent) => {
+          if (e.touches.length === 2) {
+
+            this.selection = false;
+
+            this.discardActiveObject();
+
+            const touch1 = e.touches[0];
+            const touch2 = e.touches[1];
+
+            initialPinchDistance = Math.hypot(
+                touch1.clientX - touch2.clientX,
+                touch1.clientY - touch2.clientY,
+            );
+            initialZoom = this.getVirtualZoom();
+
+            lastMidPoint = {
+              x: (touch1.clientX + touch2.clientX) / 2,
+              y: (touch1.clientY + touch2.clientY) / 2,
+            };
+          } else if (e.touches.length === 1) {
+
+          }
+        },
+        { passive: false },
+    );
+
+    container.addEventListener(
+        "touchmove",
+        (e: TouchEvent) => {
+          if (e.touches.length === 2) {
+            e.preventDefault();
+
+            const touch1 = e.touches[0];
+            const touch2 = e.touches[1];
+
+            // Zoom
+            const currentPinchDistance = Math.hypot(
+                touch1.clientX - touch2.clientX,
+                touch1.clientY - touch2.clientY,
+            );
+
+            if (initialPinchDistance > 0) {
+              const newZoom = (currentPinchDistance / initialPinchDistance) * initialZoom;
+              if (isFinite(newZoom) && newZoom > 0) {
+                this.virtualZoom(newZoom);
+              }
+            }
+
+            // Pan
+            const currentMidPoint = {
+              x: (touch1.clientX + touch2.clientX) / 2,
+              y: (touch1.clientY + touch2.clientY) / 2,
+            };
+
+            const dx = currentMidPoint.x - lastMidPoint.x;
+            const dy = currentMidPoint.y - lastMidPoint.y;
+
+            const wrapper = this.getElement().closest(".canvas-wrapper");
+            if (wrapper) {
+              wrapper.scrollLeft -= dx;
+              wrapper.scrollTop -= dy;
+            }
+            lastMidPoint = currentMidPoint;
+          }
+        },
+        { passive: false },
+    );
+
+    const stopPanning = () => {
+      this.selection = true;
+    };
+    container.addEventListener("touchend", stopPanning);
+    container.addEventListener("touchcancel", stopPanning);
   }
 
   public virtualZoom(newZoom: number) {

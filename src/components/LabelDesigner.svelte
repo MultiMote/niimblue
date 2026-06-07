@@ -474,7 +474,7 @@
 
 <div class="image-editor">
   <div class="row mb-3">
-    <div class="col d-flex {windowWidth === 0 || labelProps.size.width < windowWidth ? 'justify-content-center' : ''}">
+    <div class="col d-flex justify-content-center">
       <div class="canvas-wrapper print-start-{labelProps.printDirection}">
         <canvas bind:this={htmlCanvas}></canvas>
       </div>
@@ -606,6 +606,9 @@
   .canvas-wrapper {
     border: 1px solid rgba(0, 0, 0, 0.4);
     background-color: rgba(60, 55, 63, 0.5);
+    max-width: 100%;
+    max-height: 70vh;
+    overflow: auto;
   }
   .canvas-wrapper.print-start-left {
     border-left: 2px solid #ff4646;
@@ -615,5 +618,6 @@
   }
   .canvas-wrapper canvas {
     image-rendering: pixelated;
+    display: block;
   }
 </style>
