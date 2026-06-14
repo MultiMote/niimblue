@@ -67,9 +67,7 @@ export class CustomCanvas extends fabric.Canvas {
         "touchstart",
         (e: TouchEvent) => {
           if (e.touches.length === 2) {
-
             this.selection = false;
-
             this.discardActiveObject();
 
             const touch1 = e.touches[0];
@@ -108,9 +106,11 @@ export class CustomCanvas extends fabric.Canvas {
             );
 
             if (initialPinchDistance > 0) {
-              const newZoom = (currentPinchDistance / initialPinchDistance) * initialZoom;
-              if (isFinite(newZoom) && newZoom > 0) {
-                this.virtualZoom(newZoom);
+              const newZoom = currentPinchDistance / initialPinchDistance * initialZoom;
+              if (Math.abs(newZoom - this.virtualZoomRatio) > 0.02) {
+                if (isFinite(newZoom) && newZoom > 0) {
+                  this.virtualZoom(newZoom);
+                }
               }
             }
 
@@ -134,11 +134,16 @@ export class CustomCanvas extends fabric.Canvas {
         { passive: false },
     );
 
-    const stopPanning = () => {
-      this.selection = true;
+    const stopTouch = (e: TouchEvent) => {
+      if (e.touches.length === 0) {
+        // If not adding this delay, it could happen that objects are selected after zooming/panning
+        setTimeout(() => {
+          this.selection = true;
+        }, 10);
+      }
     };
-    container.addEventListener("touchend", stopPanning);
-    container.addEventListener("touchcancel", stopPanning);
+    container.addEventListener("touchend", stopTouch);
+    container.addEventListener("touchcancel", stopTouch);
   }
 
   public virtualZoom(newZoom: number) {
