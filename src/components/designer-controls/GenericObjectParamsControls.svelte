@@ -4,7 +4,7 @@
   import { appConfig } from "$/stores";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import ObjectPositionControls from "$/components/designer-controls/ObjectPositionControls.svelte";
-
+  import { Toasts } from "$/utils/toasts";
 
   interface Props {
     selectedObject: fabric.FabricObject;
@@ -13,6 +13,22 @@
   }
 
   let { selectedObject, editRevision, valueUpdated }: Props = $props();
+
+  const saveQuickTransform = () => {
+    appConfig.update((cfg) => ({
+      ...cfg,
+      pdfQuickTransform: {
+        scaleX: selectedObject.scaleX ?? 1,
+        scaleY: selectedObject.scaleY ?? 1,
+        left: selectedObject.left ?? 0,
+        top: selectedObject.top ?? 0,
+        angle: selectedObject.angle ?? 0,
+        originX: selectedObject.originX,
+        originY: selectedObject.originY,
+      }
+    }));
+    Toasts.message("Saved as Quick Transform for incoming PDFs");
+  };
 
   const putToCenterV = () => {
     selectedObject.canvas!.centerObjectV(selectedObject);
@@ -114,6 +130,10 @@
       </select>
     </div>
   </div>
+
+  <button class="btn btn-sm btn-outline-warning ms-1" onclick={saveQuickTransform} title="Save as PDF Quick Transform">
+    <MdIcon icon="save" /> Quick Transform
+  </button>
 {/if}
 
 <style>
