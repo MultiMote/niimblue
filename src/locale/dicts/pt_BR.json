@@ -146,5 +146,16 @@
     "preview.print.system": "Imprimir com impressora do sistema",
     "preview.print": "Imprimir",
     "preview.threshold": "Limite",
-    "preview.title": "Pré-visualização de impressão"
+    "preview.title": "Pré-visualização de impressão",
+    "debug.reset": "Resetar",
+    "editor.iconpicker.show": "Mostrar",
+    "editor.iconpicker.show.user": "apenas ícones do usuário",
+    "editor.iconpicker.show.pack": "apenas ícones do pacote",
+    "editor.iconpicker.show.both": "ícones do usuário + pacote",
+    "editor.import.pdf": "Importar PDF",
+    "editor.iconpicker.add": "Adicionar novo",
+    "editor.iconpicker.delete_mode": "Modo Deletar",
+    "editor.grid": "Grade",
+    "params.aruco.dict": "Dicionário",
+    "editor.warning.load.csv": "Os dados CSV também serão substituídos"
 }
