@@ -3,9 +3,9 @@
 Install dependencies
 
 ```bash
-cd ..
+cd ../..
 npm i
-cd capacitor
+cd standalone-apps/capacitor
 npm i
 ```
 
