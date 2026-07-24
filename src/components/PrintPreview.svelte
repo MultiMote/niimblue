@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import { derived } from "svelte/store";
   import { appConfig, connectionState, printerClient, printerMeta, refreshRfidInfo } from "$/stores";
-  import { copyImageData, threshold, atkinson, invert, bayer } from "$/utils/post_process";
+  import * as effects from "$/utils/post_process";
   import {
     type EncodedImage,
     ImageEncoder,
@@ -44,6 +44,7 @@
   let quantity = $state<number>(1);
   let postProcessType = $state<PostProcessType>();
   let postProcessInvert = $state<boolean>(false);
+  let postProcessMirror = $state<boolean>(false);
   let thresholdValue = $state<number>(140);
   let originalImage: ImageData;
   let previewContext: CanvasRenderingContext2D;
@@ -171,18 +172,22 @@
   };
 
   const updatePreview = () => {
-    let iData: ImageData = copyImageData(originalImage);
+    let iData: ImageData = effects.copyImageData(originalImage);
 
     if (postProcessType === "threshold") {
-      iData = threshold(iData, thresholdValue);
+      iData = effects.threshold(iData, thresholdValue);
     } else if (postProcessType === "dither") {
-      iData = atkinson(iData, thresholdValue);
+      iData = effects.atkinson(iData, thresholdValue);
     } else if (postProcessType === "bayer") {
-      iData = bayer(iData, thresholdValue);
+      iData = effects.bayer(iData, thresholdValue);
     }
 
     if (postProcessInvert) {
-      iData = invert(iData);
+      iData = effects.invert(iData);
+    }
+
+    if (postProcessMirror) {
+      iData = effects.mirror(iData);
     }
 
     offsetWarning = "";
@@ -335,7 +340,7 @@
         }
 
         let times = 1;
-        
+
         if ("$times" in row && row["$times"] !== "") {
           try {
             times = parseInt(row["$times"]);
@@ -435,6 +440,15 @@
           updatePreview();
         }}>
         <MdIcon icon="invert_colors" />
+      </button>
+
+      <button
+        class="btn btn-sm {postProcessMirror ? 'btn-secondary' : 'btn-outline-secondary'}"
+        onclick={() => {
+          postProcessMirror = !postProcessMirror;
+          updatePreview();
+        }}>
+        <MdIcon icon="flip" />
       </button>
     </div>
 

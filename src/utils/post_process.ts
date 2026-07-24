@@ -109,3 +109,26 @@ export const invert = (image: ImageData): ImageData => {
 
   return image;
 };
+
+
+export const mirror = (image: ImageData): ImageData => {
+  const { width, height, data } = image;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < Math.floor(width / 2); x++) {
+      const oppositeX = width - 1 - x;
+
+      const left = (y * width + x) * 4;
+      const right = (y * width + oppositeX) * 4;
+
+      // Swap RGBA values
+      for (let c = 0; c < 4; c++) {
+        const temp = data[left + c];
+        data[left + c] = data[right + c];
+        data[right + c] = temp;
+      }
+    }
+  }
+
+  return image;
+};
