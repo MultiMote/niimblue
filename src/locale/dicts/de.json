@@ -176,5 +176,12 @@
     "fonts.add": "Hinzufügen",
     "fonts.browse": "Durchsuchen...",
     "fonts.gfonts": "Hole Schriftarten",
-    "fonts.title_override": "Überschreibe Namen"
+    "fonts.title_override": "Überschreibe Namen",
+    "editor.import.pdf": "PDF importieren",
+    "editor.objectpicker.aruco": "ArUco",
+    "editor.grid": "Raster",
+    "params.aruco.marker_id": "Markierungs-ID",
+    "params.aruco.dict": "Dictionary",
+    "params.generic.keepAspectRatio": "Seitenverhältnis beibehalten",
+    "params.text.font_family.search": "Suche"
 }
