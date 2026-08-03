@@ -2,8 +2,7 @@ export const copyImageData = (iData: ImageData): ImageData => {
   return new ImageData(new Uint8ClampedArray(iData.data), iData.width, iData.height);
 };
 
-// Original code is taken from https://github.com/NielsLeenheer/CanvasDither
-// (but it is has typescript definitions and Atkinson threshold)
+// Some code is taken from https://github.com/NielsLeenheer/CanvasDither
 
 /**
  * Convert the image to black and white using the Atkinson algorithm
