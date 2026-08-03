@@ -1,5 +1,5 @@
 {
-    "lang.name": "Português",
+    "lang.name": "Português (Brasil)",
     "browser_warning.lines.first": "Ah não, seu navegador não suporta comunicações bluetooth e seriais",
     "browser_warning.lines.second": "Mesmo assim, você ainda pode desenhar etiquetas.",
     "connector.bluetooth": "Bluetooth",
