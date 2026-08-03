@@ -172,6 +172,8 @@
     "preview.postprocess.atkinson": "Dither (Atkinson)",
     "preview.postprocess.bayer": "Dither (Bayer)",
     "preview.postprocess.floyd_steinberg": "Dither (Floyd-Steinberg)",
+    "preview.postprocess.jjn": "Dither (Jarvis–Judice–Ninke)",
+    "preview.postprocess.stucki": "Dither (Stucki)",
     "preview.postprocess.threshold": "Threshold",
     "preview.postprocess": "Post-process",
     "preview.print_task": "Print task",

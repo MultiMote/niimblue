@@ -126,6 +126,92 @@ export const floydSteinberg = (image: ImageData, threshold: number): ImageData =
 };
 
 /**
+ * Change the image to black and white using the Jarvis–Judice–Ninke dithering
+ *
+ * @param  {object}   image     The imageData of a Canvas 2d context
+ * @param  {number}   threshold Threshold value (0-255)
+ * @return {object}             The resulting imageData
+ */
+export const jarvisJudiceNinke = (image: ImageData, threshold: number): ImageData => {
+  const src = image.data;
+  const width = image.width;
+  const height = image.height;
+  const dst = new Float32Array(width * height);
+
+  for (let l = 0, i = 0; i < src.length; l++, i += 4) {
+    dst[l] = rgbToGray(src[i], src[i + 1], src[i + 2]);
+  }
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const l = y * width + x;
+      const i = l * 4;
+      const old = dst[l];
+      const value = old < threshold ? 0 : 255;
+      const error = old - value;
+      src.fill(value, i, i + 3);
+
+      // Jarvis–Judice–Ninke error diffusion (weights sum to 48)
+      const diff = (dx: number, dy: number, w: number) => {
+        const nx = x + dx;
+        const ny = y + dy;
+        if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+          dst[ny * width + nx] += error * w;
+        }
+      };
+      diff(1, 0, 7 / 48);   diff(2, 0, 5 / 48);
+      diff(-2, 1, 3 / 48); diff(-1, 1, 5 / 48); diff(0, 1, 7 / 48); diff(1, 1, 5 / 48); diff(2, 1, 3 / 48);
+      diff(-2, 2, 1 / 48); diff(-1, 2, 3 / 48); diff(0, 2, 5 / 48); diff(1, 2, 3 / 48); diff(2, 2, 1 / 48);
+    }
+  }
+
+  return image;
+};
+
+/**
+ * Change the image to black and white using the Stucki dithering
+ *
+ * @param  {object}   image     The imageData of a Canvas 2d context
+ * @param  {number}   threshold Threshold value (0-255)
+ * @return {object}             The resulting imageData
+ */
+export const stucki = (image: ImageData, threshold: number): ImageData => {
+  const src = image.data;
+  const width = image.width;
+  const height = image.height;
+  const dst = new Float32Array(width * height);
+
+  for (let l = 0, i = 0; i < src.length; l++, i += 4) {
+    dst[l] = rgbToGray(src[i], src[i + 1], src[i + 2]);
+  }
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const l = y * width + x;
+      const i = l * 4;
+      const old = dst[l];
+      const value = old < threshold ? 0 : 255;
+      const error = old - value;
+      src.fill(value, i, i + 3);
+
+      // Stucki error diffusion (weights sum to 42)
+      const diff = (dx: number, dy: number, w: number) => {
+        const nx = x + dx;
+        const ny = y + dy;
+        if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+          dst[ny * width + nx] += error * w;
+        }
+      };
+      diff(1, 0, 8 / 42);   diff(2, 0, 4 / 42);
+      diff(-2, 1, 2 / 42); diff(-1, 1, 4 / 42); diff(0, 1, 8 / 42); diff(1, 1, 4 / 42); diff(2, 1, 2 / 42);
+      diff(-2, 2, 1 / 42); diff(-1, 2, 2 / 42); diff(0, 2, 4 / 42); diff(1, 2, 2 / 42); diff(2, 2, 1 / 42);
+    }
+  }
+
+  return image;
+};
+
+/**
  * Change the image to blank and white using the Bayer ordered dithering
  *
  * @param  {object}   image         The imageData of a Canvas 2d context

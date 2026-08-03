@@ -156,6 +156,8 @@
     "params.saved_labels.save.url.warn": "标签数据太大了，部分浏览器可能无法正确处理这个URL。\n可以尝试减小标签大小（例如删除图像）。\n继续吗？",
     "preview.postprocess.bayer": "抖动（Bayer）",
     "preview.postprocess.floyd_steinberg": "抖动（Floyd-Steinberg）",
+    "preview.postprocess.jjn": "抖动（Jarvis–Judice–Ninke）",
+    "preview.postprocess.stucki": "抖动（Stucki）",
     "editor.warning.load.csv": "CSV数据也将会被替换。",
     "params.saved_labels.save.withcsv": "动态数据 (CSV) 已启用，因此它将包含在已保存的标签中。",
     "debug.packet_interval.help": "覆盖数据包间隔。注意：需要重新加载页面才能生效，如果值太低某些功能可能会出现问题。",

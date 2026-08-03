@@ -182,6 +182,10 @@
       iData = effects.bayer(iData, thresholdValue);
     } else if (postProcessType === "floyd_steinberg") {
       iData = effects.floydSteinberg(iData, thresholdValue);
+    } else if (postProcessType === "jjn") {
+      iData = effects.jarvisJudiceNinke(iData, thresholdValue);
+    } else if (postProcessType === "stucki") {
+      iData = effects.stucki(iData, thresholdValue);
     }
 
     if (postProcessInvert) {
@@ -428,6 +432,8 @@
         <option value="dither">{$tr("preview.postprocess.atkinson")}</option>
         <option value="bayer">{$tr("preview.postprocess.bayer")}</option>
         <option value="floyd_steinberg">{$tr("preview.postprocess.floyd_steinberg")}</option>
+        <option value="jjn">{$tr("preview.postprocess.jjn")}</option>
+        <option value="stucki">{$tr("preview.postprocess.stucki")}</option>
       </select>
 
       <ParamLockButton
