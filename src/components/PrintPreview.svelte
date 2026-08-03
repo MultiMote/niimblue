@@ -180,6 +180,8 @@
       iData = effects.atkinson(iData, thresholdValue);
     } else if (postProcessType === "bayer") {
       iData = effects.bayer(iData, thresholdValue);
+    } else if (postProcessType === "floyd_steinberg") {
+      iData = effects.floydSteinberg(iData, thresholdValue);
     }
 
     if (postProcessInvert) {
@@ -425,6 +427,7 @@
         <option value="threshold">{$tr("preview.postprocess.threshold")}</option>
         <option value="dither">{$tr("preview.postprocess.atkinson")}</option>
         <option value="bayer">{$tr("preview.postprocess.bayer")}</option>
+        <option value="floyd_steinberg">{$tr("preview.postprocess.floyd_steinberg")}</option>
       </select>
 
       <ParamLockButton
