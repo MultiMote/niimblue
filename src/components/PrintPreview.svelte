@@ -178,8 +178,12 @@
       iData = effects.threshold(iData, thresholdValue);
     } else if (postProcessType === "dither") {
       iData = effects.atkinson(iData, thresholdValue);
-    } else if (postProcessType === "bayer") {
-      iData = effects.bayer(iData, thresholdValue);
+    } else if (postProcessType === "bayer2") {
+      iData = effects.bayer(iData, 2);
+    } else if (postProcessType === "bayer4") {
+      iData = effects.bayer(iData, 4);
+    } else if (postProcessType === "bayer8") {
+      iData = effects.bayer(iData, 8);
     }
 
     if (postProcessInvert) {
@@ -424,7 +428,9 @@
         onchange={() => updateSavedProp("postProcess", postProcessType, true)}>
         <option value="threshold">{$tr("preview.postprocess.threshold")}</option>
         <option value="dither">{$tr("preview.postprocess.atkinson")}</option>
-        <option value="bayer">{$tr("preview.postprocess.bayer")}</option>
+        <option value="bayer2">{$tr("preview.postprocess.bayer")} 2x2</option>
+        <option value="bayer4">{$tr("preview.postprocess.bayer")} 4x4</option>
+        <option value="bayer8">{$tr("preview.postprocess.bayer")} 8x8</option>
       </select>
 
       <ParamLockButton
@@ -452,25 +458,27 @@
       </button>
     </div>
 
-    <div class="input-group input-group-sm">
-      <span class="input-group-text">{$tr("preview.threshold")}</span>
+    {#if !(postProcessType && ["bayer2", "bayer4", "bayer8"].includes(postProcessType))}
+      <div class="input-group input-group-sm">
+        <span class="input-group-text">{$tr("preview.threshold")}</span>
 
-      <input
-        type="range"
-        id="threshold"
-        class="form-range"
-        min="1"
-        max="255"
-        bind:value={thresholdValue}
-        onchange={() => updateSavedProp("threshold", thresholdValue, true)} />
-      <span class="input-group-text">{thresholdValue}</span>
+        <input
+          type="range"
+          id="threshold"
+          class="form-range"
+          min="1"
+          max="255"
+          bind:value={thresholdValue}
+          onchange={() => updateSavedProp("threshold", thresholdValue, true)} />
+        <span class="input-group-text">{thresholdValue}</span>
 
-      <ParamLockButton
-        propName="threshold"
-        value={thresholdValue}
-        savedValue={savedProps.threshold}
-        onClick={toggleSavedProp} />
-    </div>
+        <ParamLockButton
+          propName="threshold"
+          value={thresholdValue}
+          savedValue={savedProps.threshold}
+          onClick={toggleSavedProp} />
+      </div>
+    {/if}
 
     <div class="input-group flex-nowrap input-group-sm">
       <span class="input-group-text">{$tr("preview.copies")}</span>

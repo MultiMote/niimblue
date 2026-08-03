@@ -6,12 +6,11 @@ export const copyImageData = (iData: ImageData): ImageData => {
 // (but it is has typescript definitions and Atkinson threshold)
 
 /**
- * Change the image to blank and white using a simple threshold
+ * Convert the image to black and white using the Atkinson algorithm
  *
- *
- * @param  {object}   image         The imageData of a Canvas 2d context
- * @param  {number}   threshold     Threshold value (0-255)
- * @return {object}                 The resulting imageData
+ * @param  image         The imageData of a Canvas 2d context
+ * @param  threshold     Threshold value (0-255)
+ * @return               The resulting imageData
  *
  */
 export const threshold = (image: ImageData, threshold: number): ImageData => {
@@ -25,11 +24,11 @@ export const threshold = (image: ImageData, threshold: number): ImageData => {
 };
 
 /**
- * Change the image to blank and white using the Atkinson algorithm
+ * Convert the image to black and white using the Atkinson algorithm
  *
- * @param  {object}   image         The imageData of a Canvas 2d context
- * @param  {number}   threshold     Threshold value (0-255)
- * @return {object}                 The resulting imageData
+ * @param  image         The imageData of a Canvas 2d context
+ * @param  threshold     Threshold value (0-255)
+ * @return               The resulting imageData
  *
  */
 export const atkinson = (image: ImageData, threshold: number): ImageData => {
@@ -56,39 +55,53 @@ export const atkinson = (image: ImageData, threshold: number): ImageData => {
   return image;
 };
 
+const BAYER_MATRICES = {
+  2: [
+    [0, 2],
+    [3, 1],
+  ],
+  4: [
+    [0, 8, 2, 10],
+    [12, 4, 14, 6],
+    [3, 11, 1, 9],
+    [15, 7, 13, 5],
+  ],
+  8: [
+    [0, 48, 12, 60, 3, 51, 15, 63],
+    [32, 16, 44, 28, 35, 19, 47, 31],
+    [8, 56, 4, 52, 11, 59, 7, 55],
+    [40, 24, 36, 20, 43, 27, 39, 23],
+    [2, 50, 14, 62, 1, 49, 13, 61],
+    [34, 18, 46, 30, 33, 17, 45, 29],
+    [10, 58, 6, 54, 9, 57, 5, 53],
+    [42, 26, 38, 22, 41, 25, 37, 21],
+  ],
+};
+
 /**
- * Change the image to blank and white using the Bayer ordered dithering
+ * Convert the image to black and white using the Bayer algorithm
  *
- * @param  {object}   image         The imageData of a Canvas 2d context
- * @param  {number}   threshold     Threshold value (0-255)
- * @return {object}                 The resulting imageData
+ * @param  image         The imageData of a Canvas 2d context
+ * @param  patternSize   The imageData of a Canvas 2d context
+ * @return               The resulting imageData
  *
  */
-export const bayer = (image: ImageData, threshold: number): ImageData => {
-  const src = image.data;
-  const width = image.width;
+export const bayer = (image: ImageData, patternSize: 2 | 4 | 8 = 4): ImageData => {
+  const matrix = BAYER_MATRICES[patternSize];
+  const scale = patternSize * patternSize;
+  const { width, height, data } = image;
 
-  // Pre-calculated 8x8 Bayer matrix (normalized to 0-255)
-  const bayerMatrix = [
-    [0, 191, 48, 239, 12, 203, 60, 251],
-    [128, 64, 176, 112, 140, 76, 188, 124],
-    [32, 223, 16, 207, 44, 235, 28, 219],
-    [160, 96, 144, 80, 172, 108, 156, 92],
-    [8, 199, 56, 247, 4, 195, 52, 243],
-    [136, 72, 184, 120, 132, 68, 180, 116],
-    [40, 231, 24, 215, 36, 227, 20, 211],
-    [168, 104, 152, 88, 164, 100, 148, 84]
-  ];
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+      const threshold = ((matrix[y % patternSize][x % patternSize] + 0.5) / scale) * 255;
+      const value = gray > threshold ? 255 : 0;
 
-  for (let i = 0; i < src.length; i += 4) {
-    const x = (i / 4) % width;
-    const y = Math.floor((i / 4) / width);
-
-    const gray = src[i] * 0.299 + src[i + 1] * 0.587 + src[i + 2] * 0.114;
-    const bayerValue = bayerMatrix[y % 8][x % 8];
-    const value = gray < threshold - bayerValue / 2 ? 0 : 255;
-
-    src[i] = src[i + 1] = src[i + 2] = value;
+      data[i] = value;
+      data[i + 1] = value;
+      data[i + 2] = value;
+    }
   }
 
   return image;
@@ -97,19 +110,18 @@ export const bayer = (image: ImageData, threshold: number): ImageData => {
 /**
  * Invert image
  *
- * @param  {object}   image         The imageData of a Canvas 2d context
- * @return {object}                 The resulting imageData
+ * @param  image         The imageData of a Canvas 2d context
+ * @return               The resulting imageData
  *
  */
 export const invert = (image: ImageData): ImageData => {
   for (let i = 0; i < image.data.length; i += 4) {
-    const black = (image.data[i] + image.data[i + 1] + image.data[i + 2]) === 0;
+    const black = image.data[i] + image.data[i + 1] + image.data[i + 2] === 0;
     image.data.fill(black ? 255 : 0, i, i + 3);
   }
 
   return image;
 };
-
 
 export const mirror = (image: ImageData): ImageData => {
   const { width, height, data } = image;
