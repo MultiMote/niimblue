@@ -138,5 +138,13 @@
     "params.saved_labels.save.withcsv": "Les données dynamiques (CSV) sont activées, elles seront donc incluses dans l'étiquette sauvegardée",
     "editor.iconpicker.show.both": "Icônes utilisateur + pack",
     "editor.import.pdf": "Import PDF",
-    "editor.grid": "Grille"
+    "editor.grid": "Grille",
+    "debug.title": "Debugage",
+    "debug.reset": "Remise à zéro",
+    "editor.iconpicker.add": "Ajouter nouveau",
+    "editor.iconpicker.delete_mode": "Effacer",
+    "editor.iconpicker.show": "Voir",
+    "editor.iconpicker.show.user": "Icônes utilisateur seulement",
+    "editor.iconpicker.show.pack": "Packs d'icônes seulement",
+    "editor.objectpicker.aruco": "symboles ArUco"
 }
