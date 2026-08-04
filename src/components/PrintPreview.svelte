@@ -179,7 +179,7 @@
     if (postProcessType === "threshold") {
       iData = effects.threshold(iData, thresholdValue);
     } else if (postProcessType === "dither") {
-      iData = effects.atkinson(iData, thresholdValue);
+      iData = effects.atkinson(iData, { threshold: thresholdValue, strength: strengthValue, serpentine: serpentineValue });
     } else if (postProcessType === "bayer2") {
       iData = effects.bayer(iData, 2);
     } else if (postProcessType === "bayer4") {
@@ -493,7 +493,7 @@
       </div>
     {/if}
 
-    {#if postProcessType === "floyd_steinberg" || postProcessType === "jjn" || postProcessType === "stucki"}
+    {#if postProcessType === "floyd_steinberg" || postProcessType === "jjn" || postProcessType === "stucki" || postProcessType === "dither"}
       <div class="input-group input-group-sm">
         <span class="input-group-text">{$tr("preview.strength")}</span>
 
