@@ -4,7 +4,7 @@
 
 import { createDiffuser, rgbToGray } from "$/utils/dither";
 
-// ─── Error-diffusion dithering ─────────────────────────────────────────────────
+// Error-diffusion dithering
 
 /** Floyd–Steinberg (4 neighbours) */
 export const floydSteinberg = createDiffuser(16, [
@@ -54,7 +54,7 @@ export const atkinson = createDiffuser(8, [
   [0, 0, 1, 0, 0],
 ], { normalize: false });
 
-// ─── Non-diffusion effects ────────────────────────────────────────────────────
+// Non-diffusion effects
 
 /**
  * Change the image to black and white using a simple threshold
@@ -122,7 +122,7 @@ export const bayer = (image: ImageData, patternSize: 2 | 4 | 8 = 4): ImageData =
   return image;
 };
 
-// ─── Image transforms ─────────────────────────────────────────────────────────
+// Image transforms
 
 /**
  * Invert image
@@ -155,7 +155,7 @@ export const mirror = (image: ImageData): ImageData => {
   return image;
 };
 
-// ─── Utilities ────────────────────────────────────────────────────────────────
+// Utilities
 
 export const copyImageData = (iData: ImageData): ImageData => {
   return new ImageData(new Uint8ClampedArray(iData.data), iData.width, iData.height);

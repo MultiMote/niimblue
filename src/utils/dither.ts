@@ -11,7 +11,7 @@ export type DitherFn = (image: ImageData, options?: DitherOptions) => ImageData;
 
 export const rgbToGray = (r: number, g: number, b: number): number => r * 0.299 + g * 0.587 + b * 0.114;
 
-// ─── Factory ─────────────────────────────────────────────────────────────────
+// Factory
 
 /**
  * Create an error-diffusion dithering function from a 2D weight grid.
@@ -35,7 +35,7 @@ export const createDiffuser = (
     throw new Error("createDiffuser: denom must be > 0");
   }
 
-  // ── build diffusion entries ──────────────────────────────────
+  // build diffusion entries
 
   const rows = grid.length;
   const cols = grid[0].length;
@@ -52,7 +52,7 @@ export const createDiffuser = (
     }
   }
 
-  // ── normalize (skip for kernels that intentionally discard error) ──
+  // normalize (skip for kernels that intentionally discard error)
 
   const sum = entries.reduce((acc, [, , wf]) => acc + wf, 0);
 
@@ -63,7 +63,7 @@ export const createDiffuser = (
 
   const reversedKernel = kernel.map(([dx, dy, wf]) => [-dx, dy, wf] as [number, number, number]);
 
-  // ── return dither function ────────────────────────────────────
+  // return dither function
 
   return (image, options = {}) => {
     const { threshold = 128, strength = 1, serpentine = true } = options;
