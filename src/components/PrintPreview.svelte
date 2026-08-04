@@ -46,6 +46,8 @@
   let postProcessInvert = $state<boolean>(false);
   let postProcessMirror = $state<boolean>(false);
   let thresholdValue = $state<number>(140);
+  let strengthValue = $state<number>(1);
+  let serpentineValue = $state<boolean>(true);
   let originalImage: ImageData;
   let previewContext: CanvasRenderingContext2D;
   let printTaskName = $state<PrintTaskName>("B1");
@@ -181,11 +183,11 @@
     } else if (postProcessType === "bayer") {
       iData = effects.bayer(iData, thresholdValue);
     } else if (postProcessType === "floyd_steinberg") {
-      iData = effects.floydSteinberg(iData, thresholdValue);
+      iData = effects.floydSteinberg(iData, { threshold: thresholdValue, strength: strengthValue, serpentine: serpentineValue });
     } else if (postProcessType === "jjn") {
-      iData = effects.jarvisJudiceNinke(iData, thresholdValue);
+      iData = effects.jarvisJudiceNinke(iData, { threshold: thresholdValue, strength: strengthValue, serpentine: serpentineValue });
     } else if (postProcessType === "stucki") {
-      iData = effects.stucki(iData, thresholdValue);
+      iData = effects.stucki(iData, { threshold: thresholdValue, strength: strengthValue, serpentine: serpentineValue });
     }
 
     if (postProcessInvert) {
@@ -259,6 +261,8 @@
       if (saved.postProcess !== undefined) postProcessType = saved.postProcess;
       if (saved.postProcessInvert !== undefined) postProcessInvert = saved.postProcessInvert;
       if (saved.threshold !== undefined) thresholdValue = saved.threshold;
+      if (saved.strength !== undefined) strengthValue = saved.strength;
+      if (saved.serpentine !== undefined) serpentineValue = saved.serpentine;
       if (saved.quantity !== undefined) quantity = saved.quantity;
       if (saved.density !== undefined) density = saved.density;
       if (saved.speed !== undefined) speed = saved.speed;
@@ -480,6 +484,40 @@
         savedValue={savedProps.threshold}
         onClick={toggleSavedProp} />
     </div>
+
+    {#if postProcessType === "floyd_steinberg" || postProcessType === "jjn" || postProcessType === "stucki"}
+      <div class="input-group input-group-sm">
+        <span class="input-group-text">{$tr("preview.strength")}</span>
+
+        <input
+          type="range"
+          id="strength"
+          class="form-range"
+          min="0"
+          max="1.5"
+          step="0.1"
+          bind:value={strengthValue}
+          onchange={() => updateSavedProp("strength", strengthValue, true)} />
+        <span class="input-group-text">{strengthValue.toFixed(1)}</span>
+
+        <ParamLockButton
+          propName="strength"
+          value={strengthValue}
+          savedValue={savedProps.strength}
+          onClick={toggleSavedProp} />
+
+        <button
+          class="btn btn-sm {serpentineValue ? 'btn-secondary' : 'btn-outline-secondary'}"
+          title={$tr("preview.serpentine")}
+          onclick={() => {
+            serpentineValue = !serpentineValue;
+            updateSavedProp("serpentine", serpentineValue, true);
+          }}>
+          <MdIcon icon="swap_vert" />
+        </button>
+
+      </div>
+    {/if}
 
     <div class="input-group flex-nowrap input-group-sm">
       <span class="input-group-text">{$tr("preview.copies")}</span>

@@ -119,6 +119,8 @@
     "preview.print.cancel": "取消打印",
     "preview.print": "打印",
     "preview.threshold": "阈值",
+    "preview.strength": "扩散强度",
+    "preview.serpentine": "蛇形扫描",
     "preview.title": "打印预览",
     "params.label.mirror": "镜像元素",
     "preview.print.system": "使用系统打印接口打印",
