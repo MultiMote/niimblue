@@ -7,7 +7,7 @@ export type ConnectionType = "bluetooth" | "serial" | "capacitor-ble";
 
 export type LabelUnit = "mm" | "px";
 export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qrcode" | "barcode" | "aruco" | "pdf";
-export type PostProcessType = "threshold" | "dither" | "bayer2"| "bayer4"| "bayer8";
+export type PostProcessType = "threshold" | "dither" | "bayer2" | "bayer4" | "bayer8" | "floyd_steinberg" | "jjn" | "stucki";
 export type MoveDirection = "up" | "down" | "left" | "right";
 export type LabelShape = "rect" | "rounded_rect" | "circle";
 export type LabelSplit = "none" | "vertical" | "horizontal";
@@ -80,9 +80,11 @@ export const PreviewPropsOffsetSchema = z.object({
 });
 
 export const PreviewPropsSchema = z.object({
-  postProcess: z.enum(["threshold", "dither", "bayer2", "bayer4", "bayer8"]).optional(),
+  postProcess: z.enum(["threshold", "dither", "bayer2", "bayer4", "bayer8", "floyd_steinberg", "jjn", "stucki"]).optional(),
   postProcessInvert: z.boolean().optional(),
   threshold: z.number().gte(1).lte(255).optional(),
+  strength: z.number().gte(0).lte(1.5).optional(),
+  serpentine: z.boolean().optional(),
   quantity: z.number().gte(1).optional(),
   density: z.number().gte(1).optional(),
   speed: z.union([z.literal(0), z.literal(1)]).optional(),
