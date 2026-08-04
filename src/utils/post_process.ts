@@ -2,14 +2,7 @@
  * Image post-processing effects.
  */
 
-import { createDiffuser, type DitherFn } from "$/utils/dither";
-
-// ─── Shared helpers ───────────────────────────────────────────────────────────
-
-/** ITU-R BT.601 grayscale */
-export const rgbToGray = (r: number, g: number, b: number): number => {
-  return r * 0.299 + g * 0.587 + b * 0.114;
-};
+import { createDiffuser, rgbToGray } from "$/utils/dither";
 
 // ─── Error-diffusion dithering ─────────────────────────────────────────────────
 
@@ -19,72 +12,47 @@ export const floydSteinberg = createDiffuser(16, [
   [3, 5, 1],
 ]);
 
-/** Jarvis–Judice–Ninke (12 neighbours) — 8-bit clamped buffer like ditheringstudio.com */
+/** Jarvis–Judice–Ninke (12 neighbours) */
 export const jarvisJudiceNinke = createDiffuser(48, [
   [0, 0, 0, 7, 5],
   [3, 5, 7, 5, 3],
   [1, 3, 5, 3, 1],
-], { clamp: true });
+]);
 
-/** Stucki (12 neighbours) — 8-bit clamped buffer */
+/** Stucki (12 neighbours) */
 export const stucki = createDiffuser(42, [
   [0, 0, 0, 8, 4],
   [2, 4, 8, 4, 2],
   [1, 2, 4, 2, 1],
-], { clamp: true });
+]);
 
-/** Burkes (7 neighbours) — 8-bit clamped buffer */
+/** Burkes (7 neighbours) */
 export const burkes = createDiffuser(32, [
   [0, 0, 0, 8, 4],
   [2, 4, 8, 4, 2],
-], { clamp: true });
+]);
 
-/** Sierra-3 (10 neighbours) — 8-bit clamped buffer */
+/** Sierra-3 (10 neighbours) */
 export const sierra3 = createDiffuser(32, [
   [0, 0, 0, 5, 3],
   [2, 4, 5, 4, 2],
   [0, 2, 3, 2, 0],
-], { clamp: true });
+]);
 
-/** False Floyd–Steinberg (3 neighbours, simplified) — 8-bit clamped buffer */
-const _falseFloyd = createDiffuser(8, [
+/** False Floyd–Steinberg (3 neighbours, simplified) */
+export const falseFloyd = createDiffuser(8, [
   [0, 0, 3],
   [0, 3, 2],
-], { clamp: true });
-
-/**
- * False Floyd–Steinberg.
- *
- * The site implements this algorithm by hand without any diffusion-strength
- * control, so strength is fixed at 1 here too.
- */
-export const falseFloyd: DitherFn = (image, options) =>
-  _falseFloyd(image, { ...options, strength: 1 });
+]);
 
 // Atkinson: 6 neighbours at 1/8 each.  Only 6/8 of the error is diffused
 // (the remaining 2/8 is discarded), producing the characteristic bright,
 // high-contrast Macintosh look.  normalize=false preserves this ratio.
-// 8-bit clamped buffer; site has no serpentine variant, so scanning is
-// always left-to-right.
-const _atkinson = createDiffuser(8, [
+export const atkinson = createDiffuser(8, [
   [0, 0, 0, 1, 1],
   [0, 1, 1, 1, 0],
   [0, 0, 1, 0, 0],
-], { normalize: false, clamp: true, defaultSerpentine: false });
-
-/**
- * Atkinson dithering (not kernel-based — fixed 6-neighbour pattern)
- *
- * Atkinson diffuses only 6/8 of the error, producing a brighter,
- * high-contrast result characteristic of the original Macintosh.
- *
- * @param image      The imageData of a Canvas 2d context
- * @param threshold  Threshold slider (1–255), mapped to Diffusion Factor (0–2)
- */
-export const atkinson = (image: ImageData, threshold: number): ImageData => {
-  const factor = Math.max(0, Math.min(2, threshold / 128));
-  return _atkinson(image, { threshold: 128, strength: factor });
-};
+], { normalize: false });
 
 // ─── Non-diffusion effects ────────────────────────────────────────────────────
 
