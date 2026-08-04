@@ -1,29 +1,99 @@
-export const copyImageData = (iData: ImageData): ImageData => {
-  return new ImageData(new Uint8ClampedArray(iData.data), iData.width, iData.height);
-};
-
 /**
- * Convert an RGB pixel to grayscale luminance using ITU-R BT.601 weights.
- * @param r red channel (0-255)
- * @param g green channel (0-255)
- * @param b blue channel (0-255)
- * @returns luminance (0-255)
+ * Image post-processing effects.
  */
+
+import { createDiffuser, type DitherFn } from "$/utils/dither";
+
+// ─── Shared helpers ───────────────────────────────────────────────────────────
+
+/** ITU-R BT.601 grayscale */
 export const rgbToGray = (r: number, g: number, b: number): number => {
   return r * 0.299 + g * 0.587 + b * 0.114;
 };
 
-// Original code is taken from https://github.com/NielsLeenheer/CanvasDither
-// (but it is has typescript definitions and Atkinson threshold)
+// ─── Error-diffusion dithering ─────────────────────────────────────────────────
+
+/** Floyd–Steinberg (4 neighbours) */
+export const floydSteinberg = createDiffuser(16, [
+  [0, 0, 7],
+  [3, 5, 1],
+]);
+
+/** Jarvis–Judice–Ninke (12 neighbours) — 8-bit clamped buffer like ditheringstudio.com */
+export const jarvisJudiceNinke = createDiffuser(48, [
+  [0, 0, 0, 7, 5],
+  [3, 5, 7, 5, 3],
+  [1, 3, 5, 3, 1],
+], { clamp: true });
+
+/** Stucki (12 neighbours) — 8-bit clamped buffer */
+export const stucki = createDiffuser(42, [
+  [0, 0, 0, 8, 4],
+  [2, 4, 8, 4, 2],
+  [1, 2, 4, 2, 1],
+], { clamp: true });
+
+/** Burkes (7 neighbours) — 8-bit clamped buffer */
+export const burkes = createDiffuser(32, [
+  [0, 0, 0, 8, 4],
+  [2, 4, 8, 4, 2],
+], { clamp: true });
+
+/** Sierra-3 (10 neighbours) — 8-bit clamped buffer */
+export const sierra3 = createDiffuser(32, [
+  [0, 0, 0, 5, 3],
+  [2, 4, 5, 4, 2],
+  [0, 2, 3, 2, 0],
+], { clamp: true });
+
+/** False Floyd–Steinberg (3 neighbours, simplified) — 8-bit clamped buffer */
+const _falseFloyd = createDiffuser(8, [
+  [0, 0, 3],
+  [0, 3, 2],
+], { clamp: true });
 
 /**
- * Change the image to blank and white using a simple threshold
+ * False Floyd–Steinberg.
  *
+ * The site implements this algorithm by hand without any diffusion-strength
+ * control, so strength is fixed at 1 here too.
+ */
+export const falseFloyd: DitherFn = (image, options) =>
+  _falseFloyd(image, { ...options, strength: 1 });
+
+// Atkinson: 6 neighbours at 1/8 each.  Only 6/8 of the error is diffused
+// (the remaining 2/8 is discarded), producing the characteristic bright,
+// high-contrast Macintosh look.  normalize=false preserves this ratio.
+// 8-bit clamped buffer; site has no serpentine variant, so scanning is
+// always left-to-right.
+const _atkinson = createDiffuser(8, [
+  [0, 0, 0, 1, 1],
+  [0, 1, 1, 1, 0],
+  [0, 0, 1, 0, 0],
+], { normalize: false, clamp: true, defaultSerpentine: false });
+
+/**
+ * Atkinson dithering (not kernel-based — fixed 6-neighbour pattern)
  *
- * @param  {object}   image         The imageData of a Canvas 2d context
- * @param  {number}   threshold     Threshold value (0-255)
- * @return {object}                 The resulting imageData
+ * Atkinson diffuses only 6/8 of the error, producing a brighter,
+ * high-contrast result characteristic of the original Macintosh.
  *
+ * @param image      The imageData of a Canvas 2d context
+ * @param threshold  Threshold slider (1–255), mapped to Diffusion Factor (0–2)
+ */
+export const atkinson = (image: ImageData, threshold: number): ImageData => {
+  const factor = Math.max(0, Math.min(2, threshold / 128));
+  return _atkinson(image, { threshold: 128, strength: factor });
+};
+
+// ─── Non-diffusion effects ────────────────────────────────────────────────────
+
+/**
+ * Change the image to black and white using a simple threshold
+ *
+ * @param  image      The imageData of a Canvas 2d context
+ * @param  threshold  Threshold value (0-255)
+ * @return            The resulting imageData
  */
 export const threshold = (image: ImageData, threshold: number): ImageData => {
   for (let i = 0; i < image.data.length; i += 4) {
@@ -31,142 +101,19 @@ export const threshold = (image: ImageData, threshold: number): ImageData => {
     const value = luminance < threshold ? 0 : 255;
     image.data.fill(value, i, i + 3);
   }
-
   return image;
 };
 
 /**
- * Change the image to blank and white using the Atkinson algorithm
+ * Bayer ordered dithering
  *
- * @param  {object}   image         The imageData of a Canvas 2d context
- * @param  {number}   threshold     Threshold value (0-255)
- * @return {object}                 The resulting imageData
- *
- */
-export const atkinson = (image: ImageData, threshold: number): ImageData => {
-  const src = image.data;
-  const width = image.width;
-  const height = image.height;
-  const dst = new Uint8ClampedArray(width * height);
-
-  for (let l = 0, i = 0; i < src.length; l++, i += 4) {
-    dst[l] = rgbToGray(src[i], src[i + 1], src[i + 2]);
-  }
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const l = y * width + x;
-      const i = l * 4;
-      const value = dst[l] < threshold ? 0 : 255;
-      const error = Math.floor((dst[l] - value) / 8);
-      src.fill(value, i, i + 3);
-
-      // Atkinson error diffusion to 6 neighbors, with bounds checking
-      const diff = (dx: number, dy: number) => {
-        const nx = x + dx;
-        const ny = y + dy;
-        if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-          dst[ny * width + nx] += error;
-        }
-      };
-      diff(1, 0);   // right
-      diff(2, 0);   // right two
-      diff(-1, 1);  // bottom-left
-      diff(0, 1);   // bottom
-      diff(1, 1);   // bottom-right
-      diff(0, 2);   // bottom two
-    }
-  }
-
-  return image;
-};
-
-/**
- * Generic error diffusion dithering
- * @param image The imageData of a Canvas 2d context
- * @param threshold Threshold value (0-255)
- * @param kernel Array of [dx, dy, weight] tuples defining the diffusion pattern
- * @returns The resulting imageData
- */
-export const errorDiffusion = (image: ImageData, threshold: number, kernel: [number, number, number][]): ImageData => {
-  const src = image.data;
-  const width = image.width;
-  const height = image.height;
-  const dst = new Float32Array(width * height);
-
-  for (let l = 0, i = 0; i < src.length; l++, i += 4) {
-    dst[l] = rgbToGray(src[i], src[i + 1], src[i + 2]);
-  }
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const l = y * width + x;
-      const i = l * 4;
-      const old = dst[l];
-      const value = old < threshold ? 0 : 255;
-      const error = old - value;
-      src.fill(value, i, i + 3);
-
-      for (const [dx, dy, w] of kernel) {
-        const nx = x + dx;
-        const ny = y + dy;
-        if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-          dst[ny * width + nx] += error * w;
-        }
-      }
-    }
-  }
-
-  return image;
-};
-
-/**
- * Change the image to black and white using the Floyd–Steinberg dithering
- */
-export const floydSteinberg = (image: ImageData, threshold: number): ImageData => {
-  return errorDiffusion(image, threshold, [
-    [1, 0, 7 / 16],
-    [-1, 1, 3 / 16],
-    [0, 1, 5 / 16],
-    [1, 1, 1 / 16],
-  ]);
-};
-
-/**
- * Change the image to black and white using the Jarvis–Judice–Ninke dithering
- */
-export const jarvisJudiceNinke = (image: ImageData, threshold: number): ImageData => {
-  return errorDiffusion(image, threshold, [
-    [1, 0, 7 / 48], [2, 0, 5 / 48],
-    [-2, 1, 3 / 48], [-1, 1, 5 / 48], [0, 1, 7 / 48], [1, 1, 5 / 48], [2, 1, 3 / 48],
-    [-2, 2, 1 / 48], [-1, 2, 3 / 48], [0, 2, 5 / 48], [1, 2, 3 / 48], [2, 2, 1 / 48],
-  ]);
-};
-
-/**
- * Change the image to black and white using the Stucki dithering
- */
-export const stucki = (image: ImageData, threshold: number): ImageData => {
-  return errorDiffusion(image, threshold, [
-    [1, 0, 8 / 42], [2, 0, 4 / 42],
-    [-2, 1, 2 / 42], [-1, 1, 4 / 42], [0, 1, 8 / 42], [1, 1, 4 / 42], [2, 1, 2 / 42],
-    [-2, 2, 1 / 42], [-1, 2, 2 / 42], [0, 2, 4 / 42], [1, 2, 2 / 42], [2, 2, 1 / 42],
-  ]);
-};
-
-/**
- * Change the image to blank and white using the Bayer ordered dithering
- *
- * @param  {object}   image         The imageData of a Canvas 2d context
- * @param  {number}   threshold     Threshold value (0-255)
- * @return {object}                 The resulting imageData
- *
+ * @param image      The imageData of a Canvas 2d context
+ * @param threshold  Threshold value (0-255)
  */
 export const bayer = (image: ImageData, threshold: number): ImageData => {
   const src = image.data;
   const width = image.width;
 
-  // Pre-calculated 8x8 Bayer matrix (normalized to 0-255)
   const bayerMatrix = [
     [0, 191, 48, 239, 12, 203, 60, 251],
     [128, 64, 176, 112, 140, 76, 188, 124],
@@ -175,51 +122,44 @@ export const bayer = (image: ImageData, threshold: number): ImageData => {
     [8, 199, 56, 247, 4, 195, 52, 243],
     [136, 72, 184, 120, 132, 68, 180, 116],
     [40, 231, 24, 215, 36, 227, 20, 211],
-    [168, 104, 152, 88, 164, 100, 148, 84]
+    [168, 104, 152, 88, 164, 100, 148, 84],
   ];
 
   for (let i = 0; i < src.length; i += 4) {
     const x = (i / 4) % width;
     const y = Math.floor((i / 4) / width);
-
     const gray = rgbToGray(src[i], src[i + 1], src[i + 2]);
     const bayerValue = bayerMatrix[y % 8][x % 8];
     const value = gray < threshold - bayerValue / 2 ? 0 : 255;
-
     src[i] = src[i + 1] = src[i + 2] = value;
   }
 
   return image;
 };
 
+// ─── Image transforms ─────────────────────────────────────────────────────────
+
 /**
  * Invert image
- *
- * @param  {object}   image         The imageData of a Canvas 2d context
- * @return {object}                 The resulting imageData
- *
  */
 export const invert = (image: ImageData): ImageData => {
   for (let i = 0; i < image.data.length; i += 4) {
     const black = (image.data[i] + image.data[i + 1] + image.data[i + 2]) === 0;
     image.data.fill(black ? 255 : 0, i, i + 3);
   }
-
   return image;
 };
 
-
+/**
+ * Mirror image horizontally
+ */
 export const mirror = (image: ImageData): ImageData => {
   const { width, height, data } = image;
-
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < Math.floor(width / 2); x++) {
       const oppositeX = width - 1 - x;
-
       const left = (y * width + x) * 4;
       const right = (y * width + oppositeX) * 4;
-
-      // Swap RGBA values
       for (let c = 0; c < 4; c++) {
         const temp = data[left + c];
         data[left + c] = data[right + c];
@@ -227,6 +167,11 @@ export const mirror = (image: ImageData): ImageData => {
       }
     }
   }
-
   return image;
+};
+
+// ─── Utilities ────────────────────────────────────────────────────────────────
+
+export const copyImageData = (iData: ImageData): ImageData => {
+  return new ImageData(new Uint8ClampedArray(iData.data), iData.width, iData.height);
 };
