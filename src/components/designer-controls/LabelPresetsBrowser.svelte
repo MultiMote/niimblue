@@ -98,19 +98,29 @@
 
   .card > .remove {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 0.1rem;
+    right: 0.1rem;
+    z-index: 1;
   }
 
   .card > .remove > button {
-    padding: 0;
-    line-height: 100%;
+    padding: 0.1rem;
+    line-height: 1;
+    min-width: 1.35rem;
+    min-height: 1.35rem;
   }
 
   .card > .label {
     background-color: rgba(255, 255, 255, 0.8);
     color: black;
     border-radius: 8px;
+    max-width: calc(100% - 0.35rem);
+    padding: 0.2rem 0.35rem;
+    margin-top: 1rem;
+    font-size: 0.7rem;
+    line-height: 1.15;
+    text-align: center;
+    overflow-wrap: anywhere;
   }
 
   .card.print-start-left {

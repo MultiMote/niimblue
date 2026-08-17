@@ -30,6 +30,7 @@ export class CustomCanvas extends fabric.Canvas {
   private gridEnabled: boolean = false;
   private virtualZoomRatio: number = 1;
   onZoomChange?: (zoom: number) => void;
+  private zoomCleanup?: () => void;
 
   constructor(
     el?: string | HTMLCanvasElement,
@@ -40,114 +41,183 @@ export class CustomCanvas extends fabric.Canvas {
     this.preserveObjectStacking = true;
   }
 
+  private getViewport(): HTMLElement | null {
+    return this.getElement().closest(".canvas-stage") ?? this.getElement().parentElement;
+  }
+
+  private panBy(dx: number, dy: number) {
+    const box = this.getViewport();
+    if (!box) return;
+    box.scrollLeft -= dx;
+    box.scrollTop -= dy;
+  }
+
   private setupZoomAndPan() {
-    this.on("mouse:wheel", (opt) => {
-      const event = opt.e as WheelEvent;
+    const viewport = this.getViewport();
+    if (!viewport) return;
 
-      if (event.ctrlKey) {
-        event.preventDefault();
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
 
-        const delta = event.deltaY;
-        if (delta > 0) {
-          this.virtualZoomOut();
-        } else {
-          this.virtualZoomIn();
-        }
+      if (event.shiftKey) {
+        this.panBy(-(event.deltaX || event.deltaY), event.deltaX ? -event.deltaY : 0);
+        return;
       }
-    });
 
-    const container = this.getElement().parentElement;
-    if (!container) return;
+      if (event.deltaY > 0) {
+        this.virtualZoom(this.virtualZoomRatio * 0.95, event);
+      } else if (event.deltaY < 0) {
+        this.virtualZoom(this.virtualZoomRatio * 1.05, event);
+      }
+    };
+
+    let panning = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    const canPanFrom = (event: PointerEvent) => {
+      if (event.button === 1) return true;
+      if (event.button !== 0) return false;
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return false;
+      return target.classList.contains("canvas-stage") || target.classList.contains("canvas-wrapper");
+    };
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (!canPanFrom(event)) return;
+      event.preventDefault();
+      panning = true;
+      lastX = event.clientX;
+      lastY = event.clientY;
+      viewport.setPointerCapture(event.pointerId);
+      viewport.classList.add("is-panning");
+    };
+
+    const blockMiddleClickDefault = (event: MouseEvent) => {
+      if (event.button === 1) {
+        event.preventDefault();
+      }
+    };
+
+    const onPointerMove = (event: PointerEvent) => {
+      if (!panning) return;
+      this.panBy(event.clientX - lastX, event.clientY - lastY);
+      lastX = event.clientX;
+      lastY = event.clientY;
+    };
+
+    const onPointerUp = (event: PointerEvent) => {
+      if (!panning) return;
+      panning = false;
+      viewport.classList.remove("is-panning");
+      if (viewport.hasPointerCapture(event.pointerId)) {
+        viewport.releasePointerCapture(event.pointerId);
+      }
+    };
 
     let initialPinchDistance = 0;
     let initialZoom = 1;
     let lastMidPoint = { x: 0, y: 0 };
 
-    container.addEventListener(
-        "touchstart",
-        (e: TouchEvent) => {
-          if (e.touches.length === 2) {
-            this.selection = false;
-            this.discardActiveObject();
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        this.selection = false;
+        this.discardActiveObject();
 
-            const touch1 = e.touches[0];
-            const touch2 = e.touches[1];
+        const touch1 = e.touches[0]!;
+        const touch2 = e.touches[1]!;
 
-            initialPinchDistance = Math.hypot(
-                touch1.clientX - touch2.clientX,
-                touch1.clientY - touch2.clientY,
-            );
-            initialZoom = this.getVirtualZoom();
+        initialPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+        initialZoom = this.getVirtualZoom();
+        lastMidPoint = {
+          x: (touch1.clientX + touch2.clientX) / 2,
+          y: (touch1.clientY + touch2.clientY) / 2,
+        };
+      }
+    };
 
-            lastMidPoint = {
-              x: (touch1.clientX + touch2.clientX) / 2,
-              y: (touch1.clientY + touch2.clientY) / 2,
-            };
-          } else if (e.touches.length === 1) {
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length !== 2) return;
+      e.preventDefault();
 
-          }
-        },
-        { passive: false },
-    );
+      const touch1 = e.touches[0]!;
+      const touch2 = e.touches[1]!;
+      const currentMidPoint = {
+        x: (touch1.clientX + touch2.clientX) / 2,
+        y: (touch1.clientY + touch2.clientY) / 2,
+      };
+      const currentPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
 
-    container.addEventListener(
-        "touchmove",
-        (e: TouchEvent) => {
-          if (e.touches.length === 2) {
-            e.preventDefault();
+      if (initialPinchDistance > 0) {
+        const newZoom = (currentPinchDistance / initialPinchDistance) * initialZoom;
+        if (isFinite(newZoom) && newZoom > 0 && Math.abs(newZoom - this.virtualZoomRatio) > 0.02) {
+          this.virtualZoom(newZoom, currentMidPoint);
+        }
+      }
 
-            const touch1 = e.touches[0];
-            const touch2 = e.touches[1];
-
-            // Zoom
-            const currentPinchDistance = Math.hypot(
-                touch1.clientX - touch2.clientX,
-                touch1.clientY - touch2.clientY,
-            );
-
-            if (initialPinchDistance > 0) {
-              const newZoom = currentPinchDistance / initialPinchDistance * initialZoom;
-              if (Math.abs(newZoom - this.virtualZoomRatio) > 0.02) {
-                if (isFinite(newZoom) && newZoom > 0) {
-                  this.virtualZoom(newZoom);
-                }
-              }
-            }
-
-            // Pan
-            const currentMidPoint = {
-              x: (touch1.clientX + touch2.clientX) / 2,
-              y: (touch1.clientY + touch2.clientY) / 2,
-            };
-
-            const dx = currentMidPoint.x - lastMidPoint.x;
-            const dy = currentMidPoint.y - lastMidPoint.y;
-
-            const wrapper = this.getElement().closest(".canvas-wrapper");
-            if (wrapper) {
-              wrapper.scrollLeft -= dx;
-              wrapper.scrollTop -= dy;
-            }
-            lastMidPoint = currentMidPoint;
-          }
-        },
-        { passive: false },
-    );
+      this.panBy(currentMidPoint.x - lastMidPoint.x, currentMidPoint.y - lastMidPoint.y);
+      lastMidPoint = currentMidPoint;
+    };
 
     const stopTouch = (e: TouchEvent) => {
       if (e.touches.length === 0) {
-        // If not adding this delay, it could happen that objects are selected after zooming/panning
         setTimeout(() => {
           this.selection = true;
         }, 10);
       }
     };
-    container.addEventListener("touchend", stopTouch);
-    container.addEventListener("touchcancel", stopTouch);
+
+    viewport.addEventListener("wheel", onWheel, { passive: false, capture: true });
+    viewport.addEventListener("pointerdown", onPointerDown);
+    viewport.addEventListener("pointermove", onPointerMove);
+    viewport.addEventListener("pointerup", onPointerUp);
+    viewport.addEventListener("pointercancel", onPointerUp);
+    viewport.addEventListener("mousedown", blockMiddleClickDefault);
+    viewport.addEventListener("auxclick", blockMiddleClickDefault);
+    viewport.addEventListener("touchstart", onTouchStart, { passive: false });
+    viewport.addEventListener("touchmove", onTouchMove, { passive: false });
+    viewport.addEventListener("touchend", stopTouch);
+    viewport.addEventListener("touchcancel", stopTouch);
+
+    this.zoomCleanup = () => {
+      viewport.removeEventListener("wheel", onWheel, true);
+      viewport.removeEventListener("pointerdown", onPointerDown);
+      viewport.removeEventListener("pointermove", onPointerMove);
+      viewport.removeEventListener("pointerup", onPointerUp);
+      viewport.removeEventListener("pointercancel", onPointerUp);
+      viewport.removeEventListener("mousedown", blockMiddleClickDefault);
+      viewport.removeEventListener("auxclick", blockMiddleClickDefault);
+      viewport.removeEventListener("touchstart", onTouchStart);
+      viewport.removeEventListener("touchmove", onTouchMove);
+      viewport.removeEventListener("touchend", stopTouch);
+      viewport.removeEventListener("touchcancel", stopTouch);
+    };
   }
 
-  public virtualZoom(newZoom: number) {
-    this.virtualZoomRatio = Math.min(Math.max(0.25, newZoom), 4);
+  override dispose() {
+    this.zoomCleanup?.();
+    this.zoomCleanup = undefined;
+    return super.dispose();
+  }
+
+  public virtualZoom(newZoom: number, origin?: { clientX?: number; clientY?: number; x?: number; y?: number }) {
+    const oldZoom = this.virtualZoomRatio;
+    const clamped = Math.min(Math.max(0.25, newZoom), 4);
+    const canvasEl = this.getElement();
+    const scroller = this.getViewport();
+    const originX = origin?.clientX ?? origin?.x;
+    const originY = origin?.clientY ?? origin?.y;
+
+    let focusX = 0;
+    let focusY = 0;
+    if (originX !== undefined && originY !== undefined && canvasEl) {
+      const rect = canvasEl.getBoundingClientRect();
+      focusX = originX - rect.left;
+      focusY = originY - rect.top;
+    }
+
+    this.virtualZoomRatio = clamped;
     this.setDimensions(
       {
         width: this.virtualZoomRatio * this.getWidth() + "px",
@@ -155,17 +225,23 @@ export class CustomCanvas extends fabric.Canvas {
       },
       { cssOnly: true },
     );
-    if (this.onZoomChange) {
-      this.onZoomChange(this.virtualZoomRatio);
+
+    if (originX !== undefined && originY !== undefined && scroller && oldZoom > 0 && canvasEl) {
+      const ratio = clamped / oldZoom;
+      const rect = canvasEl.getBoundingClientRect();
+      scroller.scrollLeft += rect.left + focusX * ratio - originX;
+      scroller.scrollTop += rect.top + focusY * ratio - originY;
     }
+
+    this.onZoomChange?.(this.virtualZoomRatio);
   }
 
-  public virtualZoomIn() {
-    this.virtualZoom(this.virtualZoomRatio * 1.05);
+  public virtualZoomIn(origin?: { clientX: number; clientY: number }) {
+    this.virtualZoom(this.virtualZoomRatio * 1.05, origin);
   }
 
-  public virtualZoomOut() {
-    this.virtualZoom(this.virtualZoomRatio * 0.95);
+  public virtualZoomOut(origin?: { clientX: number; clientY: number }) {
+    this.virtualZoom(this.virtualZoomRatio * 0.95, origin);
   }
 
   public getVirtualZoom(): number {
@@ -174,6 +250,33 @@ export class CustomCanvas extends fabric.Canvas {
 
   public resetVirtualZoom() {
     this.virtualZoom(1);
+    this.centerInViewport();
+  }
+
+  public centerInViewport() {
+    const stage = this.getViewport();
+    if (!stage) return;
+    const apply = () => {
+      stage.scrollLeft = Math.max(0, (stage.scrollWidth - stage.clientWidth) / 2);
+      stage.scrollTop = Math.max(0, (stage.scrollHeight - stage.clientHeight) / 2);
+    };
+    apply();
+    requestAnimationFrame(apply);
+  }
+
+  public fitToViewport(padding: number | { top?: number; right?: number; bottom?: number; left?: number } = 20) {
+    const stage = this.getViewport();
+    if (!stage) return;
+    const resolved =
+      typeof padding === "number"
+        ? { top: padding, right: padding, bottom: padding, left: padding }
+        : { top: 20, right: 20, bottom: 20, left: 20, ...padding };
+    const availW = stage.clientWidth - resolved.left - resolved.right;
+    const availH = stage.clientHeight - resolved.top - resolved.bottom;
+    if (availW <= 0 || availH <= 0) return;
+    const fit = Math.min(1, availW / this.getWidth(), availH / this.getHeight());
+    this.virtualZoom(fit);
+    this.centerInViewport();
   }
 
   setLabelProps(value: LabelProps) {

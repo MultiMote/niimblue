@@ -30,6 +30,7 @@
     } else if (to === "bottom") {
       selectedObject.canvas?.sendObjectToBack(selectedObject);
     }
+    valueUpdated();
   };
 
   const fit = () => {

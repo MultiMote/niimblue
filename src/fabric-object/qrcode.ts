@@ -67,6 +67,8 @@ export class QRCode<
     Object.assign(this, qrCodeDefaultValues);
     this.setOptions(options);
     this.lockScalingFlip = true;
+    // Pixel-aligned module drawing + half-pixel translate; cache blit softens odd sizes.
+    this.objectCaching = false;
     this.setControlsVisibility({
       ml: false,
       mt: false,

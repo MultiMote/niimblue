@@ -13,10 +13,7 @@
 @import "bootstrap/scss/alert";
 @import "bootstrap/scss/transitions";
 @import "font";
-
-body {
-  font-family: "Noto Sans Variable", sans-serif;
-}
+@import "theme";
 
 .toastify.toast-danger {
   background: var(--bs-danger-bg-subtle);

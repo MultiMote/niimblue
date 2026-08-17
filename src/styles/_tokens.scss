@@ -1,0 +1,79 @@
+$nb-break-mobile: 960px;
+$nb-break-compact: 640px;
+
+$nb-colors: (
+  "bg": #0b0e14,
+  "workspace": #10141c,
+  "surface": #161b26,
+  "surface-2": #1c2332,
+  "surface-3": #242c3d,
+  "text": #eef1f6,
+  "muted": #93a0b5,
+  "accent": #4d9fff,
+  "accent-2": #ff5a52,
+  "success": #3ddc97,
+  "warning": #f5c15a,
+  "danger": #ff6b6b,
+  "accent-subtle": #263a59,
+  "accent-soft": #243854,
+  "accent-strong": #27405e,
+);
+
+$nb-radii: (
+  "radius": 10px,
+  "radius-sm": 8px,
+);
+
+$nb-layout: (
+  "header-h": 56px,
+  "footer-h": 40px,
+  "rail-w": 88px,
+  "property-panel-w": 320px,
+  "scroll-size": 8px,
+  "mobile-panel-h": 2.85rem,
+);
+
+@mixin nb-root-vars {
+  :root,
+  [data-bs-theme="dark"] {
+    @each $name, $value in $nb-colors {
+      --nb-#{$name}: #{$value};
+    }
+
+    @each $name, $value in $nb-radii {
+      --nb-#{$name}: #{$value};
+    }
+
+    @each $name, $value in $nb-layout {
+      --nb-#{$name}: #{$value};
+    }
+
+    --nb-border: rgba(232, 236, 241, 0.08);
+    --nb-border-strong: rgba(232, 236, 241, 0.14);
+    --nb-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+    --nb-scroll-thumb: rgba(147, 160, 181, 0.42);
+    --nb-scroll-thumb-hover: #6e9fd7;
+    --nb-header-bg: rgba(22, 27, 38, 0.88);
+    --nb-topbar-bg: rgba(22, 27, 38, 0.7);
+    --nb-accent-border: rgba(77, 159, 255, 0.45);
+    --nb-accent-border-soft: rgba(77, 159, 255, 0.4);
+    --nb-accent-border-strong: rgba(77, 159, 255, 0.5);
+    --nb-focus-ring: rgba(77, 159, 255, 0.28);
+
+    --bs-body-bg: var(--nb-bg);
+    --bs-body-color: var(--nb-text);
+    --bs-secondary-color: var(--nb-muted);
+    --bs-tertiary-bg: var(--nb-surface-2);
+    --bs-secondary-bg: var(--nb-surface);
+    --bs-border-color: var(--nb-border);
+    --bs-border-color-translucent: var(--nb-border);
+    --bs-primary: var(--nb-accent);
+    --bs-primary-rgb: 77, 159, 255;
+    --bs-danger: var(--nb-danger);
+    --bs-warning: var(--nb-warning);
+    --bs-success: var(--nb-success);
+    --bs-link-color: var(--nb-accent);
+    --bs-emphasis-color: #fff;
+    --bs-body-font-family: "Noto Sans Variable", sans-serif;
+  }
+}

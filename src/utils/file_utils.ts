@@ -201,6 +201,11 @@ export class FileUtils {
     FileUtils.downloadBase64(`label_${timestamp}.png`, "image/png", url.split("base64,")[1]);
   }
 
+  /** Download a text file such as ZPL */
+  static saveTextFile(filename: string, contents: string) {
+    FileUtils.downloadBase64(filename, "text/plain", FileUtils.base64str(contents));
+  }
+
   /** Convert label template to JSON and download it */
   static saveLabelPresetsAsJson(presets: LabelPreset[]) {
     const parsed = z.array(LabelPresetSchema).parse(presets);

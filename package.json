@@ -31,7 +31,8 @@
 		"pdfjs-dist": "^6.2.108",
 		"qrcode-generator": "2.0.4",
 		"toastify-js": "^1.12.0",
-		"zod": "^4.4.3"
+		"zod": "^4.4.3",
+		"zpl-parser": "^0.1.0"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.39.4",

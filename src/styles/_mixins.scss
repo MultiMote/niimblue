@@ -1,0 +1,26 @@
+@mixin nb-scroll-row {
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@mixin nb-panel-tab-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  border: 0;
+  background: transparent;
+  color: var(--nb-muted);
+  font-size: 0.75rem;
+  font-weight: 650;
+  min-height: 2.25rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+}

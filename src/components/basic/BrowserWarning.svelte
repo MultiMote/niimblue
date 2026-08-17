@@ -6,23 +6,47 @@
   let caps = Utils.getAvailableTransports();
 
   let antiFingerprinting = detectAntiFingerprinting();
+  let insecureRemote =
+    typeof window !== "undefined" &&
+    !window.isSecureContext &&
+    window.location.hostname !== "localhost" &&
+    window.location.hostname !== "127.0.0.1";
+
+  let hideTransportWarning = $state(false);
+  let hideFingerprintWarning = $state(false);
+
+  const showTransportWarning = $derived(
+    !hideTransportWarning && (insecureRemote || (!caps.webSerial && !caps.webBluetooth && !caps.capacitorBle)),
+  );
 </script>
 
-{#if !caps.webSerial && !caps.webBluetooth && !caps.capacitorBle}
-  <div class="alert alert-danger" role="alert">
-    <div>
-      {$tr("browser_warning.lines.first")}
-      <MdIcon icon="sentiment_very_dissatisfied" />
+{#if showTransportWarning}
+  {#if insecureRemote}
+    <div class="alert alert-warning alert-dismissible" role="alert">
+      {$tr("browser_warning.https")}
+      <button type="button" class="btn-close" aria-label="Dismiss" onclick={() => (hideTransportWarning = true)}
+      ></button>
     </div>
-    <div>
-      {$tr("browser_warning.lines.second")}
+  {:else}
+    <div class="alert alert-danger alert-dismissible" role="alert">
+      <div>
+        {$tr("browser_warning.lines.first")}
+        <MdIcon icon="sentiment_very_dissatisfied" />
+      </div>
+      <div>
+        {$tr("browser_warning.lines.second")}
+      </div>
+      <button type="button" class="btn-close" aria-label="Dismiss" onclick={() => (hideTransportWarning = true)}
+      ></button>
     </div>
-  </div>
+  {/if}
 {/if}
 
-{#if antiFingerprinting}
-  <div class="alert alert-danger" role="alert">
+{#if antiFingerprinting && !hideFingerprintWarning}
+  <div class="alert alert-danger alert-dismissible" role="alert">
     {$tr("browser_warning.fingerprinting")}
+    <button type="button" class="btn-close" aria-label="Dismiss" onclick={() => (hideFingerprintWarning = true)}
+    ></button>
   </div>
 {/if}
 

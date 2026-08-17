@@ -23,7 +23,7 @@ Support project:
 
 ## Features
 
-* Privacy first! This application works completely offline (at browser side) and does not send any data (except for downloading application files and importing ZPL labels). Label data is stored in your browser.
+* Privacy first! This application works completely offline (at browser side) and does not send any data (except for downloading application files). Label data is stored in your browser.
 * Support for both Bluetooth and USB connections.
 * Rich label editor. Label saving, import/export.
 * Print preview. You can see how your label will look like after post-processing. Several post-processing algorithms are available.

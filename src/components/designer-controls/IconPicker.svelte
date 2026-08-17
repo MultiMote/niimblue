@@ -10,9 +10,10 @@
   interface Props {
     onSubmit: (i: MaterialIcon) => void;
     onSubmitSvg: (i: string) => void;
+    labeled?: boolean;
   }
 
-  let { onSubmit, onSubmitSvg }: Props = $props();
+  let { onSubmit, onSubmitSvg, labeled = false }: Props = $props();
 
   let iconNames = $state<MaterialIcon[]>([]);
   let search = $state<string>("");
@@ -67,14 +68,22 @@
 </script>
 
 <div class="dropdown" bind:this={dropdown}>
-  <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+  <button
+    class={labeled ? "tool-btn" : "btn btn-sm btn-secondary"}
+    data-bs-toggle="dropdown"
+    data-bs-auto-close="outside"
+    title={$tr("editor.iconpicker.title")}>
     <MdIcon icon="emoji_emotions" />
-    <MdIcon icon="add" />
+    {#if labeled}
+      <span class="tool-btn-label">{$tr("editor.rail.icon")}</span>
+    {:else}
+      <MdIcon icon="add" />
+    {/if}
   </button>
 
-  <div class="dropdown-menu">
+  <div class="dropdown-menu icon-picker-menu">
     <h6 class="dropdown-header">{$tr("editor.iconpicker.title")}</h6>
-    <div class="p-3">
+    <div class="icon-picker-body p-3">
       <input
         disabled={$appConfig.iconListMode === "user"}
         type="text"
@@ -138,14 +147,34 @@
 </div>
 
 <style>
-  .dropdown-menu {
-    width: 100vw;
-    max-width: 450px;
+  .icon-picker-menu {
+    width: min(100vw - 1.5rem, 450px);
   }
+
   .icons {
-    max-height: 400px;
-    overflow-y: scroll;
+    max-height: min(400px, 50dvh);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
+
+  :global(.dropdown-menu-sheet.icon-picker-menu) {
+    width: min(calc(100vw - 1.5rem), 28rem) !important;
+  }
+
+  :global(.dropdown-menu-sheet) .icon-picker-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  :global(.dropdown-menu-sheet) .icons {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+  }
+
   .user-icon img {
     width: 24px;
   }

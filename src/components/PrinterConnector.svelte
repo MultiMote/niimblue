@@ -115,178 +115,183 @@
   });
 </script>
 
-<div class="input-group w-auto input-group-sm flex-nowrap justify-content-end">
+<div class="connection-bar">
   {#if $connectionState === "connected"}
-    <button class="btn btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-      <MdIcon icon="settings" />
-    </button>
-    <div class="dropdown-menu p-1">
-      {#if $printerInfo}
-        <div>
-          Printer info:
-          <ul>
-            {#each Object.entries($printerInfo) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-
-      {#if $printerMeta}
-        <button
-          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#modelMeta">
-          Model metadata <MdIcon icon="expand_more" />
-        </button>
-
-        <div class="collapse" id="modelMeta">
-          <ul>
-            {#each Object.entries($printerMeta) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-
-      {#if $rfidInfo}
-        <button
-          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#rfidInfo">
-          RFID info <MdIcon icon="expand_more" />
-        </button>
-
-        <div class="collapse" id="rfidInfo">
-          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
-
-          <ul>
-            {#each Object.entries($rfidInfo) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-
-      {#if $ribbonRfidInfo}
-        <button
-          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#ribbonRfidInfo">
-          Ribbon RFID info <MdIcon icon="expand_more" />
-        </button>
-
-        <div class="collapse" id="ribbonRfidInfo">
-          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
-
-          <ul>
-            {#each Object.entries($ribbonRfidInfo) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-
-      {#if $heartbeatData}
-        <button
-          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#heartbeatData">
-          Heartbeat data <MdIcon icon="expand_more" />
-        </button>
-
-        <div class="collapse" id="heartbeatData">
-          <ul>
-            {#each Object.entries($heartbeatData) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-
-      <FirmwareUpdater />
-
-      <button
-        class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#tests">
-        Tests <MdIcon icon="expand_more" />
-      </button>
-
-      <div class="collapse" id="tests">
-        <div class="d-flex flex-wrap gap-1 mt-1">
-          <button class="btn btn-sm btn-primary" onclick={startHeartbeat}>Heartbeat on</button>
-          <button class="btn btn-sm btn-primary" onclick={stopHeartbeat}>Heartbeat off</button>
-          <button class="btn btn-sm btn-primary" onclick={soundOn}>Sound on</button>
-          <button class="btn btn-sm btn-primary" onclick={soundOff}>Sound off</button>
-          <button class="btn btn-sm btn-primary" onclick={fetchInfo}>Fetch info again</button>
-          <button class="btn btn-sm btn-primary" onclick={reset}>Reset</button>
-        </div>
-      </div>
-    </div>
-    <span class="input-group-text">
+    <div class="connection-pill">
+      <span class="status-dot {$heartbeatFails > 0 ? 'warn' : ''}"></span>
       {#if connectionType === "serial"}
         <MdIcon icon="usb" />
       {:else}
         <MdIcon icon="bluetooth" />
       {/if}
-    </span>
-    <span class="input-group-text {$heartbeatFails > 0 ? 'text-warning' : ''}">
-      {$printerMeta?.model ?? $connectedPrinterName}
-    </span>
-    {#if $heartbeatData?.chargeLevel}
-      <span class="input-group-text">
-        <MdIcon icon={batteryIcon($heartbeatData.chargeLevel)} class="r-90"></MdIcon>
+      <span class="connection-name {$heartbeatFails > 0 ? 'text-warning' : ''}">
+        {$printerMeta?.model ?? $connectedPrinterName}
       </span>
-    {/if}
+      {#if $heartbeatData?.chargeLevel}
+        <span title="{$heartbeatData.chargeLevel}%">
+          <MdIcon icon={batteryIcon($heartbeatData.chargeLevel)} class="r-90"></MdIcon>
+        </span>
+      {/if}
+
+      <div class="dropdown">
+        <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside" title={$tr("debug.title")}>
+          <MdIcon icon="settings" />
+        </button>
+        <div class="dropdown-menu dropdown-menu-end p-2">
+          {#if $printerInfo}
+            <div>
+              Printer info:
+              <ul>
+                {#each Object.entries($printerInfo) as [key, value] (key)}
+                  <li>{key}: <strong>{value ?? "-"}</strong></li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
+
+          {#if $printerMeta}
+            <button
+              class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#modelMeta">
+              Model metadata <MdIcon icon="expand_more" />
+            </button>
+
+            <div class="collapse" id="modelMeta">
+              <ul>
+                {#each Object.entries($printerMeta) as [key, value] (key)}
+                  <li>{key}: <strong>{value ?? "-"}</strong></li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
+
+          {#if $rfidInfo}
+            <button
+              class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#rfidInfo">
+              RFID info <MdIcon icon="expand_more" />
+            </button>
+
+            <div class="collapse" id="rfidInfo">
+              <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
+
+              <ul>
+                {#each Object.entries($rfidInfo) as [key, value] (key)}
+                  <li>{key}: <strong>{value ?? "-"}</strong></li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
+
+          {#if $ribbonRfidInfo}
+            <button
+              class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#ribbonRfidInfo">
+              Ribbon RFID info <MdIcon icon="expand_more" />
+            </button>
+
+            <div class="collapse" id="ribbonRfidInfo">
+              <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
+
+              <ul>
+                {#each Object.entries($ribbonRfidInfo) as [key, value] (key)}
+                  <li>{key}: <strong>{value ?? "-"}</strong></li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
+
+          {#if $heartbeatData}
+            <button
+              class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#heartbeatData">
+              Heartbeat data <MdIcon icon="expand_more" />
+            </button>
+
+            <div class="collapse" id="heartbeatData">
+              <ul>
+                {#each Object.entries($heartbeatData) as [key, value] (key)}
+                  <li>{key}: <strong>{value ?? "-"}</strong></li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
+
+          <FirmwareUpdater />
+
+          <button
+            class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#tests">
+            Tests <MdIcon icon="expand_more" />
+          </button>
+
+          <div class="collapse" id="tests">
+            <div class="d-flex flex-wrap gap-1 mt-1">
+              <button class="btn btn-sm btn-primary" onclick={startHeartbeat}>Heartbeat on</button>
+              <button class="btn btn-sm btn-primary" onclick={stopHeartbeat}>Heartbeat off</button>
+              <button class="btn btn-sm btn-primary" onclick={soundOn}>Sound on</button>
+              <button class="btn btn-sm btn-primary" onclick={soundOff}>Sound off</button>
+              <button class="btn btn-sm btn-primary" onclick={fetchInfo}>Fetch info again</button>
+              <button class="btn btn-sm btn-primary" onclick={reset}>Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-sm btn-danger" onclick={onDisconnectClicked} title={$tr("ui.disconnect")}>
+        <MdIcon icon="power_off" />
+      </button>
+    </div>
   {:else}
     {#if featureSupport.webBluetooth}
       <button
         disabled={$connectionState === "connecting"}
-        class="btn text-nowrap {connectionType === 'bluetooth' ? 'btn-light' : 'btn-outline-secondary'}"
+        class="btn btn-sm {connectionType === 'bluetooth' ? 'btn-primary' : 'btn-secondary'}"
         onclick={() => switchConnectionType("bluetooth")}>
         <MdIcon icon="bluetooth" />
-        {$tr("connector.bluetooth")}
+        <span class="btn-label">{$tr("connector.bluetooth")}</span>
       </button>
     {/if}
     {#if featureSupport.webSerial}
       <button
         disabled={$connectionState === "connecting"}
-        class="btn text-nowrap {connectionType === 'serial' ? 'btn-light' : 'btn-outline-secondary'}"
+        class="btn btn-sm {connectionType === 'serial' ? 'btn-primary' : 'btn-secondary'}"
         onclick={() => switchConnectionType((connectionType = "serial"))}>
         <MdIcon icon="usb" />
-        {$tr("connector.serial")}
+        <span class="btn-label">{$tr("connector.serial")}</span>
       </button>
     {/if}
     {#if featureSupport.capacitorBle}
       <button
         disabled={$connectionState === "connecting"}
-        class="btn text-nowrap {connectionType === 'capacitor-ble' ? 'btn-light' : 'btn-outline-secondary'}"
+        class="btn btn-sm {connectionType === 'capacitor-ble' ? 'btn-primary' : 'btn-secondary'}"
         onclick={() => switchConnectionType((connectionType = "capacitor-ble"))}>
         <MdIcon icon="usb" />
         Capacitor BLE
       </button>
     {/if}
-  {/if}
 
-  {#if $connectionState !== "connected"}
     <button
-      class="btn btn-primary"
+      class="btn btn-sm btn-primary icon-btn"
       disabled={$connectionState === "connecting" ||
         (!featureSupport.capacitorBle && !featureSupport.webBluetooth && !featureSupport.webSerial)}
       onclick={onConnectClicked}>
       <MdIcon icon="power" />
-    </button>
-  {/if}
-
-  {#if $connectionState === "connected"}
-    <button class="btn btn-danger" onclick={onDisconnectClicked}>
-      <MdIcon icon="power_off" />
+      {#if $connectionState === "connecting"}
+        <span class="btn-label">{$tr("ui.connecting")}</span>
+      {:else}
+        <span class="btn-label">{$tr("ui.connect")}</span>
+      {/if}
     </button>
   {/if}
 </div>

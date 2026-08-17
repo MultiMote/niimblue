@@ -268,8 +268,13 @@
 </script>
 
 <div class="dropdown">
-  <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-    <MdIcon icon="settings" />
+  <button
+    class="btn btn-sm btn-secondary icon-btn"
+    data-bs-toggle="dropdown"
+    data-bs-auto-close="outside"
+    title={$tr("params.label.menu_title")}>
+    <MdIcon icon="straighten" />
+    <span class="label-size-chip">{labelProps.size.width}×{labelProps.size.height}px</span>
   </button>
   <div class="dropdown-menu">
     <h6 class="dropdown-header">{$tr("params.label.menu_title")}</h6>
@@ -442,6 +447,11 @@
   .dropdown-menu {
     width: 100vw;
     max-width: 450px;
+  }
+
+  .label-size-chip {
+    font-variant-numeric: tabular-nums;
+    font-weight: 650;
   }
 
   .cursor-help {

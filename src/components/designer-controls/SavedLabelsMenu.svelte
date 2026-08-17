@@ -8,6 +8,7 @@
   import { Toasts } from "$/utils/toasts";
   import Dropdown from "bootstrap/js/dist/dropdown";
   import { FileUtils } from "$/utils/file_utils";
+  import { canvasToZpl } from "$/utils/zpl_export";
   import * as fabric from "fabric";
   import { Utils } from "@mmote/niimbluelib";
 
@@ -171,6 +172,17 @@
     }
   };
 
+  const onExportZplClicked = () => {
+    try {
+      const { zpl, warnings } = canvasToZpl(canvas);
+      warnings.forEach((warning) => Toasts.message(warning));
+      const safeTitle = title.replaceAll(/[\\/:*?"<>|]/g, "_").trim();
+      FileUtils.saveTextFile(safeTitle ? `${safeTitle}.zpl` : `label_${FileUtils.timestamp()}.zpl`, zpl);
+    } catch (e) {
+      Toasts.error(e);
+    }
+  };
+
   const onExportPngClicked = () => {
     try {
       FileUtils.saveCanvasAsPng(canvas);
@@ -202,8 +214,13 @@
 </script>
 
 <div class="dropdown">
-  <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-    <MdIcon icon="sd_storage" />
+  <button
+    class="btn btn-sm btn-secondary icon-btn"
+    data-bs-toggle="dropdown"
+    data-bs-auto-close="outside"
+    title={$tr("params.saved_labels.menu_title")}>
+    <MdIcon icon="folder_open" />
+    <span class="d-none d-sm-inline">{$tr("params.saved_labels.save.browser")}</span>
   </button>
   <div class="saved-labels dropdown-menu" bind:this={dropdownRef}>
     <h6 class="dropdown-header text-wrap">
@@ -238,6 +255,9 @@
           <ul class="dropdown-menu">
             <li>
               <button class="dropdown-item" onclick={onExportPngClicked}>PNG</button>
+            </li>
+            <li>
+              <button class="dropdown-item" onclick={onExportZplClicked}>{$tr("params.saved_labels.save.zpl")}</button>
             </li>
             {#if !isStandalone}
               <li>
