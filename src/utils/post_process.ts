@@ -48,11 +48,15 @@ export const falseFloyd = createDiffuser(8, [
 // Atkinson: 6 neighbours at 1/8 each.  Only 6/8 of the error is diffused
 // (the remaining 2/8 is discarded), producing the characteristic bright,
 // high-contrast Macintosh look.  normalize=false preserves this ratio.
-export const atkinson = createDiffuser(8, [
-  [0, 0, 0, 1, 1],
-  [0, 1, 1, 1, 0],
-  [0, 0, 1, 0, 0],
-], { normalize: false });
+export const atkinson = createDiffuser(
+  8,
+  [
+    [0, 0, 0, 1, 1],
+    [0, 1, 1, 1, 0],
+    [0, 0, 1, 0, 0],
+  ],
+  { normalize: false },
+);
 
 // Non-diffusion effects
 
@@ -69,6 +73,44 @@ export const threshold = (image: ImageData, threshold: number): ImageData => {
     const value = luminance < threshold ? 0 : 255;
     image.data.fill(value, i, i + 3);
   }
+  return image;
+};
+
+/**
+ * Change the image to black, red and white using a simple threshold
+ *
+ * @param  image          The imageData of a Canvas 2d context
+ * @param  darkThreshold  Dark threshold value (0-255)
+ * @param  redThreshold   Red threshold value (0-255)
+ * @return                The resulting imageData
+ */
+export const thresholdRedBlack = (image: ImageData, darkThreshold: number, redThreshold: number = 100): ImageData => {
+  const data = image.data;
+  const len = data.length;
+
+  for (let i = 0; i < len; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+
+    if (r - g > redThreshold && r - b > redThreshold) {
+      // red
+      data[i] = 255;
+      data[i + 1] = 0;
+      data[i + 2] = 0;
+    } else if (rgbToGray(r, g, b) < darkThreshold) {
+      // black
+      data[i] = 0;
+      data[i + 1] = 0;
+      data[i + 2] = 0;
+    } else {
+      // white
+      data[i] = 255;
+      data[i + 1] = 255;
+      data[i + 2] = 255;
+    }
+  }
+
   return image;
 };
 

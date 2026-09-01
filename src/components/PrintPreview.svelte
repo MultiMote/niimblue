@@ -12,6 +12,8 @@
     type PrintTaskName,
     AbstractPrintTask,
     Utils,
+    PrintOptions,
+    PageColorType
   } from "@mmote/niimbluelib";
   import type { LabelProps, PostProcessType, FabricJson, PreviewProps, PreviewPropsOffset } from "$/types";
   import ParamLockButton from "$/components/basic/ParamLockButton.svelte";
@@ -42,10 +44,11 @@
   let density = $state<number>($printerMeta?.densityDefault ?? 3);
   let speed = $state<0 | 1>(1);
   let quantity = $state<number>(1);
-  let postProcessType = $state<PostProcessType>();
+  let postProcessType = $state<PostProcessType>("threshold");
   let postProcessInvert = $state<boolean>(false);
   let postProcessMirror = $state<boolean>(false);
   let thresholdValue = $state<number>(140);
+  let thresholdValueRed = $state<number>(100);
   let strengthValue = $state<number>(1);
   let serpentineValue = $state<boolean>(true);
   let originalImage: ImageData;
@@ -66,6 +69,11 @@
   let savedProps = $state<PreviewProps>({});
 
   let modalRef: AppModal;
+
+  // let halfCut = $state<number>(0);
+  // let tubeWidthMm = $state<number>(2.5);
+  // let cutType = $state<number>(2);
+  // let tubeType = $state<number>(1);
 
   const disconnected = derived(connectionState, ($connectionState) => $connectionState !== "connected");
 
@@ -112,14 +120,27 @@
     for (let curPage = 0; curPage < pagesTotal; curPage++) {
       $printerClient.stopHeartbeat();
 
-      currentPrintTask = $printerClient.abstraction.newPrintTask(printTaskName, {
+      const opts: Partial<PrintOptions> = {
         totalPages: quantity,
         density,
         speed,
         labelType,
         statusPollIntervalMs: 100,
         statusTimeoutMs: 8_000,
-      });
+        pageColor: PageColorType.DoubleColor
+      };
+
+      if (printTaskName === "D110M_V4") {
+        // opts.tubeType = tubeType;
+        // opts.tubeWidthMm = tubeWidthMm;
+        // opts.cutType = cutType;
+        // opts.halfCut = halfCut !== 0;
+        if (postProcessType === "threshold_rb") {
+          opts.pageColor = PageColorType.DoubleColor;
+        }
+      }
+
+      currentPrintTask = $printerClient.abstraction.newPrintTask(printTaskName, opts);
 
       page = curPage;
       console.log("Printing page", page);
@@ -127,7 +148,7 @@
       await generatePreviewData(page);
 
       try {
-        const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, labelProps.printDirection);
+        const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, opts.pageColor!, labelProps.printDirection);
         await currentPrintTask.printInit();
         await currentPrintTask.printPage(encoded, quantity);
       } catch (e) {
@@ -176,23 +197,25 @@
   const updatePreview = () => {
     let iData: ImageData = effects.copyImageData(originalImage);
 
-    if (postProcessType === "threshold") {
-      iData = effects.threshold(iData, thresholdValue);
-    } else if (postProcessType === "dither") {
-      iData = effects.atkinson(iData, { threshold: thresholdValue, strength: strengthValue, serpentine: serpentineValue });
-    } else if (postProcessType === "bayer2") {
-      iData = effects.bayer(iData, 2);
-    } else if (postProcessType === "bayer4") {
-      iData = effects.bayer(iData, 4);
-    } else if (postProcessType === "bayer8") {
-      iData = effects.bayer(iData, 8);
-    } else if (postProcessType === "floyd_steinberg") {
-      iData = effects.floydSteinberg(iData, { threshold: thresholdValue, strength: strengthValue, serpentine: serpentineValue });
-    } else if (postProcessType === "jjn") {
-      iData = effects.jarvisJudiceNinke(iData, { threshold: thresholdValue, strength: strengthValue, serpentine: serpentineValue });
-    } else if (postProcessType === "stucki") {
-      iData = effects.stucki(iData, { threshold: thresholdValue, strength: strengthValue, serpentine: serpentineValue });
-    }
+    const ditherOpts = {
+      threshold: thresholdValue,
+      strength: strengthValue,
+      serpentine: serpentineValue
+    };
+
+    const processors: Record<PostProcessType, (data: ImageData) => ImageData>  = {
+      threshold: (data) => effects.threshold(data, thresholdValue),
+      threshold_rb: (data) => effects.thresholdRedBlack(data, thresholdValue, thresholdValueRed),
+      dither: (data) => effects.atkinson(data, ditherOpts),
+      floyd_steinberg: (data) => effects.floydSteinberg(data, ditherOpts),
+      jjn: (data) => effects.jarvisJudiceNinke(data, ditherOpts),
+      stucki: (data) => effects.stucki(data, ditherOpts),
+      bayer2: (data) => effects.bayer(data, 2),
+      bayer4: (data) => effects.bayer(data, 4),
+      bayer8: (data) => effects.bayer(data, 8),
+    };
+
+    iData = processors[postProcessType](iData);
 
     if (postProcessInvert) {
       iData = effects.invert(iData);
@@ -265,6 +288,7 @@
       if (saved.postProcess !== undefined) postProcessType = saved.postProcess;
       if (saved.postProcessInvert !== undefined) postProcessInvert = saved.postProcessInvert;
       if (saved.threshold !== undefined) thresholdValue = saved.threshold;
+      if (saved.thresholdRed !== undefined) thresholdValueRed = saved.thresholdRed;
       if (saved.strength !== undefined) strengthValue = saved.strength;
       if (saved.serpentine !== undefined) serpentineValue = saved.serpentine;
       if (saved.quantity !== undefined) quantity = saved.quantity;
@@ -437,6 +461,7 @@
         bind:value={postProcessType}
         onchange={() => updateSavedProp("postProcess", postProcessType, true)}>
         <option value="threshold">{$tr("preview.postprocess.threshold")}</option>
+        <option value="threshold_rb">{$tr("preview.postprocess.threshold.red")}</option>
         <option value="dither">{$tr("preview.postprocess.atkinson")}</option>
         <option value="bayer2">{$tr("preview.postprocess.bayer")} 2x2</option>
         <option value="bayer4">{$tr("preview.postprocess.bayer")} 4x4</option>
@@ -527,6 +552,28 @@
       </div>
     {/if}
 
+    {#if postProcessType === "threshold_rb"}
+      <div class="input-group input-group-sm">
+        <span class="input-group-text">{$tr("preview.threshold.red")}</span>
+
+        <input
+          type="range"
+          id="thresholdRed"
+          class="form-range"
+          min="1"
+          max="255"
+          bind:value={thresholdValueRed}
+          onchange={() => updateSavedProp("thresholdRed", thresholdValueRed, true)} />
+        <span class="input-group-text">{thresholdValueRed}</span>
+
+        <ParamLockButton
+          propName="thresholdRed"
+          value={thresholdValueRed}
+          savedValue={savedProps.thresholdRed}
+          onClick={toggleSavedProp} />
+      </div>
+    {/if}
+
     <div class="input-group flex-nowrap input-group-sm">
       <span class="input-group-text">{$tr("preview.copies")}</span>
       <input
@@ -564,6 +611,26 @@
 
         <ParamLockButton propName="speed" value={speed} savedValue={savedProps.speed} onClick={toggleSavedProp} />
       </div>
+
+      <!-- <div class="input-group flex-nowrap input-group-sm">
+        <span class="input-group-text text-bg-info">halfCut</span>
+        <input class="form-control" type="number" bind:value={halfCut} />
+      </div>
+
+      <div class="input-group flex-nowrap input-group-sm">
+        <span class="input-group-text text-bg-info">tubeWidth (mm)</span>
+        <input class="form-control" type="number" bind:value={tubeWidthMm} />
+      </div>
+
+      <div class="input-group flex-nowrap input-group-sm">
+        <span class="input-group-text text-bg-info">cutType</span>
+        <input class="form-control" type="number" bind:value={cutType} />
+      </div>
+
+      <div class="input-group flex-nowrap input-group-sm">
+        <span class="input-group-text text-bg-info">tubeType</span>
+        <input class="form-control" type="number" bind:value={tubeType} />
+      </div> -->
     {/if}
 
     <div class="input-group input-group-sm">

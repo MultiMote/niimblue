@@ -29,6 +29,11 @@
     selectedObject.set({ fill: value });
     valueUpdated();
   };
+
+  const strokeChanged = (value: string) => {
+    selectedObject.set({ stroke: value });
+    valueUpdated();
+  };
 </script>
 
 <input type="hidden" value={editRevision}>
@@ -62,18 +67,36 @@
   </div>
 {/if}
 
-{#if selectedObject instanceof fabric.Rect || selectedObject instanceof fabric.Circle}
+{#if selectedObject instanceof fabric.Rect || selectedObject instanceof fabric.Circle || selectedObject instanceof fabric.Polyline}
+  {#if !(selectedObject instanceof fabric.Polyline)}
+    <div class="input-group input-group-sm flex-nowrap fill">
+      <span class="input-group-text" title={$tr("params.vector.fill")}>
+        <MdIcon icon="format_color_fill" />
+      </span>
+      <select
+        class="form-select"
+        value={selectedObject.fill}
+        onchange={(e) => fillChanged(e.currentTarget.value)}>
+        <option value="white">{$tr("params.color.white")}</option>
+        <option value="black">{$tr("params.color.black")}</option>
+        <option value="red">{$tr("params.color.red")}</option>
+        <option value="transparent">{$tr("params.color.transparent")}</option>
+      </select>
+    </div>
+  {/if}
+
   <div class="input-group input-group-sm flex-nowrap fill">
-    <span class="input-group-text" title={$tr("params.vector.fill")}>
-      <MdIcon icon="format_color_fill" />
+    <span class="input-group-text" title={$tr("params.vector.stroke_color")}>
+      <MdIcon icon="border_color" />
     </span>
     <select
       class="form-select"
-      value={selectedObject.fill}
-      onchange={(e) => fillChanged(e.currentTarget.value)}>
-      <option value="transparent">{$tr("params.color.transparent")}</option>
+      value={selectedObject.stroke}
+      onchange={(e) => strokeChanged(e.currentTarget.value)}>
       <option value="white">{$tr("params.color.white")}</option>
       <option value="black">{$tr("params.color.black")}</option>
+      <option value="red">{$tr("params.color.red")}</option>
+      <option value="transparent">{$tr("params.color.transparent")}</option>
     </select>
   </div>
 {/if}

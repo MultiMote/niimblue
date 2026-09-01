@@ -186,6 +186,7 @@
       <select class="form-select" value={selectedText.fill} onchange={(e) => fillChanged(e.currentTarget.value)}>
         <option value="white">{$tr("params.color.white")}</option>
         <option value="black">{$tr("params.color.black")}</option>
+        <option value="red">{$tr("params.color.red")}</option>
       </select>
     </div>
     <div class="input-group input-group-sm flex-nowrap color pb-2">
@@ -198,6 +199,7 @@
         onchange={(e) => backgroundColorChanged(e.currentTarget.value)}>
         <option value="white">{$tr("params.color.white")}</option>
         <option value="black">{$tr("params.color.black")}</option>
+        <option value="red">{$tr("params.color.red")}</option>
         <option value="transparent">{$tr("params.color.transparent")}</option>
       </select>
     </div>

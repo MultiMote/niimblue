@@ -7,7 +7,6 @@ export type ConnectionType = "bluetooth" | "serial" | "capacitor-ble";
 
 export type LabelUnit = "mm" | "px";
 export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qrcode" | "barcode" | "aruco" | "pdf";
-export type PostProcessType = "threshold" | "dither" | "bayer2" | "bayer4" | "bayer8" | "floyd_steinberg" | "jjn" | "stucki";
 export type MoveDirection = "up" | "down" | "left" | "right";
 export type LabelShape = "rect" | "rounded_rect" | "circle";
 export type LabelSplit = "none" | "vertical" | "horizontal";
@@ -79,10 +78,23 @@ export const PreviewPropsOffsetSchema = z.object({
   offsetType: z.enum(["inner", "outer"]),
 });
 
+const PostProcessTypeSchema = z.enum([
+  "threshold",
+  "threshold_rb",
+  "dither",
+  "bayer2",
+  "bayer4",
+  "bayer8",
+  "floyd_steinberg",
+  "jjn",
+  "stucki",
+]);
+
 export const PreviewPropsSchema = z.object({
-  postProcess: z.enum(["threshold", "dither", "bayer2", "bayer4", "bayer8", "floyd_steinberg", "jjn", "stucki"]).optional(),
+  postProcess: PostProcessTypeSchema.optional(),
   postProcessInvert: z.boolean().optional(),
   threshold: z.number().gte(1).lte(255).optional(),
+  thresholdRed: z.number().gte(1).lte(255).optional(),
   strength: z.number().gte(0).lte(1.5).optional(),
   serpentine: z.boolean().optional(),
   quantity: z.number().gte(1).optional(),
@@ -116,12 +128,13 @@ export const UserIconSchema = z.object({
   data: z.string(),
 });
 
-export const UserFontSchema = z
-  .object({
-    gzippedDataB64: z.string(),
-    family: z.string(),
-    mimeType: z.string(),
-  });
+export const UserFontSchema = z.object({
+  gzippedDataB64: z.string(),
+  family: z.string(),
+  mimeType: z.string(),
+});
+
+export type PostProcessType = z.infer<typeof PostProcessTypeSchema>;
 
 export type CsvParams = z.infer<typeof CsvParamsSchema>;
 export type UserIcon = z.infer<typeof UserIconSchema>;
