@@ -127,7 +127,7 @@
         labelType,
         statusPollIntervalMs: 100,
         statusTimeoutMs: 8_000,
-        pageColor: PageColorType.DoubleColor
+        pageColor: PageColorType.SingleColor
       };
 
       if (printTaskName === "D110M_V4") {
@@ -461,7 +461,7 @@
         bind:value={postProcessType}
         onchange={() => updateSavedProp("postProcess", postProcessType, true)}>
         <option value="threshold">{$tr("preview.postprocess.threshold")}</option>
-        <option value="threshold_rb">{$tr("preview.postprocess.threshold.red")}</option>
+        <option value="threshold_rb" disabled={printTaskName !== "D110M_V4"}>{$tr("preview.postprocess.threshold.red")}</option>
         <option value="dither">{$tr("preview.postprocess.atkinson")}</option>
         <option value="bayer2">{$tr("preview.postprocess.bayer")} 2x2</option>
         <option value="bayer4">{$tr("preview.postprocess.bayer")} 4x4</option>
@@ -658,7 +658,14 @@
       <select
         class="form-select"
         bind:value={printTaskName}
-        onchange={() => updateSavedProp("printTaskName", printTaskName)}>
+        onchange={() => {
+          updateSavedProp("printTaskName", printTaskName);
+          if (printTaskName !== "D110M_V4" && postProcessType === "threshold_rb") {
+            postProcessType = "threshold";
+            updatePreview();
+          }
+
+        }}>
         {#each printTaskNames as name (name)}
           <option value={name}>
             {#if detectedPrintTaskName === name}✔{/if}
