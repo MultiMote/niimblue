@@ -12,20 +12,15 @@ import {
   type ConnectionState,
   type ConnectionType,
 } from "$/types";
+import { Utils } from "@mmote/niimbluelib";
 import {
-  NiimbotBluetoothClient,
-  NiimbotCapacitorBleClient,
-  NiimbotSerialClient,
-  RequestCommandId,
-  ResponseCommandId,
-  Utils,
-  instantiateClient,
-  type HeartbeatData,
-  type NiimbotAbstractClient,
+  instantiatePrinterClient,
+  type PrinterClient,
+  type PrinterHeartbeatData,
   type PrinterInfo,
-  type PrinterModelMeta,
-  type RfidInfo,
-} from "@mmote/niimbluelib";
+  type PrinterMetadata,
+  type PrinterRfidInfo,
+} from "$/printers";
 import { Toasts } from "$/utils/toasts";
 import { tr } from "$/utils/i18n";
 import { LocalStoragePersistence, writablePersisted } from "$/utils/persistence";
@@ -41,12 +36,12 @@ export const loadedFonts = writable<FontFace[]>([]);
 
 export const connectionState = writable<ConnectionState>("disconnected");
 export const connectedPrinterName = writable<string>("");
-export const printerClient = writable<NiimbotAbstractClient>();
-export const heartbeatData = writable<HeartbeatData>();
+export const printerClient = writable<PrinterClient>();
+export const heartbeatData = writable<PrinterHeartbeatData>();
 export const printerInfo = writable<PrinterInfo>();
-export const rfidInfo = writable<RfidInfo | undefined>();
-export const ribbonRfidInfo = writable<RfidInfo | undefined>();
-export const printerMeta = writable<PrinterModelMeta | undefined>();
+export const rfidInfo = writable<PrinterRfidInfo | undefined>();
+export const ribbonRfidInfo = writable<PrinterRfidInfo | undefined>();
+export const printerMeta = writable<PrinterMetadata | undefined>();
 export const heartbeatFails = writable<number>(0);
 export const csvData = writablePersisted<CsvParams>("csv_params", CsvParamsSchema, { data: CSV_DEFAULT });
 
@@ -70,29 +65,24 @@ export const refreshRfidInfo = () => {
     return;
   }
 
-  client.abstraction.rfidInfo().then(rfidInfo.set).catch(console.error);
+  client.getRfidInfo().then(rfidInfo.set).catch(console.error);
 
-  client.abstraction
-    .rfidInfo2()
+  client
+    .getRibbonRfidInfo()
     .then(ribbonRfidInfo.set)
     .catch(() => {});
 };
 
 export const initClient = (connectionType: ConnectionType) => {
-  printerClient.update((prevClient: NiimbotAbstractClient) => {
-    let newClient: NiimbotAbstractClient = prevClient;
+  printerClient.update((prevClient: PrinterClient) => {
+    let newClient: PrinterClient = prevClient;
 
-    if (
-      prevClient === undefined ||
-      (connectionType !== "bluetooth" && prevClient instanceof NiimbotBluetoothClient) ||
-      (connectionType !== "serial" && prevClient instanceof NiimbotSerialClient) ||
-      (connectionType !== "capacitor-ble" && prevClient instanceof NiimbotCapacitorBleClient)
-    ) {
+    if (prevClient === undefined || prevClient.connectionType !== connectionType) {
       if (prevClient !== undefined) {
         prevClient.disconnect();
       }
 
-      newClient = instantiateClient(connectionType);
+      newClient = instantiatePrinterClient(connectionType);
 
       const conf = get(appConfig);
 
@@ -101,11 +91,13 @@ export const initClient = (connectionType: ConnectionType) => {
       }
 
       newClient.on("packetsent", (e) => {
-        console.log(`>> ${Utils.bufToHex(e.packet.toBytes())} (${RequestCommandId[e.packet.command]})`);
+        const commandName = newClient.getPacketCommandName("request", e.packet.command);
+        console.log(`>> ${Utils.bufToHex(e.packet.toBytes())} (${commandName})`);
       });
 
       newClient.on("packetreceived", (e) => {
-        console.log(`<< ${Utils.bufToHex(e.packet.toBytes())} (${ResponseCommandId[e.packet.command]})`);
+        const commandName = newClient.getPacketCommandName("response", e.packet.command);
+        console.log(`<< ${Utils.bufToHex(e.packet.toBytes())} (${commandName})`);
       });
 
       newClient.on("connect", (e) => {

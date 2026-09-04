@@ -5,16 +5,15 @@
   import * as effects from "$/utils/post_process";
   import {
     type EncodedImage,
-    ImageEncoder,
     LabelType,
     printTaskNames,
     type PrintProgressEvent,
     type PrintTaskName,
-    AbstractPrintTask,
     Utils,
     PrintOptions,
     PageColorType
   } from "@mmote/niimbluelib";
+  import type { PrinterPrintTask } from "$/printers";
   import type { LabelProps, PostProcessType, FabricJson, PreviewProps, PreviewPropsOffset } from "$/types";
   import ParamLockButton from "$/components/basic/ParamLockButton.svelte";
   import { tr, type TranslationKey } from "$/utils/i18n";
@@ -64,7 +63,7 @@
   let pagesTotal = $state<number>(1);
   let offset = $state<PreviewPropsOffset>({ x: 0, y: 0, offsetType: "inner" });
   let offsetWarning = $state<string>("");
-  let currentPrintTask: AbstractPrintTask | undefined;
+  let currentPrintTask: PrinterPrintTask | undefined;
 
   let savedProps = $state<PreviewProps>({});
 
@@ -88,7 +87,7 @@
         await currentPrintTask.printEnd();
       } else {
         console.warn("Print task undefined, falling back to PrintEnd command");
-        await $printerClient.abstraction.printEnd();
+        await $printerClient.printEnd();
       }
 
       refreshRfidInfo();
@@ -140,7 +139,7 @@
         }
       }
 
-      currentPrintTask = $printerClient.abstraction.newPrintTask(printTaskName, opts);
+      currentPrintTask = $printerClient.newPrintTask(printTaskName, opts);
 
       page = curPage;
       console.log("Printing page", page);
@@ -148,7 +147,11 @@
       await generatePreviewData(page);
 
       try {
-        const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, opts.pageColor!, labelProps.printDirection);
+        const encoded: EncodedImage = $printerClient.encodeCanvas(
+          previewCanvas,
+          opts.pageColor!,
+          labelProps.printDirection,
+        );
         await currentPrintTask.printInit();
         await currentPrintTask.printPage(encoded, quantity);
       } catch (e) {
