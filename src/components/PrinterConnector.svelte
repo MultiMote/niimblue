@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { NiimbotCapacitorBleClient, SoundSettingsItemType, Utils, type AvailableTransports } from "@mmote/niimbluelib";
+  import { Utils, type AvailableTransports } from "@mmote/niimbluelib";
   import {
     printerClient,
     connectedPrinterName,
@@ -31,7 +31,7 @@
     connectionState.set("connecting");
 
     try {
-      if ($printerClient instanceof NiimbotCapacitorBleClient && $automation?.autoConnectDeviceId !== undefined) {
+      if ($printerClient.capabilities.deviceIdConnection && $automation?.autoConnectDeviceId !== undefined) {
         await $printerClient.connect({ deviceId: $automation.autoConnectDeviceId });
       } else {
         await $printerClient.connect();
@@ -55,13 +55,11 @@
   };
 
   const soundOn = async () => {
-    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.BluetoothConnectionSound, true);
-    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.PowerSound, true);
+    await $printerClient.setSoundEnabled(true);
   };
 
   const soundOff = async () => {
-    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.BluetoothConnectionSound, false);
-    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.PowerSound, false);
+    await $printerClient.setSoundEnabled(false);
   };
 
   const fetchInfo = async () => {
@@ -69,7 +67,7 @@
   };
 
   const reset = async () => {
-    await $printerClient.abstraction.printerReset();
+    await $printerClient.reset();
   };
 
   const switchConnectionType = (c: ConnectionType) => {
@@ -208,7 +206,9 @@
         </div>
       {/if}
 
-      <FirmwareUpdater />
+      {#if $printerClient.capabilities.firmwareUpdate}
+        <FirmwareUpdater />
+      {/if}
 
       <button
         class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
@@ -222,10 +222,14 @@
         <div class="d-flex flex-wrap gap-1 mt-1">
           <button class="btn btn-sm btn-primary" onclick={startHeartbeat}>Heartbeat on</button>
           <button class="btn btn-sm btn-primary" onclick={stopHeartbeat}>Heartbeat off</button>
-          <button class="btn btn-sm btn-primary" onclick={soundOn}>Sound on</button>
-          <button class="btn btn-sm btn-primary" onclick={soundOff}>Sound off</button>
+          {#if $printerClient.capabilities.soundSettings}
+            <button class="btn btn-sm btn-primary" onclick={soundOn}>Sound on</button>
+            <button class="btn btn-sm btn-primary" onclick={soundOff}>Sound off</button>
+          {/if}
           <button class="btn btn-sm btn-primary" onclick={fetchInfo}>Fetch info again</button>
-          <button class="btn btn-sm btn-primary" onclick={reset}>Reset</button>
+          {#if $printerClient.capabilities.printerReset}
+            <button class="btn btn-sm btn-primary" onclick={reset}>Reset</button>
+          {/if}
         </div>
       </div>
     </div>
