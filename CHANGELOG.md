@@ -4,3 +4,5 @@
 * Add dual color printing support:
   - Add red color to vector objects
   - Add red/black threshold post-processing
+* Use single PrintStart/PrintEnd session for multi-page printing
+* Fix print progress calculation

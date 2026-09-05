@@ -117,7 +117,6 @@ export const AutomationPropsSchema = z.object({
 export const AppConfigSchema = z.object({
   /** Keep image aspect ration when using "fit" button */
   fitMode: z.enum(["stretch", "ratio_min", "ratio_max"]),
-  pageDelay: z.number().gte(0).optional(),
   iconListMode: z.enum(["user", "pack", "both"]),
   packetIntervalMs: z.number().gte(0).optional(),
   gridEnabled: z.boolean().optional(),

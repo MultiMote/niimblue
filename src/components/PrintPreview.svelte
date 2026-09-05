@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { derived } from "svelte/store";
-  import { appConfig, connectionState, printerClient, printerMeta, refreshRfidInfo } from "$/stores";
+  import { connectionState, printerClient, printerMeta, refreshRfidInfo } from "$/stores";
   import * as effects from "$/utils/post_process";
   import {
     type EncodedImage,
@@ -11,7 +11,6 @@
     type PrintProgressEvent,
     type PrintTaskName,
     AbstractPrintTask,
-    Utils,
     PrintOptions,
     PageColorType
   } from "@mmote/niimbluelib";
@@ -60,20 +59,13 @@
   let error = $state<string>("");
   let detectedPrintTaskName: PrintTaskName | undefined = $printerClient?.getPrintTaskType();
   let csvParsed: DSVRowArray<string>;
-  let page = $state<number>(0);
+  let currentPage = $state<number>(0);
   let pagesTotal = $state<number>(1);
   let offset = $state<PreviewPropsOffset>({ x: 0, y: 0, offsetType: "inner" });
   let offsetWarning = $state<string>("");
   let currentPrintTask: AbstractPrintTask | undefined;
-
   let savedProps = $state<PreviewProps>({});
-
   let modalRef: AppModal;
-
-  // let halfCut = $state<number>(0);
-  // let tubeWidthMm = $state<number>(2.5);
-  // let cutType = $state<number>(2);
-  // let tubeType = $state<number>(1);
 
   const disconnected = derived(connectionState, ($connectionState) => $connectionState !== "connected");
 
@@ -104,8 +96,8 @@
     const sources: string[] = [];
 
     for (let curPage = 0; curPage < pagesTotal; curPage++) {
-      page = curPage;
-      await generatePreviewData(page);
+      currentPage = curPage;
+      await generatePreviewData(currentPage);
       sources.push(previewCanvas.toDataURL("image/png"));
     }
 
@@ -116,77 +108,59 @@
     printState = "sending";
     error = "";
 
-    // do it in a stupid way (multi-page print not finished yet)
-    for (let curPage = 0; curPage < pagesTotal; curPage++) {
-      $printerClient.stopHeartbeat();
+    $printerClient.stopHeartbeat();
 
-      const opts: Partial<PrintOptions> = {
-        totalPages: quantity,
-        density,
-        speed,
-        labelType,
-        statusPollIntervalMs: 100,
-        statusTimeoutMs: 8_000,
-        pageColor: PageColorType.SingleColor
-      };
+    const opts: Partial<PrintOptions> = {
+      totalPages: pagesTotal * quantity,
+      density,
+      speed,
+      labelType,
+      statusPollIntervalMs: 100,
+      statusTimeoutMs: 8_000,
+      pageColor: PageColorType.SingleColor
+    };
 
-      if (printTaskName === "D110M_V4") {
-        // opts.tubeType = tubeType;
-        // opts.tubeWidthMm = tubeWidthMm;
-        // opts.cutType = cutType;
-        // opts.halfCut = halfCut !== 0;
-        if (postProcessType === "threshold_rb") {
-          opts.pageColor = PageColorType.DoubleColor;
-        }
-      }
+    if (printTaskName === "D110M_V4" && postProcessType === "threshold_rb") {
+      opts.pageColor = PageColorType.DoubleColor;
+    }
 
-      currentPrintTask = $printerClient.abstraction.newPrintTask(printTaskName, opts);
+    const listener = (e: PrintProgressEvent) => {
+      const currentPageProgress = (e.pagePrintProgress + e.pageFeedProgress) / 2;
+      printProgress = Math.min(100, Math.floor(((e.page + currentPageProgress / 100) / opts.totalPages!) * 100));
+    };
 
-      page = curPage;
-      console.log("Printing page", page);
+    $printerClient.on("printprogress", listener);
 
-      await generatePreviewData(page);
+    printState = "printing";
+    currentPrintTask = $printerClient.abstraction.newPrintTask(printTaskName, opts);
 
-      try {
+    try {
+      await currentPrintTask.printInit();
+
+      for (let pageIdx = 0; pageIdx < pagesTotal; pageIdx++) {
+        currentPage = pageIdx;
+        console.log("Printing page", currentPage);
+        await generatePreviewData(currentPage);
         const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, opts.pageColor!, labelProps.printDirection);
-        await currentPrintTask.printInit();
+
         await currentPrintTask.printPage(encoded, quantity);
-      } catch (e) {
-        error = `${e}`;
-        console.error(e);
-        return;
+        await currentPrintTask.waitForPageFinished();
       }
+      await currentPrintTask.waitForFinished();
+    } catch (e) {
+      error = `${e}`;
+      console.error(e);
+    }
 
-      printState = "printing";
-
-      const listener = (e: PrintProgressEvent) => {
-        printProgress = Math.floor((e.page / quantity) * ((e.pagePrintProgress + e.pageFeedProgress) / 2));
-      };
-
-      $printerClient.on("printprogress", listener);
-
-      try {
-        await currentPrintTask.waitForFinished();
-      } catch (e) {
-        error = `${e}`;
-        console.error(e);
-      }
-
-      $printerClient.off("printprogress", listener);
-
+    try {
       await endPrint();
-
-      if (
-        $appConfig.pageDelay !== undefined &&
-        $appConfig.pageDelay > 0 &&
-        pagesTotal > 1 &&
-        curPage < pagesTotal - 1
-      ) {
-        await Utils.sleep($appConfig.pageDelay);
-      }
+    } catch (e) {
+      error = `${e}`;
+      console.error(e);
     }
 
     printState = "idle";
+    $printerClient.off("printprogress", listener);
     $printerClient.startHeartbeat();
 
     if (printNow && !error) {
@@ -304,20 +278,20 @@
 
   const pageDown = () => {
     if (!csvEnabled) {
-      page = 0;
+      currentPage = 0;
       return;
     }
-    page = Math.max(0, Math.min(csvParsed.length - 1, page - 1));
-    generatePreviewData(page);
+    currentPage = Math.max(0, Math.min(csvParsed.length - 1, currentPage - 1));
+    generatePreviewData(currentPage);
   };
 
   const pageUp = () => {
     if (!csvEnabled) {
-      page = 0;
+      currentPage = 0;
       return;
     }
-    page = Math.min(csvParsed.length - 1, page + 1);
-    generatePreviewData(page);
+    currentPage = Math.min(csvParsed.length - 1, currentPage + 1);
+    generatePreviewData(currentPage);
   };
 
   const generatePreviewData = async (page: number): Promise<void> => {
@@ -407,7 +381,7 @@
 
     loadProps();
 
-    await generatePreviewData(page);
+    await generatePreviewData(currentPage);
 
     if (printNow && !$disconnected && printState === "idle") {
       onPrint();
@@ -433,7 +407,7 @@
   </div>
 
   <div class="text-center">
-    {#if pagesTotal > 1}<div>Page {page + 1} / {pagesTotal}</div>{/if}
+    {#if pagesTotal > 1}<div>Page {currentPage + 1} / {pagesTotal}</div>{/if}
 
     {#if printState === "sending"}
       <div>Sending...</div>
@@ -611,26 +585,6 @@
 
         <ParamLockButton propName="speed" value={speed} savedValue={savedProps.speed} onClick={toggleSavedProp} />
       </div>
-
-      <!-- <div class="input-group flex-nowrap input-group-sm">
-        <span class="input-group-text text-bg-info">halfCut</span>
-        <input class="form-control" type="number" bind:value={halfCut} />
-      </div>
-
-      <div class="input-group flex-nowrap input-group-sm">
-        <span class="input-group-text text-bg-info">tubeWidth (mm)</span>
-        <input class="form-control" type="number" bind:value={tubeWidthMm} />
-      </div>
-
-      <div class="input-group flex-nowrap input-group-sm">
-        <span class="input-group-text text-bg-info">cutType</span>
-        <input class="form-control" type="number" bind:value={cutType} />
-      </div>
-
-      <div class="input-group flex-nowrap input-group-sm">
-        <span class="input-group-text text-bg-info">tubeType</span>
-        <input class="form-control" type="number" bind:value={tubeType} />
-      </div> -->
     {/if}
 
     <div class="input-group input-group-sm">

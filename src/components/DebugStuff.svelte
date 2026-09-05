@@ -27,11 +27,4 @@
   <div class="mb-1">
     {$tr("debug.page_delay.help")}
   </div>
-
-  <div class="input-group flex-nowrap input-group-sm mb-3" role="group">
-    <input class="form-control" type="number" min="0" placeholder="0" bind:value={$appConfig.pageDelay} />
-    <span class="input-group-text">ms</span>
-    <button class="btn btn-outline-secondary" onclick={() => ($appConfig.pageDelay = undefined)}
-      >{$tr("debug.reset")}</button>
-  </div>
 </AppModal>
