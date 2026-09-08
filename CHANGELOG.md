@@ -6,3 +6,5 @@
   - Add red/black threshold post-processing
 * Use single PrintStart/PrintEnd session for multi-page printing
 * Fix print progress calculation
+* Display isSupportColor, printheadWidth at printer info menu
+* Add statusPollTimer cleanup to printEnd
