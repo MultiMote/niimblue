@@ -1,0 +1,2 @@
+Scanned /home/katsu/ossruns/2026-09-09-oss-sec/niimblue/standalone-apps/capacitor/package-lock.json file and found 102 packages
+No issues found
