@@ -18,13 +18,16 @@
     "lib": ["dom", "dom.iterable", "es2022", "webworker"],
     "baseUrl": "./",
     "paths": {
-      "$/*": ["src/*"]
+      "$/*": ["src/*"],
+      "$lib/*": ["src/renderer/lib/*"]
     }
   },
   "include": [
     "vite.config.ts",
+    "vite.electron.config.ts",
     "src/**/*.js",
     "src/**/*.ts",
-    "src/**/*.svelte"
+    "src/**/*.svelte",
+    "electron/**/*.ts"
   ]
 }
