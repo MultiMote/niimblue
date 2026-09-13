@@ -80,7 +80,7 @@
         await currentPrintTask.printEnd();
       } else {
         console.warn("Print task undefined, falling back to PrintEnd command");
-        await $printerClient.abstraction.printEnd();
+        await $printerClient.protocol.printEnd();
       }
 
       refreshRfidInfo();
@@ -132,7 +132,7 @@
     $printerClient.on("printprogress", listener);
 
     printState = "printing";
-    currentPrintTask = $printerClient.abstraction.newPrintTask(printTaskName, opts);
+    currentPrintTask = $printerClient.protocol.newPrintTask(printTaskName, opts);
 
     try {
       await currentPrintTask.printInit();

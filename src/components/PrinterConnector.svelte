@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { NiimbotCapacitorBleClient, SoundSettingsItemType, Utils, type AvailableTransports } from "@mmote/niimbluelib";
+  import {
+    NiimbotCapacitorBleClient,
+    SoundSettingsItemType,
+    Utils,
+    type AvailableTransports,
+  } from "@mmote/niimbluelib";
   import {
     printerClient,
     connectedPrinterName,
@@ -55,13 +60,13 @@
   };
 
   const soundOn = async () => {
-    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.BluetoothConnectionSound, true);
-    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.PowerSound, true);
+    await $printerClient.protocol.setSoundEnabled(SoundSettingsItemType.BluetoothConnectionSound, true);
+    await $printerClient.protocol.setSoundEnabled(SoundSettingsItemType.PowerSound, true);
   };
 
   const soundOff = async () => {
-    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.BluetoothConnectionSound, false);
-    await $printerClient.abstraction.setSoundEnabled(SoundSettingsItemType.PowerSound, false);
+    await $printerClient.protocol.setSoundEnabled(SoundSettingsItemType.BluetoothConnectionSound, false);
+    await $printerClient.protocol.setSoundEnabled(SoundSettingsItemType.PowerSound, false);
   };
 
   const fetchInfo = async () => {
@@ -69,7 +74,7 @@
   };
 
   const reset = async () => {
-    await $printerClient.abstraction.printerReset();
+    await $printerClient.protocol.printerReset();
   };
 
   const switchConnectionType = (c: ConnectionType) => {
@@ -78,19 +83,10 @@
   };
 
   const batteryIcon = (value: number): MaterialIcon => {
-    if (value > 4) {
-      value = Math.min(4, Math.max(1, Math.ceil(value / 25)));
-    }
-
-    if (value === 4) {
-      return "battery_full";
-    } else if (value === 3) {
-      return "battery_5_bar";
-    } else if (value === 2) {
-      return "battery_3_bar";
-    } else if (value === 1) {
-      return "battery_2_bar";
-    }
+    if (value >= 90) return "battery_full";
+    if (value >= 65) return "battery_5_bar";
+    if (value >= 40) return "battery_3_bar";
+    if (value >= 15) return "battery_2_bar";
     return "battery_0_bar";
   };
 
@@ -239,11 +235,9 @@
     <span class="input-group-text {$heartbeatFails > 0 ? 'text-warning' : ''}">
       {$printerMeta?.model ?? $connectedPrinterName}
     </span>
-    {#if $heartbeatData?.chargeLevel}
-      <span class="input-group-text">
-        <MdIcon icon={batteryIcon($heartbeatData.chargeLevel)} class="r-90"></MdIcon>
-      </span>
-    {/if}
+    <span class="input-group-text">
+      <MdIcon icon={batteryIcon($heartbeatData?.batteryPercents ?? $printerInfo?.batteryPercents ?? 0)} class="r-90"></MdIcon>
+    </span>
   {:else}
     {#if featureSupport.webBluetooth}
       <button

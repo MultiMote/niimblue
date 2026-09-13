@@ -70,9 +70,9 @@ export const refreshRfidInfo = () => {
     return;
   }
 
-  client.abstraction.rfidInfo().then(rfidInfo.set).catch(console.error);
+  client.protocol.rfidInfo().then(rfidInfo.set).catch(console.error);
 
-  client.abstraction
+  client.protocol
     .rfidInfo2()
     .then(ribbonRfidInfo.set)
     .catch(() => {});

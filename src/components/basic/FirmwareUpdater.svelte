@@ -46,7 +46,7 @@
     try {
       $printerClient.on("firmwareprogress", listener);
       fwProgress = "...";
-      await $printerClient.abstraction.firmwareUpgrade(fwData, fwVersion);
+      await $printerClient.protocol.firmwareUpgrade(fwData, fwVersion);
       $printerClient.off("firmwareprogress", listener);
       await $printerClient.disconnect();
 
