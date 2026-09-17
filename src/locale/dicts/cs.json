@@ -177,5 +177,13 @@
     "fonts.browse": "Procházet...",
     "fonts.gfonts": "Získat písma",
     "fonts.title_override": "Přepsat název",
-    "fonts.title": "Vlastní písma"
+    "fonts.title": "Vlastní písma",
+    "editor.import.pdf": "Import PDF",
+    "editor.grid": "Mřížka",
+    "params.aruco.dict": "Slovník",
+    "params.text.font_family.search": "Hledat",
+    "preview.postprocess.floyd_steinberg": "Prokládání (Floyd-Steinberg)",
+    "preview.postprocess.jjn": "Prokládání (Jarvis–Judice–Ninke)",
+    "preview.postprocess.stucki": "Prokládání (Stucki)",
+    "preview.strength": "Síla"
 }
