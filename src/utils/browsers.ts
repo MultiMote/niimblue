@@ -1,3 +1,12 @@
+/** Safari on iPhone and iPad can gain Web Bluetooth through the beacio extension. */
+export const isIOSSafari = () => {
+  const userAgent = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(userAgent) ||
+    (/Macintosh/.test(userAgent) && navigator.maxTouchPoints > 1);
+
+  return isIOS && /Safari/.test(userAgent) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(userAgent);
+};
+
 /** Check if browser makes some modifications to canvas when reading */
 export const detectAntiFingerprinting = () => {
   const size = 32;

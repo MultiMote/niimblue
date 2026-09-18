@@ -27,11 +27,18 @@
   import { LocalStoragePersistence } from "$/utils/persistence";
   import type { MaterialIcon } from "material-icons";
   import FirmwareUpdater from "$/components/basic/FirmwareUpdater.svelte";
+  import { isIOSSafari } from "$/utils/browsers";
 
   let connectionType = $state<ConnectionType>("bluetooth");
   let featureSupport = $state<AvailableTransports>({ webBluetooth: false, webSerial: false, capacitorBle: false });
 
   const onConnectClicked = async () => {
+    featureSupport = Utils.getAvailableTransports();
+    if (isIOSSafari() && connectionType === "bluetooth" && !featureSupport.webBluetooth) {
+      Toasts.error($tr("browser_warning.ios_safari_setup"));
+      return;
+    }
+
     initClient(connectionType);
     connectionState.set("connecting");
 
@@ -239,7 +246,7 @@
       <MdIcon icon={batteryIcon($heartbeatData?.batteryPercents ?? $printerInfo?.batteryPercents ?? 0)} class="r-90"></MdIcon>
     </span>
   {:else}
-    {#if featureSupport.webBluetooth}
+    {#if featureSupport.webBluetooth || isIOSSafari()}
       <button
         disabled={$connectionState === "connecting"}
         class="btn text-nowrap {connectionType === 'bluetooth' ? 'btn-light' : 'btn-outline-secondary'}"
@@ -272,7 +279,7 @@
     <button
       class="btn btn-primary"
       disabled={$connectionState === "connecting" ||
-        (!featureSupport.capacitorBle && !featureSupport.webBluetooth && !featureSupport.webSerial)}
+        (!featureSupport.capacitorBle && !featureSupport.webBluetooth && !featureSupport.webSerial && !isIOSSafari())}
       onclick={onConnectClicked}>
       <MdIcon icon="power" />
     </button>
