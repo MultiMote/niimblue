@@ -13,9 +13,7 @@ import {
   type ConnectionType,
 } from "$/types";
 import {
-  NiimbotBluetoothClient,
-  NiimbotCapacitorBleClient,
-  NiimbotSerialClient,
+  CombinedRfidInfo,
   RequestCommandId,
   ResponseCommandId,
   Utils,
@@ -24,14 +22,12 @@ import {
   type NiimbotAbstractClient,
   type PrinterInfo,
   type PrinterModelMeta,
-  type RfidInfo,
 } from "@mmote/niimbluelib";
-import { Toasts } from "$/utils/toasts";
-import { tr } from "$/utils/i18n";
 import { LocalStoragePersistence, writablePersisted } from "$/utils/persistence";
 import { APP_CONFIG_DEFAULTS, CSV_DEFAULT, OBJECT_DEFAULTS_TEXT } from "$/defaults";
 import z from "zod";
 import { FileUtils } from "$/utils/file_utils";
+import { createPrinterInfo } from "@mmote/niimbluelib/dist/cjs/client/abstract_client";
 
 export const fontCache = writable<string[]>([OBJECT_DEFAULTS_TEXT.fontFamily]);
 export const appConfig = writablePersisted<AppConfig>("config", AppConfigSchema, APP_CONFIG_DEFAULTS);
@@ -44,8 +40,7 @@ export const connectedPrinterName = writable<string>("");
 export const printerClient = writable<NiimbotAbstractClient>();
 export const heartbeatData = writable<HeartbeatData>();
 export const printerInfo = writable<PrinterInfo>();
-export const rfidInfo = writable<RfidInfo | undefined>();
-export const ribbonRfidInfo = writable<RfidInfo | undefined>();
+export const rfidInfo = writable<CombinedRfidInfo>({});
 export const printerMeta = writable<PrinterModelMeta | undefined>();
 export const heartbeatFails = writable<number>(0);
 export const csvData = writablePersisted<CsvParams>("csv_params", CsvParamsSchema, { data: CSV_DEFAULT });
@@ -63,31 +58,11 @@ export const automation = readable<AutomationProps | undefined>(
   })(),
 );
 
-export const refreshRfidInfo = () => {
-  const client = get(printerClient);
-
-  if (!client) {
-    return;
-  }
-
-  client.protocol.rfidInfo().then(rfidInfo.set).catch(console.error);
-
-  client.protocol
-    .rfidInfo2()
-    .then(ribbonRfidInfo.set)
-    .catch(() => {});
-};
-
 export const initClient = (connectionType: ConnectionType) => {
   printerClient.update((prevClient: NiimbotAbstractClient) => {
     let newClient: NiimbotAbstractClient = prevClient;
 
-    if (
-      prevClient === undefined ||
-      (connectionType !== "bluetooth" && prevClient instanceof NiimbotBluetoothClient) ||
-      (connectionType !== "serial" && prevClient instanceof NiimbotSerialClient) ||
-      (connectionType !== "capacitor-ble" && prevClient instanceof NiimbotCapacitorBleClient)
-    ) {
+    if (connectionType !== prevClient?.getType()) {
       if (prevClient !== undefined) {
         prevClient.disconnect();
       }
@@ -109,48 +84,35 @@ export const initClient = (connectionType: ConnectionType) => {
       });
 
       newClient.on("connect", (e) => {
-        console.log("onConnect");
         heartbeatFails.set(0);
         connectionState.set("connected");
         connectedPrinterName.set(e.info.deviceName ?? "unknown");
       });
 
       newClient.on("printerinfofetched", (e) => {
-        console.log("printerInfoFetched");
         printerInfo.set(e.info);
         printerMeta.set(newClient.getModelMetadata());
       });
 
       newClient.on("disconnect", () => {
-        console.log("onDisconnect");
         connectionState.set("disconnected");
         connectedPrinterName.set("");
-        printerInfo.set({});
+        printerInfo.set(createPrinterInfo());
         printerMeta.set(undefined);
       });
 
       newClient.on("heartbeat", (e) => {
         heartbeatFails.set(0);
-        heartbeatData.update((prev) => {
-          if (
-            prev?.paperRfidSuccess !== e.data?.paperRfidSuccess ||
-            prev?.ribbonRfidSuccess !== e.data?.ribbonRfidSuccess
-          ) {
-            refreshRfidInfo();
-          }
-          return e.data;
-        });
+        heartbeatData.set(e.data);
+      });
+
+      newClient.on("rfidinfofetched", (e) => {
+        rfidInfo.set(e.info);
       });
 
       newClient.on("heartbeatfailed", (e) => {
-        const maxFails = 5;
         heartbeatFails.set(e.failedAttempts);
-
-        console.warn(`Heartbeat failed ${e.failedAttempts}/${maxFails}`);
-        if (e.failedAttempts >= maxFails) {
-          Toasts.error(get(tr)("connector.disconnect.heartbeat"));
-          newClient.disconnect();
-        }
+        console.warn(`Heartbeat failed ${e.failedAttempts}/${newClient.getHeartbeatMaxFails()}`);
       });
     }
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { derived } from "svelte/store";
-  import { connectionState, printerClient, printerMeta, refreshRfidInfo } from "$/stores";
+  import { connectionState, printerClient, printerMeta } from "$/stores";
   import * as effects from "$/utils/post_process";
   import {
     type EncodedImage,
@@ -12,7 +12,10 @@
     type PrintTaskName,
     AbstractPrintTask,
     PrintOptions,
-    PageColorType
+    PageColorType,
+    PrintPacketProgressEvent,
+    printTasksCapabilities,
+    PrintTaskCapability as TaskCap,
   } from "@mmote/niimbluelib";
   import type { LabelProps, PostProcessType, FabricJson, PreviewProps, PreviewPropsOffset } from "$/types";
   import ParamLockButton from "$/components/basic/ParamLockButton.svelte";
@@ -38,8 +41,11 @@
   let { labelProps, canvasCallback, printNow = false, csvData, csvEnabled, show = $bindable() }: Props = $props();
 
   let previewCanvas: HTMLCanvasElement;
-  let printState = $state<"idle" | "sending" | "printing">("idle");
-  let printProgress = $state<number>(0); // todo: more progress data
+  let printState = $state<"idle" | "printing">("idle");
+  let printProgress = $state<{ progressType: "send" | "print"; percents: number }>({
+    progressType: "send",
+    percents: 0,
+  });
   let density = $state<number>($printerMeta?.densityDefault ?? 3);
   let speed = $state<0 | 1>(1);
   let quantity = $state<number>(1);
@@ -83,13 +89,11 @@
         await $printerClient.protocol.printEnd();
       }
 
-      refreshRfidInfo();
-
       $printerClient.startHeartbeat();
     }
 
     printState = "idle";
-    printProgress = 0;
+    printProgress = { progressType: "send", percents: 0 };
   };
 
   const onPrintOnSystemPrinter = async () => {
@@ -105,7 +109,7 @@
   };
 
   const onPrint = async () => {
-    printState = "sending";
+    printState = "printing";
     error = "";
 
     $printerClient.stopHeartbeat();
@@ -117,21 +121,26 @@
       labelType,
       statusPollIntervalMs: 100,
       statusTimeoutMs: 8_000,
-      pageColor: PageColorType.SingleColor
+      pageColor: PageColorType.SingleColor,
     };
 
-    if (["D110M_V4", "B1"].includes(printTaskName) && postProcessType === "threshold_rb") {
+    if (taskHasCap(TaskCap.SupportDoubleColor) && postProcessType === "threshold_rb") {
       opts.pageColor = PageColorType.DoubleColor;
     }
 
-    const listener = (e: PrintProgressEvent) => {
+    const printListener = (e: PrintProgressEvent) => {
       const currentPageProgress = (e.pagePrintProgress + e.pageFeedProgress) / 2;
-      printProgress = Math.min(100, Math.floor(((e.page + currentPageProgress / 100) / opts.totalPages!) * 100));
+      const percents = Math.min(100, Math.floor(((e.page + currentPageProgress / 100) / opts.totalPages!) * 100));
+      printProgress = { progressType: "print", percents };
     };
 
-    $printerClient.on("printprogress", listener);
+    const sendListener = (e: PrintPacketProgressEvent) => {
+      printProgress = { progressType: "send", percents: e.progress };
+    };
 
-    printState = "printing";
+    $printerClient.on("printprogress", printListener);
+    $printerClient.on("printpacketprogress", sendListener);
+
     currentPrintTask = $printerClient.protocol.newPrintTask(printTaskName, opts);
 
     try {
@@ -141,7 +150,11 @@
         currentPage = pageIdx;
         console.log("Printing page", currentPage);
         await generatePreviewData(currentPage);
-        const encoded: EncodedImage = ImageEncoder.encodeCanvas(previewCanvas, opts.pageColor!, labelProps.printDirection);
+        const encoded: EncodedImage = ImageEncoder.encodeCanvas(
+          previewCanvas,
+          opts.pageColor!,
+          labelProps.printDirection,
+        );
 
         await currentPrintTask.printPage(encoded, quantity);
         await currentPrintTask.waitForPageFinished();
@@ -160,7 +173,8 @@
     }
 
     printState = "idle";
-    $printerClient.off("printprogress", listener);
+    $printerClient.off("printprogress", printListener);
+    $printerClient.off("printpacketprogress", sendListener);
     $printerClient.startHeartbeat();
 
     if (printNow && !error) {
@@ -174,10 +188,10 @@
     const ditherOpts = {
       threshold: thresholdValue,
       strength: strengthValue,
-      serpentine: serpentineValue
+      serpentine: serpentineValue,
     };
 
-    const processors: Record<PostProcessType, (data: ImageData) => ImageData>  = {
+    const processors: Record<PostProcessType, (data: ImageData) => ImageData> = {
       threshold: (data) => effects.threshold(data, thresholdValue),
       threshold_rb: (data) => effects.thresholdRedBlack(data, thresholdValue, thresholdValueRed),
       dither: (data) => effects.atkinson(data, ditherOpts),
@@ -341,6 +355,10 @@
     endPrint();
   };
 
+  const taskHasCap = (cap: TaskCap) => {
+    return printTasksCapabilities[printTaskName].includes(cap);
+  };
+
   onMount(async () => {
     if (csvEnabled) {
       const parseResult = csvParse(csvData);
@@ -409,14 +427,15 @@
   <div class="text-center">
     {#if pagesTotal > 1}<div>Page {currentPage + 1} / {pagesTotal}</div>{/if}
 
-    {#if printState === "sending"}
-      <div>Sending...</div>
-    {/if}
     {#if printState === "printing"}
       <div>
-        Printing...
+        {#if printProgress.progressType === "send"}
+          <div>{$tr("preview.print.state.sending")}</div>
+        {:else if printProgress.progressType === "print"}
+          <div>{$tr("preview.print.state.printing")}</div>
+        {/if}
         <div class="progress" role="progressbar">
-          <div class="progress-bar" style="width: {printProgress}%">{printProgress}%</div>
+          <div class="progress-bar" style="width: {printProgress.percents}%">{printProgress.percents}%</div>
         </div>
       </div>
     {/if}
@@ -435,7 +454,8 @@
         bind:value={postProcessType}
         onchange={() => updateSavedProp("postProcess", postProcessType, true)}>
         <option value="threshold">{$tr("preview.postprocess.threshold")}</option>
-        <option value="threshold_rb" disabled={!["D110M_V4", "B1"].includes(printTaskName)}>{$tr("preview.postprocess.threshold.red")}</option>
+        <option value="threshold_rb" disabled={!taskHasCap(TaskCap.SupportDoubleColor)}
+          >{$tr("preview.postprocess.threshold.red")}</option>
         <option value="dither">{$tr("preview.postprocess.atkinson")}</option>
         <option value="bayer2">{$tr("preview.postprocess.bayer")} 2x2</option>
         <option value="bayer4">{$tr("preview.postprocess.bayer")} 4x4</option>
@@ -522,7 +542,6 @@
           }}>
           <MdIcon icon="swap_vert" />
         </button>
-
       </div>
     {/if}
 
@@ -614,11 +633,10 @@
         bind:value={printTaskName}
         onchange={() => {
           updateSavedProp("printTaskName", printTaskName);
-          if (!["D110M_V4", "B1"].includes(printTaskName) && postProcessType === "threshold_rb") {
+          if (!taskHasCap(TaskCap.SupportDoubleColor) && postProcessType === "threshold_rb") {
             postProcessType = "threshold";
             updatePreview();
           }
-
         }}>
         {#each printTaskNames as name (name)}
           <option value={name}>

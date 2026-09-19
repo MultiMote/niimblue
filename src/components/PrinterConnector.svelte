@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+    LabelType,
     NiimbotCapacitorBleClient,
     SoundSettingsItemType,
     Utils,
@@ -16,20 +17,28 @@
     heartbeatFails,
     automation,
     rfidInfo,
-    ribbonRfidInfo,
-    refreshRfidInfo,
   } from "$/stores";
   import type { ConnectionType } from "$/types";
-  import { tr } from "$/utils/i18n";
+  import { tr, type TranslationKey } from "$/utils/i18n";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import { Toasts } from "$/utils/toasts";
   import { onMount } from "svelte";
   import { LocalStoragePersistence } from "$/utils/persistence";
   import type { MaterialIcon } from "material-icons";
   import FirmwareUpdater from "$/components/basic/FirmwareUpdater.svelte";
+  import PrinterVerboseInfo from "$/components/PrinterVerboseInfo.svelte";
 
   let connectionType = $state<ConnectionType>("bluetooth");
   let featureSupport = $state<AvailableTransports>({ webBluetooth: false, webSerial: false, capacitorBle: false });
+  let verboseInfoShow = $state<boolean>(false);
+
+  const percentage = (cur?: number, total?: number) => {
+    if (cur === undefined || total === undefined) {
+      return 0;
+    }
+    const usage = Math.floor((cur / total) * 100);
+    return Math.min(Math.max(usage, 0), 100);
+  };
 
   const onConnectClicked = async () => {
     initClient(connectionType);
@@ -57,20 +66,6 @@
 
   const stopHeartbeat = async () => {
     $printerClient.stopHeartbeat();
-  };
-
-  const soundOn = async () => {
-    await $printerClient.protocol.setSoundEnabled(SoundSettingsItemType.BluetoothConnectionSound, true);
-    await $printerClient.protocol.setSoundEnabled(SoundSettingsItemType.PowerSound, true);
-  };
-
-  const soundOff = async () => {
-    await $printerClient.protocol.setSoundEnabled(SoundSettingsItemType.BluetoothConnectionSound, false);
-    await $printerClient.protocol.setSoundEnabled(SoundSettingsItemType.PowerSound, false);
-  };
-
-  const fetchInfo = async () => {
-    await $printerClient.fetchPrinterInfo();
   };
 
   const reset = async () => {
@@ -116,115 +111,146 @@
     <button class="btn btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
       <MdIcon icon="settings" />
     </button>
-    <div class="dropdown-menu p-1">
+
+    <div class="dropdown-menu p-3">
       {#if $printerInfo}
-        <div>
-          Printer info:
-          <ul>
-            {#each Object.entries($printerInfo) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
+        <div class="text-secondary">{$tr("connector.device_version")}</div>
+
+        <div class="d-flex border rounded">
+          <div class="px-1 bg-light-subtle border-end">HW</div>
+          <div class="px-1 flex-grow-1 border-end text-center">{$printerInfo.hardwareVersion}</div>
+          <div class="px-1 flex-grow-1 border-end text-center">{$printerInfo.softwareVersion}</div>
+          <div class="px-1 bg-body-secondary">FW</div>
         </div>
       {/if}
 
-      {#if $printerMeta}
-        <button
-          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#modelMeta">
-          Model metadata <MdIcon icon="expand_more" />
-        </button>
+      <div class="text-secondary mt-2">
+        {$tr("connector.rfid.paper")}
+        <button class="btn btn-sm p-0" onclick={() => $printerClient.fetchRfidInfo()}><MdIcon icon="loop" /></button>
+      </div>
 
-        <div class="collapse" id="modelMeta">
-          <ul>
-            {#each Object.entries($printerMeta) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
+      {#if $rfidInfo.labelRfidInfo?.tagPresent}
+        <div class="d-flex border rounded mt-1">
+          <div class="px-1 bg-light-subtle border-end">{$tr("connector.rfid.usage")}</div>
+          <div class="px-1 flex-grow-1 d-flex align-items-center gap-1">
+            <div class="progress flex-grow-1" role="progressbar" style:height="0.6rem">
+              <div
+                class="progress-bar"
+                style:width={`${percentage($rfidInfo.labelRfidInfo.usedPaper, $rfidInfo.labelRfidInfo.allPaper)}%`}>
+              </div>
+            </div>
+            <div class="fs-08">
+              {$rfidInfo.labelRfidInfo?.usedPaper} / {$rfidInfo.labelRfidInfo?.allPaper}
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex border rounded mt-1">
+          <div class="px-1 bg-light-subtle border-end">{$tr("connector.rfid.type")}</div>
+          <div class="px-1 flex-grow-1 text-center">
+            {$tr(`preview.label_type.${LabelType[$rfidInfo.labelRfidInfo?.consumablesType]}` as TranslationKey)} ({$rfidInfo
+              .labelRfidInfo?.consumablesType})
+          </div>
+        </div>
+
+        {#if $rfidInfo.paperInfo?.paperWidth !== undefined && $rfidInfo.paperInfo?.paperHeight !== undefined}
+          <div class="d-flex border rounded mt-1">
+            <div class="px-1 bg-light-subtle border-end">{$tr("connector.rfid.dimensions")}</div>
+            <div class="px-1 flex-grow-1 text-center">
+              {$rfidInfo.paperInfo.paperWidth}x{$rfidInfo.paperInfo.paperHeight}mm
+            </div>
+          </div>
+        {/if}
+      {:else}
+        {$tr("connector.rfid.no_tag")}
+      {/if}
+
+      {#if $rfidInfo.ribbonRfidInfo?.tagPresent}
+        <div class="text-secondary mt-2">
+          {$tr("connector.rfid.ribbon")}
+          <button class="btn btn-sm p-0" onclick={() => $printerClient.fetchRfidInfo()}><MdIcon icon="loop" /></button>
+        </div>
+
+        <div class="d-flex border rounded mt-1">
+          <div class="px-1 bg-light-subtle border-end">{$tr("connector.rfid.usage")}</div>
+          <div class="px-1 flex-grow-1 d-flex align-items-center gap-1">
+            <div class="progress flex-grow-1" role="progressbar" style:height="0.6rem">
+              <div
+                class="progress-bar"
+                style:width={`${percentage($rfidInfo.ribbonRfidInfo.usedPaper, $rfidInfo.ribbonRfidInfo.allPaper)}%`}>
+              </div>
+            </div>
+            <div class="fs-08">
+              {$rfidInfo.ribbonRfidInfo?.usedPaper} / {$rfidInfo.ribbonRfidInfo?.allPaper}
+            </div>
+          </div>
         </div>
       {/if}
 
-      {#if $rfidInfo}
-        <button
-          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#rfidInfo">
-          RFID info <MdIcon icon="expand_more" />
-        </button>
+      <div class="text-secondary mt-2">{$tr("connector.settings")}</div>
 
-        <div class="collapse" id="rfidInfo">
-          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
+      <div class="form-check form-switch">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          role="switch"
+          id="power-sound-switch"
+          checked={$printerInfo.settings.powerSound}
+          onchange={() =>
+            $printerClient.setSoundEnabled(SoundSettingsItemType.PowerSound, !$printerInfo.settings.powerSound)} />
+        <label class="form-check-label" for="power-sound-switch">{$tr("connector.settings.power_sound")}</label>
+      </div>
 
-          <ul>
-            {#each Object.entries($rfidInfo) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
+      <div class="form-check form-switch">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          role="switch"
+          id="connection-sound-switch"
+          checked={$printerInfo.settings.connectionSound}
+          onchange={() =>
+            $printerClient.setSoundEnabled(
+              SoundSettingsItemType.BluetoothConnectionSound,
+              !$printerInfo.settings.connectionSound,
+            )} />
+        <label class="form-check-label" for="connection-sound-switch"
+          >{$tr("connector.settings.connection_sound")}</label>
+      </div>
 
-      {#if $ribbonRfidInfo}
-        <button
-          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#ribbonRfidInfo">
-          Ribbon RFID info <MdIcon icon="expand_more" />
-        </button>
 
-        <div class="collapse" id="ribbonRfidInfo">
-          <button class="btn btn-outline-secondary btn-sm mt-1" onclick={refreshRfidInfo}>Update</button>
+      <button class="btn btn-sm btn-outline-secondary w-100 mt-3" onclick={() => (verboseInfoShow = true)}
+        >{$tr("connector.open_verbose")}</button>
 
-          <ul>
-            {#each Object.entries($ribbonRfidInfo) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
+      <button
+        class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#firmware_flashing">
+        {$tr("connector.firmware_flashing")}
+        <MdIcon icon="expand_more" />
+      </button>
 
-      {#if $heartbeatData}
-        <button
-          class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#heartbeatData">
-          Heartbeat data <MdIcon icon="expand_more" />
-        </button>
-
-        <div class="collapse" id="heartbeatData">
-          <ul>
-            {#each Object.entries($heartbeatData) as [key, value] (key)}
-              <li>{key}: <strong>{value ?? "-"}</strong></li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-
-      <FirmwareUpdater />
+      <div class="collapse" id="firmware_flashing">
+        <FirmwareUpdater />
+      </div>
 
       <button
         class="btn btn-sm btn-outline-secondary d-block w-100 mt-1"
         type="button"
         data-bs-toggle="collapse"
         data-bs-target="#tests">
-        Tests <MdIcon icon="expand_more" />
+        {$tr("debug.title")} <MdIcon icon="expand_more" />
       </button>
 
       <div class="collapse" id="tests">
         <div class="d-flex flex-wrap gap-1 mt-1">
           <button class="btn btn-sm btn-primary" onclick={startHeartbeat}>Heartbeat on</button>
           <button class="btn btn-sm btn-primary" onclick={stopHeartbeat}>Heartbeat off</button>
-          <button class="btn btn-sm btn-primary" onclick={soundOn}>Sound on</button>
-          <button class="btn btn-sm btn-primary" onclick={soundOff}>Sound off</button>
-          <button class="btn btn-sm btn-primary" onclick={fetchInfo}>Fetch info again</button>
           <button class="btn btn-sm btn-primary" onclick={reset}>Reset</button>
         </div>
       </div>
     </div>
+
     <span class="input-group-text">
       {#if connectionType === "serial"}
         <MdIcon icon="usb" />
@@ -236,7 +262,8 @@
       {$printerMeta?.model ?? $connectedPrinterName}
     </span>
     <span class="input-group-text">
-      <MdIcon icon={batteryIcon($heartbeatData?.batteryPercents ?? $printerInfo?.batteryPercents ?? 0)} class="r-90"></MdIcon>
+      <MdIcon icon={batteryIcon($heartbeatData?.batteryPercents ?? $printerInfo?.batteryPercents ?? 0)} class="r-90"
+      ></MdIcon>
     </span>
   {:else}
     {#if featureSupport.webBluetooth}
@@ -282,6 +309,10 @@
     <button class="btn btn-danger" onclick={onDisconnectClicked}>
       <MdIcon icon="power_off" />
     </button>
+  {/if}
+
+  {#if verboseInfoShow}
+    <PrinterVerboseInfo bind:show={verboseInfoShow} />
   {/if}
 </div>
 
