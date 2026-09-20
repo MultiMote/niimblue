@@ -182,5 +182,6 @@
     "fonts.gfonts": "Найти шрифты",
     "fonts.title_override": "Своё название",
     "editor.objectpicker.aruco": "ArUco",
-    "preview.postprocess.floyd_steinberg": "Дизеринг (Флойда-Стейнберга)"
+    "preview.postprocess.floyd_steinberg": "Дизеринг (Флойда-Стейнберга)",
+    "params.generic.keepAspectRatio": "Сохранять пропорции"
 }
