@@ -201,5 +201,8 @@
     "connector.settings.connection_sound": "Suono connessione",
     "connector.firmware_flashing": "Aggiorna firmware",
     "connector.firmware_flashing.to": "A",
-    "connector.firmware_flashing.ver": "ver."
+    "connector.firmware_flashing.ver": "ver.",
+    "connector.firmware_flashing.burn": "Scrivi",
+    "connector.firmware_flashing.uploading": "Caricamento",
+    "connector.firmware_flashing.browse": "Sfoglia..."
 }
