@@ -205,5 +205,12 @@
     "fonts.browse": "Обзор...",
     "fonts.gfonts": "Найти шрифты",
     "fonts.title_override": "Своё название",
-    "editor.objectpicker.aruco": "ArUco"
+    "editor.objectpicker.aruco": "ArUco",
+    "preview.postprocess.floyd_steinberg": "Дизеринг (Флойда-Стейнберга)",
+    "params.generic.keepAspectRatio": "Сохранять пропорции",
+    "editor.grid": "Сетка",
+    "preview.postprocess.jjn": "Дизеринг (Джарвис–Джудис–Нинке)",
+    "preview.postprocess.stucki": "Дизеринг (Штуки)",
+    "preview.strength": "Сила",
+    "preview.serpentine": "Серпентинный"
 }

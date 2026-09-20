@@ -186,5 +186,7 @@
     "fonts.browse": "浏览…",
     "fonts.gfonts": "获取更多字体",
     "fonts.title_override": "显示名称",
-    "params.text.autosize": "调整文本大小以适应组件宽度"
+    "params.text.autosize": "调整文本大小以适应组件宽度",
+    "params.generic.keepAspectRatio": "保持宽高比",
+    "editor.grid": "网格"
 }
