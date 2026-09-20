@@ -212,5 +212,6 @@
     "preview.postprocess.jjn": "Дизеринг (Джарвис–Джудис–Нинке)",
     "preview.postprocess.stucki": "Дизеринг (Штуки)",
     "preview.strength": "Сила",
-    "preview.serpentine": "Серпентинный"
+    "preview.serpentine": "Серпентинный",
+    "connector.firmware_flashing.done": "Прошивка завершена, принтер сейчас отключится. Он не будет подавать признаков жизни несколько секунд."
 }
