@@ -3,6 +3,7 @@
     "browser_warning.fingerprinting": "¡Vaya! Parece que tu navegador está distorsionando el lienzo para protegerte del fingerprinting. Por favor, desactiva esta protección, ya que puede provocar artefactos en las etiquetas.",
     "browser_warning.lines.first": "Oh no, tu navegador no admite comunicaciones Bluetooth ni serie",
     "browser_warning.lines.second": "En cualquier caso, aún puedes dibujar etiquetas.",
+    "browser_warning.ios_safari": "Para imprimir por Bluetooth en Safari en iPhone o iPad necesitas la extensión beacio.",
     "connector.bluetooth": "Bluetooth",
     "connector.disconnect.heartbeat": "Desconectado (la impresora no responde)",
     "connector.serial": "Serie (USB)",

@@ -3,6 +3,7 @@
     "browser_warning.fingerprinting": "Whoa! It looks like your browser is distorting the canvas to protect against fingerprinting. Please disable this protection, as it can cause artifacts on labels.",
     "browser_warning.lines.first": "Oh no, your browser does not support bluetooth and serial communications",
     "browser_warning.lines.second": "Anyway, you still can draw labels.",
+    "browser_warning.ios_safari": "Bluetooth printing in Safari on iPhone or iPad can be achieved using an extension, such as beacio.",
     "connector.bluetooth": "Bluetooth",
     "connector.disconnect.heartbeat": "Disconnected (printer does not respond)",
     "connector.serial": "Serial (USB)",

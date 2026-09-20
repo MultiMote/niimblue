@@ -2,26 +2,34 @@
   import { Utils } from "@mmote/niimbluelib";
   import { tr } from "$/utils/i18n";
   import MdIcon from "$/components/basic/MdIcon.svelte";
-  import { detectAntiFingerprinting } from "$/utils/browsers";
+  import { detectAntiFingerprinting, isIOSSafari } from "$/utils/browsers";
   let caps = Utils.getAvailableTransports();
+  let browserWarningDismissed = $state(false);
+  let fingerprintingWarningDismissed = $state(false);
 
   let antiFingerprinting = detectAntiFingerprinting();
 </script>
 
-{#if !caps.webSerial && !caps.webBluetooth && !caps.capacitorBle}
-  <div class="alert alert-danger" role="alert">
-    <div>
-      {$tr("browser_warning.lines.first")}
-      <MdIcon icon="sentiment_very_dissatisfied" />
-    </div>
-    <div>
-      {$tr("browser_warning.lines.second")}
-    </div>
+{#if !browserWarningDismissed && !caps.webSerial && !caps.webBluetooth && !caps.capacitorBle}
+  <div class="alert alert-danger alert-dismissible" role="alert">
+    <button type="button" class="btn-close" aria-label="Dismiss warning" onclick={() => browserWarningDismissed = true}></button>
+    {#if isIOSSafari()}
+      <div>{$tr("browser_warning.ios_safari")}</div>
+    {:else}
+      <div>
+        {$tr("browser_warning.lines.first")}
+        <MdIcon icon="sentiment_very_dissatisfied" />
+      </div>
+      <div>
+        {$tr("browser_warning.lines.second")}
+      </div>
+    {/if}
   </div>
 {/if}
 
-{#if antiFingerprinting}
-  <div class="alert alert-danger" role="alert">
+{#if !fingerprintingWarningDismissed && antiFingerprinting}
+  <div class="alert alert-danger alert-dismissible" role="alert">
+    <button type="button" class="btn-close" aria-label="Dismiss warning" onclick={() => fingerprintingWarningDismissed = true}></button>
     {$tr("browser_warning.fingerprinting")}
   </div>
 {/if}
