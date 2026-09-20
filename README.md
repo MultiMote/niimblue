@@ -62,6 +62,9 @@ Modern Chrome-based browsers should usually work.
 
 In some systems you need to enable Chrome `Web Bluetooth` or `Experimental Web Platform Features` (navigate to `chrome://flags`).
 
+Safari: while, this browser has no native `Web Bluetooth`, there is [beacio extension](https://beacio.com/) that enables Web Bluetooth under Safari.
+Setup details available [here](https://beacio.com/setup).
+
 ## Images
 
 Images may be outdated.
