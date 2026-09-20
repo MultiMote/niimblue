@@ -181,5 +181,6 @@
     "fonts.browse": "Обзор...",
     "fonts.gfonts": "Найти шрифты",
     "fonts.title_override": "Своё название",
-    "editor.objectpicker.aruco": "ArUco"
+    "editor.objectpicker.aruco": "ArUco",
+    "preview.postprocess.floyd_steinberg": "Дизеринг (Флойда-Стейнберга)"
 }
