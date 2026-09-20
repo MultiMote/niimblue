@@ -105,7 +105,7 @@
     "preview.label_type.Perforated": "Perforato",
     "preview.label_type.PvcTag": "Etichetta in PVC",
     "preview.label_type.Transparent": "Trasparente",
-    "preview.label_type.WithGaps": "With Gaps",
+    "preview.label_type.WithGaps": "Con spazio",
     "preview.label_type": "Tipo di etichetta",
     "preview.not_connected": "La stampante non è connessa",
     "preview.not_implemented": "NON IMPLEMENTATO",
@@ -188,5 +188,18 @@
     "preview.postprocess.jjn": "Dither (Jarvis–Judice–Ninke)",
     "preview.postprocess.stucki": "Dither (Stucki)",
     "preview.strength": "Potenza",
-    "preview.serpentine": "Serpentina"
+    "preview.serpentine": "Serpentina",
+    "connector.device_version": "Versione dispositivo",
+    "connector.rfid.usage": "Utilizzo",
+    "connector.rfid.type": "Tipo",
+    "connector.rfid.dimensions": "Dimensioni",
+    "connector.rfid.paper": "Informazioni RFID carta",
+    "connector.rfid.ribbon": "Informazioni RFID nastro",
+    "connector.rfid.no_tag": "Nessun tag presente",
+    "connector.settings": "Impostazioni",
+    "connector.settings.power_sound": "Suono accendi/spegni",
+    "connector.settings.connection_sound": "Suono connessione",
+    "connector.firmware_flashing": "Aggiorna firmware",
+    "connector.firmware_flashing.to": "A",
+    "connector.firmware_flashing.ver": "ver."
 }
