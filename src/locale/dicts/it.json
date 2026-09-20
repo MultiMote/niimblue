@@ -204,5 +204,14 @@
     "connector.firmware_flashing.ver": "ver.",
     "connector.firmware_flashing.burn": "Scrivi",
     "connector.firmware_flashing.uploading": "Caricamento",
-    "connector.firmware_flashing.browse": "Sfoglia..."
+    "connector.firmware_flashing.browse": "Sfoglia...",
+    "connector.firmware_flashing.warning": "Scrivere il firmware sbagliato può far morire la tua stampante. Vuoi continuare?",
+    "connector.firmware_flashing.done": "Flashing completato, la stampante si spegnerà. Non risponderà per un pò.",
+    "connector.open_verbose": "Informazioni dettagliate",
+    "params.vector.stroke_color": "Colore tratto",
+    "params.color.red": "rosso",
+    "preview.postprocess.threshold.red": "Threshold (rosso/nero)",
+    "preview.print.state.sending": "Invio...",
+    "preview.print.state.printing": "Stampa...",
+    "preview.threshold.red": "Threshold rosso"
 }
