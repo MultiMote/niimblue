@@ -17,6 +17,7 @@ import lang_tr from "$/locale/dicts/tr.json";
 import lang_hi from "$/locale/dicts/hi.json";
 import lang_mr from "$/locale/dicts/mr.json";
 import lang_bg from "$/locale/dicts/bg.json";
+import lang_sv from "$/locale/dicts/sv.json";
 
 export type TranslationKey = keyof typeof lang_en;
 export type TranslationDict = Record<TranslationKey, string>;
@@ -60,6 +61,8 @@ export const langPack = {
   mr: lang_mr as TranslationDict,
   /** Bulgarian */
   bg: lang_bg as TranslationDict,
+  /** Swedish */
+  sv: lang_sv as TranslationDict,
 } as const;
 
 export type SupportedLanguage = keyof typeof langPack;
