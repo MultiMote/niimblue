@@ -58,7 +58,7 @@
 </script>
 
 <button class="btn btn-sm" onclick={onImportClicked}>
-  <MdIcon icon="receipt_long" />
+  <MdIcon icon="picture_as_pdf" />
 
   {$tr("editor.import.pdf")}
 

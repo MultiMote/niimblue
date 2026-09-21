@@ -51,7 +51,7 @@
 </script>
 
 <button class="btn btn-sm" onclick={onImportClicked}>
-  <MdIcon icon="picture_as_pdf" />
+  <MdIcon icon="receipt_long" />
 
   {$tr("editor.import.zpl")}
 
