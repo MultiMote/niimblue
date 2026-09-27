@@ -64,7 +64,7 @@ jobs:
     name: Deploy to Main Server
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(gitea.ref, 'refs/tags/')
+    if: gitea.ref_name == 'dev' || startsWith(gitea.ref, 'refs/tags/')
     steps:
       - name: Download Build
         uses: https://github.com/christopherHX/gitea-download-artifact@v4
@@ -86,7 +86,7 @@ jobs:
         run: |
           rsync -avz --delete \
                 -e "ssh -p ${{ secrets.SSH_PORT || 22 }}" \
-                ./dist/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/${{ gitea.head_ref || gitea.ref_name }}/
+                ./dist/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/${{ gitea.ref_name == 'dev' && 'dev' || 'main' }}/
 
   deploy-server-2:
     name: Deploy to Second Server
