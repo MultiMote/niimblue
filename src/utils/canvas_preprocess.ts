@@ -1,32 +1,57 @@
 import * as fabric from "fabric";
-import QRCode from "$/fabric-object/qrcode";
+import dayjs, { ManipulateType } from "dayjs";
 import Barcode from "$/fabric-object/barcode";
-import dayjs from "dayjs";
+import QRCode from "$/fabric-object/qrcode";
 import { TextboxExt } from "$/fabric-object/textbox-ext";
 
-const VARIABLE_TEMPLATE_RX = /{\s*(\$?\w+)\s*(?:\|\s*(.*?)\s*)?}/g;
+const VARIABLE_TEMPLATE_RX = /{\s*(\$?\w+)(?:([+-])(\d+)([yMwdhms]))?\s*(?:\|\s*(.*?)\s*)?}/g;
 
-const preprocessDateTime = (format?: string) => {
-  const dt = dayjs();
-  if (format) {
-    return dt.format(format);
-  }
-  return dt.format("YYYY-MM-DD HH:mm:ss");
+type Variables = Record<string, string>;
+
+const DATE_DURATION_UNITS: Record<string, ManipulateType> = {
+  y: "year",
+  M: "month",
+  w: "week",
+  d: "day",
+  h: "hour",
+  m: "minute",
+  s: "second",
 };
 
-const preprocessString = (input: string, variables?: { [v: string]: string }): string => {
-  return input.replace(VARIABLE_TEMPLATE_RX, (src, key, filter) => {
-    if (variables !== undefined && key in variables) {
-      return variables[key];
-    } else if (key === "dt") {
-      return preprocessDateTime(filter);
+const preprocessDateTime = (format?: string, sign?: string, amount?: string, unit?: string): string => {
+  let date = dayjs();
+
+  if (sign && amount && unit) {
+    const durationUnit = DATE_DURATION_UNITS[unit];
+
+    if (durationUnit) {
+      const value = Number(amount) * (sign === "-" ? -1 : 1);
+      date = date.add(value, durationUnit);
     }
-    return src;
-  });
+  }
+
+  return date.format(format ?? "YYYY-MM-DD HH:mm:ss");
 };
 
-/** Replace text templates in some canvas objects */
-export const canvasPreprocess = (canvas: fabric.Canvas, variables?: { [key: string]: string }) => {
+const preprocessString = (input: string, variables?: Variables): string => {
+  return input.replace(
+    VARIABLE_TEMPLATE_RX,
+    (source, key: string, sign?: string, amount?: string, unit?: string, format?: string) => {
+      if (variables !== undefined && key in variables) {
+        return variables[key];
+      }
+
+      if (key === "dt") {
+        return preprocessDateTime(format, sign, amount, unit);
+      }
+
+      return source;
+    },
+  );
+};
+
+/** Replace text templates in some canvas objects. */
+export const canvasPreprocess = (canvas: fabric.Canvas, variables?: Variables): void => {
   canvas.forEachObject((obj: fabric.FabricObject) => {
     if (obj instanceof fabric.IText) {
       const text = preprocessString(obj.text ?? "", variables);
@@ -36,8 +61,14 @@ export const canvasPreprocess = (canvas: fabric.Canvas, variables?: { [key: stri
       } else {
         obj.set({ text });
       }
-    } else if (obj instanceof QRCode || obj instanceof Barcode) {
-      obj.set({ text: preprocessString(obj.text ?? "", variables) });
+
+      return;
+    }
+
+    if (obj instanceof QRCode || obj instanceof Barcode) {
+      obj.set({
+        text: preprocessString(obj.text ?? "", variables),
+      });
     }
   });
 };
