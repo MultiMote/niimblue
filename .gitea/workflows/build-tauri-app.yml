@@ -77,6 +77,9 @@ jobs:
         env:
           XWIN_CROSS_COMPILER: clang
 
+      - name: Copy release exe
+        run: cp "${{ env.TAURI_PROJECT_DIR }}/src-tauri/target/x86_64-pc-windows-msvc/release/niimblues.exe" "$RUNNER_TEMP/niimblues-${{ gitea.ref_name }}.exe"
+
       - name: Create draft release if it does not exist
         run: |
           if ! gh release view "${{ gitea.ref_name }}" -R MultiMote/niimblue >/dev/null 2>&1; then
@@ -91,7 +94,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
 
       - name: Update GitHub release
-        run: gh release upload "${{ gitea.ref_name }}" ${{ env.TAURI_PROJECT_DIR }}/src-tauri/target/x86_64-pc-windows-msvc/release/niimblues.exe -R MultiMote/niimblue --clobber
+        run: gh release upload "${{ gitea.ref_name }}" "$RUNNER_TEMP/niimblues-${{ gitea.ref_name }}.exe" -R MultiMote/niimblue --clobber
         env:
           GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
 

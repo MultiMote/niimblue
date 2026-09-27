@@ -114,7 +114,7 @@ jobs:
         run: |
           rsync -avz --delete \
                 -e "ssh -p ${{ secrets.SSH_PORT_2 || 22 }}" \
-                ./dist/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST_2 }}:${{ secrets.DEPLOY_PATH_2 }}/${{ gitea.head_ref || gitea.ref_name }}/
+                ./dist/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST_2 }}:${{ secrets.DEPLOY_PATH_2 }}/${{ gitea.ref_name == 'dev' && 'dev' || 'main' }}/
 
   upload-dist-to-github:
     name: Update GitHub Release
