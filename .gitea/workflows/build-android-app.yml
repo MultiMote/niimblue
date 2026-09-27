@@ -92,7 +92,9 @@ jobs:
 
       - name: Build and sign capacitor app
         working-directory: ${{ env.CAPACITOR_PROJECT_DIR }}
-        run: npm run build-android
+        run: |
+          export APP_VERSION="${APP_VERSION#v}"
+          npm run build-android
         env:
           KEYSTORE_PATH: ${{ gitea.workspace }}/.keystore/keystore.jks
           KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
@@ -118,7 +120,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
 
       - name: Update GitHub release
-        run: gh release upload "${gitea.ref_name}" $RUNNER_TEMP/niimblues.apk -R MultiMote/niimblue --clobber
+        run: gh release upload "${{gitea.ref_name}}" $RUNNER_TEMP/niimblues.apk -R MultiMote/niimblue --clobber
         env:
           GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
 

@@ -23,8 +23,4 @@
     <button class="btn btn-outline-secondary" onclick={() => ($appConfig.packetIntervalMs = undefined)}
       >{$tr("debug.reset")}</button>
   </div>
-
-  <div class="mb-1">
-    {$tr("debug.page_delay.help")}
-  </div>
 </AppModal>

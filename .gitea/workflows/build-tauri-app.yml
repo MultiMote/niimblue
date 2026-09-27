@@ -66,9 +66,10 @@ jobs:
       - name: Write version
         working-directory: ${{ env.TAURI_PROJECT_DIR }}
         run: |
-          echo "{\"version\": \"$VER\"}" > ./version.json
+          export APP_VERSION="${APP_VERSION#v}"
+          echo "{\"version\": \"$APP_VERSION\"}" > ./version.json
         env:
-          VER: ${{ gitea.ref_name }}
+          APP_VERSION: ${{ gitea.ref_name }}
 
       - name: Build app
         working-directory: ${{ env.TAURI_PROJECT_DIR }}
