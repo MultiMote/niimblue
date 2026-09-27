@@ -2,7 +2,7 @@
 	"name": "niimblue",
 	"private": true,
 	"type": "module",
-	"version": "0.0.1",
+	"version": "2026.9.0",
 	"scripts": {
 		"dev-check": "npm run sv-check && npm run dev",
 		"dev": "vite",
