@@ -1,9 +1,9 @@
 name: Build Windows Tauri app
 
 on:
-  schedule:
-    # Two times per month
-    - cron: '0 0 1,15 * *'
+  push:
+    tags:
+      - '*'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -66,10 +66,9 @@ jobs:
       - name: Write version
         working-directory: ${{ env.TAURI_PROJECT_DIR }}
         run: |
-          VER=$(date +'%Y.%-m').$RUN_N
           echo "{\"version\": \"$VER\"}" > ./version.json
         env:
-          RUN_N: ${{ gitea.run_number }}
+          VER: ${{ gitea.ref_name }}
 
       - name: Build app
         working-directory: ${{ env.TAURI_PROJECT_DIR }}
@@ -77,8 +76,21 @@ jobs:
         env:
           XWIN_CROSS_COMPILER: clang
 
+      - name: Create draft release if it does not exist
+        run: |
+          if ! gh release view "${{ gitea.ref_name }}" -R MultiMote/niimblue >/dev/null 2>&1; then
+            gh release create "${{ gitea.ref_name }}" \
+              -R MultiMote/niimblue \
+              --target "${{ gitea.sha }}" \
+              --draft \
+              --title "${{ gitea.ref_name }}" \
+              --notes ""
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
+
       - name: Update GitHub release
-        run: gh release upload snapshot ${{ env.TAURI_PROJECT_DIR }}/src-tauri/target/x86_64-pc-windows-msvc/release/niimblues.exe -R MultiMote/niimblue --clobber
+        run: gh release upload "${{ gitea.ref_name }}" ${{ env.TAURI_PROJECT_DIR }}/src-tauri/target/x86_64-pc-windows-msvc/release/niimblues.exe -R MultiMote/niimblue --clobber
         env:
           GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
 

@@ -6,6 +6,8 @@ on:
     branches:
       - main
       - dev
+    tags:
+      - '*'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -36,7 +38,8 @@ jobs:
       - name: Build
         run: npx vite build --base="/"
         env:
-          COMMIT_HASH: ${{gitea.sha}}
+          COMMIT_HASH: ${{ gitea.sha }}
+          COMMIT_TAG: ${{ gitea.ref_type == 'tag' && gitea.ref_name || '' }}
 
       - name: Generate Sitemap
         run: |
@@ -61,6 +64,7 @@ jobs:
     name: Deploy to Main Server
     needs: build
     runs-on: ubuntu-latest
+    if: startsWith(gitea.ref, 'refs/tags/')
     steps:
       - name: Download Build
         uses: https://github.com/christopherHX/gitea-download-artifact@v4
@@ -88,7 +92,7 @@ jobs:
     name: Deploy to Second Server
     needs: build
     runs-on: ubuntu-latest
-    if: gitea.ref_name == 'main'
+    if: startsWith(gitea.ref, 'refs/tags/')
     steps:
       - name: Download Build
         uses: https://github.com/christopherHX/gitea-download-artifact@v4
@@ -116,7 +120,7 @@ jobs:
     name: Update GitHub Release
     needs: build
     runs-on: ubuntu-latest
-    if: gitea.ref_name == 'main'
+    if: gitea.ref_name == 'main' || gitea.ref_type == 'tag'
     steps:
       - name: Download Build
         uses: https://github.com/christopherHX/gitea-download-artifact@v4
@@ -133,8 +137,23 @@ jobs:
         with:
           gh-cli-version: 2.72.0
 
-      - name: Update GitHub release
-        run: gh release upload snapshot niimblue-dist.zip -R MultiMote/niimblue --clobber
+      - name: Create draft release if it does not exist
+        run: |
+          if ! gh release view "${GH_RELEASE}" -R MultiMote/niimblue >/dev/null 2>&1; then
+            gh release create "${GH_RELEASE}" \
+              -R MultiMote/niimblue \
+              --target "${{ gitea.sha }}" \
+              --draft \
+              --title "${GH_RELEASE}" \
+              --notes ""
+          fi
         env:
           GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
+          GH_RELEASE: ${{ gitea.ref_type == 'tag' && gitea.ref_name || 'snapshot' }}
+
+      - name: Update GitHub release
+        run: gh release upload "${GH_RELEASE}" niimblue-dist.zip -R MultiMote/niimblue --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
+          GH_RELEASE: ${{ gitea.ref_type == 'tag' && gitea.ref_name || 'snapshot' }}
 

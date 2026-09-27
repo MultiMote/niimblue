@@ -12,7 +12,7 @@ const getDate = (): string => {
 export default defineConfig({
   plugins: [svelte()],
   define: {
-    __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
+    __APP_VERSION__: JSON.stringify(process.env.COMMIT_TAG),
     __APP_COMMIT__: JSON.stringify(process.env.COMMIT_HASH),
     __BUILD_DATE__: JSON.stringify(getDate()),
   },

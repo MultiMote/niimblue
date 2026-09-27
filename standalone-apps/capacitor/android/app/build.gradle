@@ -5,13 +5,14 @@ android {
     compileSdk = rootProject.ext.compileSdkVersion
 
     def appVersionCode = Integer.valueOf(System.getenv("APP_VERSION_CODE") ?: "1")
+    def appVersion = System.getenv("APP_VERSION") ?: "0.0.1"
 
     defaultConfig {
         applicationId "ru.mmote.niimblues"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode (50 + appVersionCode) // Last GH actions build
-        versionName "0.1.${appVersionCode}"
+        versionName appVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

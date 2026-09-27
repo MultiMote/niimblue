@@ -10,6 +10,8 @@
   // eslint-disable-next-line no-undef
   const appCommit = __APP_COMMIT__;
   // eslint-disable-next-line no-undef
+  const appVersion = __APP_VERSION__;
+  // eslint-disable-next-line no-undef
   const buildDate = __BUILD_DATE__;
 
   let isStandalone = Utils.getAvailableTransports().capacitorBle || "__TAURI__" in window;
@@ -51,7 +53,11 @@
       </select>
     </div>
     <div>
-      {#if appCommit}
+      {#if appVersion}
+        <a class="text-secondary" href="https://github.com/MultiMote/niimblue/releases/tag/{appVersion}">
+          {appVersion}
+        </a>
+      {:else if appCommit}
         <a class="text-secondary" href="https://github.com/MultiMote/niimblue/commit/{appCommit}">
           {appCommit.slice(0, 6)}
         </a>

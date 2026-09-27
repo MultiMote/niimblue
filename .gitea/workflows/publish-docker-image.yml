@@ -2,8 +2,8 @@ name: Build and publish a Docker image
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - '*'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -30,4 +30,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/multimote/niimblue:latest,ghcr.io/multimote/niimblue:gh-${{github.sha}}
+          tags: ghcr.io/multimote/niimblue:latest,ghcr.io/multimote/niimblue:${{ gitea.ref_name }}

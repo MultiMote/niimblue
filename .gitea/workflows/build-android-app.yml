@@ -1,14 +1,9 @@
 name: Build and publish an android app
 
 on:
-  # push:
-  #   branches:
-  #     - gitea
-
-  schedule:
-    # Two times per month
-    - cron: '0 0 1,15 * *'
-
+  push:
+    tags:
+      - '*'
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -77,6 +72,9 @@ jobs:
       - name: Build niimblue www
         working-directory: ${{ env.CAPACITOR_PROJECT_DIR }}
         run: npm run build-www
+        env:
+          COMMIT_HASH: ${{ gitea.sha }}
+          COMMIT_TAG: ${{ gitea.ref_name }}
 
       - name: Gradle cache
         uses: actions/cache@v4
@@ -101,13 +99,28 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEYSTORE_ALIAS_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           APP_VERSION_CODE: ${{ gitea.run_number }}
+          APP_VERSION: ${{ gitea.ref_name }}
 
       - name: Copy release apk
         run: cp ${{ env.CAPACITOR_PROJECT_DIR }}/android/app/build/outputs/apk/release/app-release-signed.apk $RUNNER_TEMP/niimblues.apk
 
-      - name: Update GitHub release
-        run: gh release upload snapshot $RUNNER_TEMP/niimblues.apk -R MultiMote/niimblue --clobber
+      - name: Create draft release if it does not exist
+        run: |
+          if ! gh release view "${{ gitea.ref_name }}" -R MultiMote/niimblue >/dev/null 2>&1; then
+            gh release create "${{ gitea.ref_name }}" \
+              -R MultiMote/niimblue \
+              --target "${{ gitea.sha }}" \
+              --draft \
+              --title "${{ gitea.ref_name }}" \
+              --notes ""
+          fi
         env:
           GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
+
+      - name: Update GitHub release
+        run: gh release upload "${gitea.ref_name}" $RUNNER_TEMP/niimblues.apk -R MultiMote/niimblue --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
+
 
 

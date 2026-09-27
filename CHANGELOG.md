@@ -18,3 +18,4 @@
   - RFID usage progress bars.
   - RFID paper type and dimensions (for modern printers).
   - Sound settings sliders.
+* Add datetime duration parsing (example: `{dt+3d}`, `{dt-3h}`, `{dt+1w|YYYY-MM-DD}`).
