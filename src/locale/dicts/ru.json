@@ -213,5 +213,6 @@
     "preview.postprocess.stucki": "Дизеринг (Штуки)",
     "preview.strength": "Сила",
     "preview.serpentine": "Серпентинный",
-    "connector.firmware_flashing.done": "Прошивка завершена, принтер сейчас отключится. Он не будет подавать признаков жизни несколько секунд."
+    "connector.firmware_flashing.done": "Прошивка завершена, принтер сейчас отключится. Он не будет подавать признаков жизни несколько секунд.",
+    "browser_warning.ios_safari": "Для поддержки Bluetooth-печати из Safari на iPhone или iPad требуется установка специального расширения (например, Beacio)."
 }
