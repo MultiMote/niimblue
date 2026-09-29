@@ -10,7 +10,6 @@
   import { FileUtils } from "$/utils/file_utils";
   import * as fabric from "fabric";
   import { Utils } from "@mmote/niimbluelib";
-  import { z } from "zod";
 
   interface Props {
     onRequestLabelTemplate: () => ExportedLabelTemplate;
@@ -131,39 +130,32 @@
   };
 
   const onImportClicked = async () => {
+    const contents = await FileUtils.pickAndReadSingleTextFile("json");
+    const rawData = JSON.parse(contents);
+
+
     try {
-      const contents = await FileUtils.pickAndReadSingleTextFile("json");
-      const rawData = JSON.parse(contents);
       const label = ExportedLabelTemplateSchema.parse(rawData);
 
-      const result = [...savedLabels, label];
-      const { zodErrors, otherErrors } = LocalStoragePersistence.saveLabels(result);
+      let message = $tr("editor.warning.load");
 
-      zodErrors.forEach((e) => Toasts.zodErrors(e, "Label import error:"));
-      otherErrors.forEach((e) => Toasts.error(e));
+      if (label.csv) {
+        message += "\n" + $tr("editor.warning.load.csv");
+      }
 
-      if (zodErrors.length !== 0 || otherErrors.length !== 0) {
+      if (!confirm(message)) {
         return;
       }
 
-      savedLabels = LocalStoragePersistence.loadLabels();
+      onLoadRequested(label);
 
-      selectedIndex = -1;
-      for (let i = savedLabels.length - 1; i >= 0; i--) {
-        if (savedLabels[i].timestamp === label.timestamp) {
-          selectedIndex = i;
-          break;
-        }
+      if (label.title) {
+        title = label.title;
       }
 
-      title = selectedIndex === -1 ? "" : (savedLabels[selectedIndex]?.title ?? "");
-      calcUsedSpace();
+      new Dropdown(dropdownRef).hide();
     } catch (e) {
-      if (e instanceof z.ZodError) {
-        Toasts.zodErrors(e, "Label import error:");
-      } else {
-        Toasts.error(e);
-      }
+      Toasts.zodErrors(e, "Canvas load error:");
     }
   };
 
