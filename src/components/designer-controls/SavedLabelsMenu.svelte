@@ -10,6 +10,7 @@
   import { FileUtils } from "$/utils/file_utils";
   import * as fabric from "fabric";
   import { Utils } from "@mmote/niimbluelib";
+  import { z } from "zod";
 
   interface Props {
     onRequestLabelTemplate: () => ExportedLabelTemplate;
@@ -146,14 +147,22 @@
       }
 
       savedLabels = LocalStoragePersistence.loadLabels();
-      selectedIndex = savedLabels.length - 1;
-      title = savedLabels[selectedIndex]?.title ?? "";
+
+      selectedIndex = -1;
+      for (let i = savedLabels.length - 1; i >= 0; i--) {
+        if (savedLabels[i].timestamp === label.timestamp) {
+          selectedIndex = i;
+          break;
+        }
+      }
+
+      title = selectedIndex === -1 ? "" : (savedLabels[selectedIndex]?.title ?? "");
       calcUsedSpace();
     } catch (e) {
-      if (e instanceof Error) {
-        Toasts.error(e);
-      } else {
+      if (e instanceof z.ZodError) {
         Toasts.zodErrors(e, "Label import error:");
+      } else {
+        Toasts.error(e);
       }
     }
   };
