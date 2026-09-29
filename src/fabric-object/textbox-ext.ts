@@ -180,6 +180,71 @@ export class TextboxExt<
     );
   }
 
+  override _renderSelection(
+    ctx: CanvasRenderingContext2D,
+    selection: { selectionStart: number; selectionEnd: number },
+    boundaries: { left: number; top: number; leftOffset: number; topOffset: number },
+  ): void {
+    if (this.direction !== "rtl") {
+      super._renderSelection(ctx, selection, boundaries);
+      return;
+    }
+
+    const selectionStart = Math.min(selection.selectionStart, selection.selectionEnd);
+    const selectionEnd = Math.max(selection.selectionStart, selection.selectionEnd);
+
+    if (selectionStart === selectionEnd) {
+      return;
+    }
+
+    const endLine = this.get2DCursorLocation(selectionEnd).lineIndex;
+    const lineRanges = new Map<number, { minX: number; maxX: number; top: number }>();
+
+    // Use the exact cursor geometry for every selected insertion boundary.
+    // This keeps the blue selection rectangle aligned with the caret even when
+    // Arabic shaping makes visual glyph widths differ from per-character widths.
+    for (let index = selectionStart; index <= selectionEnd; index++) {
+      const location = this.get2DCursorLocation(index);
+      const cursor = this._getCursorBoundaries(index, true);
+      const x = cursor.left + cursor.leftOffset;
+      const top = cursor.top + cursor.topOffset;
+      const range = lineRanges.get(location.lineIndex);
+
+      if (range === undefined) {
+        lineRanges.set(location.lineIndex, { minX: x, maxX: x, top });
+      } else {
+        range.minX = Math.min(range.minX, x);
+        range.maxX = Math.max(range.maxX, x);
+      }
+    }
+
+    for (const [lineIndex, range] of lineRanges) {
+      let lineHeight = this.getHeightOfLine(lineIndex);
+      let drawHeight = lineHeight;
+      let extraTop = 0;
+
+      if (this.lineHeight < 1 || (lineIndex === endLine && this.lineHeight > 1)) {
+        lineHeight /= this.lineHeight;
+        drawHeight = lineHeight;
+      }
+
+      if (this.inCompositionMode) {
+        ctx.fillStyle = this.compositionColor || "black";
+        drawHeight = 1;
+        extraTop = lineHeight;
+      } else {
+        ctx.fillStyle = this.selectionColor;
+      }
+
+      ctx.fillRect(
+        range.minX,
+        range.top + extraTop,
+        range.maxX - range.minX,
+        drawHeight,
+      );
+    }
+  }
+
   override toObject<T extends Omit<Props & fabric.TClassProperties<this>, keyof SProps>, K extends keyof T = never>(
     propertiesToInclude: K[] = [],
   ): Pick<T, K> & SProps {
