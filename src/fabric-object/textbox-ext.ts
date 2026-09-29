@@ -154,22 +154,25 @@ export class TextboxExt<
     const lineLeftOffset = this._getLineLeftOffset(lineIndex);
     const chars = this.__charBounds[lineIndex];
     const effectiveX = lineLeftOffset - mouseOffset.x;
-    let width = 0;
 
-    for (let j = 0; j < charLength; j++) {
-      const charWidth = chars[j].kernedWidth;
-      const widthAfter = width + charWidth;
+    // Fabric renders the cursor from charBounds[charIndex].left. For shaped RTL
+    // scripts (Arabic in particular), those measured positions can differ slightly
+    // from a running sum of kernedWidth. Pick the nearest real cursor boundary so
+    // click hit-testing and cursor rendering use the same geometry.
+    let nearestCharIndex = 0;
+    let nearestDistance = Number.POSITIVE_INFINITY;
 
-      if (effectiveX <= widthAfter) {
-        if (Math.abs(effectiveX - widthAfter) <= Math.abs(effectiveX - width)) {
-          charIndex++;
-        }
-        break;
+    for (let j = 0; j <= charLength; j++) {
+      const cursorX = chars[j]?.left ?? 0;
+      const distance = Math.abs(effectiveX - cursorX);
+
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestCharIndex = j;
       }
-
-      width = widthAfter;
-      charIndex++;
     }
+
+    charIndex += nearestCharIndex;
 
     return Math.min(
       this.flipX ? charLength - charIndex : charIndex,
