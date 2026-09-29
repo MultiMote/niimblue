@@ -7,10 +7,17 @@
     onItemSelected: (index: number) => void;
     onItemDelete: (index: number) => void;
     presets: LabelPreset[];
+    selectedIndex?: number;
     class?: string;
   }
 
-  let { class: className = "", onItemDelete, onItemSelected, presets }: Props = $props();
+  let {
+    class: className = "",
+    onItemDelete,
+    onItemSelected,
+    presets,
+    selectedIndex = -1,
+  }: Props = $props();
   let deleteIndex = $state<number>(-1);
 
   const scaleDimensions = (preset: LabelPreset): { width: number; height: number } => {
@@ -43,7 +50,9 @@
   {#each presets as item, idx (item)}
     <div
       role="button"
-      class="btn p-0 card-wrapper d-flex justify-content-center align-items-center"
+      class="btn p-0 card-wrapper d-flex justify-content-center align-items-center {selectedIndex === idx
+        ? 'border-primary'
+        : ''}"
       tabindex="0"
       onkeydown={() => onItemSelected(idx)}
       onclick={() => onItemSelected(idx)}>
