@@ -37,6 +37,7 @@
   const mirrorTypes: MirrorType[] = ["none", "flip", "copy"];
 
   let labelPresets = $state<LabelPreset[]>(DEFAULT_LABEL_PRESETS);
+  let selectedPresetIndex = $state<number>(-1);
 
   let title = $state<string | undefined>("");
   let prevUnit: LabelUnit = "mm";
@@ -123,6 +124,7 @@
 
   const onLabelPresetSelected = (index: number) => {
     const preset = labelPresets[index];
+    selectedPresetIndex = index;
 
     if (preset !== undefined) {
       dpmm = preset.dpmm;
@@ -149,6 +151,13 @@
     const result = [...labelPresets];
     result.splice(idx, 1);
     labelPresets = result;
+
+    if (selectedPresetIndex === idx) {
+      selectedPresetIndex = -1;
+    } else if (selectedPresetIndex > idx) {
+      selectedPresetIndex--;
+    }
+
     LocalStoragePersistence.saveLabelPresets(labelPresets);
   };
 
@@ -169,23 +178,44 @@
     hasPresetOffset = true;
   };
 
+  const makeLabelPreset = (): LabelPreset => ({
+    dpmm,
+    printDirection,
+    unit,
+    width,
+    height,
+    title,
+    shape,
+    split,
+    splitParts,
+    tailPos,
+    tailLength,
+    mirror,
+    offset: { ...offset },
+  });
+
   const onLabelPresetAdd = () => {
-    const newPreset: LabelPreset = {
-      dpmm,
-      printDirection,
-      unit,
-      width,
-      height,
-      title,
-      shape,
-      split,
-      splitParts,
-      tailPos,
-      tailLength,
-      mirror,
-      offset: { ...offset },
-    };
-    const newPresets = [...labelPresets, newPreset];
+    const newPresets = [...labelPresets, makeLabelPreset()];
+    try {
+      LocalStoragePersistence.saveLabelPresets(newPresets);
+      labelPresets = newPresets;
+    } catch (e) {
+      Toasts.zodErrors(e, "Presets save error:");
+    }
+  };
+
+  const onLabelPresetReplace = () => {
+    if (selectedPresetIndex === -1) {
+      return;
+    }
+
+    if (!confirm($tr("editor.warning.save"))) {
+      return;
+    }
+
+    const newPresets = [...labelPresets];
+    newPresets[selectedPresetIndex] = makeLabelPreset();
+
     try {
       LocalStoragePersistence.saveLabelPresets(newPresets);
       labelPresets = newPresets;
@@ -242,6 +272,7 @@
       const presets = z.array(LabelPresetSchema).parse(rawData);
       LocalStoragePersistence.saveLabelPresets(presets);
       labelPresets = presets;
+      selectedPresetIndex = -1;
     } catch (e) {
       Toasts.zodErrors(e, "Presets load error:");
     }
@@ -328,6 +359,7 @@
       <LabelPresetsBrowser
         class="mb-1"
         presets={labelPresets}
+        selectedIndex={selectedPresetIndex}
         onItemSelected={onLabelPresetSelected}
         onItemDelete={onLabelPresetDelete} />
 
@@ -472,6 +504,11 @@
         <button class="btn btn-sm btn-secondary" onclick={onLabelPresetAdd}>
           {$tr("params.label.save_template")}
         </button>
+        {#if selectedPresetIndex !== -1}
+          <button class="btn btn-sm btn-secondary" onclick={onLabelPresetReplace}>
+            {$tr("params.saved_labels.save.browser.replace")}
+          </button>
+        {/if}
         <button class="btn btn-sm btn-primary" onclick={onApply}>{$tr("params.label.apply")}</button>
       </div>
     </div>
