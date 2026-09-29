@@ -130,32 +130,31 @@
   };
 
   const onImportClicked = async () => {
-    const contents = await FileUtils.pickAndReadSingleTextFile("json");
-    const rawData = JSON.parse(contents);
-
-
     try {
+      const contents = await FileUtils.pickAndReadSingleTextFile("json");
+      const rawData = JSON.parse(contents);
       const label = ExportedLabelTemplateSchema.parse(rawData);
 
-      let message = $tr("editor.warning.load");
+      const result = [...savedLabels, label];
+      const { zodErrors, otherErrors } = LocalStoragePersistence.saveLabels(result);
 
-      if (label.csv) {
-        message += "\n" + $tr("editor.warning.load.csv");
-      }
+      zodErrors.forEach((e) => Toasts.zodErrors(e, "Label import error:"));
+      otherErrors.forEach((e) => Toasts.error(e));
 
-      if (!confirm(message)) {
+      if (zodErrors.length !== 0 || otherErrors.length !== 0) {
         return;
       }
 
-      onLoadRequested(label);
-
-      if (label.title) {
-        title = label.title;
-      }
-
-      new Dropdown(dropdownRef).hide();
+      savedLabels = LocalStoragePersistence.loadLabels();
+      selectedIndex = savedLabels.length - 1;
+      title = savedLabels[selectedIndex]?.title ?? "";
+      calcUsedSpace();
     } catch (e) {
-      Toasts.zodErrors(e, "Canvas load error:");
+      if (e instanceof Error) {
+        Toasts.error(e);
+      } else {
+        Toasts.zodErrors(e, "Label import error:");
+      }
     }
   };
 
