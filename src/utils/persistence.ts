@@ -150,8 +150,8 @@ export class LocalStoragePersistence {
       } catch (e) {
         if (e instanceof z.ZodError) {
           zodErrors.push(e);
-        } else if (e instanceof Error) {
-          otherErrors.push(e);
+        } else {
+          otherErrors.push(e instanceof Error ? e : new Error(String(e)));
         }
       }
     }
@@ -173,8 +173,8 @@ export class LocalStoragePersistence {
 
       if (e instanceof z.ZodError) {
         zodErrors.push(e);
-      } else if (e instanceof Error) {
-        otherErrors.push(e);
+      } else {
+        otherErrors.push(e instanceof Error ? e : new Error(String(e)));
       }
     }
 
