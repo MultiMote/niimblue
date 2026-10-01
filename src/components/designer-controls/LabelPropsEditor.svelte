@@ -20,6 +20,7 @@
   import { Toasts } from "$/utils/toasts";
   import { FileUtils } from "$/utils/file_utils";
   import DpiSelector from "$/components/designer-controls/DpiSelector.svelte";
+  import { z } from "zod";
 
   interface Props {
     labelProps: LabelProps;
@@ -217,12 +218,20 @@
       const rawData = JSON.parse(contents);
       const imported = FileUtils.parseSingleOrList(rawData, LabelPresetSchema);
       const items = imported.kind === "single" ? [imported.item] : imported.items;
-      const presets = [...labelPresets, ...items];
 
+      if (items.length === 0) {
+        return;
+      }
+
+      const presets = [...labelPresets, ...items];
       LocalStoragePersistence.saveLabelPresets(presets);
       labelPresets = presets;
     } catch (e) {
-      Toasts.zodErrors(e, "Presets load error:");
+      if (e instanceof z.ZodError) {
+        Toasts.zodErrors(e, "Presets load error:");
+      } else {
+        Toasts.error(e);
+      }
     }
   };
 
