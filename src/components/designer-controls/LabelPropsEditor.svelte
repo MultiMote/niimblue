@@ -216,18 +216,9 @@
       const contents = await FileUtils.pickAndReadSingleTextFile("json");
       const rawData = JSON.parse(contents);
       const imported = FileUtils.parseSingleOrList(rawData, LabelPresetSchema);
+      const items = imported.kind === "single" ? [imported.item] : imported.items;
+      const presets = [...labelPresets, ...items];
 
-      if (imported.kind === "list") {
-        if (!confirm($tr("params.label.warning.import"))) {
-          return;
-        }
-
-        LocalStoragePersistence.saveLabelPresets(imported.items);
-        labelPresets = imported.items;
-        return;
-      }
-
-      const presets = [...labelPresets, imported.item];
       LocalStoragePersistence.saveLabelPresets(presets);
       labelPresets = presets;
     } catch (e) {
