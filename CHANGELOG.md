@@ -1,3 +1,7 @@
+# 2026.10.0
+
+* Fix Arabic RTL text cursor and selection
+
 # 2026.9.0
 
 * Add changelog (starts from commit 48ce74).
