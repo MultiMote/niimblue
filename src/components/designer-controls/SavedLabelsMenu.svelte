@@ -10,6 +10,7 @@
   import { FileUtils } from "$/utils/file_utils";
   import * as fabric from "fabric";
   import { Utils } from "@mmote/niimbluelib";
+  import { z } from "zod";
 
   interface Props {
     onRequestLabelTemplate: () => ExportedLabelTemplate;
@@ -130,13 +131,30 @@
   };
 
   const onImportClicked = async () => {
-    const contents = await FileUtils.pickAndReadSingleTextFile("json");
-    const rawData = JSON.parse(contents);
-
-
     try {
-      const label = ExportedLabelTemplateSchema.parse(rawData);
+      const contents = await FileUtils.pickAndReadSingleTextFile("json");
+      const rawData = JSON.parse(contents);
+      const imported = FileUtils.parseSingleOrList(rawData, ExportedLabelTemplateSchema);
 
+      if (imported.kind === "list") {
+        const labels = [...savedLabels, ...imported.items];
+        const { zodErrors, otherErrors } = LocalStoragePersistence.saveLabels(labels);
+
+        zodErrors.forEach((e) => Toasts.zodErrors(e, "Label import error:"));
+        otherErrors.forEach((e) => Toasts.error(e));
+
+        if (zodErrors.length !== 0 || otherErrors.length !== 0) {
+          return;
+        }
+
+        savedLabels = LocalStoragePersistence.loadLabels();
+        selectedIndex = -1;
+        title = "";
+        calcUsedSpace();
+        return;
+      }
+
+      const label = imported.item;
       let message = $tr("editor.warning.load");
 
       if (label.csv) {
@@ -155,7 +173,11 @@
 
       new Dropdown(dropdownRef).hide();
     } catch (e) {
-      Toasts.zodErrors(e, "Canvas load error:");
+      if (e instanceof z.ZodError) {
+        Toasts.zodErrors(e, "Canvas load error:");
+      } else {
+        Toasts.error(e);
+      }
     }
   };
 
@@ -168,6 +190,18 @@
       FileUtils.saveLabelAsJson(label);
     } catch (e) {
       Toasts.zodErrors(e, "Canvas save error:");
+    }
+  };
+
+  const onExportAllClicked = () => {
+    try {
+      FileUtils.saveLabelsAsJson(savedLabels);
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        Toasts.zodErrors(e, "Labels export error:");
+      } else {
+        Toasts.error(e);
+      }
     }
   };
 
@@ -225,26 +259,40 @@
           {$tr("params.saved_labels.load.json")}
         </button>
         <div class="btn-group btn-group-sm">
-          <button class="btn btn-outline-secondary" onclick={onExportClicked}>
+          <button
+            type="button"
+            class="btn btn-outline-secondary dropdown-toggle"
+            data-bs-toggle="dropdown"
+            aria-expanded="false">
             <MdIcon icon="data_object" />
             {$tr("params.saved_labels.save.json")}
           </button>
-          <button
-            type="button"
-            aria-label="dropdown"
-            class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
-            data-bs-toggle="dropdown">
-          </button>
           <ul class="dropdown-menu">
+            <li><h6 class="dropdown-header">{$tr("params.saved_labels.export.current")}</h6></li>
             <li>
-              <button class="dropdown-item" onclick={onExportPngClicked}>PNG</button>
+              <button class="dropdown-item" onclick={onExportClicked}>
+                {$tr("params.saved_labels.export.json")}
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" onclick={onExportPngClicked}>
+                {$tr("params.saved_labels.export.png")}
+              </button>
             </li>
             {#if !isStandalone}
               <li>
-                <button class="dropdown-item" onclick={onExportUrlClicked}
-                  >{$tr("params.saved_labels.save.url")}</button>
+                <button class="dropdown-item" onclick={onExportUrlClicked}>
+                  {$tr("params.saved_labels.save.url")}
+                </button>
               </li>
             {/if}
+            <li><hr class="dropdown-divider" /></li>
+            <li><h6 class="dropdown-header">{$tr("params.saved_labels.export.all")}</h6></li>
+            <li>
+              <button class="dropdown-item" onclick={onExportAllClicked}>
+                {$tr("params.saved_labels.export.json")}
+              </button>
+            </li>
           </ul>
         </div>
       </div>
