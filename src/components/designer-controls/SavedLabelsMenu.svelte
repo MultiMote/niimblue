@@ -135,46 +135,29 @@
       const contents = await FileUtils.pickAndReadSingleTextFile("json");
       const rawData = JSON.parse(contents);
       const imported = FileUtils.parseSingleOrList(rawData, ExportedLabelTemplateSchema);
+      const items = imported.kind === "single" ? [imported.item] : imported.items;
+      const { zodErrors, otherErrors } = LocalStoragePersistence.appendLabels(items);
 
-      if (imported.kind === "list") {
-        const labels = [...savedLabels, ...imported.items];
-        const { zodErrors, otherErrors } = LocalStoragePersistence.saveLabels(labels);
+      zodErrors.forEach((e) => Toasts.zodErrors(e, "Label import error:"));
+      otherErrors.forEach((e) => Toasts.error(e));
 
-        zodErrors.forEach((e) => Toasts.zodErrors(e, "Label import error:"));
-        otherErrors.forEach((e) => Toasts.error(e));
-
-        if (zodErrors.length !== 0 || otherErrors.length !== 0) {
-          return;
-        }
-
-        savedLabels = LocalStoragePersistence.loadLabels();
-        selectedIndex = -1;
-        title = "";
-        calcUsedSpace();
+      if (zodErrors.length !== 0 || otherErrors.length !== 0) {
         return;
       }
 
-      const label = imported.item;
-      let message = $tr("editor.warning.load");
+      savedLabels = LocalStoragePersistence.loadLabels();
+      selectedIndex = -1;
+      title = "";
+      calcUsedSpace();
 
-      if (label.csv) {
-        message += "\n" + $tr("editor.warning.load.csv");
-      }
-
-      if (!confirm(message)) {
-        return;
-      }
-
-      onLoadRequested(label);
-
-      if (label.title) {
-        title = label.title;
-      }
-
-      new Dropdown(dropdownRef).hide();
+      Toasts.message(
+        items.length === 1
+          ? $tr("params.saved_labels.import.added_one")
+          : $tr("params.saved_labels.import.added_many").replace("{count}", String(items.length)),
+      );
     } catch (e) {
       if (e instanceof z.ZodError) {
-        Toasts.zodErrors(e, "Canvas load error:");
+        Toasts.zodErrors(e, "Label import error:");
       } else {
         Toasts.error(e);
       }
