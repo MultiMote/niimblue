@@ -146,6 +146,14 @@
     LocalStoragePersistence.saveLabelPresets(labelPresets);
   };
 
+  const onLabelPresetExport = (idx: number) => {
+    try {
+      FileUtils.saveLabelPresetAsJson(labelPresets[idx]);
+    } catch (e) {
+      Toasts.zodErrors(e, "Preset save error:");
+    }
+  };
+
   const onLabelPresetAdd = () => {
     const newPreset: LabelPreset = {
       dpmm,
@@ -205,15 +213,22 @@
   };
 
   const onImportClicked = async () => {
-    const contents = await FileUtils.pickAndReadSingleTextFile("json");
-    const rawData = JSON.parse(contents);
-
-    if (!confirm($tr("params.label.warning.import"))) {
-      return;
-    }
-
     try {
-      const presets = z.array(LabelPresetSchema).parse(rawData);
+      const contents = await FileUtils.pickAndReadSingleTextFile("json");
+      const rawData = JSON.parse(contents);
+      const imported = FileUtils.parseSingleOrList(rawData, LabelPresetSchema);
+
+      if (imported.kind === "list") {
+        if (!confirm($tr("params.label.warning.import"))) {
+          return;
+        }
+
+        LocalStoragePersistence.saveLabelPresets(imported.items);
+        labelPresets = imported.items;
+        return;
+      }
+
+      const presets = [...labelPresets, imported.item];
       LocalStoragePersistence.saveLabelPresets(presets);
       labelPresets = presets;
     } catch (e) {
@@ -282,7 +297,7 @@
         </button>
         <button class="btn btn-sm btn-outline-secondary" onclick={onExportClicked}>
           <MdIcon icon="data_object" />
-          {$tr("params.label.export")}
+          {$tr("params.label.export_all")}
         </button>
       </div>
       <div class="mb-3 {error ? 'cursor-help text-warning' : 'text-secondary'}" title={error}>
@@ -301,7 +316,8 @@
         class="mb-1"
         presets={labelPresets}
         onItemSelected={onLabelPresetSelected}
-        onItemDelete={onLabelPresetDelete} />
+        onItemDelete={onLabelPresetDelete}
+        onItemExport={onLabelPresetExport} />
 
       <div class="input-group flex-nowrap input-group-sm mb-2">
         <span class="input-group-text">{$tr("params.label.size")}</span>
