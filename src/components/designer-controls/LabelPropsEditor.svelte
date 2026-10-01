@@ -19,7 +19,6 @@
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import { Toasts } from "$/utils/toasts";
   import { FileUtils } from "$/utils/file_utils";
-  import { z } from "zod";
   import DpiSelector from "$/components/designer-controls/DpiSelector.svelte";
 
   interface Props {
