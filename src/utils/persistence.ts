@@ -132,6 +132,55 @@ export class LocalStoragePersistence {
     return `${basename}_${counter}`;
   }
 
+  static appendLabels(labels: ExportedLabelTemplate[]): {
+    zodErrors: z.ZodError[];
+    otherErrors: Error[];
+  } {
+    const zodErrors: z.ZodError[] = [];
+    const otherErrors: Error[] = [];
+    const parsedLabels: ExportedLabelTemplate[] = [];
+
+    for (const label of labels) {
+      try {
+        const parsed = ExportedLabelTemplateSchema.omit({ id: true }).parse(label);
+        if (parsed.timestamp === undefined) {
+          parsed.timestamp = FileUtils.timestamp();
+        }
+        parsedLabels.push(parsed);
+      } catch (e) {
+        if (e instanceof z.ZodError) {
+          zodErrors.push(e);
+        } else if (e instanceof Error) {
+          otherErrors.push(e);
+        }
+      }
+    }
+
+    if (zodErrors.length !== 0 || otherErrors.length !== 0) {
+      return { zodErrors, otherErrors };
+    }
+
+    const createdKeys: string[] = [];
+
+    try {
+      for (const label of parsedLabels) {
+        const key = this.createUidForLabel(label);
+        this.validateAndSaveObject(key, label, ExportedLabelTemplateSchema.omit({ id: true }));
+        createdKeys.push(key);
+      }
+    } catch (e) {
+      createdKeys.forEach((key) => localStorage.removeItem(key));
+
+      if (e instanceof z.ZodError) {
+        zodErrors.push(e);
+      } else if (e instanceof Error) {
+        otherErrors.push(e);
+      }
+    }
+
+    return { zodErrors, otherErrors };
+  }
+
   static saveLabels(labels: ExportedLabelTemplate[]): {
     zodErrors: z.ZodError[];
     otherErrors: Error[];
