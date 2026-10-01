@@ -139,7 +139,7 @@
     "params.saved_labels.load.url.warn": "Load label from URL? Here be dragons.",
     "params.saved_labels.load.url.loaded": "Label loaded from URL",
     "params.saved_labels.save.url.copied": "Label URL copied to clipboard",
-    "params.saved_labels.save.url.warn": "Label data is quite large and URL may not work in all browsers.\nTry to reduce label size (remove images, for example).\nProceed?",
+    "params.saved_labels.save.url.warn": "Label data is quite large, so this URL may not work in all browsers.\nTry reducing the label size (for example, remove images), or use Export → Current label → JSON file instead.\nProceed anyway?",
     "params.text.align.center": "Align text: Center",
     "params.text.align.left": "Align text: Left",
     "params.text.align.right": "Align text: Right",
