@@ -136,6 +136,11 @@
       const rawData = JSON.parse(contents);
       const imported = FileUtils.parseSingleOrList(rawData, ExportedLabelTemplateSchema);
       const items = imported.kind === "single" ? [imported.item] : imported.items;
+
+      if (items.length === 0) {
+        return;
+      }
+
       const { zodErrors, otherErrors } = LocalStoragePersistence.appendLabels(items);
 
       zodErrors.forEach((e) => Toasts.zodErrors(e, "Label import error:"));
@@ -147,7 +152,6 @@
 
       savedLabels = LocalStoragePersistence.loadLabels();
       selectedIndex = -1;
-      title = "";
       calcUsedSpace();
 
       Toasts.message(
