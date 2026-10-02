@@ -7,6 +7,7 @@
     type LabelSplit,
     type LabelUnit,
     type MirrorType,
+    type PreviewPropsOffset,
     type TailPosition,
   } from "$/types";
   import LabelPresetsBrowser from "$/components/designer-controls/LabelPresetsBrowser.svelte";
@@ -36,6 +37,7 @@
   const mirrorTypes: MirrorType[] = ["none", "flip", "copy"];
 
   let labelPresets = $state<LabelPreset[]>(DEFAULT_LABEL_PRESETS);
+  let selectedPresetIndex = $state<number>(-1);
 
   let title = $state<string | undefined>("");
   let prevUnit: LabelUnit = "mm";
@@ -50,6 +52,8 @@
   let tailLength = $state<number>(0);
   let tailPos = $state<TailPosition>("right");
   let mirror = $state<MirrorType>("none");
+  let offset = $state<PreviewPropsOffset>({ x: 0, y: 0, offsetType: "inner" });
+  let hasPresetOffset = $state<boolean>(false);
 
   let error = $derived.by<string>(() => {
     let error = "";
@@ -114,11 +118,13 @@
       tailPos,
       tailLength: Math.floor(newTailLength),
       mirror,
+      offset: hasPresetOffset ? { ...offset } : undefined,
     });
   };
 
   const onLabelPresetSelected = (index: number) => {
     const preset = labelPresets[index];
+    selectedPresetIndex = index;
 
     if (preset !== undefined) {
       dpmm = preset.dpmm;
@@ -134,6 +140,8 @@
       tailPos = preset.tailPos ?? "right";
       tailLength = preset.tailLength ?? 0;
       mirror = preset.mirror ?? "none";
+      hasPresetOffset = preset.offset !== undefined;
+      offset = preset.offset !== undefined ? { ...preset.offset } : getFallbackOffset();
     }
 
     onApply();
@@ -143,25 +151,71 @@
     const result = [...labelPresets];
     result.splice(idx, 1);
     labelPresets = result;
+
+    if (selectedPresetIndex === idx) {
+      selectedPresetIndex = -1;
+    } else if (selectedPresetIndex > idx) {
+      selectedPresetIndex--;
+    }
+
     LocalStoragePersistence.saveLabelPresets(labelPresets);
   };
 
+  const getFallbackOffset = (): PreviewPropsOffset => {
+    try {
+      const savedOffset = LocalStoragePersistence.loadSavedPreviewProps()?.offset;
+      if (savedOffset !== undefined) {
+        return { ...savedOffset };
+      }
+    } catch (e) {
+      console.warn("Preview offset load error:", e);
+    }
+
+    return { x: 0, y: 0, offsetType: "inner" };
+  };
+
+  const onOffsetChange = () => {
+    hasPresetOffset = true;
+  };
+
+  const makeLabelPreset = (): LabelPreset => ({
+    dpmm,
+    printDirection,
+    unit,
+    width,
+    height,
+    title,
+    shape,
+    split,
+    splitParts,
+    tailPos,
+    tailLength,
+    mirror,
+    offset: { ...offset },
+  });
+
   const onLabelPresetAdd = () => {
-    const newPreset: LabelPreset = {
-      dpmm,
-      printDirection,
-      unit,
-      width,
-      height,
-      title,
-      shape,
-      split,
-      splitParts,
-      tailPos,
-      tailLength,
-      mirror,
-    };
-    const newPresets = [...labelPresets, newPreset];
+    const newPresets = [...labelPresets, makeLabelPreset()];
+    try {
+      LocalStoragePersistence.saveLabelPresets(newPresets);
+      labelPresets = newPresets;
+    } catch (e) {
+      Toasts.zodErrors(e, "Presets save error:");
+    }
+  };
+
+  const onLabelPresetReplace = () => {
+    if (selectedPresetIndex === -1) {
+      return;
+    }
+
+    if (!confirm($tr("editor.warning.save"))) {
+      return;
+    }
+
+    const newPresets = [...labelPresets];
+    newPresets[selectedPresetIndex] = makeLabelPreset();
+
     try {
       LocalStoragePersistence.saveLabelPresets(newPresets);
       labelPresets = newPresets;
@@ -201,6 +255,8 @@
     tailPos = labelProps.tailPos ?? "right";
     tailLength = labelProps.tailLength ?? 0;
     mirror = labelProps.mirror ?? "none";
+    hasPresetOffset = labelProps.offset !== undefined;
+    offset = labelProps.offset !== undefined ? { ...labelProps.offset } : getFallbackOffset();
     onUnitChange();
   };
 
@@ -216,6 +272,7 @@
       const presets = z.array(LabelPresetSchema).parse(rawData);
       LocalStoragePersistence.saveLabelPresets(presets);
       labelPresets = presets;
+      selectedPresetIndex = -1;
     } catch (e) {
       Toasts.zodErrors(e, "Presets load error:");
     }
@@ -241,6 +298,8 @@
     tailPos = defaultPreset.tailPos ?? "right";
     tailLength = defaultPreset.tailLength ?? 0;
     mirror = defaultPreset.mirror ?? "none";
+    hasPresetOffset = defaultPreset.offset !== undefined;
+    offset = defaultPreset.offset !== undefined ? { ...defaultPreset.offset } : getFallbackOffset();
 
     try {
       const savedPresets: LabelPreset[] | null = LocalStoragePersistence.loadLabelPresets();
@@ -300,6 +359,7 @@
       <LabelPresetsBrowser
         class="mb-1"
         presets={labelPresets}
+        selectedIndex={selectedPresetIndex}
         onItemSelected={onLabelPresetSelected}
         onItemDelete={onLabelPresetDelete} />
 
@@ -423,6 +483,18 @@
         </div>
       {/if}
 
+      <div class="input-group input-group-sm mb-2">
+        <span class="input-group-text">{$tr("preview.offset")}</span>
+        <span class="input-group-text"><MdIcon icon="unfold_more" class="r-90" /></span>
+        <input class="form-control" type="number" bind:value={offset.x} onchange={onOffsetChange} />
+        <span class="input-group-text"><MdIcon icon="unfold_more" /></span>
+        <input class="form-control" type="number" bind:value={offset.y} onchange={onOffsetChange} />
+        <select class="form-select" bind:value={offset.offsetType} onchange={onOffsetChange}>
+          <option value="inner">{$tr("preview.offset.inner")}</option>
+          <option value="outer">{$tr("preview.offset.outer")}</option>
+        </select>
+      </div>
+
       <div class="input-group flex-nowrap input-group-sm mb-2">
         <span class="input-group-text">{$tr("params.label.label_title")}</span>
         <input class="form-control" type="text" bind:value={title} />
@@ -432,6 +504,11 @@
         <button class="btn btn-sm btn-secondary" onclick={onLabelPresetAdd}>
           {$tr("params.label.save_template")}
         </button>
+        {#if selectedPresetIndex !== -1}
+          <button class="btn btn-sm btn-secondary" onclick={onLabelPresetReplace}>
+            {$tr("params.saved_labels.save.browser.replace")}
+          </button>
+        {/if}
         <button class="btn btn-sm btn-primary" onclick={onApply}>{$tr("params.label.apply")}</button>
       </div>
     </div>
