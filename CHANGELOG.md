@@ -2,6 +2,7 @@
 
 * Fix Arabic RTL text cursor and selection
 * Parse nested variables (example: `{dt+{var}d}`).
+* Auto use `D110M_V4` print task for `protocolVersion 4+` printers.
 
 # 2026.9.0
 
