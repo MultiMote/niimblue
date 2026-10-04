@@ -1,6 +1,7 @@
 # 2026.10.0
 
 * Fix Arabic RTL text cursor and selection
+* Parse nested variables (example: `{dt+{var}d}`).
 
 # 2026.9.0
 

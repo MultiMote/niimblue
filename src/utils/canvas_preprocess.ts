@@ -34,27 +34,50 @@ const preprocessDateTime = (format?: string, sign?: string, amount?: string, uni
 };
 
 const preprocessString = (input: string, variables?: Variables): string => {
-  return input.replace(
-    VARIABLE_TEMPLATE_RX,
-    (source, key: string, sign?: string, amount?: string, unit?: string, format?: string) => {
-      if (variables !== undefined && key in variables) {
-        return variables[key];
-      }
+  let result = input;
+  let prev: string;
+  let depth = 0;
 
-      if (key === "dt") {
-        return preprocessDateTime(format, sign, amount, unit);
-      }
+  do {
+    prev = result;
+    result = result.replace(
+      VARIABLE_TEMPLATE_RX,
+      (source, key: string, sign?: string, amount?: string, unit?: string, format?: string) => {
+        if (variables !== undefined && key in variables) {
+          return variables[key];
+        }
+        if (key === "dt") {
+          return preprocessDateTime(format, sign, amount, unit);
+        }
+        return source;
+      },
+    );
+    depth++;
+  } while (result !== prev && depth < 10);
 
-      return source;
-    },
-  );
+  return result;
+};
+
+/** Preprocess all variable values so nested expressions become expanded. */
+const preprocessVariables = (variables?: Variables): Variables | undefined => {
+  if (!variables) {
+    return undefined;
+  }
+
+  const resolved: Variables = {};
+  for (const [key, value] of Object.entries(variables)) {
+    resolved[key] = preprocessString(value, variables);
+  }
+  return resolved;
 };
 
 /** Replace text templates in some canvas objects. */
 export const canvasPreprocess = (canvas: fabric.Canvas, variables?: Variables): void => {
+  const processedVars = preprocessVariables(variables);
+
   canvas.forEachObject((obj: fabric.FabricObject) => {
     if (obj instanceof fabric.IText) {
-      const text = preprocessString(obj.text ?? "", variables);
+      const text = preprocessString(obj.text ?? "", processedVars);
 
       if (obj instanceof TextboxExt && obj.fontAutoSize) {
         obj.setAndShrinkText(text, obj.width);
@@ -67,7 +90,7 @@ export const canvasPreprocess = (canvas: fabric.Canvas, variables?: Variables): 
 
     if (obj instanceof QRCode || obj instanceof Barcode) {
       obj.set({
-        text: preprocessString(obj.text ?? "", variables),
+        text: preprocessString(obj.text ?? "", processedVars),
       });
     }
   });
