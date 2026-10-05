@@ -6,6 +6,20 @@ interface UniqueTextboxExtProps {
 
 const TEXTBOX_PROPS: Array<keyof UniqueTextboxExtProps> = ["fontAutoSize"];
 
+const RTL_STRONG_CHAR_RE = /[\p{Script=Arabic}\p{Script=Hebrew}]/u;
+const LETTER_RE = /\p{Letter}/u;
+
+const detectTextDirection = (text: string): "ltr" | "rtl" | undefined => {
+  for (const char of text) {
+    if (RTL_STRONG_CHAR_RE.test(char)) {
+      return "rtl";
+    }
+    if (LETTER_RE.test(char)) {
+      return "ltr";
+    }
+  }
+};
+
 export const textboxExtDefaultValues: Partial<fabric.TClassProperties<TextboxExt>> = {
   fontAutoSize: false,
 };
@@ -29,11 +43,27 @@ export class TextboxExt<
     super(text, options);
     Object.assign(this, textboxExtDefaultValues);
     this.setOptions(options);
+    this.syncTextDirection();
 
     this.setControlsVisibility({
       mb: false,
       mt: false,
     });
+  }
+
+  private syncTextDirection(): boolean {
+    const direction = detectTextDirection(this.text);
+    const changed = direction !== undefined && direction !== this.direction;
+
+    if (changed) {
+      this.set({ direction });
+    }
+
+    if (this.hiddenTextarea) {
+      this.hiddenTextarea.dir = this.direction;
+    }
+
+    return changed;
   }
 
   /** Set text and reduce fontSize until text fits to the given width */
@@ -43,6 +73,7 @@ export class TextboxExt<
     let linesCount = this._splitTextIntoLines(text).lines.length;
 
     this.set({ text });
+    this.syncTextDirection();
 
     while ((linesCount > linesLimit || this.width > maxWidth) && this.fontSize > 2) {
       this.fontSize -= 1;
@@ -63,7 +94,9 @@ export class TextboxExt<
   }
 
   override enterEditingImpl() {
+    this.syncTextDirection();
     super.enterEditingImpl();
+    this.syncTextDirection();
     this.widthBeforeEditing = this.width;
   }
 
@@ -75,9 +108,140 @@ export class TextboxExt<
   override updateFromTextArea(): void {
     super.updateFromTextArea();
 
+    if (this.syncTextDirection()) {
+      this.canvas?.requestRenderAll();
+    }
+
     if (this.widthBeforeEditing !== undefined && this.fontAutoSize) {
       const lines = this.text.split("\n").length;
       this.shrinkText(this.widthBeforeEditing, lines);
+    }
+  }
+
+  /**
+   * Backport Fabric.js #10993 for RTL cursor hit-testing.
+   * Fabric 7.4.0 compares RTL pointer coordinates in the wrong coordinate space.
+   */
+  override getSelectionStartFromPointer(e: fabric.TPointerEvent): number {
+    if (this.direction !== "rtl") {
+      return super.getSelectionStartFromPointer(e);
+    }
+
+    const mouseOffset = this.canvas!
+      .getScenePoint(e)
+      .transform(fabric.util.invertTransform(this.calcTransformMatrix()))
+      .add(new fabric.Point(-this._getLeftOffset(), -this._getTopOffset()));
+
+    let height = 0;
+    let charIndex = 0;
+    let lineIndex = 0;
+
+    for (let i = 0; i < this._textLines.length; i++) {
+      if (height <= mouseOffset.y) {
+        height += this.getHeightOfLine(i);
+        lineIndex = i;
+        if (i > 0) {
+          charIndex += this._textLines[i - 1].length + this.missingNewlineOffset(i - 1);
+        }
+      } else {
+        break;
+      }
+    }
+
+    const charLength = this._textLines[lineIndex].length;
+
+    // _getLineLeftOffset also ensures the character bounds for the line are measured.
+    const lineLeftOffset = this._getLineLeftOffset(lineIndex);
+    const chars = this.__charBounds[lineIndex];
+    const effectiveX = lineLeftOffset - mouseOffset.x;
+
+    // Fabric renders the cursor from charBounds[charIndex].left. For shaped RTL
+    // scripts (Arabic in particular), those measured positions can differ slightly
+    // from a running sum of kernedWidth. Pick the nearest real cursor boundary so
+    // click hit-testing and cursor rendering use the same geometry.
+    let nearestCharIndex = 0;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+
+    for (let j = 0; j <= charLength; j++) {
+      const cursorX = chars[j]?.left ?? 0;
+      const distance = Math.abs(effectiveX - cursorX);
+
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestCharIndex = j;
+      }
+    }
+
+    charIndex += nearestCharIndex;
+
+    return Math.min(
+      this.flipX ? charLength - charIndex : charIndex,
+      this._text.length,
+    );
+  }
+
+  override _renderSelection(
+    ctx: CanvasRenderingContext2D,
+    selection: { selectionStart: number; selectionEnd: number },
+    boundaries: { left: number; top: number; leftOffset: number; topOffset: number },
+  ): void {
+    if (this.direction !== "rtl") {
+      super._renderSelection(ctx, selection, boundaries);
+      return;
+    }
+
+    const selectionStart = Math.min(selection.selectionStart, selection.selectionEnd);
+    const selectionEnd = Math.max(selection.selectionStart, selection.selectionEnd);
+
+    if (selectionStart === selectionEnd) {
+      return;
+    }
+
+    const endLine = this.get2DCursorLocation(selectionEnd).lineIndex;
+    const lineRanges = new Map<number, { minX: number; maxX: number; top: number }>();
+
+    // Use the exact cursor geometry for every selected insertion boundary.
+    // This keeps the blue selection rectangle aligned with the caret even when
+    // Arabic shaping makes visual glyph widths differ from per-character widths.
+    for (let index = selectionStart; index <= selectionEnd; index++) {
+      const location = this.get2DCursorLocation(index);
+      const cursor = this._getCursorBoundaries(index, true);
+      const x = cursor.left + cursor.leftOffset;
+      const top = cursor.top + cursor.topOffset;
+      const range = lineRanges.get(location.lineIndex);
+
+      if (range === undefined) {
+        lineRanges.set(location.lineIndex, { minX: x, maxX: x, top });
+      } else {
+        range.minX = Math.min(range.minX, x);
+        range.maxX = Math.max(range.maxX, x);
+      }
+    }
+
+    for (const [lineIndex, range] of lineRanges) {
+      let lineHeight = this.getHeightOfLine(lineIndex);
+      let drawHeight = lineHeight;
+      let extraTop = 0;
+
+      if (this.lineHeight < 1 || (lineIndex === endLine && this.lineHeight > 1)) {
+        lineHeight /= this.lineHeight;
+        drawHeight = lineHeight;
+      }
+
+      if (this.inCompositionMode) {
+        ctx.fillStyle = this.compositionColor || "black";
+        drawHeight = 1;
+        extraTop = lineHeight;
+      } else {
+        ctx.fillStyle = this.selectionColor;
+      }
+
+      ctx.fillRect(
+        range.minX,
+        range.top + extraTop,
+        range.maxX - range.minX,
+        drawHeight,
+      );
     }
   }
 

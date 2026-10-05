@@ -1,7 +1,13 @@
+# 2026.10.0
+
+* Fix Arabic RTL text cursor and selection
+* Parse nested variables (example: `{dt+{var}d}`).
+* Auto use `D110M_V4` print task for `protocolVersion 4+` printers.
+
 # 2026.9.0
 
 * Add changelog (starts from commit 48ce74).
-* Add dual color printing support:.
+* Add dual color printing support:
   - Add red color to vector objects.
   - Add red/black threshold post-processing.
 * Use single PrintStart/PrintEnd session for multi-page printing.

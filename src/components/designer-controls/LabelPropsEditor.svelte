@@ -20,8 +20,8 @@
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import { Toasts } from "$/utils/toasts";
   import { FileUtils } from "$/utils/file_utils";
-  import { z } from "zod";
   import DpiSelector from "$/components/designer-controls/DpiSelector.svelte";
+  import { z } from "zod";
 
   interface Props {
     labelProps: LabelProps;
@@ -194,6 +194,14 @@
     offset: { ...offset },
   });
 
+  const onLabelPresetExport = (idx: number) => {
+    try {
+      FileUtils.saveLabelPresetAsJson(labelPresets[idx]);
+    } catch (e) {
+      Toasts.zodErrors(e, "Preset save error:");
+    }
+  };
+
   const onLabelPresetAdd = () => {
     const newPresets = [...labelPresets, makeLabelPreset()];
     try {
@@ -261,20 +269,26 @@
   };
 
   const onImportClicked = async () => {
-    const contents = await FileUtils.pickAndReadSingleTextFile("json");
-    const rawData = JSON.parse(contents);
-
-    if (!confirm($tr("params.label.warning.import"))) {
-      return;
-    }
-
     try {
-      const presets = z.array(LabelPresetSchema).parse(rawData);
+      const contents = await FileUtils.pickAndReadSingleTextFile("json");
+      const rawData = JSON.parse(contents);
+      const imported = FileUtils.parseSingleOrList(rawData, LabelPresetSchema);
+      const items = imported.kind === "single" ? [imported.item] : imported.items;
+
+      if (items.length === 0) {
+        return;
+      }
+
+      const presets = [...labelPresets, ...items];
       LocalStoragePersistence.saveLabelPresets(presets);
       labelPresets = presets;
       selectedPresetIndex = -1;
     } catch (e) {
-      Toasts.zodErrors(e, "Presets load error:");
+      if (e instanceof z.ZodError) {
+        Toasts.zodErrors(e, "Presets load error:");
+      } else {
+        Toasts.error(e);
+      }
     }
   };
 
@@ -341,7 +355,7 @@
         </button>
         <button class="btn btn-sm btn-outline-secondary" onclick={onExportClicked}>
           <MdIcon icon="data_object" />
-          {$tr("params.label.export")}
+          {$tr("params.label.export_all")}
         </button>
       </div>
       <div class="mb-3 {error ? 'cursor-help text-warning' : 'text-secondary'}" title={error}>
@@ -361,7 +375,8 @@
         presets={labelPresets}
         selectedIndex={selectedPresetIndex}
         onItemSelected={onLabelPresetSelected}
-        onItemDelete={onLabelPresetDelete} />
+        onItemDelete={onLabelPresetDelete}
+        onItemExport={onLabelPresetExport} />
 
       <div class="input-group flex-nowrap input-group-sm mb-2">
         <span class="input-group-text">{$tr("params.label.size")}</span>

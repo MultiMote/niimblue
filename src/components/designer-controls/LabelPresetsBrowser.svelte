@@ -6,6 +6,7 @@
   interface Props {
     onItemSelected: (index: number) => void;
     onItemDelete: (index: number) => void;
+    onItemExport: (index: number) => void;
     presets: LabelPreset[];
     selectedIndex?: number;
     class?: string;
@@ -14,6 +15,7 @@
   let {
     class: className = "",
     onItemDelete,
+    onItemExport,
     onItemSelected,
     presets,
     selectedIndex = -1,
@@ -43,6 +45,11 @@
     e.stopPropagation();
     deleteIndex = idx;
   };
+
+  const exportRequested = (e: MouseEvent, idx: number) => {
+    e.stopPropagation();
+    onItemExport(idx);
+  };
 </script>
 
 <div class="preset-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {className}">
@@ -59,7 +66,14 @@
       <div
         class="card print-start-{item.printDirection} d-flex justify-content-center align-items-center"
         style="width: {scaleDimensions(item).width}%; height: {scaleDimensions(item).height}%;">
-        <div class="remove d-flex">
+        <div class="buttons d-flex">
+          <button
+            class="btn text-primary-emphasis"
+            onclick={(e) => exportRequested(e, idx)}
+            title={$tr("params.label.export")}>
+            <MdIcon icon="download" />
+          </button>
+
           {#if deleteIndex === idx}
             <button class="remove btn text-danger-emphasis" onclick={(e) => deleteConfirmed(e, idx)}>
               <MdIcon icon="delete" />
@@ -105,13 +119,14 @@
     position: relative;
   }
 
-  .card > .remove {
+  .card > .buttons {
     position: absolute;
     top: 0;
     right: 0;
+    z-index: 2;
   }
 
-  .card > .remove > button {
+  .card > .buttons > button {
     padding: 0;
     line-height: 100%;
   }

@@ -29,7 +29,13 @@ export class FileUtils {
   /** Convert string to base64 string */
   static base64str(str: string): string {
     const bytes = new TextEncoder().encode(str);
-    const binString = String.fromCodePoint(...bytes);
+    const chunkSize = 0x8000;
+    let binString = "";
+
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      binString += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+    }
+
     return btoa(binString);
   }
 
@@ -37,6 +43,17 @@ export class FileUtils {
   static base64obj(obj: unknown): string {
     const json: string = JSON.stringify(obj);
     return FileUtils.base64str(json);
+  }
+
+  static parseSingleOrList<T>(
+    rawData: unknown,
+    schema: z.ZodType<T>,
+  ): { kind: "single"; item: T } | { kind: "list"; items: T[] } {
+    if (Array.isArray(rawData)) {
+      return { kind: "list", items: z.array(schema).parse(rawData) };
+    }
+
+    return { kind: "single", item: schema.parse(rawData) };
   }
 
   /** Convert object to base64 string */
@@ -185,6 +202,16 @@ export class FileUtils {
     FileUtils.downloadBase64(filename, "application/json", FileUtils.base64obj(parsed));
   }
 
+  /** Export all saved labels to one JSON file */
+  static saveLabelsAsJson(labels: ExportedLabelTemplate[]) {
+    const parsed = z.array(ExportedLabelTemplateSchema.omit({ id: true })).parse(labels);
+    FileUtils.downloadBase64(
+      `labels_${FileUtils.timestamp()}.json`,
+      "application/json",
+      FileUtils.base64obj(parsed),
+    );
+  }
+
   /** Convert canvas to PNG and download it */
   static saveCanvasAsPng(canvas: fabric.Canvas) {
     const timestamp = FileUtils.timestamp();
@@ -201,7 +228,15 @@ export class FileUtils {
     FileUtils.downloadBase64(`label_${timestamp}.png`, "image/png", url.split("base64,")[1]);
   }
 
-  /** Convert label template to JSON and download it */
+  /** Convert label preset to JSON and download it */
+  static saveLabelPresetAsJson(preset: LabelPreset) {
+    const parsed = LabelPresetSchema.parse(preset);
+    const title = parsed.title?.trim();
+    const filename = title ? `${title.replaceAll(/[\\/:*?"<>|]/g, "_")}.json` : `preset_${FileUtils.timestamp()}.json`;
+    FileUtils.downloadBase64(filename, "application/json", FileUtils.base64obj(parsed));
+  }
+
+  /** Convert label presets to JSON and download them */
   static saveLabelPresetsAsJson(presets: LabelPreset[]) {
     const parsed = z.array(LabelPresetSchema).parse(presets);
     FileUtils.downloadBase64(`presets_${FileUtils.timestamp()}.json`, "application/json", FileUtils.base64obj(parsed));
