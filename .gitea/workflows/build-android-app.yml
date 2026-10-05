@@ -104,7 +104,7 @@ jobs:
           APP_VERSION: ${{ gitea.ref_name }}
 
       - name: Copy release apk
-        run: cp ${{ env.CAPACITOR_PROJECT_DIR }}/android/app/build/outputs/apk/release/app-release-signed.apk $RUNNER_TEMP/niimblues.apk
+        run: cp ${{ env.CAPACITOR_PROJECT_DIR }}/android/app/build/outputs/apk/release/app-release-signed.apk "$RUNNER_TEMP/niimblues-${{ gitea.ref_name }}.apk"
 
       - name: Create draft release if it does not exist
         run: |
@@ -120,7 +120,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
 
       - name: Update GitHub release
-        run: gh release upload "${{gitea.ref_name}}" $RUNNER_TEMP/niimblues.apk -R MultiMote/niimblue --clobber
+        run: gh release upload "${{gitea.ref_name}}" "$RUNNER_TEMP/niimblues-${{ gitea.ref_name }}.apk" -R MultiMote/niimblue --clobber
         env:
           GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
 
