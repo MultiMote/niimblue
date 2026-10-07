@@ -132,6 +132,7 @@
     "params.text.align.right": "Выравнивание текста: Справа",
     "params.text.autosize": "Подгонять размер текста под ширину поля",
     "params.text.bold": "Полужирный",
+    "params.text.character_spacing": "Межсимвольный интервал",
     "params.text.edit.title": "Редактирование текста",
     "params.text.edit": "Редактировать во всплывающем диалоге",
     "params.text.fetch_fonts": "Получить список шрифтов",

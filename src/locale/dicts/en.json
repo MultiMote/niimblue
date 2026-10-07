@@ -145,6 +145,7 @@
     "params.text.align.right": "Align text: Right",
     "params.text.autosize": "Adjust text size to fit field width",
     "params.text.bold": "Bold",
+    "params.text.character_spacing": "Character pacing",
     "params.text.edit.title": "Editing text",
     "params.text.edit": "Edit in popup",
     "params.text.fetch_fonts": "Load system fonts",
