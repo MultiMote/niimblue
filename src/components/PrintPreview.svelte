@@ -404,6 +404,10 @@
 
     loadProps();
 
+    if (labelProps.offset !== undefined) {
+      offset = { ...labelProps.offset };
+    }
+
     await generatePreviewData(currentPage);
 
     if (printNow && !$disconnected && printState === "idle") {

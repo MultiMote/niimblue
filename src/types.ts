@@ -26,6 +26,12 @@ export const FabricObjectSchema = z.custom<fabric.FabricObject>((val: any): bool
   return typeof val === "object";
 });
 
+export const PreviewPropsOffsetSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+  offsetType: z.enum(["inner", "outer"]),
+});
+
 export const LabelPropsSchema = z.object({
   printDirection: z.enum(["left", "top"]),
   size: z.object({
@@ -38,6 +44,7 @@ export const LabelPropsSchema = z.object({
   tailPos: z.enum(["right", "bottom", "left", "top"]).default("right").optional(),
   tailLength: z.number().default(0).optional(),
   mirror: z.enum(["none", "copy", "flip"]).default("none").optional(),
+  offset: PreviewPropsOffsetSchema.optional(),
 });
 
 export const LabelPresetSchema = z.object({
@@ -53,6 +60,7 @@ export const LabelPresetSchema = z.object({
   tailPos: z.enum(["right", "bottom", "left", "top"]).default("right").optional(),
   tailLength: z.number().default(0).optional(),
   mirror: z.enum(["none", "copy", "flip"]).default("none").optional(),
+  offset: PreviewPropsOffsetSchema.optional(),
 });
 
 export const FabricJsonSchema = z.object({
@@ -71,12 +79,6 @@ export const ExportedLabelTemplateSchema = z.object({
 });
 
 const [firstTask, ...otherTasks] = printTaskNames;
-
-export const PreviewPropsOffsetSchema = z.object({
-  x: z.number(),
-  y: z.number(),
-  offsetType: z.enum(["inner", "outer"]),
-});
 
 const PostProcessTypeSchema = z.enum([
   "threshold",
