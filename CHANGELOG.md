@@ -5,6 +5,7 @@
 * Auto use `D110M_V4` print task for `protocolVersion 4+` printers.
 * Standardize template and saved label JSON import/export.
 * Add character spacing field.
+* Add preset print offset and replace support.
 
 # 2026.9.0
 

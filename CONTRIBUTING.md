@@ -12,6 +12,8 @@ Thank you for your interest in contributing to NiimBlue!
 
 - Avoid Mobile-Only UI changes. If you want to make UI changes, please make sure they work well on both desktop and mobile.
 
+- Add `CHANGELOG.md` short entry if the change affects the user experience (refactoring, for example, doesn't need to be added).
+
 - Run `npm run sv-check` and `npm run lint` before submitting pull request.
 
 - AI generated code is not appreciated. If you use AI to generate code, please make sure to review it and ensure it meets the project standards.
