@@ -2,6 +2,7 @@
   import type { LabelPreset } from "$/types";
   import { tr } from "$/utils/i18n";
   import MdIcon from "$/components/basic/MdIcon.svelte";
+  import { browserInfo } from "$/utils/browser.svelte";
 
   interface Props {
     onItemSelected: (index: number) => void;
@@ -20,7 +21,10 @@
     presets,
     selectedIndex = -1,
   }: Props = $props();
+
   let deleteIndex = $state<number>(-1);
+  let menuIndex = $state<number>(-1);
+  let longPressTimer: ReturnType<typeof setTimeout> | null = null;
 
   const scaleDimensions = (preset: LabelPreset): { width: number; height: number } => {
     const scaleFactor = Math.min(100 / preset.width, 100 / preset.height);
@@ -30,83 +34,147 @@
     };
   };
 
-  const deleteConfirmed = (e: MouseEvent, idx: number) => {
+  const deleteConfirmed = (e: Event, idx: number) => {
     e.stopPropagation();
     deleteIndex = -1;
+    menuIndex = -1;
     onItemDelete(idx);
   };
 
-  const deleteRejected = (e: MouseEvent) => {
+  const deleteRejected = (e: Event) => {
     e.stopPropagation();
     deleteIndex = -1;
   };
 
-  const deleteRequested = (e: MouseEvent, idx: number) => {
+  const deleteRequested = (e: Event, idx: number) => {
     e.stopPropagation();
     deleteIndex = idx;
   };
 
-  const exportRequested = (e: MouseEvent, idx: number) => {
+  const exportRequested = (e: Event, idx: number) => {
     e.stopPropagation();
+    menuIndex = -1;
     onItemExport(idx);
+  };
+
+  const startLongPress = (e: TouchEvent, idx: number) => {
+    if (!browserInfo.isMobile) return;
+
+    longPressTimer = setTimeout(() => {
+      menuIndex = idx;
+    }, 500);
+  };
+
+  const cancelLongPress = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+  };
+
+  const closeMenu = () => {
+    menuIndex = -1;
+    deleteIndex = -1;
   };
 </script>
 
-<div class="preset-browser overflow-y-auto border d-flex p-2 gap-1 flex-wrap {className}">
-  <!-- fixme: key -->
-  {#each presets as item, idx (item)}
-    <div
-      role="button"
-      class="btn p-0 card-wrapper d-flex justify-content-center align-items-center {selectedIndex === idx
-        ? 'border-primary'
-        : ''}"
-      tabindex="0"
-      onkeydown={() => onItemSelected(idx)}
-      onclick={() => onItemSelected(idx)}>
+<div class="preset-browser border {className}">
+  <div class="preset-list overflow-y-auto d-flex p-2 gap-1 flex-wrap">
+    {#each presets as item, idx (item)}
       <div
-        class="card print-start-{item.printDirection} d-flex justify-content-center align-items-center"
-        style="width: {scaleDimensions(item).width}%; height: {scaleDimensions(item).height}%;">
-        <div class="buttons d-flex">
-          <button
-            class="btn text-primary-emphasis"
-            onclick={(e) => exportRequested(e, idx)}
-            title={$tr("params.label.export")}>
-            <MdIcon icon="download" />
-          </button>
+        role="button"
+        class="btn p-0 card-wrapper d-flex justify-content-center align-items-center {selectedIndex === idx
+          ? 'border-primary'
+          : ''}"
+        tabindex="0"
+        oncontextmenu={(e) => e.preventDefault()}
+        onkeydown={() => onItemSelected(idx)}
+        onclick={() => onItemSelected(idx)}
+        ontouchstart={(e) => startLongPress(e, idx)}
+        ontouchend={cancelLongPress}
+        ontouchmove={cancelLongPress}
+        ontouchcancel={cancelLongPress}>
+        <div
+          class="card print-start-{item.printDirection} d-flex justify-content-center align-items-center"
+          style="width: {scaleDimensions(item).width}%; height: {scaleDimensions(item).height}%;">
+          {#if !browserInfo.isMobile}
+            <div class="buttons d-flex">
+              <button
+                class="btn text-primary-emphasis"
+                onclick={(e) => exportRequested(e, idx)}
+                title={$tr("params.label.export")}>
+                <MdIcon icon="download" />
+              </button>
 
-          {#if deleteIndex === idx}
-            <button class="remove btn text-danger-emphasis" onclick={(e) => deleteConfirmed(e, idx)}>
-              <MdIcon icon="delete" />
-            </button>
-            <button class="remove btn text-success" onclick={(e) => deleteRejected(e)}>
-              <MdIcon icon="close" />
-            </button>
-          {:else}
-            <button class="remove btn text-danger-emphasis" onclick={(e) => deleteRequested(e, idx)}>
-              <MdIcon icon="delete" />
-            </button>
+              {#if deleteIndex === idx}
+                <button class="remove btn text-danger-emphasis" onclick={(e) => deleteConfirmed(e, idx)}>
+                  <MdIcon icon="delete" />
+                </button>
+                <button class="remove btn text-success" onclick={(e) => deleteRejected(e)}>
+                  <MdIcon icon="close" />
+                </button>
+              {:else}
+                <button class="remove btn text-danger-emphasis" onclick={(e) => deleteRequested(e, idx)}>
+                  <MdIcon icon="delete" />
+                </button>
+              {/if}
+            </div>
           {/if}
+
+          <span class="label p-1">
+            {#if item.title}
+              {item.title}
+            {:else}
+              {item.width}x{item.height}{#if item.unit === "mm"}{$tr(
+                  "params.label.mm",
+                )}{:else if item.unit === "px"}{$tr("params.label.px")}{/if}
+            {/if}
+          </span>
         </div>
+      </div>
+    {/each}
+  </div>
 
-        <span class="label p-1">
-          {#if item.title}
-            {item.title}
-          {:else}
-            {item.width}x{item.height}{#if item.unit === "mm"}{$tr("params.label.mm")}{:else if item.unit === "px"}{$tr(
-                "params.label.px",
-              )}{/if}
-          {/if}
-        </span>
+  {#if browserInfo.isMobile && menuIndex >= 0}
+    <div class="popup-layer">
+      <div class="popup-backdrop" onclick={closeMenu}></div>
+
+      <div class="popup bg-body border rounded shadow">
+        <button class="btn w-100" onclick={(e) => exportRequested(e, menuIndex)}>
+          <MdIcon icon="download" />
+          {$tr("params.label.export")}
+        </button>
+
+        {#if deleteIndex === menuIndex}
+          <button class="btn w-100 text-danger" onclick={(e) => deleteConfirmed(e, menuIndex)}>
+            <MdIcon icon="delete" /> {$tr("params.label.delete.confirm")}
+          </button>
+          <button class="btn w-100" onclick={deleteRejected}>
+            <MdIcon icon="close" /> {$tr("params.label.delete.cancel")}
+          </button>
+        {:else}
+          <button class="btn w-100 text-danger" onclick={(e) => deleteRequested(e, menuIndex)}>
+            <MdIcon icon="delete" /> {$tr("params.label.delete")}
+          </button>
+        {/if}
       </div>
     </div>
-  {/each}
+  {/if}
 </div>
 
 <style>
   .preset-browser {
-    max-height: 200px;
     max-width: 100%;
     min-height: 96px;
+    max-height: 200px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .preset-list {
+    width: 100%;
+    height: 100%;
+    max-height: 200px;
   }
 
   .card-wrapper {
@@ -140,7 +208,34 @@
   .card.print-start-left {
     border-left: 2px solid #ff4646;
   }
+
   .card.print-start-top {
     border-top: 2px solid #ff4646;
+  }
+
+  .popup-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .popup-backdrop {
+    position: absolute;
+    inset: 0;
+    pointer-events: auto;
+  }
+
+  .popup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 160px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    pointer-events: auto;
   }
 </style>

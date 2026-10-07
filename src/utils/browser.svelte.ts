@@ -1,14 +1,19 @@
+export const browserInfo = $state({
+  isMobile: false,
+  isAntiFingerprinting: false,
+  isIOSSafari: false,
+});
+
 /** Safari on iPhone and iPad can gain Web Bluetooth through the beacio extension. */
-export const isIOSSafari = () => {
+const isIOSSafari = () => {
   const userAgent = navigator.userAgent;
-  const isIOS = /iPad|iPhone|iPod/.test(userAgent) ||
-    (/Macintosh/.test(userAgent) && navigator.maxTouchPoints > 1);
+  const isIOS = /iPad|iPhone|iPod/.test(userAgent) || (/Macintosh/.test(userAgent) && navigator.maxTouchPoints > 1);
 
   return isIOS && /Safari/.test(userAgent) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(userAgent);
 };
 
 /** Check if browser makes some modifications to canvas when reading */
-export const detectAntiFingerprinting = () => {
+const detectAntiFingerprinting = () => {
   const size = 32;
   const color = [0, 127, 255, 255];
 
@@ -36,3 +41,16 @@ export const detectAntiFingerprinting = () => {
   canvas.remove();
   return false;
 };
+
+(() => {
+  browserInfo.isIOSSafari = isIOSSafari();
+  browserInfo.isAntiFingerprinting = detectAntiFingerprinting();
+
+  const mediaQuery = window.matchMedia("(pointer: coarse)");
+
+  browserInfo.isMobile = mediaQuery.matches;
+
+  mediaQuery.addEventListener("change", (event) => {
+    browserInfo.isMobile = event.matches;
+  });
+})();

@@ -2,18 +2,16 @@
   import { Utils } from "@mmote/niimbluelib";
   import { tr } from "$/utils/i18n";
   import MdIcon from "$/components/basic/MdIcon.svelte";
-  import { detectAntiFingerprinting, isIOSSafari } from "$/utils/browsers";
+  import { browserInfo } from "$/utils/browser.svelte";
   let caps = Utils.getAvailableTransports();
   let browserWarningDismissed = $state(false);
   let fingerprintingWarningDismissed = $state(false);
-
-  let antiFingerprinting = detectAntiFingerprinting();
 </script>
 
 {#if !browserWarningDismissed && !caps.webSerial && !caps.webBluetooth && !caps.capacitorBle}
   <div class="alert alert-danger alert-dismissible" role="alert">
     <button type="button" class="btn-close" aria-label="Dismiss warning" onclick={() => browserWarningDismissed = true}></button>
-    {#if isIOSSafari()}
+    {#if browserInfo.isIOSSafari }
       <div>{$tr("browser_warning.ios_safari")}</div>
     {:else}
       <div>
@@ -27,7 +25,7 @@
   </div>
 {/if}
 
-{#if !fingerprintingWarningDismissed && antiFingerprinting}
+{#if !fingerprintingWarningDismissed && browserInfo.isAntiFingerprinting }
   <div class="alert alert-danger alert-dismissible" role="alert">
     <button type="button" class="btn-close" aria-label="Dismiss warning" onclick={() => fingerprintingWarningDismissed = true}></button>
     {$tr("browser_warning.fingerprinting")}

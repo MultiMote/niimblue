@@ -6,6 +6,7 @@
 * Standardize template and saved label JSON import/export.
 * Add character spacing field.
 * Add preset print offset and replace support.
+* Move label delete and export buttons to popup on mobile.
 
 # 2026.9.0
 
