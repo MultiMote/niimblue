@@ -26,7 +26,7 @@
   import { LocalStoragePersistence } from "$/utils/persistence";
   import type { MaterialIcon } from "material-icons";
   import FirmwareUpdater from "$/components/basic/FirmwareUpdater.svelte";
-  import PrinterVerboseInfo from "$/components/PrinterVerboseInfo.svelte";
+  import PrinterVerboseInfo from "$/components/dialogs/PrinterVerboseInfo.svelte";
 
   let connectionType = $state<ConnectionType>("bluetooth");
   let featureSupport = $state<AvailableTransports>({ webBluetooth: false, webSerial: false, capacitorBle: false });

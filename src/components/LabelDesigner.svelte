@@ -27,7 +27,7 @@
   import LabelPropsEditor from "$/components/designer-controls/LabelPropsEditor.svelte";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import ObjectPicker from "$/components/designer-controls/ObjectPicker.svelte";
-  import PrintPreview from "$/components/PrintPreview.svelte";
+  import PrintPreview from "$/components/dialogs/PrintPreview.svelte";
   import ArUcoParamsPanel from "$/components/designer-controls/ArUcoParamsControls.svelte";
   import QrCodeParamsPanel from "$/components/designer-controls/QRCodeParamsControls.svelte";
   import TextParamsControls from "$/components/designer-controls/TextParamsControls.svelte";

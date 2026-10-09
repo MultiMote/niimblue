@@ -4,7 +4,7 @@
   import LabelDesigner from "$/components/LabelDesigner.svelte";
   import PrinterConnector from "$/components/PrinterConnector.svelte";
   import { locale, locales, tr } from "$/utils/i18n";
-  import DebugStuff from "$/components/DebugStuff.svelte";
+  import DebugStuff from "$/components/dialogs/DebugStuff.svelte";
   import MdIcon from "$/components/basic/MdIcon.svelte";
 
   // eslint-disable-next-line no-undef

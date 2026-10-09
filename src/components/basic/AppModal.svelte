@@ -13,34 +13,49 @@
   let { show = $bindable(), title, onClose, children, footer }: Props = $props();
 
   let modalEl: HTMLElement;
-  let modal: Modal;
+  let modal: Modal | null = null;
 
   onMount(() => {
     modal = new Modal(modalEl);
-    modal.show();
 
-    modalEl.addEventListener('hide.bs.modal', () => {
-      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    modalEl.addEventListener("hide.bs.modal", () => {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
     });
 
     modalEl.addEventListener("hidden.bs.modal", () => {
-      if (onClose) onClose();
       show = false;
+      onClose?.();
     });
 
+    if (show) {
+      modal.show();
+    }
+  });
+
+  $effect(() => {
+    if (!modal) {
+      return;
+    }
+
+    if (show) {
+      modal.show();
+    } else {
+      modal.hide();
+    }
   });
 
   onDestroy(() => {
     if (modal) {
       modal.hide();
       modal.dispose();
+      modal = null;
     }
   });
 
   export const hide = () => {
-    if (modal) {
-      modal.hide();
-    }
+    modal?.hide();
   };
 </script>
 
