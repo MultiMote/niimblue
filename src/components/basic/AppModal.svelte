@@ -3,14 +3,14 @@
   import { onDestroy, onMount, type Snippet } from "svelte";
 
   interface Props {
-    show: boolean;
+    show?: boolean;
     title: string;
     onClose?: () => void;
     children: Snippet;
     footer?: Snippet;
   }
 
-  let { show = $bindable(), title, onClose, children, footer }: Props = $props();
+  let { show = $bindable(true), title, onClose, children, footer }: Props = $props();
 
   let modalEl: HTMLElement;
   let modal: Modal | null = null;

@@ -7,6 +7,7 @@
 * Add character spacing field.
 * Add preset print offset and replace support.
 * Move label delete and export buttons to popup on mobile.
+* Label dimensions editor and saved labels menu are modal now.
 
 # 2026.9.0
 

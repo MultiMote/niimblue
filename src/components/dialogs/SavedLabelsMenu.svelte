@@ -6,28 +6,29 @@
   import { ExportedLabelTemplateSchema, type ExportedLabelTemplate } from "$/types";
   import { LocalStoragePersistence } from "$/utils/persistence";
   import { Toasts } from "$/utils/toasts";
-  import Dropdown from "bootstrap/js/dist/dropdown";
   import { FileUtils } from "$/utils/file_utils";
   import * as fabric from "fabric";
   import { Utils } from "@mmote/niimbluelib";
   import { z } from "zod";
+  import AppModal from "$/components/basic/AppModal.svelte";
 
   interface Props {
     onRequestLabelTemplate: () => ExportedLabelTemplate;
     onLoadRequested: (label: ExportedLabelTemplate) => void;
+    onClose?: () => void;
     canvas: fabric.Canvas;
     csvEnabled: boolean;
   }
 
-  let { onRequestLabelTemplate, onLoadRequested, canvas, csvEnabled }: Props = $props();
+  let { onRequestLabelTemplate, onLoadRequested, canvas, csvEnabled, onClose }: Props = $props();
 
-  let dropdownRef: HTMLDivElement;
   let savedLabels = $state<ExportedLabelTemplate[]>([]);
   let selectedIndex = $state<number>(-1);
   let title = $state<string>("");
   let usedSpace = $state<number>(0);
   let customDefaultTemplate = $state<boolean>(LocalStoragePersistence.hasCustomDefaultTemplate());
   let isStandalone = Utils.getAvailableTransports().capacitorBle;
+  let modalRef: AppModal;
 
   const calcUsedSpace = () => {
     usedSpace = LocalStoragePersistence.usedSpace();
@@ -127,7 +128,7 @@
     }
 
     onLoadRequested(label);
-    new Dropdown(dropdownRef).hide();
+    modalRef.hide();
   };
 
   const onImportClicked = async () => {
@@ -222,123 +223,111 @@
   });
 </script>
 
-<div class="dropdown">
-  <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-    <MdIcon icon="sd_storage" />
-  </button>
-  <div class="saved-labels dropdown-menu" bind:this={dropdownRef}>
-    <h6 class="dropdown-header text-wrap">
-      {$tr("params.saved_labels.menu_title")} - {usedSpace}
-      {$tr("params.saved_labels.kb_used")}
+<AppModal title={$tr("params.saved_labels.menu_title")} {onClose} bind:this={modalRef}>
+  <div class="mb-1">
+    {usedSpace}
+    {$tr("params.saved_labels.kb_used")}
 
-      {#if csvEnabled}
-        <div class="pt-3 text-warning">
-            {$tr("params.saved_labels.save.withcsv")}
-        </div>
-      {/if}
-    </h6>
-
-
-    <div class="px-3">
-      <div class="p-1">
-        <button class="btn btn-sm btn-outline-secondary" onclick={onImportClicked}>
-          <MdIcon icon="data_object" />
-          {$tr("params.saved_labels.load.json")}
-        </button>
-        <div class="btn-group btn-group-sm">
-          <button
-            type="button"
-            class="btn btn-outline-secondary dropdown-toggle"
-            data-bs-toggle="dropdown"
-            aria-expanded="false">
-            <MdIcon icon="data_object" />
-            {$tr("params.saved_labels.save.json")}
-          </button>
-          <ul class="dropdown-menu">
-            <li><h6 class="dropdown-header">{$tr("params.saved_labels.export.current")}</h6></li>
-            <li>
-              <button class="dropdown-item" onclick={onExportClicked}>
-                {$tr("params.saved_labels.export.json")}
-              </button>
-            </li>
-            <li>
-              <button class="dropdown-item" onclick={onExportPngClicked}>
-                {$tr("params.saved_labels.export.png")}
-              </button>
-            </li>
-            {#if !isStandalone}
-              <li>
-                <button class="dropdown-item" onclick={onExportUrlClicked}>
-                  {$tr("params.saved_labels.save.url")}
-                </button>
-              </li>
-            {/if}
-            <li><hr class="dropdown-divider" /></li>
-            <li><h6 class="dropdown-header">{$tr("params.saved_labels.export.all")}</h6></li>
-            <li>
-              <button class="dropdown-item" onclick={onExportAllClicked}>
-                {$tr("params.saved_labels.export.json")}
-              </button>
-            </li>
-          </ul>
-        </div>
+    {#if csvEnabled}
+      <div class="pt-1 text-warning">
+        {$tr("params.saved_labels.save.withcsv")}
       </div>
+    {/if}
+  </div>
 
-      <SavedLabelsBrowser
-        class="mb-1"
-        {selectedIndex}
-        labels={savedLabels}
-        onItemClicked={onLabelSelected}
-        onItemDelete={onLabelDelete}
-        onItemExport={onLabelExport} />
-
-      <div class="input-group flex-nowrap input-group-sm mb-3">
-        <span class="input-group-text">{$tr("params.saved_labels.label_title")}</span>
-        <input
-          class="form-control"
-          type="text"
-          placeholder={$tr("params.saved_labels.label_title.placeholder")}
-          bind:value={title} />
-      </div>
-
-      <div class="d-flex gap-1 flex-wrap justify-content-end">
-        <div class="btn-group btn-group-sm make-default">
-          <button class="btn text-secondary" onclick={onMakeDefaultClicked}>
-            {$tr("params.saved_labels.make_default")}
+  <div class="mb-1">
+    <button class="btn btn-sm btn-outline-secondary" onclick={onImportClicked}>
+      <MdIcon icon="data_object" />
+      {$tr("params.saved_labels.load.json")}
+    </button>
+    <div class="btn-group btn-group-sm">
+      <button
+        type="button"
+        class="btn btn-outline-secondary dropdown-toggle"
+        data-bs-toggle="dropdown"
+        aria-expanded="false">
+        <MdIcon icon="data_object" />
+        {$tr("params.saved_labels.save.json")}
+      </button>
+      <ul class="dropdown-menu">
+        <li><h6 class="dropdown-header">{$tr("params.saved_labels.export.current")}</h6></li>
+        <li>
+          <button class="dropdown-item" onclick={onExportClicked}>
+            {$tr("params.saved_labels.export.json")}
           </button>
-          {#if customDefaultTemplate}
-            <button class="btn text-secondary" onclick={onRemoveDefaultClicked}>
-              <MdIcon icon="close" />
+        </li>
+        <li>
+          <button class="dropdown-item" onclick={onExportPngClicked}>
+            {$tr("params.saved_labels.export.png")}
+          </button>
+        </li>
+        {#if !isStandalone}
+          <li>
+            <button class="dropdown-item" onclick={onExportUrlClicked}>
+              {$tr("params.saved_labels.save.url")}
             </button>
-          {/if}
-        </div>
-
-        <button class="btn btn-sm btn-secondary" onclick={onSaveClicked}>
-          <MdIcon icon="save" />
-          {$tr("params.saved_labels.save.browser")}
-        </button>
-
-        {#if selectedIndex !== -1}
-          <button class="btn btn-sm btn-secondary" onclick={onSaveReplaceClicked}>
-            <MdIcon icon="edit_note" />
-            {$tr("params.saved_labels.save.browser.replace")}
-          </button>
-
-          <button class="btn btn-sm btn-primary" onclick={onLoadClicked}>
-            <MdIcon icon="folder" />
-            {$tr("params.saved_labels.load.browser")}
-          </button>
+          </li>
         {/if}
-      </div>
+        <li><hr class="dropdown-divider" /></li>
+        <li><h6 class="dropdown-header">{$tr("params.saved_labels.export.all")}</h6></li>
+        <li>
+          <button class="dropdown-item" onclick={onExportAllClicked}>
+            {$tr("params.saved_labels.export.json")}
+          </button>
+        </li>
+      </ul>
     </div>
   </div>
-</div>
+
+  <SavedLabelsBrowser
+    class="mb-1"
+    {selectedIndex}
+    labels={savedLabels}
+    onItemClicked={onLabelSelected}
+    onItemDelete={onLabelDelete}
+    onItemExport={onLabelExport} />
+
+  <div class="input-group flex-nowrap input-group-sm">
+    <span class="input-group-text">{$tr("params.saved_labels.label_title")}</span>
+    <input
+      class="form-control"
+      type="text"
+      placeholder={$tr("params.saved_labels.label_title.placeholder")}
+      bind:value={title} />
+  </div>
+
+  {#snippet footer()}
+    <div class="btn-group btn-group-sm make-default">
+      <button class="btn text-secondary" onclick={onMakeDefaultClicked}>
+        {$tr("params.saved_labels.make_default")}
+      </button>
+      {#if customDefaultTemplate}
+        <button class="btn text-secondary" onclick={onRemoveDefaultClicked}>
+          <MdIcon icon="close" />
+        </button>
+      {/if}
+    </div>
+
+    <button class="btn btn-sm btn-secondary" onclick={onSaveClicked}>
+      <MdIcon icon="save" />
+      {$tr("params.saved_labels.save.browser")}
+    </button>
+
+    {#if selectedIndex !== -1}
+      <button class="btn btn-sm btn-secondary" onclick={onSaveReplaceClicked}>
+        <MdIcon icon="edit_note" />
+        {$tr("params.saved_labels.save.browser.replace")}
+      </button>
+
+      <button class="btn btn-sm btn-primary" onclick={onLoadClicked}>
+        <MdIcon icon="folder" />
+        {$tr("params.saved_labels.load.browser")}
+      </button>
+    {/if}
+  {/snippet}
+</AppModal>
 
 <style>
-  .saved-labels.dropdown-menu {
-    width: 100vw;
-    max-width: 450px;
-  }
   .make-default {
     margin-right: auto;
   }

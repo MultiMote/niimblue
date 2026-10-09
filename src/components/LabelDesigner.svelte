@@ -24,7 +24,7 @@
   import CsvControl from "$/components/designer-controls/CsvControl.svelte";
   import GenericObjectParamsControls from "$/components/designer-controls/GenericObjectParamsControls.svelte";
   import IconPicker from "$/components/designer-controls/IconPicker.svelte";
-  import LabelPropsEditor from "$/components/designer-controls/LabelPropsEditor.svelte";
+  import LabelPropsEditor from "$/components/dialogs/LabelPropsEditor.svelte";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import ObjectPicker from "$/components/designer-controls/ObjectPicker.svelte";
   import PrintPreview from "$/components/dialogs/PrintPreview.svelte";
@@ -34,16 +34,18 @@
   import VariableInsertControl from "$/components/designer-controls/VariableInsertControl.svelte";
   import { DEFAULT_LABEL_PROPS, GRID_SIZE, OBJECT_DEFAULTS } from "$/defaults";
   import { LabelDesignerUtils } from "$/utils/label_designer_utils";
-  import SavedLabelsMenu from "$/components/designer-controls/SavedLabelsMenu.svelte";
+  import SavedLabelsMenu from "$/components/dialogs/SavedLabelsMenu.svelte";
   import { CustomCanvas } from "$/fabric-object/custom_canvas";
   import VectorParamsControls from "$/components/designer-controls/VectorParamsControls.svelte";
   import { CanvasUtils } from "$/utils/canvas_utils";
 
+  type DialogName = "none" | "preview" | "label_props" | "saved_labels";
+
   let htmlCanvas: HTMLCanvasElement;
+  let currentDialog = $state<DialogName>("none");
 
   let fabricCanvas = $state<CustomCanvas>();
   let labelProps = $state<LabelProps>(DEFAULT_LABEL_PROPS);
-  let previewOpened = $state<boolean>(false);
   let selectedObject = $state<fabric.FabricObject | undefined>(undefined);
   let selectedCount = $state<number>(0);
   let editRevision = $state<number>(0);
@@ -211,12 +213,12 @@
 
   const openPreview = () => {
     printNow = false;
-    previewOpened = true;
+    currentDialog = "preview";
   };
 
   const openPreviewAndPrint = () => {
     printNow = true;
-    previewOpened = true;
+    currentDialog = "preview";
   };
 
   const controlValueUpdated = () => {
@@ -293,7 +295,7 @@
       Toasts.error(e);
     }
     return false;
-  }
+  };
 
   const loadDefaultLabel = async () => {
     const urlLoaded = await loadLabelFromUrl();
@@ -430,8 +432,6 @@
       CanvasUtils.fixFabricObjectScale(e.target);
     });
 
-    // userFonts.subscribe((e) => {console.log(e); renderOnFontsChanged();});
-
     if ($automation !== undefined) {
       if ($automation.startPrint !== undefined) {
         if ($automation.startPrint === "immediately") {
@@ -458,7 +458,7 @@
   });
 
   $effect(() => {
-    if (!previewOpened) {
+    if (currentDialog !== "preview") {
       printNow = false;
     }
   });
@@ -484,17 +484,17 @@
   <div class="row mb-1">
     <div class="col d-flex justify-content-center">
       <div class="toolbar d-flex flex-wrap gap-1 justify-content-center align-items-center">
-        <LabelPropsEditor {labelProps} onChange={onUpdateLabelProps} />
+        <button class="btn btn-sm btn-secondary" onclick={() => (currentDialog = "label_props")}>
+          <MdIcon icon="settings" />
+        </button>
 
         <button class="btn btn-sm btn-secondary" onclick={clearCanvas} title={$tr("editor.clear")}>
           <MdIcon icon="cancel_presentation" />
         </button>
 
-        <SavedLabelsMenu
-          canvas={fabricCanvas!}
-          onRequestLabelTemplate={exportCurrentLabel}
-          {onLoadRequested}
-          {csvEnabled} />
+        <button class="btn btn-sm btn-secondary" onclick={() => (currentDialog = "saved_labels")}>
+          <MdIcon icon="sd_storage" />
+        </button>
 
         <button
           class="btn btn-sm btn-secondary"
@@ -519,10 +519,7 @@
           <MdIcon icon="grid_on" />
         </button>
 
-        <button
-          class="btn btn-sm btn-secondary"
-          onclick={() => fabricCanvas?.resetVirtualZoom()}
-          title="Reset zoom">
+        <button class="btn btn-sm btn-secondary" onclick={() => fabricCanvas?.resetVirtualZoom()} title="Reset zoom">
           {zoomText}
         </button>
 
@@ -530,7 +527,7 @@
 
         <IconPicker onSubmit={onIconPicked} onSubmitSvg={onSvgIconPicked} />
 
-        <ObjectPicker onSubmit={onObjectPicked} {labelProps} {zplImageReady} {pdfImageReady}  />
+        <ObjectPicker onSubmit={onObjectPicked} {labelProps} {zplImageReady} {pdfImageReady} />
 
         <button class="btn btn-sm btn-primary ms-1" onclick={openPreview}>
           <MdIcon icon="visibility" />
@@ -591,14 +588,23 @@
     </div>
   </div>
 
-  {#if previewOpened}
+  {#if currentDialog === "preview"}
     <PrintPreview
-      bind:show={previewOpened}
+      onClose={() => (currentDialog = "none")}
       canvasCallback={getCanvasForPreview}
       {labelProps}
       {printNow}
       {csvEnabled}
       csvData={$csvData.data} />
+  {:else if currentDialog === "label_props"}
+    <LabelPropsEditor onClose={() => (currentDialog = "none")} onChange={onUpdateLabelProps} {labelProps} />
+  {:else if currentDialog === "saved_labels"}
+    <SavedLabelsMenu
+      onClose={() => (currentDialog = "none")}
+      canvas={fabricCanvas!}
+      onRequestLabelTemplate={exportCurrentLabel}
+      {onLoadRequested}
+      {csvEnabled} />
   {/if}
 </div>
 

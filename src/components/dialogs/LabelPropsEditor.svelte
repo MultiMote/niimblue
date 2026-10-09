@@ -22,13 +22,15 @@
   import { FileUtils } from "$/utils/file_utils";
   import DpiSelector from "$/components/designer-controls/DpiSelector.svelte";
   import { z } from "zod";
+  import AppModal from "$/components/basic/AppModal.svelte";
 
   interface Props {
     labelProps: LabelProps;
     onChange: (newProps: LabelProps) => void;
+    onClose?: () => void;
   }
 
-  let { labelProps, onChange }: Props = $props();
+  let { labelProps, onChange, onClose }: Props = $props();
 
   const tailPositions: TailPosition[] = ["right", "bottom", "left", "top"];
   const printDirections: PrintDirection[] = ["left", "top"];
@@ -54,6 +56,7 @@
   let mirror = $state<MirrorType>("none");
   let offset = $state<PreviewPropsOffset>({ x: 0, y: 0, offsetType: "inner" });
   let hasPresetOffset = $state<boolean>(false);
+  let modalRef: AppModal;
 
   let error = $derived.by<string>(() => {
     let error = "";
@@ -145,6 +148,11 @@
     }
 
     onApply();
+  };
+
+  const applyAndClose = () => {
+    onApply();
+    modalRef.hide();
   };
 
   const onLabelPresetDelete = (idx: number) => {
@@ -340,202 +348,189 @@
   });
 </script>
 
-<div class="dropdown">
-  <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-    <MdIcon icon="settings" />
-  </button>
-  <div class="dropdown-menu">
-    <h6 class="dropdown-header">{$tr("params.label.menu_title")}</h6>
-
-    <div class="px-3">
-      <div class="p-1">
-        <button class="btn btn-sm btn-outline-secondary" onclick={onImportClicked}>
-          <MdIcon icon="data_object" />
-          {$tr("params.label.import")}
-        </button>
-        <button class="btn btn-sm btn-outline-secondary" onclick={onExportClicked}>
-          <MdIcon icon="data_object" />
-          {$tr("params.label.export_all")}
-        </button>
-      </div>
-      <div class="mb-3 {error ? 'cursor-help text-warning' : 'text-secondary'}" title={error}>
-        {$tr("params.label.current")}
-        {labelProps.size.width}x{labelProps.size.height}
-        {$tr("params.label.px")}
-        {#if labelProps.printDirection === "top"}
-          ({$tr("params.label.direction")} {$tr("params.label.direction.top")})
-        {:else if labelProps.printDirection === "left"}
-          ({$tr("params.label.direction")} {$tr("params.label.direction.left")})
-        {/if}
-        <button class="btn btn-sm" onclick={fillWithCurrentParams}><MdIcon icon="arrow_downward" /></button>
-      </div>
-
-      <LabelPresetsBrowser
-        class="mb-1"
-        presets={labelPresets}
-        selectedIndex={selectedPresetIndex}
-        onItemSelected={onLabelPresetSelected}
-        onItemDelete={onLabelPresetDelete}
-        onItemExport={onLabelPresetExport} />
-
-      <div class="input-group flex-nowrap input-group-sm mb-2">
-        <span class="input-group-text">{$tr("params.label.size")}</span>
-        <input class="form-control" type="number" min="1" step={unit === "px" ? 8 : 1} bind:value={width} />
-        <button class="btn btn-sm btn-secondary" onclick={onFlip}><MdIcon icon="swap_horiz" /></button>
-        <input class="form-control" type="number" min="1" step={unit === "px" ? 8 : 1} bind:value={height} />
-        <select class="form-select" bind:value={unit} onchange={onUnitChange}>
-          <option value="mm"> {$tr("params.label.mm")}</option>
-          <option value="px"> {$tr("params.label.px")}</option>
-        </select>
-      </div>
-
-      {#if unit !== "px"}
-        <DpiSelector bind:value={dpmm} />
-      {/if}
-
-      <div class="input-group flex-nowrap input-group-sm print-dir-switch mb-2" role="group">
-        <span class="input-group-text w-100">{$tr("params.label.direction")}</span>
-        {#each printDirections as v (v)}
-          <input
-            type="radio"
-            class="btn-check"
-            name="print-dir"
-            id="print-dir-{v}"
-            autocomplete="off"
-            bind:group={printDirection}
-            value={v} />
-          <label class="btn btn-outline-secondary px-3" for="print-dir-{v}">
-            <div class="svg-icon"></div>
-          </label>
-        {/each}
-      </div>
-
-      <div class="input-group flex-nowrap input-group-sm label-shape-switch mb-2" role="group">
-        <span class="input-group-text w-100">{$tr("params.label.shape")}</span>
-        {#each labelShapes as v (v)}
-          <input
-            type="radio"
-            class="btn-check"
-            name="label-shape"
-            id="label-shape-{v}"
-            autocomplete="off"
-            bind:group={shape}
-            value={v} />
-          <label class="btn btn-outline-secondary px-3" for="label-shape-{v}">
-            <div class="svg-icon"></div>
-          </label>
-        {/each}
-      </div>
-
-      {#if shape !== "circle"}
-        <div class="input-group flex-nowrap input-group-sm label-split-switch mb-2" role="group">
-          <span class="input-group-text w-100">{$tr("params.label.split")}</span>
-          {#each labelSplits as v (v)}
-            <input
-              type="radio"
-              class="btn-check"
-              name="label-split"
-              id="label-split-{v}"
-              autocomplete="off"
-              bind:group={split}
-              value={v} />
-            <label class="btn btn-outline-secondary px-3" for="label-split-{v}">
-              <div class="svg-icon"></div>
-            </label>
-          {/each}
-        </div>
-
-        {#if split !== "none"}
-          <div class="input-group flex-nowrap input-group-sm mb-2">
-            <span class="input-group-text">{$tr("params.label.split.count")}</span>
-            <input class="form-control" type="number" min="1" bind:value={splitParts} />
-          </div>
-        {/if}
-      {/if}
-
-      {#if split !== "none"}
-        <div class="input-group flex-nowrap input-group-sm mirror-switch mb-2" role="group">
-          <span class="input-group-text w-100">{$tr("params.label.mirror")}</span>
-          {#each mirrorTypes as v (v)}
-            <input
-              type="radio"
-              class="btn-check"
-              name="mirror"
-              id="mirror-{v}"
-              autocomplete="off"
-              bind:group={mirror}
-              value={v} />
-            <label class="btn btn-outline-secondary px-3" for="mirror-{v}">
-              <div class="svg-icon"></div>
-            </label>
-          {/each}
-        </div>
-
-        <div class="input-group flex-nowrap input-group-sm tail-pos-switch mb-2" role="group">
-          <span class="input-group-text w-100">{$tr("params.label.tail.position")}</span>
-          {#each tailPositions as v (v)}
-            <input
-              type="radio"
-              class="btn-check"
-              name="tail-pos"
-              id="tail-{v}"
-              autocomplete="off"
-              bind:group={tailPos}
-              value={v} />
-            <label class="btn btn-outline-secondary px-3" for="tail-{v}">
-              <div class="svg-icon"></div>
-            </label>
-          {/each}
-        </div>
-
-        <div class="input-group flex-nowrap input-group-sm mb-2">
-          <span class="input-group-text">{$tr("params.label.tail.length")}</span>
-          <input class="form-control" type="number" min="1" bind:value={tailLength} />
-          <span class="input-group-text">
-            {#if unit === "mm"}{$tr("params.label.mm")}{/if}
-            {#if unit === "px"}{$tr("params.label.px")}{/if}
-          </span>
-        </div>
-      {/if}
-
-      <div class="input-group input-group-sm mb-2">
-        <span class="input-group-text">{$tr("preview.offset")}</span>
-        <span class="input-group-text"><MdIcon icon="unfold_more" class="r-90" /></span>
-        <input class="form-control" type="number" bind:value={offset.x} onchange={onOffsetChange} />
-        <span class="input-group-text"><MdIcon icon="unfold_more" /></span>
-        <input class="form-control" type="number" bind:value={offset.y} onchange={onOffsetChange} />
-        <select class="form-select" bind:value={offset.offsetType} onchange={onOffsetChange}>
-          <option value="inner">{$tr("preview.offset.inner")}</option>
-          <option value="outer">{$tr("preview.offset.outer")}</option>
-        </select>
-      </div>
-
-      <div class="input-group flex-nowrap input-group-sm mb-2">
-        <span class="input-group-text">{$tr("params.label.label_title")}</span>
-        <input class="form-control" type="text" bind:value={title} />
-      </div>
-
-      <div class="text-end">
-        <button class="btn btn-sm btn-secondary" onclick={onLabelPresetAdd}>
-          {$tr("params.label.save_template")}
-        </button>
-        {#if selectedPresetIndex !== -1}
-          <button class="btn btn-sm btn-secondary" onclick={onLabelPresetReplace}>
-            {$tr("params.saved_labels.save.browser.replace")}
-          </button>
-        {/if}
-        <button class="btn btn-sm btn-primary" onclick={onApply}>{$tr("params.label.apply")}</button>
-      </div>
-    </div>
+<AppModal title={$tr("params.label.menu_title")} {onClose} bind:this={modalRef}>
+  <div class="mb-1">
+    <button class="btn btn-sm btn-outline-secondary" onclick={onImportClicked}>
+      <MdIcon icon="data_object" />
+      {$tr("params.label.import")}
+    </button>
+    <button class="btn btn-sm btn-outline-secondary" onclick={onExportClicked}>
+      <MdIcon icon="data_object" />
+      {$tr("params.label.export_all")}
+    </button>
   </div>
-</div>
+
+  <div class="mb-3 {error ? 'cursor-help text-warning' : 'text-secondary'}" title={error}>
+    {$tr("params.label.current")}
+    {labelProps.size.width}x{labelProps.size.height}
+    {$tr("params.label.px")}
+    {#if labelProps.printDirection === "top"}
+      ({$tr("params.label.direction")} {$tr("params.label.direction.top")})
+    {:else if labelProps.printDirection === "left"}
+      ({$tr("params.label.direction")} {$tr("params.label.direction.left")})
+    {/if}
+    <button class="btn btn-sm" onclick={fillWithCurrentParams}><MdIcon icon="arrow_downward" /></button>
+  </div>
+
+  <LabelPresetsBrowser
+    class="mb-1"
+    presets={labelPresets}
+    selectedIndex={selectedPresetIndex}
+    onItemSelected={onLabelPresetSelected}
+    onItemDelete={onLabelPresetDelete}
+    onItemExport={onLabelPresetExport} />
+
+  <div class="input-group flex-nowrap input-group-sm mb-2">
+    <span class="input-group-text">{$tr("params.label.size")}</span>
+    <input class="form-control" type="number" min="1" step={unit === "px" ? 8 : 1} bind:value={width} />
+    <button class="btn btn-sm btn-secondary" onclick={onFlip}><MdIcon icon="swap_horiz" /></button>
+    <input class="form-control" type="number" min="1" step={unit === "px" ? 8 : 1} bind:value={height} />
+    <select class="form-select" bind:value={unit} onchange={onUnitChange}>
+      <option value="mm"> {$tr("params.label.mm")}</option>
+      <option value="px"> {$tr("params.label.px")}</option>
+    </select>
+  </div>
+
+  {#if unit !== "px"}
+    <DpiSelector bind:value={dpmm} />
+  {/if}
+
+  <div class="input-group flex-nowrap input-group-sm print-dir-switch mb-2" role="group">
+    <span class="input-group-text w-100">{$tr("params.label.direction")}</span>
+    {#each printDirections as v (v)}
+      <input
+        type="radio"
+        class="btn-check"
+        name="print-dir"
+        id="print-dir-{v}"
+        autocomplete="off"
+        bind:group={printDirection}
+        value={v} />
+      <label class="btn btn-outline-secondary px-3" for="print-dir-{v}">
+        <div class="svg-icon"></div>
+      </label>
+    {/each}
+  </div>
+
+  <div class="input-group flex-nowrap input-group-sm label-shape-switch mb-2" role="group">
+    <span class="input-group-text w-100">{$tr("params.label.shape")}</span>
+    {#each labelShapes as v (v)}
+      <input
+        type="radio"
+        class="btn-check"
+        name="label-shape"
+        id="label-shape-{v}"
+        autocomplete="off"
+        bind:group={shape}
+        value={v} />
+      <label class="btn btn-outline-secondary px-3" for="label-shape-{v}">
+        <div class="svg-icon"></div>
+      </label>
+    {/each}
+  </div>
+
+  {#if shape !== "circle"}
+    <div class="input-group flex-nowrap input-group-sm label-split-switch mb-2" role="group">
+      <span class="input-group-text w-100">{$tr("params.label.split")}</span>
+      {#each labelSplits as v (v)}
+        <input
+          type="radio"
+          class="btn-check"
+          name="label-split"
+          id="label-split-{v}"
+          autocomplete="off"
+          bind:group={split}
+          value={v} />
+        <label class="btn btn-outline-secondary px-3" for="label-split-{v}">
+          <div class="svg-icon"></div>
+        </label>
+      {/each}
+    </div>
+
+    {#if split !== "none"}
+      <div class="input-group flex-nowrap input-group-sm mb-2">
+        <span class="input-group-text">{$tr("params.label.split.count")}</span>
+        <input class="form-control" type="number" min="1" bind:value={splitParts} />
+      </div>
+    {/if}
+  {/if}
+
+  {#if split !== "none"}
+    <div class="input-group flex-nowrap input-group-sm mirror-switch mb-2" role="group">
+      <span class="input-group-text w-100">{$tr("params.label.mirror")}</span>
+      {#each mirrorTypes as v (v)}
+        <input
+          type="radio"
+          class="btn-check"
+          name="mirror"
+          id="mirror-{v}"
+          autocomplete="off"
+          bind:group={mirror}
+          value={v} />
+        <label class="btn btn-outline-secondary px-3" for="mirror-{v}">
+          <div class="svg-icon"></div>
+        </label>
+      {/each}
+    </div>
+
+    <div class="input-group flex-nowrap input-group-sm tail-pos-switch mb-2" role="group">
+      <span class="input-group-text w-100">{$tr("params.label.tail.position")}</span>
+      {#each tailPositions as v (v)}
+        <input
+          type="radio"
+          class="btn-check"
+          name="tail-pos"
+          id="tail-{v}"
+          autocomplete="off"
+          bind:group={tailPos}
+          value={v} />
+        <label class="btn btn-outline-secondary px-3" for="tail-{v}">
+          <div class="svg-icon"></div>
+        </label>
+      {/each}
+    </div>
+
+    <div class="input-group flex-nowrap input-group-sm mb-2">
+      <span class="input-group-text">{$tr("params.label.tail.length")}</span>
+      <input class="form-control" type="number" min="1" bind:value={tailLength} />
+      <span class="input-group-text">
+        {#if unit === "mm"}{$tr("params.label.mm")}{/if}
+        {#if unit === "px"}{$tr("params.label.px")}{/if}
+      </span>
+    </div>
+  {/if}
+
+  <div class="input-group input-group-sm mb-2">
+    <span class="input-group-text">{$tr("preview.offset")}</span>
+    <span class="input-group-text"><MdIcon icon="unfold_more" class="r-90" /></span>
+    <input class="form-control" type="number" bind:value={offset.x} onchange={onOffsetChange} />
+    <span class="input-group-text"><MdIcon icon="unfold_more" /></span>
+    <input class="form-control" type="number" bind:value={offset.y} onchange={onOffsetChange} />
+    <select class="form-select" bind:value={offset.offsetType} onchange={onOffsetChange}>
+      <option value="inner">{$tr("preview.offset.inner")}</option>
+      <option value="outer">{$tr("preview.offset.outer")}</option>
+    </select>
+  </div>
+
+  <div class="input-group flex-nowrap input-group-sm">
+    <span class="input-group-text">{$tr("params.label.label_title")}</span>
+    <input class="form-control" type="text" bind:value={title} />
+  </div>
+
+  {#snippet footer()}
+    <button class="btn btn-sm btn-secondary" onclick={onLabelPresetAdd}>
+      {$tr("params.label.save_template")}
+    </button>
+    {#if selectedPresetIndex !== -1}
+      <button class="btn btn-sm btn-secondary" onclick={onLabelPresetReplace}>
+        {$tr("params.saved_labels.save.browser.replace")}
+      </button>
+    {/if}
+    <button class="btn btn-sm btn-primary" onclick={applyAndClose}>{$tr("params.label.apply")}</button>
+  {/snippet}
+</AppModal>
 
 <style>
-  .dropdown-menu {
-    width: 100vw;
-    max-width: 450px;
-  }
-
   .cursor-help {
     cursor: help;
   }

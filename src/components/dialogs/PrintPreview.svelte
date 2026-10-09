@@ -32,13 +32,13 @@
   interface Props {
     labelProps: LabelProps;
     canvasCallback: () => FabricJson;
+    onClose?: () => void;
     printNow?: boolean;
     csvData: string;
     csvEnabled: boolean;
-    show: boolean;
   }
 
-  let { labelProps, canvasCallback, printNow = false, csvData, csvEnabled, show = $bindable() }: Props = $props();
+  let { labelProps, canvasCallback, printNow = false, csvData, csvEnabled, onClose }: Props = $props();
 
   let previewCanvas: HTMLCanvasElement;
   let printState = $state<"idle" | "printing">("idle");
@@ -353,6 +353,7 @@
 
   const onModalClose = () => {
     endPrint();
+    onClose?.();
   };
 
   const taskHasCap = (cap: TaskCap) => {
@@ -416,7 +417,7 @@
   });
 </script>
 
-<AppModal title={$tr("preview.title")} onClose={onModalClose} bind:show bind:this={modalRef}>
+<AppModal title={$tr("preview.title")} onClose={onModalClose} bind:this={modalRef}>
   <div class="d-flex justify-content-center">
     {#if pagesTotal > 1}
       <button disabled={printState !== "idle"} class="btn w-100 fs-1" onclick={pageDown}>
