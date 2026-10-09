@@ -3,6 +3,7 @@
   import { tr } from "$/utils/i18n";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import { browserInfo } from "$/utils/browser.svelte";
+  import ModalBackdrop from "$/components/basic/ModalBackdrop.svelte";
 
   interface Props {
     onItemSelected: (index: number) => void;
@@ -137,7 +138,8 @@
 
   {#if browserInfo.isMobile && menuIndex >= 0}
     <div class="popup-layer">
-      <div class="popup-backdrop" onclick={closeMenu}></div>
+
+      <ModalBackdrop onClicked={closeMenu}/>
 
       <div class="popup bg-body border rounded shadow">
         <button class="btn w-100" onclick={(e) => exportRequested(e, menuIndex)}>
@@ -218,12 +220,6 @@
     inset: 0;
     z-index: 10;
     pointer-events: none;
-  }
-
-  .popup-backdrop {
-    position: absolute;
-    inset: 0;
-    pointer-events: auto;
   }
 
   .popup {

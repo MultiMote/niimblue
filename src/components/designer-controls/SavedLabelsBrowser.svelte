@@ -3,6 +3,7 @@
   import { tr } from "$/utils/i18n";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import { browserInfo } from "$/utils/browser.svelte";
+  import ModalBackdrop from "$/components/basic/ModalBackdrop.svelte";
 
   interface Props {
     onItemClicked: (index: number) => void;
@@ -138,7 +139,7 @@
 
   {#if browserInfo.isMobile && menuIndex >= 0}
     <div class="popup-layer">
-      <div class="popup-backdrop" onclick={closeMenu}></div>
+      <ModalBackdrop onClicked={closeMenu}/>
 
       <div class="popup bg-body border rounded shadow">
         <button class="btn w-100" onclick={(e) => exportRequested(e, menuIndex)}>
@@ -148,14 +149,17 @@
 
         {#if deleteIndex === menuIndex}
           <button class="btn w-100 text-danger" onclick={(e) => deleteConfirmed(e, menuIndex)}>
-            <MdIcon icon="delete" /> {$tr("params.label.delete.confirm")}
+            <MdIcon icon="delete" />
+            {$tr("params.label.delete.confirm")}
           </button>
           <button class="btn w-100" onclick={deleteRejected}>
-            <MdIcon icon="close" /> {$tr("params.label.delete.cancel")}
+            <MdIcon icon="close" />
+            {$tr("params.label.delete.cancel")}
           </button>
         {:else}
           <button class="btn w-100 text-danger" onclick={(e) => deleteRequested(e, menuIndex)}>
-            <MdIcon icon="delete" /> {$tr("params.label.delete")}
+            <MdIcon icon="delete" />
+            {$tr("params.label.delete")}
           </button>
         {/if}
       </div>
@@ -226,12 +230,6 @@
     inset: 0;
     z-index: 10;
     pointer-events: none;
-  }
-
-  .popup-backdrop {
-    position: absolute;
-    inset: 0;
-    pointer-events: auto;
   }
 
   .popup {
