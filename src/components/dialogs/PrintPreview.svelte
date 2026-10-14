@@ -393,14 +393,9 @@
       pagesTotal = csvParsed.length;
     }
 
-    const protoVersion = $printerClient?.getPrinterInfo().protocolVersion;
-
     if (detectedPrintTaskName !== undefined) {
       console.log(`Detected print task version: ${detectedPrintTaskName}`);
       printTaskName = detectedPrintTaskName;
-    } else if (protoVersion && protoVersion >= 4) { // fixme: move to niimbluelib
-      console.log(`Using D110M_V4 because protocolVersion is ${protoVersion}`);
-      printTaskName = "D110M_V4";
     }
 
     loadProps();
