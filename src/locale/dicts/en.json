@@ -225,5 +225,9 @@
     "fonts.add": "Add",
     "fonts.browse": "Browse...",
     "fonts.gfonts": "Get fonts",
-    "fonts.title_override": "Override name"
+    "fonts.title_override": "Override name",
+    "dialog.cancel": "Cancel",
+    "dialog.no": "No",
+    "dialog.ok": "OK",
+    "dialog.yes": "Yes"
 }

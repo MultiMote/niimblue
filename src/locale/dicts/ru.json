@@ -225,5 +225,9 @@
     "params.saved_labels.export.json": "Файл JSON",
     "params.saved_labels.import.added_one": "Этикетка добавлена в сохранённые",
     "params.saved_labels.import.added_many": "{count} этикеток добавлено в сохранённые",
-    "params.saved_labels.export.png": "В PNG"
+    "params.saved_labels.export.png": "В PNG",
+    "dialog.cancel": "Отмена",
+    "dialog.no": "Нет",
+    "dialog.ok": "OK",
+    "dialog.yes": "Да"
 }

@@ -4,6 +4,7 @@
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import FontFamilyPicker from "$/components/designer-controls/FontFamilyPicker.svelte";
   import { TextboxExt } from "$/fabric-object/textbox-ext";
+  import { appPrompt } from "$/stores/prompt";
 
   interface Props {
     selectedText: fabric.IText;
@@ -106,8 +107,13 @@
     valueUpdated();
   };
 
-  const editInPopup = () => {
-    const text = prompt($tr("params.text.edit.title"), selectedText.text);
+  const editInPopup = async () => {
+    const text = await appPrompt({
+      title: $tr("params.text.edit.title"),
+      defaultValue: selectedText.text,
+      multiline: true,
+    });
+
     if (text !== null) {
       selectedText.set({ text });
       selectedText.isEditing = false;

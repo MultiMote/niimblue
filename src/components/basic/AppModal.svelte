@@ -6,28 +6,37 @@
     show?: boolean;
     title: string;
     onClose?: () => void;
+    onShow?: () => void;
     children: Snippet;
     footer?: Snippet;
   }
 
-  let { show = $bindable(true), title, onClose, children, footer }: Props = $props();
+  let { show = $bindable(true), title, onClose, onShow, children, footer }: Props = $props();
 
   let modalEl: HTMLElement;
   let modal: Modal | null = null;
 
+  const handleHide = () => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  };
+
+  const handleHidden = () => {
+    show = false;
+    onClose?.();
+  };
+
+  const handleShown = () => {
+    onShow?.();
+  };
+
   onMount(() => {
     modal = new Modal(modalEl);
 
-    modalEl.addEventListener("hide.bs.modal", () => {
-      if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur();
-      }
-    });
-
-    modalEl.addEventListener("hidden.bs.modal", () => {
-      show = false;
-      onClose?.();
-    });
+    modalEl.addEventListener("shown.bs.modal", handleShown);
+    modalEl.addEventListener("hide.bs.modal", handleHide);
+    modalEl.addEventListener("hidden.bs.modal", handleHidden);
 
     if (show) {
       modal.show();
@@ -35,9 +44,7 @@
   });
 
   $effect(() => {
-    if (!modal) {
-      return;
-    }
+    if (!modal) return;
 
     if (show) {
       modal.show();
@@ -47,16 +54,17 @@
   });
 
   onDestroy(() => {
-    if (modal) {
-      modal.hide();
-      modal.dispose();
-      modal = null;
-    }
+    modalEl.removeEventListener("shown.bs.modal", handleShown);
+    modalEl.removeEventListener("hide.bs.modal", handleHide);
+    modalEl.removeEventListener("hidden.bs.modal", handleHidden);
+
+    modal?.dispose();
+    modal = null;
   });
 
-  export const hide = () => {
+  export function hide() {
     modal?.hide();
-  };
+  }
 </script>
 
 <div bind:this={modalEl} class="modal fade" tabindex="-1" aria-hidden="true">

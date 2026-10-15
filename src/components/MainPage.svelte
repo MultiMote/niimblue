@@ -6,6 +6,7 @@
   import { locale, locales, tr } from "$/utils/i18n";
   import DebugStuff from "$/components/dialogs/DebugStuff.svelte";
   import MdIcon from "$/components/basic/MdIcon.svelte";
+  import AppPrompt from "$/components/dialogs/AppPrompt.svelte";
 
   // eslint-disable-next-line no-undef
   const appCommit = __APP_COMMIT__;
@@ -77,6 +78,8 @@
 {#if debugStuffShow}
   <DebugStuff bind:show={debugStuffShow} />
 {/if}
+
+<AppPrompt />
 
 <style>
   .niim {
