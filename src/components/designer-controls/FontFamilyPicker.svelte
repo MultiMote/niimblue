@@ -5,7 +5,7 @@
   import { Toasts } from "$/utils/toasts";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import { LocalStoragePersistence } from "$/utils/persistence";
-  import { fontCache, userFonts } from "$/stores";
+  import { fontCache, userFonts } from "$/stores/app";
   import FontsMenu from "$/components/dialogs/FontsMenu.svelte";
 
   interface Props {

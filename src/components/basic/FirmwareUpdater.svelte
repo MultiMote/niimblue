@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { FirmwareProgressEvent } from "@mmote/niimbluelib";
-  import { printerClient } from "$/stores";
+  import { printerClient } from "$/stores/app";
   import { Toasts } from "$/utils/toasts";
   import { FileUtils } from "$/utils/file_utils";
   import { tr } from "$/utils/i18n";

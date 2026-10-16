@@ -3,7 +3,7 @@
   import { csvParse } from "d3-dsv";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import { type CsvParams } from "$/types";
-  import { csvData } from "$/stores";
+  import { csvData } from "$/stores/app";
 
   interface Props {
     enabled: boolean;

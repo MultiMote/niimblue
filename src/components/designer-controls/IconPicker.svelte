@@ -3,7 +3,7 @@
   import { tr } from "$/utils/i18n";
   import { iconCodepoints, type MaterialIcon } from "$/styles/mdi_icons";
   import MdIcon from "$/components/basic/MdIcon.svelte";
-  import { appConfig, userIcons } from "$/stores";
+  import { appConfig, userIcons } from "$/stores/app";
   import { FileUtils } from "$/utils/file_utils";
   import { Toasts } from "$/utils/toasts";
 

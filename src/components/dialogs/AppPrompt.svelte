@@ -4,9 +4,9 @@
   import { tr } from "$/utils/i18n";
 
   let value = $state("");
-  let modalRef: AppModal;
-  let inputRef: HTMLInputElement;
-  let textareaRef: HTMLTextAreaElement;
+  let modalRef = $state<AppModal>();
+  let inputRef = $state<HTMLInputElement>();
+  let textareaRef = $state<HTMLTextAreaElement>();
 
   $effect(() => {
     if ($promptState.show) {
@@ -31,7 +31,7 @@
     }));
 
     resolve?.(result);
-    modalRef.hide();
+    modalRef?.hide();
   };
 </script>
 

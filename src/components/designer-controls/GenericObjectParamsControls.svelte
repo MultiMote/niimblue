@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as fabric from "fabric";
   import { tr } from "$/utils/i18n";
-  import { appConfig } from "$/stores";
+  import { appConfig } from "$/stores/app";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import ObjectPositionControls from "$/components/designer-controls/ObjectPositionControls.svelte";
 

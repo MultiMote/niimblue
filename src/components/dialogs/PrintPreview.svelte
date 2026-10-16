@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { derived } from "svelte/store";
-  import { connectionState, printerClient, printerMeta } from "$/stores";
+  import { connectionState, printerClient, printerMeta } from "$/stores/app";
   import * as effects from "$/utils/post_process";
   import {
     type EncodedImage,

@@ -11,7 +11,7 @@
     type TailPosition,
   } from "$/types";
   import LabelPresetsBrowser from "$/components/designer-controls/LabelPresetsBrowser.svelte";
-  import { printerMeta } from "$/stores";
+  import { printerMeta } from "$/stores/app";
   import { tr } from "$/utils/i18n";
   import { DEFAULT_LABEL_PRESETS } from "$/defaults";
   import { onMount, tick } from "svelte";

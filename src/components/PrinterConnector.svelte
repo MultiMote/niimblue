@@ -17,7 +17,7 @@
     heartbeatFails,
     automation,
     rfidInfo,
-  } from "$/stores";
+  } from "$/stores/app";
   import type { ConnectionType } from "$/types";
   import { tr, type TranslationKey } from "$/utils/i18n";
   import MdIcon from "$/components/basic/MdIcon.svelte";

@@ -6,7 +6,7 @@
   import { Barcode } from "$/fabric-object/barcode";
   import { QRCode } from "$/fabric-object/qrcode";
   import { iconCodepoints, type MaterialIcon } from "$/styles/mdi_icons";
-  import { appConfig, automation, connectionState, csvData, loadedFonts } from "$/stores";
+  import { appConfig, automation, connectionState, csvData, loadedFonts } from "$/stores/app";
   import {
     type ExportedLabelTemplate,
     type FabricJson,

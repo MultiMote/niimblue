@@ -1,6 +1,6 @@
 <script lang="ts">
   import AppModal from "$/components/basic/AppModal.svelte";
-  import { heartbeatData, printerClient, printerInfo, printerMeta, rfidInfo } from "$/stores";
+  import { heartbeatData, printerClient, printerInfo, printerMeta, rfidInfo } from "$/stores/app";
   import { tr } from "$/utils/i18n";
 
   let { show = $bindable() } = $props();

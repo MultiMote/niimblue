@@ -14,7 +14,7 @@ import { CustomCanvas } from "$/fabric-object/custom_canvas";
 import { Capacitor } from "@capacitor/core";
 import { CanvasUtils } from "$/utils/canvas_utils";
 import { LocalStoragePersistence } from "./persistence";
-import { csvData, loadedFonts } from "$/stores";
+import { csvData, loadedFonts } from "$/stores/app";
 import { get } from "svelte/store";
 
 export class FileUtils {

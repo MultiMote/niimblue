@@ -1,6 +1,6 @@
 <script lang="ts">
   import AppModal from "$/components/basic/AppModal.svelte";
-  import { appConfig } from "$/stores";
+  import { appConfig } from "$/stores/app";
   import { tr } from "$/utils/i18n";
   import { NIIMBOT_CLIENT_DEFAULTS } from "@mmote/niimbluelib";
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import AppModal from "$/components/basic/AppModal.svelte";
   import MdIcon from "$/components/basic/MdIcon.svelte";
-  import { userFonts } from "$/stores";
+  import { userFonts } from "$/stores/app";
   import { FileUtils } from "$/utils/file_utils";
   import { tr } from "$/utils/i18n";
   import { LocalStoragePersistence } from "$/utils/persistence";
