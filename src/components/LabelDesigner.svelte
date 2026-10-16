@@ -175,6 +175,10 @@
     loadLabelData(label).then(() => undo.push(fabricCanvas!, labelProps));
   };
 
+  const onSave = () => {
+    hasUnsavedChanges = false;
+  };
+
   const zplImageReady = async (img: Blob) => {
     await LabelDesignerObjectHelper.addImageBlob(fabricCanvas!, img);
     undo.push(fabricCanvas!, labelProps);
@@ -620,6 +624,7 @@
   {:else if currentDialog === "saved_labels"}
     <SavedLabelsMenu
       onClose={() => (currentDialog = "none")}
+      onSave={onSave}
       canvas={fabricCanvas!}
       onRequestLabelTemplate={exportCurrentLabel}
       {onLoadRequested}

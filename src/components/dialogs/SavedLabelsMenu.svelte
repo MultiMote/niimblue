@@ -16,12 +16,14 @@
     onRequestLabelTemplate: () => ExportedLabelTemplate;
     onLoadRequested: (label: ExportedLabelTemplate) => void;
     onClose?: () => void;
+    onSave?: () => void;
     canvas: fabric.Canvas;
     csvEnabled: boolean;
     hasUnsavedChanges: boolean;
   }
 
-  let { onRequestLabelTemplate, onLoadRequested, canvas, csvEnabled, onClose, hasUnsavedChanges }: Props = $props();
+  let { onRequestLabelTemplate, onLoadRequested, canvas, csvEnabled, onClose, onSave, hasUnsavedChanges }: Props =
+    $props();
 
   let savedLabels = $state<ExportedLabelTemplate[]>([]);
   let selectedIndex = $state<number>(-1);
@@ -69,6 +71,7 @@
     }
 
     calcUsedSpace();
+    onSave?.();
   };
 
   const onSaveReplaceClicked = () => {
@@ -96,6 +99,7 @@
     LocalStoragePersistence.saveDefaultTemplate(label);
     customDefaultTemplate = true;
     calcUsedSpace();
+    onSave?.();
   };
 
   const onRemoveDefaultClicked = () => {
@@ -184,6 +188,7 @@
         label.title = title.replaceAll(/[\\/:*?"<>|]/g, "_");
       }
       FileUtils.saveLabelAsJson(label);
+      onSave?.();
     } catch (e) {
       Toasts.zodErrors(e, "Canvas save error:");
     }
@@ -192,6 +197,7 @@
   const onExportAllClicked = () => {
     try {
       FileUtils.saveLabelsAsJson(savedLabels);
+      onSave?.();
     } catch (e) {
       if (e instanceof z.ZodError) {
         Toasts.zodErrors(e, "Labels export error:");
@@ -220,6 +226,7 @@
 
       navigator.clipboard.writeText(url);
       Toasts.message($tr("params.saved_labels.save.url.copied"));
+      onSave?.();
     } catch (e) {
       Toasts.error(e);
     }
