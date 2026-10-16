@@ -43,6 +43,9 @@
   };
 
   const updateObject = (e: Event, source?: "width" | "height") => {
+    // Inputs are applied live (oninput): skip transient empty/invalid values while typing.
+    if (![x, y, width, height, widthScaled, heightScaled].every(Number.isFinite)) return;
+
     const newPos = new fabric.Point(Math.round(x!), Math.round(y!));
 
     selectedObject.setPositionByOrigin(newPos, "left", "top");
@@ -109,17 +112,17 @@
   <div class="dropdown-menu arrangement p-2">
     <div class="input-group flex-nowrap input-group-sm mb-2">
       <span class="input-group-text">x</span>
-      <input class="form-control" type="number" bind:value={x} onchange={updateObject} />
+      <input class="form-control" type="number" bind:value={x} oninput={updateObject} />
     </div>
     <div class="input-group flex-nowrap input-group-sm mb-2">
       <span class="input-group-text">y</span>
-      <input class="form-control" type="number" bind:value={y} onchange={updateObject} />
+      <input class="form-control" type="number" bind:value={y} oninput={updateObject} />
     </div>
     {#if !(selectedObject instanceof fabric.FabricText || selectedObject instanceof fabric.FabricImage || selectedObject instanceof QRCode || selectedObject instanceof Barcode)}
       <div class="input-group flex-nowrap input-group-sm mb-2">
-        <input class="form-control" type="number" min="1" bind:value={width} onchange={updateObject} />
+        <input class="form-control" type="number" min="1" bind:value={width} oninput={updateObject} />
         <span class="input-group-text">x</span>
-        <input class="form-control" type="number" min="1" bind:value={height} onchange={updateObject} />
+        <input class="form-control" type="number" min="1" bind:value={height} oninput={updateObject} />
       </div>
     {/if}
     {#if selectedObject instanceof fabric.FabricImage}
@@ -129,14 +132,14 @@
           type="number"
           min="1"
           bind:value={widthScaled}
-          onchange={(e) => updateObject(e, "width")} />
+          oninput={(e) => updateObject(e, "width")} />
         <span class="input-group-text">x</span>
         <input
           class="form-control"
           type="number"
           min="1"
           bind:value={heightScaled}
-          onchange={(e) => updateObject(e, "height")} />
+          oninput={(e) => updateObject(e, "height")} />
       </div>
       <div class="form-check form-switch">
         <input
