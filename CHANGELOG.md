@@ -9,6 +9,8 @@
 * Move label delete and export buttons to popup on mobile.
 * Label dimensions editor and saved labels menu are modal now.
 * Custom input dialog when editing text.
+* Warn on tab close with unsaved changes (undo/redo currently reset state, it's a bug).
+* Do not show warning when loading label if no unsaved changes.
 
 # 2026.9.0
 

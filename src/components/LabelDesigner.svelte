@@ -54,6 +54,7 @@
   let windowWidth = $state<number>(0);
   let undoState = $state<UndoState>({ undoDisabled: false, redoDisabled: false });
   let zoomText = $state<string>("100%");
+  let hasUnsavedChanges = $state<boolean>(false);
 
   const undo = new UndoRedo();
 
@@ -74,6 +75,7 @@
     }
     await FileUtils.loadCanvasState(fabricCanvas!, data.canvas);
     undo.paused = false;
+    hasUnsavedChanges = false;
   };
 
   undo.onLabelUpdate = loadLabelData;
@@ -154,6 +156,7 @@
 
   const onUpdateLabelProps = (newProps: LabelProps) => {
     labelProps = newProps;
+    hasUnsavedChanges = true;
     fabricCanvas!.setDimensions(labelProps.size);
     fabricCanvas!.virtualZoom(fabricCanvas!.getVirtualZoom());
     try {
@@ -350,8 +353,10 @@
     await loadDefaultLabel();
 
     window.addEventListener("hashchange", loadLabelFromUrl);
+    window.addEventListener("beforeunload", warnBeforeUnload);
 
     undo.push(fabricCanvas, labelProps);
+    hasUnsavedChanges = false;
 
     // force close dropdowns on touch devices
     fabricCanvas.on("mouse:down", (): void => {
@@ -369,14 +374,21 @@
     });
 
     fabricCanvas.on("object:modified", (): void => {
+      hasUnsavedChanges = true;
       undo.push(fabricCanvas!, labelProps);
     });
 
+    fabricCanvas.on("object:added", (): void => {
+      hasUnsavedChanges = true;
+    });
+
     fabricCanvas.on("text:changed", () => {
+      hasUnsavedChanges = true;
       editRevision++;
     });
 
     fabricCanvas.on("object:removed", (): void => {
+      hasUnsavedChanges = true;
       undo.push(fabricCanvas!, labelProps);
     });
 
@@ -448,9 +460,16 @@
     }
   });
 
+  const warnBeforeUnload = (event: BeforeUnloadEvent) => {
+    if (!hasUnsavedChanges) return;
+    event.preventDefault();
+    event.returnValue = "";
+  };
+
   onDestroy(() => {
     fabricCanvas!.dispose();
     window.removeEventListener("hashchange", loadLabelFromUrl);
+    window.removeEventListener("beforeunload", warnBeforeUnload);
   });
 
   $effect(() => {
@@ -604,7 +623,9 @@
       canvas={fabricCanvas!}
       onRequestLabelTemplate={exportCurrentLabel}
       {onLoadRequested}
-      {csvEnabled} />
+      {csvEnabled}
+      {hasUnsavedChanges}
+    />
   {/if}
 </div>
 

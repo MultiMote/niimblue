@@ -61,7 +61,7 @@
     "editor.undo": "Undo",
     "editor.grid": "Grid",
     "editor.warning.load": "Canvas will be replaced with saved data",
-    "editor.warning.load.csv": "CSV data will also be replaced",
+    "editor.warning.load.csv": "CSV data will be replaced",
     "editor.warning.save": "Saved data will be overwritten. Save?",
     "main.built": "built at",
     "main.code": "Code",

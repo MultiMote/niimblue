@@ -18,9 +18,10 @@
     onClose?: () => void;
     canvas: fabric.Canvas;
     csvEnabled: boolean;
+    hasUnsavedChanges: boolean;
   }
 
-  let { onRequestLabelTemplate, onLoadRequested, canvas, csvEnabled, onClose }: Props = $props();
+  let { onRequestLabelTemplate, onLoadRequested, canvas, csvEnabled, onClose, hasUnsavedChanges }: Props = $props();
 
   let savedLabels = $state<ExportedLabelTemplate[]>([]);
   let selectedIndex = $state<number>(-1);
@@ -117,13 +118,20 @@
 
     const label = savedLabels[selectedIndex];
 
-    let message = $tr("editor.warning.load");
+    let message = "";
+
+    if (hasUnsavedChanges) {
+      message = $tr("editor.warning.load");
+    }
 
     if (label.csv) {
+      if (message) {
+        message += "\n";
+      }
       message += "\n" + $tr("editor.warning.load.csv");
     }
 
-    if (!confirm(message)) {
+    if (message && !confirm(message)) {
       return;
     }
 

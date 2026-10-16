@@ -57,7 +57,7 @@
     "editor.redo": "Повторить",
     "editor.undo": "Отменить",
     "editor.warning.load": "Холст будет заменён на сохранённый",
-    "editor.warning.load.csv": "Данные CSV также будут заменены",
+    "editor.warning.load.csv": "Данные CSV будут заменены",
     "editor.warning.save": "Сохранённые данные будут перезаписаны. Сохранить?",
     "main.built": "собрано",
     "main.code": "Исходный код",
