@@ -241,7 +241,7 @@
 
   const toggleSavedProp = (key: string, value: any) => {
     const keyObj = key as keyof typeof savedProps;
-    savedProps[keyObj] = savedProps[keyObj] === undefined ? value : undefined;
+    savedProps[keyObj] = savedProps[keyObj] === undefined ? $state.snapshot(value) : undefined;
     try {
       LocalStoragePersistence.savePreviewProps(savedProps);
     } catch (e) {
@@ -253,7 +253,7 @@
     const keyObj = key as keyof typeof savedProps;
 
     if (savedProps[keyObj] !== undefined) {
-      savedProps[keyObj] = value;
+      savedProps[keyObj] = $state.snapshot(value);
       try {
         LocalStoragePersistence.savePreviewProps(savedProps);
       } catch (e) {
@@ -284,7 +284,8 @@
       if (saved.speed !== undefined) speed = saved.speed;
       if (saved.labelType !== undefined) labelType = saved.labelType;
       if (saved.printTaskName !== undefined) printTaskName = saved.printTaskName;
-      if (saved.offset !== undefined) offset = saved.offset;
+      // copy so edits to the working offset never alias the saved object
+      if (saved.offset !== undefined) offset = { ...saved.offset };
     } catch (e) {
       Toasts.zodErrors(e, "Preview parameters load error:");
     }
@@ -398,11 +399,13 @@
       printTaskName = detectedPrintTaskName;
     }
 
-    loadProps();
-
+    // Base offset comes from the label (preset) or defaults to 0,0.
+    // A locked (saved) preview offset is applied on top of it by loadProps().
     if (labelProps.offset !== undefined) {
       offset = { ...labelProps.offset };
     }
+
+    loadProps();
 
     await generatePreviewData(currentPage);
 
