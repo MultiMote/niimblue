@@ -75,10 +75,13 @@
     }
     await FileUtils.loadCanvasState(fabricCanvas!, data.canvas);
     undo.paused = false;
-    hasUnsavedChanges = false;
   };
 
-  undo.onLabelUpdate = loadLabelData;
+  undo.onLabelUpdate = async (data) => {
+    await loadLabelData(data)
+    hasUnsavedChanges = true;
+  };
+
   undo.onStateUpdate = (state: UndoState) => {
     undoState = state;
   };
@@ -172,7 +175,10 @@
   };
 
   const onLoadRequested = (label: ExportedLabelTemplate) => {
-    loadLabelData(label).then(() => undo.push(fabricCanvas!, labelProps));
+    loadLabelData(label).then(() => {
+      undo.push(fabricCanvas!, labelProps);
+      hasUnsavedChanges = false;
+    });
   };
 
   const onSave = () => {
