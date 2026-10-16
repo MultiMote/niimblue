@@ -11,6 +11,9 @@
 * Custom input dialog when editing text.
 * Warn on tab close with unsaved changes.
 * Do not show warning when loading label if no unsaved changes.
+* Fix size inputs resetting on every keystroke.
+* Apply position and size inputs live.
+
 
 # 2026.9.0
 
