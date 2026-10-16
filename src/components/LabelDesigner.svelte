@@ -21,12 +21,12 @@
   import { Toasts } from "$/utils/toasts";
   import { UndoRedo, type UndoState } from "$/utils/undo_redo";
   import BarcodeParamsPanel from "$/components/designer-controls/BarcodeParamsControls.svelte";
-  import CsvControl from "$/components/designer-controls/CsvControl.svelte";
+  import CsvControl from "$/components/dialogs/CsvControl.svelte";
   import GenericObjectParamsControls from "$/components/designer-controls/GenericObjectParamsControls.svelte";
-  import IconPicker from "$/components/designer-controls/IconPicker.svelte";
+  import IconPicker from "$/components/dialogs/IconPicker.svelte";
   import LabelPropsEditor from "$/components/dialogs/LabelPropsEditor.svelte";
   import MdIcon from "$/components/basic/MdIcon.svelte";
-  import ObjectPicker from "$/components/designer-controls/ObjectPicker.svelte";
+  import ObjectPicker from "$/components/dialogs/ObjectPicker.svelte";
   import PrintPreview from "$/components/dialogs/PrintPreview.svelte";
   import ArUcoParamsPanel from "$/components/designer-controls/ArUcoParamsControls.svelte";
   import QrCodeParamsPanel from "$/components/designer-controls/QRCodeParamsControls.svelte";
@@ -39,7 +39,7 @@
   import VectorParamsControls from "$/components/designer-controls/VectorParamsControls.svelte";
   import { CanvasUtils } from "$/utils/canvas_utils";
 
-  type DialogName = "none" | "preview" | "label_props" | "saved_labels";
+  type DialogName = "none" | "preview" | "label_props" | "saved_labels" | "csv_props" | "icon_picker" | "object_picker";
 
   let htmlCanvas: HTMLCanvasElement;
   let currentDialog = $state<DialogName>("none");
@@ -78,7 +78,7 @@
   };
 
   undo.onLabelUpdate = async (data) => {
-    await loadLabelData(data)
+    await loadLabelData(data);
     hasUnsavedChanges = true;
   };
 
@@ -552,11 +552,28 @@
           {zoomText}
         </button>
 
-        <CsvControl bind:enabled={csvEnabled} onPlaceholderPicked={onCsvPlaceholderPicked} />
+        <button
+          class="btn btn-sm btn-{csvEnabled ? 'warning' : 'secondary'}"
+          title={$tr("params.csv.title")}
+          onclick={() => (currentDialog = "csv_props")}>
+          <MdIcon icon="dataset" />
+        </button>
 
-        <IconPicker onSubmit={onIconPicked} onSubmitSvg={onSvgIconPicked} />
+        <button
+          class="btn btn-sm btn-secondary"
+          title={$tr("editor.iconpicker.title")}
+          onclick={() => (currentDialog = "icon_picker")}>
+          <MdIcon icon="emoji_emotions" />
+          <MdIcon icon="add" />
+        </button>
 
-        <ObjectPicker onSubmit={onObjectPicked} {labelProps} {zplImageReady} {pdfImageReady} />
+        <button
+          class="btn btn-sm btn-secondary"
+          title={$tr("editor.objectpicker.title")}
+          onclick={() => (currentDialog = "object_picker")}>
+          <MdIcon icon="format_shapes" />
+          <MdIcon icon="add" />
+        </button>
 
         <button class="btn btn-sm btn-primary ms-1" onclick={openPreview}>
           <MdIcon icon="visibility" />
@@ -630,13 +647,26 @@
   {:else if currentDialog === "saved_labels"}
     <SavedLabelsMenu
       onClose={() => (currentDialog = "none")}
-      onSave={onSave}
+      {onSave}
       canvas={fabricCanvas!}
       onRequestLabelTemplate={exportCurrentLabel}
       {onLoadRequested}
       {csvEnabled}
-      {hasUnsavedChanges}
-    />
+      {hasUnsavedChanges} />
+  {:else if currentDialog === "csv_props"}
+    <CsvControl
+      onClose={() => (currentDialog = "none")}
+      bind:enabled={csvEnabled}
+      onPlaceholderPicked={onCsvPlaceholderPicked} />
+  {:else if currentDialog === "icon_picker"}
+    <IconPicker onSubmit={onIconPicked} onSubmitSvg={onSvgIconPicked} onClose={() => (currentDialog = "none")} />
+  {:else if currentDialog === "object_picker"}
+    <ObjectPicker
+      onSubmit={onObjectPicked}
+      onClose={() => (currentDialog = "none")}
+      {labelProps}
+      {zplImageReady}
+      {pdfImageReady} />
   {/if}
 </div>
 

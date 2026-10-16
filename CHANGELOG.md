@@ -7,7 +7,7 @@
 * Add character spacing field.
 * Add preset print offset and replace support.
 * Move label delete and export buttons to popup on mobile.
-* Label dimensions editor and saved labels menu are modal now.
+* Most of the dropdowns are modal dialogs now.
 * Custom input dialog when editing text.
 * Warn on tab close with unsaved changes.
 * Do not show warning when loading label if no unsaved changes.
