@@ -2,7 +2,7 @@
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import { tr } from "$/utils/i18n";
   import * as fabric from "fabric";
-  import { onDestroy } from "svelte";
+  import { onDestroy, untrack } from "svelte";
   import QRCode from "$/fabric-object/qrcode";
   import Barcode from "$/fabric-object/barcode";
 
@@ -91,7 +91,10 @@
   onDestroy(() => selectedObject.off("modified", objectDimensionsChanged));
 
   $effect(() => {
-    objectChanged(selectedObject);
+    const obj = selectedObject;
+    // Only re-sync when the selected object changes. Without untrack the effect also tracks
+    // width/height (read in updateScales) and resets the inputs on every keystroke.
+    untrack(() => objectChanged(obj));
   });
 </script>
 
