@@ -14,6 +14,20 @@
 @import "bootstrap/scss/transitions";
 @import "font";
 
+// Keep the scrollbar space reserved, so the centered layout does not jump sideways when a scrollbar
+// appears or disappears (e.g. after adding objects or opening a dropdown near the bottom of the page).
+@supports (scrollbar-gutter: stable) {
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  // The gutter stays reserved while a modal hides the scrollbar, so Bootstrap's padding that compensates
+  // for the hidden scrollbar would shift the page a second time.
+  body.modal-open {
+    padding-right: 0 !important;
+  }
+}
+
 body {
   font-family: "Noto Sans Variable", sans-serif;
 }
