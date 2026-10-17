@@ -13,6 +13,7 @@
 * Do not show warning when loading label if no unsaved changes.
 * Fix size inputs resetting on every keystroke.
 * Apply position and size inputs live.
+* Fix rectangle, QR code and ArUco disappearing and shapes looking pixelated while resizing with handles.
 
 
 # 2026.9.0
