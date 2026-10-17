@@ -13,6 +13,7 @@
 * Do not show warning when loading label if no unsaved changes.
 * Fix size inputs resetting on every keystroke.
 * Apply position and size inputs live.
+* Fix page shifting sideways when the vertical scrollbar appears.
 
 
 # 2026.9.0
