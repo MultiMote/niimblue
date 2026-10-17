@@ -7,6 +7,11 @@ export const configureFabric = () => {
 
   fabric.classRegistry.setClass(TextboxExt, "Textbox");
 
+  // Redraw objects on every step of a resize drag. By default Fabric keeps the old cached picture until
+  // the mouse is released: scaled vector shapes (circle, SVG) look pixelated, and rect/QR/ArUco lose
+  // the newly added part when enlarged.
+  fabric.FabricObject.ownDefaults.noScaleCache = false;
+
   fabric.Line.prototype.setControlsVisibility({
     tl: false,
     bl: false,
