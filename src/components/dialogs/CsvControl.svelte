@@ -27,7 +27,7 @@
   });
 </script>
 
-<AppModal title={$tr("editor.iconpicker.title")} {onClose}>
+<AppModal title={$tr("params.csv.title")} {onClose}>
   <div class="form-check form-switch">
     <input class="form-check-input" type="checkbox" role="switch" id="enabled" bind:checked={enabled} />
     <label class="form-check-label" for="enabled">{$tr("params.csv.enabled")}</label>
