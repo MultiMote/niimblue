@@ -56,6 +56,9 @@
   let thresholdValueRed = $state<number>(100);
   let strengthValue = $state<number>(1);
   let serpentineValue = $state<boolean>(true);
+  let screentoneDotSizeValue = $state<number>(5);
+  let screentoneAngleValue = $state<number>(45);
+  let screentoneContrastValue = $state<number>(60);
   let originalImage: ImageData;
   let previewContext: CanvasRenderingContext2D;
   let printTaskName = $state<PrintTaskName>("B1");
@@ -201,6 +204,7 @@
       bayer2: (data) => effects.bayer(data, 2),
       bayer4: (data) => effects.bayer(data, 4),
       bayer8: (data) => effects.bayer(data, 8),
+      screentone: (data) => effects.screentone(data, thresholdValue, screentoneDotSizeValue, screentoneAngleValue, screentoneContrastValue),
     };
 
     iData = processors[postProcessType](iData);
@@ -279,6 +283,9 @@
       if (saved.thresholdRed !== undefined) thresholdValueRed = saved.thresholdRed;
       if (saved.strength !== undefined) strengthValue = saved.strength;
       if (saved.serpentine !== undefined) serpentineValue = saved.serpentine;
+      if (saved.screentoneAngle !== undefined) screentoneAngleValue = saved.screentoneAngle;
+      if (saved.screentoneDotSize !== undefined) screentoneDotSizeValue = saved.screentoneDotSize;
+      if (saved.screentoneContrast !== undefined) screentoneContrastValue = saved.screentoneContrast;
       if (saved.quantity !== undefined) quantity = saved.quantity;
       if (saved.density !== undefined) density = saved.density;
       if (saved.speed !== undefined) speed = saved.speed;
@@ -471,6 +478,7 @@
         <option value="floyd_steinberg">{$tr("preview.postprocess.floyd_steinberg")}</option>
         <option value="jjn">{$tr("preview.postprocess.jjn")}</option>
         <option value="stucki">{$tr("preview.postprocess.stucki")}</option>
+        <option value="screentone">{$tr("preview.postprocess.screentone")}</option>
       </select>
 
       <ParamLockButton
@@ -571,6 +579,68 @@
           propName="thresholdRed"
           value={thresholdValueRed}
           savedValue={savedProps.thresholdRed}
+          onClick={toggleSavedProp} />
+      </div>
+    {/if}
+
+    {#if postProcessType === "screentone"}
+      <div class="input-group input-group-sm">
+        <span class="input-group-text">{$tr("preview.postprocess.screentone.dot_size")}</span>
+
+        <input
+          type="range"
+          id="screentoneDotSize"
+          class="form-range"
+          min="1"
+          max="20"
+          bind:value={screentoneDotSizeValue}
+          onchange={() => updateSavedProp("screentoneDotSize", screentoneDotSizeValue, true)} />
+        <span class="input-group-text">{screentoneDotSizeValue}</span>
+
+        <ParamLockButton
+          propName="screentoneDotSize"
+          value={screentoneDotSizeValue}
+          savedValue={savedProps.screentoneDotSize}
+          onClick={toggleSavedProp} />
+      </div>
+
+      <div class="input-group input-group-sm">
+        <span class="input-group-text">{$tr("preview.postprocess.screentone.angle")}</span>
+
+        <input
+          type="range"
+          id="screentoneAngle"
+          class="form-range"
+          min="0"
+          max="90"
+          bind:value={screentoneAngleValue}
+          onchange={() => updateSavedProp("screentoneAngle", screentoneAngleValue, true)} />
+        <span class="input-group-text">{screentoneAngleValue}</span>
+
+        <ParamLockButton
+          propName="screentoneAngle"
+          value={screentoneAngleValue}
+          savedValue={savedProps.screentoneAngle}
+          onClick={toggleSavedProp} />
+      </div>
+
+      <div class="input-group input-group-sm">
+        <span class="input-group-text">{$tr("preview.postprocess.screentone.contrast")}</span>
+
+       <input
+          type="range"
+          id="screentoneContrast"
+          class="form-range"
+          min="0"
+          max="255"
+          bind:value={screentoneContrastValue}
+          onchange={() => updateSavedProp("screentoneContrast", screentoneContrastValue, true)} />
+        <span class="input-group-text">{screentoneContrastValue}</span>
+
+        <ParamLockButton
+          propName="screentoneContrast"
+          value={screentoneContrastValue}
+          savedValue={savedProps.screentoneContrast}
           onClick={toggleSavedProp} />
       </div>
     {/if}

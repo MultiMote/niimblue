@@ -90,6 +90,7 @@ const PostProcessTypeSchema = z.enum([
   "floyd_steinberg",
   "jjn",
   "stucki",
+  "screentone",
 ]);
 
 export const PreviewPropsSchema = z.object({
@@ -99,6 +100,9 @@ export const PreviewPropsSchema = z.object({
   thresholdRed: z.number().gte(1).lte(255).optional(),
   strength: z.number().gte(0).lte(1.5).optional(),
   serpentine: z.boolean().optional(),
+  screentoneAngle: z.number().gte(0).lte(365).optional(),
+  screentoneDotSize: z.number().gte(1).optional(),
+  screentoneContrast: z.number().gte(0).lte(255).optional(),
   quantity: z.number().gte(1).optional(),
   density: z.number().gte(1).optional(),
   speed: z.union([z.literal(0), z.literal(1)]).optional(),

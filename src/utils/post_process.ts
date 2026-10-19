@@ -1,5 +1,6 @@
 /**
  * Image post-processing effects.
+ * 99% of this file is AI slop
  */
 
 import { createDiffuser, rgbToGray } from "$/utils/dither";
@@ -194,6 +195,64 @@ export const mirror = (image: ImageData): ImageData => {
       }
     }
   }
+  return image;
+};
+
+/** Convert an image to black-and-white screentone. */
+export const screentone = (
+  image: ImageData,
+  threshold: number = 128,
+  dotSize: number = 6,
+  angle: number = 45,
+  contrast: number = 90, // higher = bolder blacks / harder edges
+): ImageData => {
+  const { width, height, data } = image;
+
+  if (!Number.isFinite(dotSize) || dotSize < 1) {
+    throw new Error("screentone: dotSize must be >= 1");
+  }
+
+  contrast = Math.max(0, Math.min(127, contrast));
+
+  const source = new Uint8ClampedArray(data);
+  const half = dotSize / 2;
+  const radians = (angle * Math.PI) / 180;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+  const blackThreshold = 128 - contrast;
+  const whiteThreshold = 128 + contrast;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      const gray = rgbToGray(source[i], source[i + 1], source[i + 2]);
+
+      let value: number;
+
+      // Aggressive solid black for bolder edges
+      if (gray < blackThreshold + 15) {
+        value = 0;
+      } else if (gray >= whiteThreshold) {
+        value = 255;
+      } else {
+        const adjusted = Math.max(0, Math.min(255, gray - threshold + 128));
+        const tone = (adjusted - blackThreshold) / (whiteThreshold - blackThreshold || 1);
+        const radius = half * Math.sqrt(1 - tone);
+
+        const u = x * cos + y * sin;
+        const v = -x * sin + y * cos;
+        const dx = (((u % dotSize) + dotSize) % dotSize) - half;
+        const dy = (((v % dotSize) + dotSize) % dotSize) - half;
+
+        value = dx * dx + dy * dy <= radius * radius ? 0 : 255;
+      }
+
+      data[i] = value;
+      data[i + 1] = value;
+      data[i + 2] = value;
+    }
+  }
+
   return image;
 };
 
