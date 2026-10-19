@@ -632,7 +632,7 @@
           id="screentoneContrast"
           class="form-range"
           min="0"
-          max="255"
+          max="127"
           bind:value={screentoneContrastValue}
           onchange={() => updateSavedProp("screentoneContrast", screentoneContrastValue, true)} />
         <span class="input-group-text">{screentoneContrastValue}</span>
