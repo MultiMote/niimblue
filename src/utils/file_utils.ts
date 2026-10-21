@@ -464,7 +464,7 @@ export class FileUtils {
     const loadedList = get(loadedFonts);
 
     for (const font of fontsToLoad) {
-      if (loadedList.some((e) => e.family === font.family)) {
+      if (loadedList.has(font.family)) {
         continue;
       }
 
@@ -476,7 +476,7 @@ export class FileUtils {
 
       try {
         const loaded = await fontFace.load();
-        loadedList.push(loaded);
+        loadedList.set(font.family, loaded);
         document.fonts.add(loaded);
       } catch (e) {
         console.error(`Failed to load font ${font.family}:`, e);
@@ -484,12 +484,10 @@ export class FileUtils {
     }
 
     // remove font that not exist anymore
-    for (let i = loadedList.length - 1; i >= 0; i--) {
-      const loadedFont = loadedList[i];
-
-      if (!fontsToLoad.some((e) => e.family === loadedFont.family)) {
+    for (const [family, loadedFont] of loadedList) {
+      if (!fontsToLoad.some((e) => e.family === family)) {
         document.fonts.delete(loadedFont);
-        loadedList.splice(i, 1);
+        loadedList.delete(family);
       }
     }
 

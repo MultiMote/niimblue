@@ -33,7 +33,8 @@ export const fontCache = writable<string[]>([OBJECT_DEFAULTS_TEXT.fontFamily]);
 export const appConfig = writablePersisted<AppConfig>("config", AppConfigSchema, APP_CONFIG_DEFAULTS);
 export const userIcons = writablePersisted<UserIcon[]>("user_icons", z.array(UserIconSchema), []);
 export const userFonts = writablePersisted<UserFont[]>("user_fonts", z.array(UserFontSchema), []);
-export const loadedFonts = writable<FontFace[]>([]);
+/** Keyed by UserFont.family, FontFace.family is serialized differently (e.g. quoted when it contains spaces) */
+export const loadedFonts = writable<Map<string, FontFace>>(new Map());
 
 export const connectionState = writable<ConnectionState>("disconnected");
 export const connectedPrinterName = writable<string>("");

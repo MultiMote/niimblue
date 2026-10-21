@@ -74,6 +74,8 @@
       csvEnabled = true;
     }
     await FileUtils.loadCanvasState(fabricCanvas!, data.canvas);
+    // a font may have loaded while async objects (images) were built, after the $effect ran
+    renderOnFontsChanged();
     undo.paused = false;
   };
 
@@ -332,9 +334,12 @@
   };
 
   const renderOnFontsChanged = () => {
+    // text measured before its font loaded keeps fallback char widths and line wraps
+    fabric.cache.clearFontCache();
     fabricCanvas?.forEachObject((o) => {
       if (o instanceof fabric.Textbox) {
-        o.dirty = true;
+        o.initDimensions();
+        o.setCoords();
       }
     });
     fabricCanvas?.requestRenderAll();
