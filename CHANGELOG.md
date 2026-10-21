@@ -16,6 +16,8 @@
 * Fix rectangle, QR code and ArUco disappearing and shapes looking pixelated while resizing with handles.
 * Fix page shifting sideways when the vertical scrollbar appears.
 * Add screentone effect.
+* Fix uploaded fonts with spaces in the name not being applied.
+* Fix text wrapping with fallback font widths when a label is opened before uploaded fonts are loaded.
 
 
 # 2026.9.0
