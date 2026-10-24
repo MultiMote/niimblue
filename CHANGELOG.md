@@ -15,6 +15,7 @@
 * Apply position and size inputs live.
 * Fix rectangle, QR code and ArUco disappearing and shapes looking pixelated while resizing with handles.
 * Fix page shifting sideways when the vertical scrollbar appears.
+* Fix centered objects landing on half pixels, which looked blurry in preview and print.
 * Add screentone effect.
 
 
