@@ -522,6 +522,22 @@ export class CustomCanvas extends fabric.Canvas {
     }
   }
 
+  /**
+   * Snap the object's top-left corner to whole pixels (avoids half-pixel blur after centering).
+   * Text is skipped: its glyphs can't sit on exact pixels anyway, and it should stay truly centered.
+   */
+  private snapToPixel(object: fabric.FabricObject): void {
+    if (object instanceof fabric.FabricText) return;
+    const pos = object.getPointByOrigin("left", "top");
+    object.setPositionByOrigin(new fabric.Point(Math.round(pos.x), Math.round(pos.y)), "left", "top");
+    object.setCoords();
+  }
+
+  override _centerObject(object: fabric.FabricObject, center: fabric.Point): void {
+    super._centerObject(object, center);
+    this.snapToPixel(object);
+  }
+
   /** Centers object horizontally in the canvas or label part */
   override centerObjectH(object: fabric.FabricObject): void {
     if ((this.labelProps.split ?? "none") !== "none") {
@@ -540,6 +556,7 @@ export class CustomCanvas extends fabric.Canvas {
       pos.setX(centerX);
 
       object.setPositionByOrigin(pos, "center", "center");
+      this.snapToPixel(object);
       return;
     }
 
@@ -564,6 +581,7 @@ export class CustomCanvas extends fabric.Canvas {
 
       pos.setY(centerY);
       object.setPositionByOrigin(pos, "center", "center");
+      this.snapToPixel(object);
       return;
     }
 
