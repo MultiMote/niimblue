@@ -16,6 +16,7 @@
 * Fix rectangle, QR code and ArUco disappearing and shapes looking pixelated while resizing with handles.
 * Fix page shifting sideways when the vertical scrollbar appears.
 * Add screentone effect.
+* Move objects by 1 pixel with the mouse (5 pixel grid snapping only when the grid is enabled).
 
 
 # 2026.9.0
