@@ -8,10 +8,13 @@
 
   interface Props {
     selectedObject: fabric.FabricObject;
+    /** Changes whenever something edits the object from outside (center buttons, arrow keys, ...) */
+    editRevision?: number;
   }
 
-  let { selectedObject }: Props = $props();
+  let { selectedObject, editRevision }: Props = $props();
   let prevObject: fabric.FabricObject | undefined;
+  let prevCanvas: fabric.Canvas | undefined;
 
   let x = $state<number>();
   let y = $state<number>();
@@ -37,12 +40,34 @@
     updateScales(e?.action);
   };
 
+  /** Re-read the values from the object without touching the aspect ratio toggle */
+  const syncFromObject = () => {
+    const pos = selectedObject.getPointByOrigin("left", "top");
+    x = pos.x;
+    y = pos.y;
+    width = selectedObject.width;
+    height = selectedObject.height;
+    widthScaled = Math.round(width * selectedObject.scaleX);
+    heightScaled = Math.round(height * selectedObject.scaleY);
+  };
+
+  /** Show the position live while the object is dragged (runs after the snapping handler) */
+  const canvasObjectMoving = (e: { target: fabric.FabricObject }) => {
+    if (e.target !== selectedObject) return;
+    const pos = selectedObject.getPointByOrigin("left", "top");
+    x = pos.x;
+    y = pos.y;
+  };
+
   const objectChanged = (newObject: fabric.FabricObject) => {
     if (prevObject !== undefined) {
       prevObject.off("modified", objectDimensionsChanged);
     }
+    prevCanvas?.off("object:moving", canvasObjectMoving);
 
     newObject.on("modified", objectDimensionsChanged);
+    prevCanvas = newObject.canvas;
+    prevCanvas?.on("object:moving", canvasObjectMoving);
     objectDimensionsChanged();
 
     prevObject = newObject;
@@ -97,7 +122,16 @@
       keepAspectRatio = true;
   };
 
-  onDestroy(() => selectedObject.off("modified", objectDimensionsChanged));
+  onDestroy(() => {
+    selectedObject.off("modified", objectDimensionsChanged);
+    prevCanvas?.off("object:moving", canvasObjectMoving);
+  });
+
+  // The object was changed from outside (center buttons, arrow keys, ...): refresh the inputs.
+  $effect(() => {
+    void editRevision;
+    untrack(() => syncFromObject());
+  });
 
   $effect(() => {
     const obj = selectedObject;

@@ -98,6 +98,8 @@
   const moveSelected = (direction: MoveDirection, ctrl?: boolean) => {
     LabelDesignerUtils.moveSelection(fabricCanvas!, direction, ctrl);
     undo.push(fabricCanvas!, labelProps);
+    // refresh the position inputs
+    editRevision++;
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
