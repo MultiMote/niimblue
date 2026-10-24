@@ -13,6 +13,7 @@
 * Do not show warning when loading label if no unsaved changes.
 * Fix size inputs resetting on every keystroke.
 * Apply position and size inputs live.
+* Fix position inputs not updating after centering, arrow key moves and dragging until the object was reselected.
 * Fix rectangle, QR code and ArUco disappearing and shapes looking pixelated while resizing with handles.
 * Fix page shifting sideways when the vertical scrollbar appears.
 * Add screentone effect.
