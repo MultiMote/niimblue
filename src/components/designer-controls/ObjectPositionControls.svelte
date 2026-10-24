@@ -21,6 +21,12 @@
   let heightScaled = $state<number>();
   let keepAspectRatio = $state<boolean>(false);
 
+  // Images and circles are resized through scaleX/scaleY, not through width/height
+  // (a circle is drawn from its radius, so changing width/height only grows its selection box).
+  const usesScaledSize = $derived(
+    selectedObject instanceof fabric.FabricImage || selectedObject instanceof fabric.Circle,
+  );
+
   const objectDimensionsChanged = (e?: fabric.ModifiedEvent) => {
     const pos = selectedObject.getPointByOrigin("left", "top");
     x = pos.x;
@@ -50,7 +56,7 @@
 
     selectedObject.setPositionByOrigin(newPos, "left", "top");
 
-    if (selectedObject instanceof fabric.FabricImage) {
+    if (usesScaledSize) {
       if (keepAspectRatio) {
         let scale = source === "width" ? widthScaled! / selectedObject.width! : heightScaled! / selectedObject.height!;
 
@@ -118,14 +124,14 @@
       <span class="input-group-text">y</span>
       <input class="form-control" type="number" bind:value={y} oninput={updateObject} />
     </div>
-    {#if !(selectedObject instanceof fabric.FabricText || selectedObject instanceof fabric.FabricImage || selectedObject instanceof QRCode || selectedObject instanceof Barcode)}
+    {#if !(selectedObject instanceof fabric.FabricText || usesScaledSize || selectedObject instanceof QRCode || selectedObject instanceof Barcode)}
       <div class="input-group flex-nowrap input-group-sm mb-2">
         <input class="form-control" type="number" min="1" bind:value={width} oninput={updateObject} />
         <span class="input-group-text">x</span>
         <input class="form-control" type="number" min="1" bind:value={height} oninput={updateObject} />
       </div>
     {/if}
-    {#if selectedObject instanceof fabric.FabricImage}
+    {#if usesScaledSize}
       <div class="input-group flex-nowrap input-group-sm mb-2">
         <input
           class="form-control"
