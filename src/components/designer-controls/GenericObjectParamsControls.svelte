@@ -76,7 +76,7 @@
   <MdIcon icon="horizontal_distribute" />
 </button>
 
-<ObjectPositionControls {selectedObject} />
+<ObjectPositionControls {selectedObject} {editRevision} />
 
 <div class="dropdown">
   <button

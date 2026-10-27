@@ -14,6 +14,7 @@
 * Fix size inputs resetting on every keystroke.
 * Fix circle size: typing a size only grew the selection, and dragging a corner did not update the size inputs.
 * Apply position and size inputs live.
+* Fix position inputs not updating after centering, arrow key moves and dragging until the object was reselected.
 * Fix rectangle, QR code and ArUco disappearing and shapes looking pixelated while resizing with handles.
 * Fix page shifting sideways when the vertical scrollbar appears.
 * Fix centered objects landing on half pixels, which looked blurry in preview and print.
