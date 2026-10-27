@@ -147,8 +147,6 @@
       hasPresetOffset = preset.offset !== undefined;
       offset = preset.offset !== undefined ? { ...preset.offset } : getFallbackOffset();
     }
-
-    onApply();
   };
 
   const applyAndClose = () => {

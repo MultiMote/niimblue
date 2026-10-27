@@ -22,6 +22,7 @@
 * Fix centered objects landing on half pixels, which looked blurry in preview and print.
 * Add screentone effect.
 * Move objects by 1 pixel with the mouse (5 pixel grid snapping only when the grid is enabled).
+* Do not auto apply parameters when selecting label preset.
 
 # 2026.9.0
 
