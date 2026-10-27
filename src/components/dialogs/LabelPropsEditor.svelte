@@ -354,7 +354,7 @@
   });
 </script>
 
-<AppModal title={$tr("params.label.menu_title")} {onClose} bind:this={modalRef}>
+<AppModal title={$tr("params.label.menu_title")} {onClose} bind:this={modalRef} size="lg">
   <div class="mb-1">
     <button class="btn btn-sm btn-outline-secondary" onclick={onImportClicked}>
       <MdIcon icon="data_object" />

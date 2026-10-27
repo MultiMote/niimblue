@@ -10,6 +10,7 @@
 * Most of the dropdowns are modal dialogs now.
 * Custom input dialog when editing text.
 * Custom confirm dialog.
+* Larger label/template/preview dialogs.
 * Warn on tab close with unsaved changes.
 * Do not show warning when loading label if no unsaved changes.
 * Fix size inputs resetting on every keystroke.

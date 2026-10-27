@@ -422,7 +422,7 @@
   });
 </script>
 
-<AppModal title={$tr("preview.title")} onClose={onModalClose} bind:this={modalRef}>
+<AppModal title={$tr("preview.title")} onClose={onModalClose} bind:this={modalRef} size="lg">
   <div class="d-flex justify-content-center">
     {#if pagesTotal > 1}
       <button disabled={printState !== "idle"} class="btn w-100 fs-1" onclick={pageDown}>

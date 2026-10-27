@@ -259,7 +259,7 @@
   });
 </script>
 
-<AppModal title={$tr("params.saved_labels.menu_title")} {onClose} bind:this={modalRef}>
+<AppModal title={$tr("params.saved_labels.menu_title")} {onClose} bind:this={modalRef} size="lg">
   <div class="mb-1">
     {usedSpace}
     {$tr("params.saved_labels.kb_used")}
