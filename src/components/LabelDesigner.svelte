@@ -378,9 +378,11 @@
 
     fabricCanvas.on("object:moving", (e): void => {
       if (e.target && e.target.left !== undefined && e.target.top !== undefined) {
+        // Snap to the grid only when the grid is shown; otherwise move in whole pixels.
+        const step = $appConfig.gridEnabled ? GRID_SIZE : 1;
         e.target.set({
-          left: Math.round(e.target.left / GRID_SIZE) * GRID_SIZE,
-          top: Math.round(e.target.top / GRID_SIZE) * GRID_SIZE,
+          left: Math.round(e.target.left / step) * step,
+          top: Math.round(e.target.top / step) * step,
         });
       }
     });
