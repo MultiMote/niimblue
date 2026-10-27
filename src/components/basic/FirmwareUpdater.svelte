@@ -4,6 +4,7 @@
   import { Toasts } from "$/utils/toasts";
   import { FileUtils } from "$/utils/file_utils";
   import { tr } from "$/utils/i18n";
+  import { appConfirm } from "$/stores/confirm";
 
   let fwVersion = $state<string>("");
   let fwVersionValid: boolean = $derived(/^\d+\.\d+$/.test(fwVersion));
@@ -34,7 +35,12 @@
       return;
     }
 
-    if (!confirm($tr("connector.firmware_flashing.warning"))) {
+    const confirmResult = await appConfirm({
+      title: $tr("connector.firmware_flashing.warning"),
+      buttons: ["yes", "no"]
+    });
+
+    if (confirmResult !== "yes") {
       return;
     }
 

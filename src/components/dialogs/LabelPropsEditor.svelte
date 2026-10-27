@@ -23,6 +23,7 @@
   import DpiSelector from "$/components/designer-controls/DpiSelector.svelte";
   import { z } from "zod";
   import AppModal from "$/components/basic/AppModal.svelte";
+  import { appConfirm } from "$/stores/confirm";
 
   interface Props {
     labelProps: LabelProps;
@@ -220,12 +221,17 @@
     }
   };
 
-  const onLabelPresetReplace = () => {
+  const onLabelPresetReplace = async() => {
     if (selectedPresetIndex === -1) {
       return;
     }
 
-    if (!confirm($tr("editor.warning.save"))) {
+    const confirmResult = await appConfirm({
+      title: $tr("editor.warning.save"),
+      buttons: ["yes", "no"]
+    });
+
+    if (confirmResult !== "yes") {
       return;
     }
 

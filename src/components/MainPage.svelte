@@ -7,6 +7,7 @@
   import DebugStuff from "$/components/dialogs/DebugStuff.svelte";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import AppPrompt from "$/components/dialogs/AppPrompt.svelte";
+  import AppConfirm from "./dialogs/AppConfirm.svelte";
 
   // eslint-disable-next-line no-undef
   const appCommit = __APP_COMMIT__;
@@ -80,6 +81,8 @@
 {/if}
 
 <AppPrompt />
+
+<AppConfirm />
 
 <style>
   .niim {

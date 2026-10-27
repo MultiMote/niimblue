@@ -11,6 +11,7 @@
   import { Utils } from "@mmote/niimbluelib";
   import { z } from "zod";
   import AppModal from "$/components/basic/AppModal.svelte";
+  import { appConfirm } from "$/stores/confirm";
 
   interface Props {
     onRequestLabelTemplate: () => ExportedLabelTemplate;
@@ -74,12 +75,17 @@
     onSave?.();
   };
 
-  const onSaveReplaceClicked = () => {
+  const onSaveReplaceClicked = async () => {
     if (selectedIndex === -1) {
       return;
     }
 
-    if (!confirm($tr("editor.warning.save"))) {
+    const confirmResult = await appConfirm({
+      title: $tr("editor.warning.save"),
+      buttons: ["yes", "no"]
+    });
+
+    if (confirmResult !== "yes") {
       return;
     }
 
@@ -115,7 +121,7 @@
     saveLabels(result);
   };
 
-  const onLoadClicked = () => {
+  const onLoadClicked = async () => {
     if (selectedIndex === -1) {
       return;
     }
@@ -135,9 +141,17 @@
       message += "\n" + $tr("editor.warning.load.csv");
     }
 
-    if (message && !confirm(message)) {
-      return;
+    if (message) {
+      const confirmResult = await appConfirm({
+        title: message,
+        buttons: ["yes", "no"]
+      });
+
+      if (confirmResult !== "yes") {
+        return;
+      }
     }
+
 
     onLoadRequested(label);
     modalRef.hide();
@@ -220,8 +234,15 @@
       const label = onRequestLabelTemplate();
       const url = await FileUtils.makeLabelUrl(label);
 
-      if (url.length > 2000 && !confirm($tr("params.saved_labels.save.url.warn"))) {
-        return;
+      if (url.length > 2000) {
+        const confirmResult = await appConfirm({
+          title: $tr("params.saved_labels.save.url.warn"),
+          buttons: ["yes", "no"]
+        });
+
+        if (confirmResult !== "yes") {
+          return;
+        }
       }
 
       navigator.clipboard.writeText(url);

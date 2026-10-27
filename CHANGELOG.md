@@ -9,6 +9,7 @@
 * Move label delete and export buttons to popup on mobile.
 * Most of the dropdowns are modal dialogs now.
 * Custom input dialog when editing text.
+* Custom confirm dialog.
 * Warn on tab close with unsaved changes.
 * Do not show warning when loading label if no unsaved changes.
 * Fix size inputs resetting on every keystroke.
@@ -20,7 +21,6 @@
 * Fix centered objects landing on half pixels, which looked blurry in preview and print.
 * Add screentone effect.
 * Move objects by 1 pixel with the mouse (5 pixel grid snapping only when the grid is enabled).
-
 
 # 2026.9.0
 

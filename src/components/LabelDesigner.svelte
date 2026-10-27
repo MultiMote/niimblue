@@ -38,6 +38,7 @@
   import { CustomCanvas } from "$/fabric-object/custom_canvas";
   import VectorParamsControls from "$/components/designer-controls/VectorParamsControls.svelte";
   import { CanvasUtils } from "$/utils/canvas_utils";
+  import { appConfirm } from "$/stores/confirm";
 
   type DialogName = "none" | "preview" | "label_props" | "saved_labels" | "csv_props" | "icon_picker" | "object_picker";
 
@@ -283,12 +284,16 @@
     }
   };
 
-  const clearCanvas = () => {
-    if (!confirm($tr("editor.clear.confirm"))) {
-      return;
+  const clearCanvas = async () => {
+    const result = await appConfirm({
+      title: $tr("editor.clear.confirm"),
+      buttons: ["yes", "no"]
+    });
+
+    if (result === "yes") {
+      undo.push(fabricCanvas!, labelProps);
+      fabricCanvas!.clear();
     }
-    undo.push(fabricCanvas!, labelProps);
-    fabricCanvas!.clear();
   };
 
   const toggleGrid = () => {
@@ -301,7 +306,16 @@
     try {
       const urlTemplate = await FileUtils.readLabelFromUrl();
 
-      if (urlTemplate !== null && confirm($tr("params.saved_labels.load.url.warn"))) {
+      if (urlTemplate === null){
+        return false;
+      }
+
+      const confirmResult = await appConfirm({
+        title: $tr("params.saved_labels.load.url.warn"),
+        buttons: ["yes", "no"]
+      });
+
+      if (confirmResult === "yes") {
         onLoadRequested(urlTemplate);
         Toasts.message($tr("params.saved_labels.load.url.loaded"));
         return true;
