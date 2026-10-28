@@ -14,6 +14,8 @@
     "connector.rfid.ribbon": "RFID риббона",
     "connector.rfid.no_tag": "Нет метки",
     "connector.settings": "Настройки",
+    "connector.settings.auto_shutdown": "Автоотключение",
+    "connector.settings.auto_shutdown.min": "мин.",
     "connector.settings.power_sound": "Звук питания",
     "connector.settings.connection_sound": "Звук соединения",
     "connector.firmware_flashing": "Обновление прошивки",

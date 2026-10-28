@@ -15,6 +15,8 @@
     "connector.rfid.ribbon": "RFID ribbon info",
     "connector.rfid.no_tag": "No tag present",
     "connector.settings": "Settings",
+    "connector.settings.auto_shutdown": "Auto shutdown",
+    "connector.settings.auto_shutdown.min": "min.",
     "connector.settings.power_sound": "Power sound",
     "connector.settings.connection_sound": "Connection sound",
     "connector.firmware_flashing": "Firmware update",

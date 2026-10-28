@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+  AutoShutdownTime,
     LabelType,
     NiimbotCapacitorBleClient,
     SoundSettingsItemType,
@@ -215,6 +216,17 @@
             )} />
         <label class="form-check-label" for="connection-sound-switch"
           >{$tr("connector.settings.connection_sound")}</label>
+      </div>
+
+      <div class="input-group input-group-sm mt-1">
+        <span class="input-group-text ">{$tr("connector.settings.auto_shutdown")}</span>
+        <select class="form-select form-select-sm" value={ $printerInfo.settings.autoShutdownTime} onchange={(e) =>
+            $printerClient.setAutoShutdownTime(Number(e.currentTarget.value))}>
+          <option value={AutoShutdownTime.ShutdownTime1}>15 {$tr("connector.settings.auto_shutdown.min")}</option>
+          <option value={AutoShutdownTime.ShutdownTime2}>30 {$tr("connector.settings.auto_shutdown.min")}</option>
+          <option value={AutoShutdownTime.ShutdownTime3}>45 / 60 {$tr("connector.settings.auto_shutdown.min")}</option>
+          <option value={AutoShutdownTime.ShutdownTime4}>60 / ∞ {$tr("connector.settings.auto_shutdown.min")}</option>
+        </select>
       </div>
 
 
