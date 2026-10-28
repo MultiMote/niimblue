@@ -126,6 +126,7 @@ export const AppConfigSchema = z.object({
   iconListMode: z.enum(["user", "pack", "both"]),
   packetIntervalMs: z.number().gte(0).optional(),
   gridEnabled: z.boolean().optional(),
+  savedLabelsSortMode: z.enum(["date_desc", "date_asc", "title_asc", "title_desc"]).optional(),
 });
 
 export const UserIconSchema = z.object({

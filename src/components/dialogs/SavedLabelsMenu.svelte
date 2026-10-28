@@ -12,6 +12,7 @@
   import { z } from "zod";
   import AppModal from "$/components/basic/AppModal.svelte";
   import { appConfirm } from "$/stores/confirm";
+  import { appConfig } from "$/stores/app";
 
   interface Props {
     onRequestLabelTemplate: () => ExportedLabelTemplate;
@@ -33,6 +34,55 @@
   let customDefaultTemplate = $state<boolean>(LocalStoragePersistence.hasCustomDefaultTemplate());
   let isStandalone = Utils.getAvailableTransports().capacitorBle;
   let modalRef: AppModal;
+  let sortMode = $derived($appConfig.savedLabelsSortMode ?? "date_asc");
+
+  const sortAndAssign = (labels: ExportedLabelTemplate[]) => {
+    if (sortMode === "title_asc") {
+      savedLabels = [...labels].sort((a, b) => (a.title ?? "").localeCompare(b.title ?? ""));
+    } else if (sortMode === "title_desc") {
+      savedLabels = [...labels].sort((a, b) => (b.title ?? "").localeCompare(a.title ?? ""));
+    } else if (sortMode === "date_asc") {
+      savedLabels = [...labels].sort((a, b) => (a.timestamp ?? 0) - (b.timestamp ?? 0));
+    } else {
+      savedLabels = [...labels].sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0));
+    }
+  };
+
+  const toggleSortType = () => {
+    let newMode = sortMode;
+
+    if (sortMode.startsWith("date")) {
+      newMode = sortMode === "date_desc" ? "title_desc" : "title_asc";
+    } else {
+      newMode = sortMode === "title_desc" ? "date_desc" : "date_asc";
+    }
+
+    $appConfig.savedLabelsSortMode = newMode;
+
+    sortAndAssign(LocalStoragePersistence.loadLabels());
+    selectedIndex = -1;
+    title = "";
+  };
+
+  const toggleSortDirection = () => {
+    let newMode = sortMode;
+
+    if (sortMode === "date_desc") {
+      newMode = "date_asc";
+    } else if (sortMode === "date_asc") {
+      newMode = "date_desc";
+    } else if (sortMode === "title_asc") {
+      newMode = "title_desc";
+    } else if (sortMode === "title_desc") {
+      newMode = "title_asc";
+    }
+
+    $appConfig.savedLabelsSortMode = newMode;
+
+    sortAndAssign(LocalStoragePersistence.loadLabels());
+    selectedIndex = -1;
+    title = "";
+  };
 
   const calcUsedSpace = () => {
     usedSpace = LocalStoragePersistence.usedSpace();
@@ -57,7 +107,7 @@
     result.splice(idx, 1);
     LocalStoragePersistence.saveLabels(result);
 
-    savedLabels = result;
+    sortAndAssign(result);
     title = "";
     calcUsedSpace();
   };
@@ -68,7 +118,7 @@
     otherErrors.forEach((e) => Toasts.error(e));
 
     if (zodErrors.length === 0 && otherErrors.length === 0) {
-      savedLabels = labels;
+      sortAndAssign(labels);
     }
 
     calcUsedSpace();
@@ -82,7 +132,7 @@
 
     const confirmResult = await appConfirm({
       title: $tr("editor.warning.save"),
-      buttons: ["yes", "no"]
+      buttons: ["yes", "no"],
     });
 
     if (confirmResult !== "yes") {
@@ -144,14 +194,13 @@
     if (message) {
       const confirmResult = await appConfirm({
         title: message,
-        buttons: ["yes", "no"]
+        buttons: ["yes", "no"],
       });
 
       if (confirmResult !== "yes") {
         return;
       }
     }
-
 
     onLoadRequested(label);
     modalRef.hide();
@@ -177,7 +226,7 @@
         return;
       }
 
-      savedLabels = LocalStoragePersistence.loadLabels();
+      sortAndAssign(LocalStoragePersistence.loadLabels());
       selectedIndex = -1;
       calcUsedSpace();
 
@@ -237,7 +286,7 @@
       if (url.length > 2000) {
         const confirmResult = await appConfirm({
           title: $tr("params.saved_labels.save.url.warn"),
-          buttons: ["yes", "no"]
+          buttons: ["yes", "no"],
         });
 
         if (confirmResult !== "yes") {
@@ -254,7 +303,7 @@
   };
 
   onMount(() => {
-    savedLabels = LocalStoragePersistence.loadLabels();
+    sortAndAssign(LocalStoragePersistence.loadLabels());
     calcUsedSpace();
   });
 </script>
@@ -271,7 +320,7 @@
     {/if}
   </div>
 
-  <div class="mb-1">
+  <div class="mb-1 d-flex align-items-center gap-1">
     <button class="btn btn-sm btn-outline-secondary" onclick={onImportClicked}>
       <MdIcon icon="data_object" />
       {$tr("params.saved_labels.load.json")}
@@ -312,6 +361,15 @@
           </button>
         </li>
       </ul>
+    </div>
+
+    <div class="btn-group btn-group-sm ms-auto">
+      <button class="btn btn-outline-secondary" onclick={toggleSortType}>
+        <MdIcon icon={sortMode.startsWith("date") ? "schedule" : "sort_by_alpha"} />
+      </button>
+      <button class="btn btn-outline-secondary" onclick={toggleSortDirection}>
+        <MdIcon icon={["date_desc", "title_desc"].includes(sortMode) ? "arrow_downward" : "arrow_upward"} />
+      </button>
     </div>
   </div>
 
