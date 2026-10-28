@@ -38,6 +38,7 @@
     bind:show={$confirmState.show}
     title={$confirmState.title}
     noBody={!$confirmState.message}
+    noCloseButton={true}
     onClose={() => close(null)}
     size="sm">
 

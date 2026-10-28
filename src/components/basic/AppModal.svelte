@@ -10,10 +10,11 @@
     children: Snippet;
     footer?: Snippet;
     noBody?: boolean;
+    noCloseButton?: boolean;
     size?: "sm" | "lg" | "xl";
   }
 
-  let { show = $bindable(true), title, onClose, onShow, children, footer, noBody, size }: Props = $props();
+  let { show = $bindable(true), title, onClose, onShow, children, footer, noBody, size, noCloseButton }: Props = $props();
 
   let modalEl: HTMLElement;
   let modal: Modal | null = null;
@@ -82,7 +83,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5">{title}</h1>
-        <button aria-label="Dismiss" type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        {#if !noCloseButton}
+          <button aria-label="Dismiss" type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        {/if}
       </div>
 
       {#if !noBody}
