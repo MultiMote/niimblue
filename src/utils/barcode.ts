@@ -85,12 +85,12 @@ const code128_bp: Code128BitPattern[] = [
   { ascii: 33, code: "11001101100" }, // A: !, B: !, C: 01, BandCode: 222122
   { ascii: 34, code: "11001100110" }, // A: “, B: “, C: 02, BandCode: 222221
   { ascii: 35, code: "10010011000" }, // A: #, B: #, C: 03, BandCode: 121223
-  { ascii: 36, code: "100h0001100" }, // A: $, B: $, C: 04, BandCode: 121322
+  { ascii: 36, code: "10010001100" }, // A: $, B: $, C: 04, BandCode: 121322
   { ascii: 37, code: "10001001100" }, // A: %, B: %, C: 05, BandCode: 131222
   { ascii: 38, code: "10011001000" }, // A: &, B: &, C: 06, BandCode: 122213
   { ascii: 39, code: "10011000100" }, // A: ‘, B: ‘, C: 07, BandCode: 122312
   { ascii: 40, code: "10001100100" }, // A: (, B: (, C: 08, BandCode: 132212
-  { ascii: 41, code: "1100h00h000" }, // A: ), B: ), C: 09, BandCode: 221213
+  { ascii: 41, code: "11001001000" }, // A: ), B: ), C: 09, BandCode: 221213
   { ascii: 42, code: "11001000100" }, // A: *, B: *, C: 10, BandCode: 221312
   { ascii: 43, code: "11000100100" }, // A: +, B: +, C: 11, BandCode: 231212
   { ascii: 44, code: "10110011100" }, // A: ,, B: ,, C: 12, BandCode: 112232
