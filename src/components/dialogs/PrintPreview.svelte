@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { derived } from "svelte/store";
-  import { connectionState, printerClient, printerMeta } from "$/stores/app";
+  import { connectionState, printerClient, printerMeta, rfidInfo } from "$/stores/app";
   import * as effects from "$/utils/post_process";
   import {
     type EncodedImage,
@@ -410,6 +410,10 @@
     // A locked (saved) preview offset is applied on top of it by loadProps().
     if (labelProps.offset !== undefined) {
       offset = { ...labelProps.offset };
+    }
+
+    if ($rfidInfo.labelRfidInfo?.consumablesType) {
+      labelType = $rfidInfo.labelRfidInfo.consumablesType;
     }
 
     loadProps();

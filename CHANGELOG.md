@@ -26,6 +26,7 @@
 * Add auto shutdown option to the printer menu.
 * Fix invalid CODE128 encoding.
 * Add saved templates sorting type/direction.
+* Auto set label type from RFID in preview dialog.
 
 # 2026.9.0
 
