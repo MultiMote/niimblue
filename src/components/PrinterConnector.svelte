@@ -108,7 +108,7 @@
 
 <div class="input-group w-auto input-group-sm flex-nowrap justify-content-end">
   {#if $connectionState === "connected"}
-    <button class="btn btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+    <button class="btn btn-secondary" data-bs-toggle="dropdown" data-bs-auto-close="false">
       <MdIcon icon="settings" />
     </button>
 
