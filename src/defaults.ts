@@ -53,6 +53,8 @@ export const DEFAULT_LABEL_PROPS: LabelProps = {
 /** Object movement snapping */
 export const GRID_SIZE: number = 5;
 
+export const BARCODE_WIDTH: number = 200;
+
 /** Newly created Fabric object dimensions */
 export const OBJECT_SIZE_DEFAULTS = {
   width: 64,

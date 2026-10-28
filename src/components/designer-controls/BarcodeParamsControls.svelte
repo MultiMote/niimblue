@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Barcode } from "$/fabric-object/barcode";
+  import { BARCODE_ENCODINGS, Barcode, type BarcodeEncoding } from "$/fabric-object/barcode";
   import { tr } from "$/utils/i18n";
   import MdIcon from "$/components/basic/MdIcon.svelte";
 
@@ -12,7 +12,7 @@
   let { selectedBarcode, editRevision, valueUpdated }: Props = $props();
 </script>
 
-<input type="hidden" value={editRevision}>
+<input type="hidden" value={editRevision} />
 
 <div class="input-group input-group-sm flex-nowrap">
   <span class="input-group-text" title={$tr("params.barcode.encoding")}><MdIcon icon="code" /></span>
@@ -20,27 +20,13 @@
     class="form-select"
     value={selectedBarcode.encoding}
     onchange={(e) => {
-      selectedBarcode?.set("encoding", e.currentTarget.value ?? "EAN13");
+      selectedBarcode?.set("encoding", (e.currentTarget.value as BarcodeEncoding) ?? "CODE128");
       valueUpdated();
     }}>
-    <option value="EAN13">EAN13</option>
-    <option value="CODE128B">Code128 B</option>
+    {#each BARCODE_ENCODINGS as encoding (encoding.value)}
+      <option value={encoding.value}>{encoding.label}</option>
+    {/each}
   </select>
-</div>
-
-<div class="input-group input-group-sm flex-nowrap">
-  <span class="input-group-text" title={$tr("params.barcode.scale")}>
-    <MdIcon icon="settings_ethernet" />
-  </span>
-  <input
-    class="barcode-width form-control"
-    type="number"
-    min="1"
-    value={selectedBarcode.scaleFactor}
-    oninput={(e) => {
-      selectedBarcode?.set("scaleFactor", e.currentTarget.valueAsNumber ?? 1);
-      valueUpdated();
-    }} />
 </div>
 
 <button
@@ -75,7 +61,6 @@
     selectedBarcode?.set("text", e.currentTarget.value);
     valueUpdated();
   }}></textarea>
-
 
 <style>
   .input-group {

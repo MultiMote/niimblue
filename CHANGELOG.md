@@ -24,9 +24,10 @@
 * Move objects by 1 pixel with the mouse (5 pixel grid snapping only when the grid is enabled).
 * Do not auto apply parameters when selecting label preset.
 * Add auto shutdown option to the printer menu.
-* Fix invalid CODE128 encoding.
 * Add saved templates sorting type/direction.
 * Auto set label type from RFID in preview dialog.
+* Replace barcode implementation with JsBarcode and add new barcode types.
+* Barcode scaling is now automatic and calculated from the object size.
 
 # 2026.9.0
 

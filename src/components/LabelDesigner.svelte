@@ -287,7 +287,7 @@
   const clearCanvas = async () => {
     const result = await appConfirm({
       title: $tr("editor.clear.confirm"),
-      buttons: ["yes", "no"]
+      buttons: ["yes", "no"],
     });
 
     if (result === "yes") {
@@ -306,13 +306,13 @@
     try {
       const urlTemplate = await FileUtils.readLabelFromUrl();
 
-      if (urlTemplate === null){
+      if (urlTemplate === null) {
         return false;
       }
 
       const confirmResult = await appConfirm({
         title: $tr("params.saved_labels.load.url.warn"),
-        buttons: ["yes", "no"]
+        buttons: ["yes", "no"],
       });
 
       if (confirmResult === "yes") {
@@ -645,7 +645,7 @@
           <BarcodeParamsPanel selectedBarcode={selectedObject} {editRevision} valueUpdated={controlValueUpdated} />
         {/if}
 
-        {#if selectedObject instanceof fabric.IText || selectedObject instanceof QRCode || (selectedObject instanceof Barcode && selectedObject.encoding === "CODE128B")}
+        {#if selectedObject instanceof fabric.IText || selectedObject instanceof QRCode || selectedObject instanceof Barcode}
           <VariableInsertControl {selectedObject} valueUpdated={controlValueUpdated} />
         {/if}
       </div>
