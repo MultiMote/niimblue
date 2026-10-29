@@ -207,7 +207,7 @@
     "params.saved_labels.export.all": "Alle gespeicherten Labels",
     "params.saved_labels.export.json": "JSON Datei",
     "params.saved_labels.import.added_one": "Label zu gespeicherten Labels hinzugefügt",
-    "params.saved_labels.import.added_many": "{count}  Labels zu den gespeicherten Labels hinzugefügt",
+    "params.saved_labels.import.added_many": "{count} Labels zu den gespeicherten Labels hinzugefügt",
     "params.saved_labels.export.png": "als PNG",
     "params.text.character_spacing": "Zeichenabstand",
     "params.vector.stroke_color": "Linienfarbe",
