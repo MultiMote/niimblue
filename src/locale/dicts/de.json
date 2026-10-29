@@ -221,5 +221,8 @@
     "dialog.cancel": "Abbrechen",
     "dialog.no": "Nein",
     "dialog.ok": "OK",
-    "dialog.yes": "Ja"
+    "dialog.yes": "Ja",
+    "connector.rfid.dimensions": "Abmessungen",
+    "connector.firmware_flashing": "Firmware Update",
+    "connector.firmware_flashing.ver": "vers."
 }
