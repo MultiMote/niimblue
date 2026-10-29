@@ -147,5 +147,11 @@
     "preview.print.system": "使用作業系統印表機列印",
     "preview.print": "列印",
     "preview.threshold": "閾值",
-    "preview.title": "列印預覽"
+    "preview.title": "列印預覽",
+    "connector.settings": "設定",
+    "connector.settings.connection_sound": "連線提示音",
+    "connector.firmware_flashing": "韌體升級",
+    "connector.firmware_flashing.ver": "版本",
+    "connector.firmware_flashing.browse": "瀏覽",
+    "editor.iconpicker.add": "新增"
 }
