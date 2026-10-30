@@ -53,12 +53,13 @@
   let postProcessInvert = $state<boolean>(false);
   let postProcessMirror = $state<boolean>(false);
   let thresholdValue = $state<number>(140);
+  let brightnessValue = $state<number>(128);
   let thresholdValueRed = $state<number>(100);
   let strengthValue = $state<number>(1);
   let serpentineValue = $state<boolean>(true);
   let screentoneDotSizeValue = $state<number>(5);
   let screentoneAngleValue = $state<number>(45);
-  let screentoneContrastValue = $state<number>(60);
+  let contrastValue = $state<number>(60);
   let originalImage: ImageData;
   let previewContext: CanvasRenderingContext2D;
   let printTaskName = $state<PrintTaskName>("B1");
@@ -129,6 +130,8 @@
 
     if (taskHasCap(TaskCap.SupportDoubleColor) && postProcessType === "threshold_rb") {
       opts.pageColor = PageColorType.DoubleColor;
+    } else if (taskHasCap(TaskCap.SupportGrayscale) && postProcessType === "grayscale") {
+      opts.pageColor = PageColorType.MultiorderColor;
     }
 
     const printListener = (e: PrintProgressEvent) => {
@@ -204,7 +207,9 @@
       bayer2: (data) => effects.bayer(data, 2),
       bayer4: (data) => effects.bayer(data, 4),
       bayer8: (data) => effects.bayer(data, 8),
-      screentone: (data) => effects.screentone(data, thresholdValue, screentoneDotSizeValue, screentoneAngleValue, screentoneContrastValue),
+      screentone: (data) =>
+        effects.screentone(data, thresholdValue, screentoneDotSizeValue, screentoneAngleValue, contrastValue),
+      grayscale: (data) => effects.grayscale(data, contrastValue, brightnessValue),
     };
 
     iData = processors[postProcessType](iData);
@@ -285,7 +290,8 @@
       if (saved.serpentine !== undefined) serpentineValue = saved.serpentine;
       if (saved.screentoneAngle !== undefined) screentoneAngleValue = saved.screentoneAngle;
       if (saved.screentoneDotSize !== undefined) screentoneDotSizeValue = saved.screentoneDotSize;
-      if (saved.screentoneContrast !== undefined) screentoneContrastValue = saved.screentoneContrast;
+      if (saved.contrast !== undefined) contrastValue = saved.contrast;
+      if (saved.brightness !== undefined) brightnessValue = saved.brightness;
       if (saved.quantity !== undefined) quantity = saved.quantity;
       if (saved.density !== undefined) density = saved.density;
       if (saved.speed !== undefined) speed = saved.speed;
@@ -483,6 +489,7 @@
         <option value="jjn">{$tr("preview.postprocess.jjn")}</option>
         <option value="stucki">{$tr("preview.postprocess.stucki")}</option>
         <option value="screentone">{$tr("preview.postprocess.screentone")}</option>
+        <option value="grayscale">{$tr("preview.postprocess.grayscale")}</option>
       </select>
 
       <ParamLockButton
@@ -510,7 +517,7 @@
       </button>
     </div>
 
-    {#if !(postProcessType && ["bayer2", "bayer4", "bayer8"].includes(postProcessType))}
+    {#if !(postProcessType && ["bayer2", "bayer4", "bayer8", "grayscale"].includes(postProcessType))}
       <div class="input-group input-group-sm">
         <span class="input-group-text">{$tr("preview.threshold")}</span>
 
@@ -627,24 +634,48 @@
           savedValue={savedProps.screentoneAngle}
           onClick={toggleSavedProp} />
       </div>
+    {/if}
 
+    {#if ["screentone", "grayscale"].includes(postProcessType)}
       <div class="input-group input-group-sm">
-        <span class="input-group-text">{$tr("preview.postprocess.screentone.contrast")}</span>
+        <span class="input-group-text">{$tr("preview.postprocess.contrast")}</span>
 
-       <input
+        <input
           type="range"
-          id="screentoneContrast"
+          id="contrast"
           class="form-range"
           min="0"
           max="127"
-          bind:value={screentoneContrastValue}
-          onchange={() => updateSavedProp("screentoneContrast", screentoneContrastValue, true)} />
-        <span class="input-group-text">{screentoneContrastValue}</span>
+          bind:value={contrastValue}
+          onchange={() => updateSavedProp("contrast", contrastValue, true)} />
+        <span class="input-group-text">{contrastValue}</span>
 
         <ParamLockButton
-          propName="screentoneContrast"
-          value={screentoneContrastValue}
-          savedValue={savedProps.screentoneContrast}
+          propName="contrast"
+          value={contrastValue}
+          savedValue={savedProps.contrast}
+          onClick={toggleSavedProp} />
+      </div>
+    {/if}
+
+    {#if ["grayscale"].includes(postProcessType)}
+      <div class="input-group input-group-sm">
+        <span class="input-group-text">{$tr("preview.postprocess.brightness")}</span>
+
+        <input
+          type="range"
+          id="brightness"
+          class="form-range"
+          min="0"
+          max="255"
+          bind:value={brightnessValue}
+          onchange={() => updateSavedProp("brightness", brightnessValue, true)} />
+        <span class="input-group-text">{brightnessValue}</span>
+
+        <ParamLockButton
+          propName="brightness"
+          value={brightnessValue}
+          savedValue={savedProps.brightness}
           onClick={toggleSavedProp} />
       </div>
     {/if}

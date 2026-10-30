@@ -220,7 +220,7 @@
     "preview.postprocess.screentone": "Скринтон",
     "preview.postprocess.screentone.angle": "Угол",
     "preview.postprocess.screentone.dot_size": "Размер точки",
-    "preview.postprocess.screentone.contrast": "Контраст",
+    "preview.postprocess.contrast": "Контраст",
     "preview.strength": "Сила",
     "preview.serpentine": "Серпентинный",
     "connector.firmware_flashing.done": "Прошивка завершена, принтер сейчас отключится. Он не будет подавать признаков жизни несколько секунд.",
