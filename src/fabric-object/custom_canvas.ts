@@ -83,8 +83,6 @@ export class CustomCanvas extends fabric.Canvas {
               x: (touch1.clientX + touch2.clientX) / 2,
               y: (touch1.clientY + touch2.clientY) / 2,
             };
-          } else if (e.touches.length === 1) {
-
           }
         },
         { passive: false },

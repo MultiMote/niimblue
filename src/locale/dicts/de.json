@@ -214,7 +214,7 @@
     "params.color.red": "rot",
     "preview.postprocess.screentone.angle": "Winkel",
     "preview.postprocess.screentone.dot_size": "Punktgröße",
-    "preview.postprocess.screentone.contrast": "Kontrast",
+    "preview.postprocess.contrast": "Kontrast",
     "preview.print.state.sending": "Senden...",
     "preview.print.state.printing": "Drucken...",
     "preview.strength": "Stärke",

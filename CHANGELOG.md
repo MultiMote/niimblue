@@ -1,6 +1,7 @@
 # 2026.10.0
 
-* Fix Arabic RTL text cursor and selection
+* Support grayscale printing (currently supported on B1 Pro, B2 Pro, B21 Pro printers).
+* Fix Arabic RTL text cursor and selection.
 * Parse nested variables (example: `{dt+{var}d}`).
 * Auto use `D110M_V4` print task for `protocolVersion 4+` printers.
 * Standardize template and saved label JSON import/export.
