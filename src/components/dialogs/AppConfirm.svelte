@@ -47,7 +47,7 @@
     {/if}
 
     {#snippet footer()}
-      {#each $confirmState.buttons ?? ["ok"] as btn}
+      {#each $confirmState.buttons ?? ["ok"] as btn (btn)}
         <button
           class="btn"
           class:btn-primary={btn === $confirmState.defaultButton}

@@ -77,6 +77,31 @@ export const threshold = (image: ImageData, threshold: number): ImageData => {
   return image;
 };
 
+
+/**
+ * Convert image to grayscale with adjustable contrast and brightness
+ */
+export const grayscale = (
+  image: ImageData,
+  contrast: number = 64,
+  brightness: number = 128,
+): ImageData => {
+  const { data } = image;
+  const factor = contrast / 64;
+  const offset = brightness - 128;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const gray = rgbToGray(data[i], data[i + 1], data[i + 2]);
+    const value = Math.max(0, Math.min(255, (gray - 128) * factor + 128 + offset));
+
+    data[i] = value;
+    data[i + 1] = value;
+    data[i + 2] = value;
+  }
+
+  return image;
+};
+
 /**
  * Change the image to black, red and white using a simple threshold
  *
