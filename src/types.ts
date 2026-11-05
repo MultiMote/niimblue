@@ -97,6 +97,7 @@ const PostProcessTypeSchema = z.enum([
 export const PreviewPropsSchema = z.object({
   postProcess: PostProcessTypeSchema.optional(),
   postProcessInvert: z.boolean().optional(),
+  postProcessMirror: z.boolean().optional(),
   threshold: z.number().gte(1).lte(255).optional(),
   thresholdRed: z.number().gte(1).lte(255).optional(),
   strength: z.number().gte(0).lte(1.5).optional(),
@@ -155,3 +156,5 @@ export type PreviewProps = z.infer<typeof PreviewPropsSchema>;
 export type AutomationProps = z.infer<typeof AutomationPropsSchema>;
 export type AppConfig = z.infer<typeof AppConfigSchema>;
 export type UserFont = z.infer<typeof UserFontSchema>;
+
+export const previewPropsKeys = Object.keys(PreviewPropsSchema.shape) as (keyof PreviewProps)[];
