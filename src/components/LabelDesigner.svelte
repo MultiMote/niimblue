@@ -6,7 +6,7 @@
   import { Barcode } from "$/fabric-object/barcode";
   import { QRCode } from "$/fabric-object/qrcode";
   import { iconCodepoints, type MaterialIcon } from "$/styles/mdi_icons";
-  import { appConfig, automation, connectionState, csvData, loadedFonts } from "$/stores/app";
+  import { appConfig, automation, connectionState, csvData, dimensionsUpdateRequest, loadedFonts } from "$/stores/app";
   import {
     type ExportedLabelTemplate,
     type FabricJson,
@@ -171,6 +171,11 @@
     } catch (e) {
       Toasts.zodErrors(e, "Label parameters save error:");
     }
+  };
+
+  const updateDimensions = (width: number, height: number) => {
+    let newProps = { ...labelProps, size: { width, height } };
+    onUpdateLabelProps(newProps);
   };
 
   const exportCurrentLabel = (): ExportedLabelTemplate => {
@@ -493,6 +498,14 @@
     event.preventDefault();
     event.returnValue = "";
   };
+
+  onMount(() =>
+    dimensionsUpdateRequest.subscribe((req) => {
+      if (req) {
+        updateDimensions(req.width, req.height);
+      }
+    }),
+  );
 
   onDestroy(() => {
     fabricCanvas!.dispose();

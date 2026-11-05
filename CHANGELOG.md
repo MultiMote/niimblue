@@ -32,6 +32,7 @@
 * Make post-process slider values editable number boxes in the print preview dialog.
 * Fix slow printing and firmware transfers when the browser tab is in the background.
 * Web Bluetooth: retry GATT connection when the link drops during service discovery.
+* Printer menu: add "apply rfid dimensions" button.
 
 # 2026.9.0
 

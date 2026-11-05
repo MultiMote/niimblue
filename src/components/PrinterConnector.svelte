@@ -3,6 +3,7 @@
   AutoShutdownTime,
     LabelType,
     NiimbotCapacitorBleClient,
+    ResolutionClass,
     SoundSettingsItemType,
     Utils,
     type AvailableTransports,
@@ -18,6 +19,7 @@
     heartbeatFails,
     automation,
     rfidInfo,
+    dimensionsUpdateRequest,
   } from "$/stores/app";
   import type { ConnectionType } from "$/types";
   import { tr, type TranslationKey } from "$/utils/i18n";
@@ -84,6 +86,30 @@
     if (value >= 40) return "battery_3_bar";
     if (value >= 15) return "battery_2_bar";
     return "battery_0_bar";
+  };
+
+  const applyDimensionsClicked = () => {
+    const paper = $rfidInfo.paperInfo;
+    let dpmm = 8;
+
+    if ($printerInfo.resolutionClass !== undefined) {
+      dpmm = $printerInfo.resolutionClass === ResolutionClass.DPI300 ? 11.81 : 0;
+    } else if ($printerInfo.capabilities?.printheadDpi !== undefined) {
+      dpmm = $printerInfo.capabilities?.printheadDpi === 300 ? 11.81 : 0;
+    }
+
+    if (paper?.paperWidth !== undefined && paper?.paperHeight !== undefined) {
+      let width = Math.floor(paper.paperWidth * dpmm);
+      let height = Math.floor(paper.paperHeight * dpmm);
+
+      if ($printerInfo.printheadWidth !== undefined && width > $printerInfo.printheadWidth) {
+        width = $printerInfo.printheadWidth;
+      }
+
+      width -= width % 8;
+
+      dimensionsUpdateRequest.set({ width, height }); // todo: print direction?
+    }
   };
 
   onMount(() => {
@@ -159,6 +185,9 @@
             <div class="px-1 bg-light-subtle border-end">{$tr("connector.rfid.dimensions")}</div>
             <div class="px-1 flex-grow-1 text-center">
               {$rfidInfo.paperInfo.paperWidth}x{$rfidInfo.paperInfo.paperHeight}mm
+              <button class="btn text-info set-dim-button" onclick={applyDimensionsClicked}>
+                <MdIcon icon="aspect_ratio" />
+              </button>
             </div>
           </div>
         {/if}
@@ -332,5 +361,11 @@
   .dropdown-menu {
     width: 100vw;
     max-width: 300px;
+  }
+
+  .set-dim-button {
+    padding: 0 0.3rem;
+    font-size: 0.875rem;
+    line-height: 1.2;
   }
 </style>
