@@ -235,5 +235,7 @@
     "dialog.cancel": "Отмена",
     "dialog.no": "Нет",
     "dialog.ok": "OK",
-    "dialog.yes": "Да"
+    "dialog.yes": "Да",
+    "preview.postprocess.grayscale": "Градации серого",
+    "preview.postprocess.brightness": "Яркость"
 }
