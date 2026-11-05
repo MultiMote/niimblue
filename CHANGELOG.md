@@ -30,6 +30,8 @@
 * Replace barcode implementation with JsBarcode and add new barcode types.
 * Barcode scaling is now automatic and calculated from the object size.
 * Make post-process slider values editable number boxes in the print preview dialog.
+* Fix slow printing and firmware transfers when the browser tab is in the background.
+* Web Bluetooth: retry GATT connection when the link drops during service discovery.
 
 # 2026.9.0
 
