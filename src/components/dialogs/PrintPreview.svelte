@@ -258,6 +258,22 @@
     }
   };
 
+  /**
+   * Commit a value typed into a slider's number box: revert if empty, clamp to the input's own
+   * min/max and trim float noise to its step. (A native number input only clamps with its
+   * spinner, not typed text.)
+   */
+  const commitSliderValue = (e: Event, current: number): number => {
+    const el = e.currentTarget as HTMLInputElement;
+    const typed = el.valueAsNumber;
+    const decimals = (el.step.split(".")[1] ?? "").length;
+    const next = Number.isNaN(typed)
+      ? current
+      : Number(Math.min(Number(el.max), Math.max(Number(el.min), typed)).toFixed(decimals));
+    el.value = String(next);
+    return next;
+  };
+
   const updateSavedProp = (key: string, value: any, refreshPreview: boolean = false) => {
     const keyObj = key as keyof typeof savedProps;
 
@@ -529,7 +545,16 @@
           max="255"
           bind:value={thresholdValue}
           onchange={() => updateSavedProp("threshold", thresholdValue, true)} />
-        <span class="input-group-text">{thresholdValue}</span>
+        <input
+          type="number"
+          class="form-control slider-value"
+          min={1}
+          max={255}
+          value={thresholdValue}
+          onchange={(e) => {
+            thresholdValue = commitSliderValue(e, thresholdValue);
+            updateSavedProp("threshold", thresholdValue, true);
+          }} />
 
         <ParamLockButton
           propName="threshold"
@@ -552,7 +577,17 @@
           step="0.1"
           bind:value={strengthValue}
           onchange={() => updateSavedProp("strength", strengthValue, true)} />
-        <span class="input-group-text">{strengthValue.toFixed(1)}</span>
+        <input
+          type="number"
+          class="form-control slider-value"
+          min={0}
+          max={1.5}
+          step={0.1}
+          value={strengthValue}
+          onchange={(e) => {
+            strengthValue = commitSliderValue(e, strengthValue);
+            updateSavedProp("strength", strengthValue, true);
+          }} />
 
         <ParamLockButton
           propName="strength"
@@ -584,7 +619,16 @@
           max="255"
           bind:value={thresholdValueRed}
           onchange={() => updateSavedProp("thresholdRed", thresholdValueRed, true)} />
-        <span class="input-group-text">{thresholdValueRed}</span>
+        <input
+          type="number"
+          class="form-control slider-value"
+          min={1}
+          max={255}
+          value={thresholdValueRed}
+          onchange={(e) => {
+            thresholdValueRed = commitSliderValue(e, thresholdValueRed);
+            updateSavedProp("thresholdRed", thresholdValueRed, true);
+          }} />
 
         <ParamLockButton
           propName="thresholdRed"
@@ -606,7 +650,16 @@
           max="20"
           bind:value={screentoneDotSizeValue}
           onchange={() => updateSavedProp("screentoneDotSize", screentoneDotSizeValue, true)} />
-        <span class="input-group-text">{screentoneDotSizeValue}</span>
+        <input
+          type="number"
+          class="form-control slider-value"
+          min={1}
+          max={20}
+          value={screentoneDotSizeValue}
+          onchange={(e) => {
+            screentoneDotSizeValue = commitSliderValue(e, screentoneDotSizeValue);
+            updateSavedProp("screentoneDotSize", screentoneDotSizeValue, true);
+          }} />
 
         <ParamLockButton
           propName="screentoneDotSize"
@@ -626,7 +679,16 @@
           max="90"
           bind:value={screentoneAngleValue}
           onchange={() => updateSavedProp("screentoneAngle", screentoneAngleValue, true)} />
-        <span class="input-group-text">{screentoneAngleValue}</span>
+        <input
+          type="number"
+          class="form-control slider-value"
+          min={0}
+          max={90}
+          value={screentoneAngleValue}
+          onchange={(e) => {
+            screentoneAngleValue = commitSliderValue(e, screentoneAngleValue);
+            updateSavedProp("screentoneAngle", screentoneAngleValue, true);
+          }} />
 
         <ParamLockButton
           propName="screentoneAngle"
@@ -648,7 +710,16 @@
           max="127"
           bind:value={contrastValue}
           onchange={() => updateSavedProp("contrast", contrastValue, true)} />
-        <span class="input-group-text">{contrastValue}</span>
+        <input
+          type="number"
+          class="form-control slider-value"
+          min={0}
+          max={127}
+          value={contrastValue}
+          onchange={(e) => {
+            contrastValue = commitSliderValue(e, contrastValue);
+            updateSavedProp("contrast", contrastValue, true);
+          }} />
 
         <ParamLockButton
           propName="contrast"
@@ -670,7 +741,16 @@
           max="255"
           bind:value={brightnessValue}
           onchange={() => updateSavedProp("brightness", brightnessValue, true)} />
-        <span class="input-group-text">{brightnessValue}</span>
+        <input
+          type="number"
+          class="form-control slider-value"
+          min={0}
+          max={255}
+          value={brightnessValue}
+          onchange={(e) => {
+            brightnessValue = commitSliderValue(e, brightnessValue);
+            updateSavedProp("brightness", brightnessValue, true);
+          }} />
 
         <ParamLockButton
           propName="brightness"
@@ -834,6 +914,10 @@
   }
   .progress-bar {
     transition: none;
+  }
+  .input-group .slider-value {
+    flex: 0 0 auto;
+    width: 4rem;
   }
   .input-group .form-range {
     flex-grow: 1;
