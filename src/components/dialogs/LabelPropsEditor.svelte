@@ -66,9 +66,9 @@
 
     let headSize = -1;
 
-    if ($printerInfo.printheadWidth !== undefined) {
+    if ($printerInfo?.printheadWidth !== undefined) {
       headSize = $printerInfo.printheadWidth;
-    } else if ($printerMeta !== undefined) {
+    } else if ($printerMeta?.printheadPixels !== undefined) {
       headSize = $printerMeta.printheadPixels;
     }
 
@@ -556,8 +556,8 @@
   .tail-pos-switch .svg-icon {
     background-image: url("../assets/tail-pos.svg");
   }
-  .tail-pos-switch label[for="tail-bottom"] .svg-icon {
-    transform: rotate(90deg);
+  .tail-pos-switch label[for="tail-right"] .svg-icon {
+    transform: rotate(0deg);
   }
   .tail-pos-switch label[for="tail-bottom"] .svg-icon {
     transform: rotate(90deg);

@@ -245,9 +245,9 @@
 
     let headSize = -1;
 
-    if ($printerInfo.printheadWidth !== undefined) {
+    if ($printerInfo?.printheadWidth !== undefined) {
       headSize = $printerInfo.printheadWidth;
-    } else if ($printerMeta !== undefined) {
+    } else if ($printerMeta?.printheadPixels !== undefined) {
       headSize = $printerMeta.printheadPixels;
     }
 

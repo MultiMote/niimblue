@@ -1,3 +1,7 @@
+# 2026.10.1
+
+* Fix label options not open on disconnected printer
+
 # 2026.10.0
 
 * Support grayscale printing (currently supported on B1 Pro, B2 Pro, B21 Pro printers).
