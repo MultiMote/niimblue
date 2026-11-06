@@ -12,9 +12,10 @@
     noBody?: boolean;
     noCloseButton?: boolean;
     size?: "sm" | "lg" | "xl";
+    tall?: boolean;
   }
 
-  let { show = $bindable(true), title, onClose, onShow, children, footer, noBody, size, noCloseButton }: Props = $props();
+  let { show = $bindable(true), title, onClose, onShow, children, footer, noBody, size, noCloseButton, tall = false }: Props = $props();
 
   let modalEl: HTMLElement;
   let modal: Modal | null = null;
@@ -79,7 +80,7 @@
   class:modal-xl={size === "xl"}
   tabindex="-1"
   aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered" class:modal-dialog-tall={tall}>
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5">{title}</h1>
@@ -110,5 +111,42 @@
 
   .modal.nobody .modal-footer {
     border-top: none;
+  }
+
+  .modal-dialog.modal-dialog-tall {
+    width: min(72rem, calc(100vw - 1rem));
+    max-width: min(72rem, calc(100vw - 1rem));
+    height: calc(100dvh - 1rem);
+    max-height: calc(100dvh - 1rem);
+    margin: 0.5rem auto;
+  }
+
+  .modal-dialog.modal-dialog-tall .modal-content {
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .modal-dialog.modal-dialog-tall .modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-dialog.modal-dialog-tall .modal-footer {
+    flex: 0 0 auto;
+  }
+
+  @media (max-width: 576px) {
+    .modal-dialog.modal-dialog-tall {
+      width: 100vw;
+      max-width: 100vw;
+      height: 100dvh;
+      max-height: 100dvh;
+      margin: 0;
+    }
   }
 </style>

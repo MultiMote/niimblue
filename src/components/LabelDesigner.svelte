@@ -193,11 +193,6 @@
     hasUnsavedChanges = false;
   };
 
-  const zplImageReady = async (img: Blob) => {
-    await LabelDesignerObjectHelper.addImageBlob(fabricCanvas!, img);
-    undo.push(fabricCanvas!, labelProps);
-  };
-
   const pdfImageReady = async (el: HTMLCanvasElement) => {
     const img = new fabric.FabricImage(el, {
       ...OBJECT_DEFAULTS,
@@ -696,8 +691,13 @@
       onSubmit={onObjectPicked}
       onClose={() => (currentDialog = "none")}
       {labelProps}
-      {zplImageReady}
-      {pdfImageReady} />
+      {pdfImageReady}
+      canvas={fabricCanvas!}
+      onZplObjectsImported={() => {
+        undo.push(fabricCanvas!, labelProps);
+        editRevision++;
+      }}
+      onZplLabelSize={(size) => updateDimensions(size.width, size.height)} />
   {/if}
 </div>
 

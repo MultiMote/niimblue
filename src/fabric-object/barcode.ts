@@ -108,6 +108,8 @@ export class Barcode<
 
   private barcodeEncodings: JsBarcodeEncoding[] = [];
   private barcodeBarHeight: number = 0;
+  private barScale: number = 0;
+  private barsStart: number = 0;
   private error: boolean = false;
 
   constructor(options?: Props) {
@@ -142,6 +144,8 @@ export class Barcode<
     this.error = false;
     this.barcodeEncodings = [];
     this.barcodeBarHeight = 0;
+    this.barScale = 0;
+    this.barsStart = 0;
 
     if (!this.text) {
       return;
@@ -286,6 +290,8 @@ export class Barcode<
     const groupWidth = leadingTextWidth + barcodeWidth + trailingTextWidth;
     const groupStart = Math.floor((this.width - groupWidth) / 2);
     const barcodeStartPos = groupStart + leadingTextWidth;
+    this.barScale = barScale;
+    this.barsStart = barcodeStartPos;
     const textHeight = this.printText ? this.fontSize + BARCODE_TEXT_MARGIN : 0;
     const barHeight = Math.max(1, this.height - textHeight);
     const storedBarHeight = this.barcodeBarHeight || barHeight;
@@ -362,6 +368,16 @@ export class Barcode<
 
   override toObject(propertiesToInclude: any[] = []) {
     return super.toObject([...BARCODE_PROPS, ...propertiesToInclude]);
+  }
+
+  /** Module width (px) the bars are rendered with; 0 until the first render. */
+  getBarScale(): number {
+    return this.barScale;
+  }
+
+  /** Offset of the bars from the object's left edge; 0 until the first render. */
+  getBarsStart(): number {
+    return this.barsStart;
   }
 }
 

@@ -13,6 +13,7 @@
   import AppModal from "$/components/basic/AppModal.svelte";
   import { appConfirm } from "$/stores/confirm";
   import { appConfig } from "$/stores/app";
+  import { canvasToZpl } from "$/utils/zpl/zpl_export";
 
   interface Props {
     onRequestLabelTemplate: () => ExportedLabelTemplate;
@@ -277,6 +278,14 @@
       Toasts.zodErrors(e, "Canvas save error:");
     }
   };
+  const onExportZplClicked = () => {
+    try {
+      const result = canvasToZpl(canvas);
+      FileUtils.saveTextFile(`label_${FileUtils.timestamp()}.zpl`, result.zpl);
+    } catch (e) {
+      Toasts.zodErrors(e, "Canvas save error:");
+    }
+  };
 
   const onExportUrlClicked = async () => {
     try {
@@ -344,6 +353,11 @@
         <li>
           <button class="dropdown-item" onclick={onExportPngClicked}>
             {$tr("params.saved_labels.export.png")}
+          </button>
+        </li>
+        <li>
+          <button class="dropdown-item" onclick={onExportZplClicked}>
+            {$tr("params.saved_labels.export.zpl")}
           </button>
         </li>
         {#if !isStandalone}

@@ -33,10 +33,10 @@ export interface SerializedQRCodeProps extends fabric.SerializedObjectProps, Uni
 const QRCODE_PROPS = ["text", "ecl", "size", "mode", "qrVersion"] as const;
 
 export class QRCode<
-    Props extends fabric.TOptions<QRCodeProps> = Partial<QRCodeProps>,
-    SProps extends SerializedQRCodeProps = SerializedQRCodeProps,
-    EventSpec extends fabric.ObjectEvents = fabric.ObjectEvents,
-  >
+  Props extends fabric.TOptions<QRCodeProps> = Partial<QRCodeProps>,
+  SProps extends SerializedQRCodeProps = SerializedQRCodeProps,
+  EventSpec extends fabric.ObjectEvents = fabric.ObjectEvents,
+>
   extends fabric.FabricObject<Props, SProps, EventSpec>
   implements QRCodeProps
 {
@@ -61,6 +61,8 @@ export class QRCode<
    * Version
    */
   declare qrVersion: QrVersion;
+
+  private moduleCount: number = 0;
 
   constructor(options?: Props) {
     super();
@@ -106,8 +108,10 @@ export class QRCode<
       return;
     }
 
-    const qrScale = Math.floor(this.width / qr.getModuleCount());
-    let qrWidth = qrScale * qr.getModuleCount();
+    this.moduleCount = qr.getModuleCount();
+
+    const qrScale = Math.floor(this.width / this.moduleCount);
+    let qrWidth = qrScale * this.moduleCount;
     qrWidth -= qrWidth % 2; // avoid half-pixel rendering
 
     if (qrScale < 1 || qrWidth > this.width) {
@@ -123,6 +127,10 @@ export class QRCode<
     ctx.restore();
 
     super._render(ctx);
+  }
+
+  getModuleCount(): number {
+    return this.moduleCount;
   }
 
   override toObject(propertiesToInclude: any[] = []) {
