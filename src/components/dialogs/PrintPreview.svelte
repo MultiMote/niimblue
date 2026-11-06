@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { derived } from "svelte/store";
-  import { connectionState, printerClient, printerMeta, rfidInfo } from "$/stores/app";
+  import { connectionState, printerClient, printerInfo, printerMeta, rfidInfo } from "$/stores/app";
   import * as effects from "$/utils/post_process";
   import {
     type EncodedImage,
@@ -55,7 +55,7 @@
   let csvParsed: DSVRowArray<string>;
   let currentPage = $state<number>(0);
   let pagesTotal = $state<number>(1);
-  let offsetWarning = $state<string>("");
+  let warnings = $state<string[]>([]);
   let currentPrintTask: AbstractPrintTask | undefined;
   let savedProps = $state<PreviewProps>({});
 
@@ -226,7 +226,7 @@
       iData = effects.mirror(iData);
     }
 
-    offsetWarning = "";
+    warnings = [];
 
     if (params.offset.offsetType === "inner") {
       previewCanvas.width = originalImage.width;
@@ -242,12 +242,20 @@
       previewContext.putImageData(iData, Math.max(params.offset.x, 0), Math.max(params.offset.y, 0));
     }
 
-    if ($printerMeta !== undefined) {
-      const headSize = labelProps.printDirection == "left" ? previewCanvas.height : previewCanvas.width;
-      if (headSize > $printerMeta.printheadPixels) {
-        offsetWarning += $tr("params.label.warning.width") + " ";
-        offsetWarning += `(${headSize} > ${$printerMeta.printheadPixels})`;
-        offsetWarning += "\n";
+
+    let headSize = -1;
+
+    if ($printerInfo.printheadWidth !== undefined) {
+      headSize = $printerInfo.printheadWidth;
+    } else if ($printerMeta !== undefined) {
+      headSize = $printerMeta.printheadPixels;
+    }
+
+    if (headSize !== -1) {
+      const printWidth = labelProps.printDirection == "left" ? previewCanvas.height : previewCanvas.width;
+
+      if (printWidth > headSize) {
+        warnings.push($tr("params.label.warning.width") + " " + `${printWidth} > ${headSize}`);
       }
     }
   };
@@ -487,6 +495,10 @@
   </div>
 
   {#snippet footer()}
+    {#each warnings as line (line)}
+        <span class="text-warning w-100">{line}</span>
+    {/each}
+
     <div class="input-group input-group-sm">
       <span class="input-group-text">{$tr("preview.postprocess")}</span>
 
@@ -862,9 +874,6 @@
 
     <div class="input-group input-group-sm">
       <span class="input-group-text">{$tr("preview.offset")}</span>
-      {#if offsetWarning}
-        <span class="input-group-text text-warning" title={offsetWarning}><MdIcon icon="warning" /></span>
-      {/if}
       <span class="input-group-text"><MdIcon icon="unfold_more" class="r-90" /></span>
       <input
         class="form-control"

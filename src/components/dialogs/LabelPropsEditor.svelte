@@ -11,7 +11,7 @@
     type TailPosition,
   } from "$/types";
   import LabelPresetsBrowser from "$/components/designer-controls/LabelPresetsBrowser.svelte";
-  import { printerMeta } from "$/stores/app";
+  import { printerInfo, printerMeta } from "$/stores/app";
   import { tr } from "$/utils/i18n";
   import { DEFAULT_LABEL_PRESETS } from "$/defaults";
   import { onMount, tick } from "svelte";
@@ -59,32 +59,40 @@
   let hasPresetOffset = $state<boolean>(false);
   let modalRef: AppModal;
 
-  let error = $derived.by<string>(() => {
-    let error = "";
+  let warnings = $derived.by<string[]>(() => {
+    let lines: string[] = [];
 
-    const headSize = labelProps.printDirection == "left" ? labelProps.size.height : labelProps.size.width;
-    if ($printerMeta !== undefined) {
-      if (headSize > $printerMeta.printheadPixels) {
-        error += $tr("params.label.warning.width") + " ";
-        error += `(${headSize} > ${$printerMeta.printheadPixels})`;
-        error += "\n";
-      }
+    const printWidth = labelProps.printDirection == "left" ? labelProps.size.height : labelProps.size.width;
 
-      if ($printerMeta.printDirection !== labelProps.printDirection) {
-        error += $tr("params.label.warning.direction") + " ";
-        if ($printerMeta.printDirection == "left") {
-          error += $tr("params.label.direction.left");
-        } else {
-          error += $tr("params.label.direction.top");
-        }
+    let headSize = -1;
+
+    if ($printerInfo.printheadWidth !== undefined) {
+      headSize = $printerInfo.printheadWidth;
+    } else if ($printerMeta !== undefined) {
+      headSize = $printerMeta.printheadPixels;
+    }
+
+    if (headSize > 0) {
+      if (printWidth > headSize) {
+        lines.push($tr("params.label.warning.width") + ` ${printWidth} > ${headSize}`);
       }
     }
 
-    if (headSize % 8 !== 0) {
-      error += $tr("params.label.warning.div8");
+    if ($printerMeta?.printDirection !== undefined && $printerMeta?.printDirection !== labelProps.printDirection) {
+      let text = $tr("params.label.warning.direction") + " ";
+      if ($printerMeta.printDirection == "left") {
+        text += $tr("params.label.direction.left");
+      } else {
+        text += $tr("params.label.direction.top");
+      }
+      lines.push(text);
     }
 
-    return error;
+    if (printWidth % 8 !== 0) {
+      lines.push($tr("params.label.warning.div8"));
+    }
+
+    return lines;
   });
 
   const onApply = () => {
@@ -219,14 +227,14 @@
     }
   };
 
-  const onLabelPresetReplace = async() => {
+  const onLabelPresetReplace = async () => {
     if (selectedPresetIndex === -1) {
       return;
     }
 
     const confirmResult = await appConfirm({
       title: $tr("editor.warning.save"),
-      buttons: ["yes", "no"]
+      buttons: ["yes", "no"],
     });
 
     if (confirmResult !== "yes") {
@@ -364,7 +372,7 @@
     </button>
   </div>
 
-  <div class="mb-3 {error ? 'cursor-help text-warning' : 'text-secondary'}" title={error}>
+  <div class="mb-2 text-secondary">
     {$tr("params.label.current")}
     {labelProps.size.width}x{labelProps.size.height}
     {$tr("params.label.px")}
@@ -375,6 +383,10 @@
     {/if}
     <button class="btn btn-sm" onclick={fillWithCurrentParams}><MdIcon icon="arrow_downward" /></button>
   </div>
+
+  {#each warnings as line (line)}
+    <div class="mb-1 text-warning">{line}</div>
+  {/each}
 
   <LabelPresetsBrowser
     class="mb-1"
