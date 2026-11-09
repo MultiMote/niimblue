@@ -139,7 +139,6 @@ export class LabelDesignerObjectHelper {
   static addQrCode(canvas: fabric.Canvas): QRCode {
     const qr = new QRCode({
       text: "NiimBlue",
-      ...OBJECT_SIZE_DEFAULTS,
       ...OBJECT_DEFAULTS,
     });
     canvas.add(qr);
@@ -158,9 +157,6 @@ export class LabelDesignerObjectHelper {
   static addBarcode(canvas: fabric.Canvas): Barcode {
     const barcode = new Barcode({
       ...OBJECT_DEFAULTS,
-      text: "123456789012",
-      height: OBJECT_SIZE_DEFAULTS.height,
-      encoding: "CODE128B",
     });
     canvas.add(barcode);
     return barcode;

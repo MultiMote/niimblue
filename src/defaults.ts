@@ -1,6 +1,8 @@
 import * as fabric from "fabric";
 import type { AppConfig, LabelPreset, LabelProps } from "$/types";
 import { TextboxExt } from "$/fabric-object/textbox-ext";
+import Barcode from "$/fabric-object/barcode";
+import QRCode from "$/fabric-object/qrcode";
 
 export const configureFabric = () => {
   fabric.config.disableStyleCopyPaste = true;
@@ -89,6 +91,27 @@ export const OBJECT_DEFAULTS_TEXT = {
   originY: "center" as fabric.TOriginY,
   lineHeight: 1,
 } as fabric.TextboxProps;
+
+export const OBJECT_DEFAULTS_BARCODE = {
+  text: "123456789012",
+  encoding: "CODE128B",
+  printText: true,
+  fontSize: 12,
+  fontFamily: OBJECT_DEFAULTS_TEXT.fontFamily,
+  width: BARCODE_WIDTH,
+  height: OBJECT_SIZE_DEFAULTS.height,
+} as fabric.TClassProperties<Barcode>;
+
+export const OBJECT_DEFAULTS_QRCODE: Partial<fabric.TClassProperties<QRCode>> = {
+  text: "NiimBlue",
+  ecl: "M",
+  stroke: "#000000",
+  fill: "#ffffff",
+  mode: "Byte",
+  qrVersion: 0,
+  ...OBJECT_SIZE_DEFAULTS,
+};
+
 
 /** Scale image to this height when making a label thumbnail */
 export const THUMBNAIL_HEIGHT = 48;

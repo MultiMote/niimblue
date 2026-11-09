@@ -228,6 +228,11 @@ export class FileUtils {
     FileUtils.downloadBase64(`label_${timestamp}.png`, "image/png", url.split("base64,")[1]);
   }
 
+  /** Download a text file */
+  static saveTextFile(filename: string, contents: string) {
+    FileUtils.downloadBase64(filename, "text/plain", FileUtils.base64str(contents));
+  }
+
   /** Convert label preset to JSON and download it */
   static saveLabelPresetAsJson(preset: LabelPreset) {
     const parsed = LabelPresetSchema.parse(preset);

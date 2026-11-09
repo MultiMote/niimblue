@@ -1,9 +1,9 @@
-import { BARCODE_WIDTH, OBJECT_DEFAULTS_TEXT, OBJECT_SIZE_DEFAULTS } from "$/defaults";
+import { OBJECT_DEFAULTS_BARCODE } from "$/defaults";
 import { CanvasUtils } from "$/utils/canvas_utils";
 import * as fabric from "fabric";
 import JsBarcode from "jsbarcode";
 
-const BARCODE_TEXT_MARGIN = 2;
+export const BARCODE_TEXT_MARGIN = 2;
 
 export const BARCODE_ENCODINGS = [
   { value: "CODE128", label: "Code 128 (auto)" },
@@ -30,16 +30,6 @@ export const BARCODE_ENCODINGS = [
 ] as const;
 
 export type BarcodeEncoding = (typeof BARCODE_ENCODINGS)[number]["value"];
-
-export const barcodeDefaultValues: Partial<fabric.TClassProperties<Barcode>> = {
-  text: "",
-  encoding: "EAN13",
-  printText: true,
-  fontSize: 12,
-  fontFamily: OBJECT_DEFAULTS_TEXT.fontFamily,
-  width: BARCODE_WIDTH,
-  height: OBJECT_SIZE_DEFAULTS.height,
-};
 
 interface UniqueBarcodeProps {
   text: string;
@@ -108,11 +98,14 @@ export class Barcode<
 
   private barcodeEncodings: JsBarcodeEncoding[] = [];
   private barcodeBarHeight: number = 0;
+  private barScale: number = 0;
+  private barsStart: number = 0;
+  private moduleCount: number = 0;
   private error: boolean = false;
 
   constructor(options?: Props) {
     super();
-    Object.assign(this, barcodeDefaultValues);
+    Object.assign(this, OBJECT_DEFAULTS_BARCODE);
     this.setOptions(options);
     this.setControlsVisibility({
       tl: false,
@@ -142,6 +135,8 @@ export class Barcode<
     this.error = false;
     this.barcodeEncodings = [];
     this.barcodeBarHeight = 0;
+    this.barScale = 0;
+    this.barsStart = 0;
 
     if (!this.text) {
       return;
@@ -273,6 +268,7 @@ export class Barcode<
       (total, encoding) => total + (this._hasBars(encoding) ? encoding.data.length : 0),
       0,
     );
+
     const barScale = Math.floor((this.width - leadingTextWidth - trailingTextWidth) / barModules);
 
     if (barScale < 1) {
@@ -286,6 +282,9 @@ export class Barcode<
     const groupWidth = leadingTextWidth + barcodeWidth + trailingTextWidth;
     const groupStart = Math.floor((this.width - groupWidth) / 2);
     const barcodeStartPos = groupStart + leadingTextWidth;
+    this.barScale = barScale;
+    this.barsStart = barcodeStartPos;
+    this.moduleCount = barModules;
     const textHeight = this.printText ? this.fontSize + BARCODE_TEXT_MARGIN : 0;
     const barHeight = Math.max(1, this.height - textHeight);
     const storedBarHeight = this.barcodeBarHeight || barHeight;
@@ -362,6 +361,18 @@ export class Barcode<
 
   override toObject(propertiesToInclude: any[] = []) {
     return super.toObject([...BARCODE_PROPS, ...propertiesToInclude]);
+  }
+
+  getBarScale(): number {
+    return this.barScale;
+  }
+
+  getBarsStart(): number {
+    return this.barsStart;
+  }
+
+  getModuleCount(): number {
+    return this.moduleCount;
   }
 }
 

@@ -2,29 +2,28 @@
   import { type LabelProps, type OjectType } from "$/types";
   import { tr } from "$/utils/i18n";
   import MdIcon from "$/components/basic/MdIcon.svelte";
-  import ZplImportButton from "$/components/designer-controls/ZplImportButton.svelte";
+  import ZplDialog from "$/components/dialogs/ZplDialog.svelte";
   import PdfImportButton from "$/components/designer-controls/PdfImportButton.svelte";
   import AppModal from "$/components/basic/AppModal.svelte";
+  import type { CustomCanvas } from "$/fabric-object/custom_canvas";
 
   interface Props {
-    onSubmit: (i: OjectType) => void;
+    canvas: CustomCanvas;
     labelProps: LabelProps;
-    zplImageReady: (img: Blob) => void;
+    onSubmit: (i: OjectType) => void;
     pdfImageReady: (img: HTMLCanvasElement) => void;
+    onZplObjectsImported?: () => void;
+    onZplLabelSize?: (size: { width: number; height: number }) => void;
     onClose?: () => void;
   }
 
-  let { onSubmit, labelProps, zplImageReady, pdfImageReady, onClose }: Props = $props();
+  let { onSubmit, labelProps, pdfImageReady, canvas, onZplObjectsImported, onZplLabelSize, onClose }: Props = $props();
   let modalRef: AppModal;
+  let zplDialogOpen = $state(false);
 
   const onClick = (i: OjectType) => {
     modalRef.hide();
     onSubmit(i);
-  };
-
-  const zplReady = (img: Blob) => {
-    modalRef.hide();
-    zplImageReady(img);
   };
 
   const pdfReady = (img: HTMLCanvasElement) => {
@@ -68,6 +67,17 @@
     {$tr("editor.objectpicker.barcode")}
   </button>
 
-  <ZplImportButton {labelProps} onImageReady={zplReady} />
+  <button class="btn me-1" type="button" onclick={() => (zplDialogOpen = true)} title={$tr("editor.import.zpl")}>
+    <MdIcon icon="code" />
+    {$tr("editor.import.zpl")}
+  </button>
   <PdfImportButton {labelProps} onImageReady={pdfReady} />
 </AppModal>
+
+{#if zplDialogOpen}
+  <ZplDialog
+    {canvas}
+    onObjectsImported={onZplObjectsImported}
+    onLabelSize={onZplLabelSize}
+    onClose={() => (zplDialogOpen = false)} />
+{/if}

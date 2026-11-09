@@ -1,6 +1,11 @@
+# 2026.11.0
+
+* Offline ZPL import/export.
+
+
 # 2026.10.1
 
-* Fix label options not open on disconnected printer
+* Fix label options not open on disconnected printer.
 
 # 2026.10.0
 

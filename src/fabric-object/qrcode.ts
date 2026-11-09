@@ -1,6 +1,6 @@
 import QRCodeFactory from "qrcode-generator";
 import * as fabric from "fabric";
-import { OBJECT_SIZE_DEFAULTS } from "$/defaults";
+import { OBJECT_DEFAULTS_QRCODE } from "$/defaults";
 import { Range } from "$/types";
 import { stringToBytes } from "$/utils/qrcode";
 import { CanvasUtils } from "$/utils/canvas_utils";
@@ -11,16 +11,6 @@ export type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
 export type Mode = "Numeric" | "Alphanumeric" | "Byte" /* Default */ | "Kanji";
 
 export type QrVersion = Range<41>; // 0-40, 0 is automatic
-
-export const qrCodeDefaultValues: Partial<fabric.TClassProperties<QRCode>> = {
-  text: "Text",
-  ecl: "M",
-  stroke: "#000000",
-  fill: "#ffffff",
-  mode: "Byte",
-  qrVersion: 0,
-  ...OBJECT_SIZE_DEFAULTS,
-};
 
 interface UniqueQRCodeProps {
   text: string;
@@ -33,10 +23,10 @@ export interface SerializedQRCodeProps extends fabric.SerializedObjectProps, Uni
 const QRCODE_PROPS = ["text", "ecl", "size", "mode", "qrVersion"] as const;
 
 export class QRCode<
-    Props extends fabric.TOptions<QRCodeProps> = Partial<QRCodeProps>,
-    SProps extends SerializedQRCodeProps = SerializedQRCodeProps,
-    EventSpec extends fabric.ObjectEvents = fabric.ObjectEvents,
-  >
+  Props extends fabric.TOptions<QRCodeProps> = Partial<QRCodeProps>,
+  SProps extends SerializedQRCodeProps = SerializedQRCodeProps,
+  EventSpec extends fabric.ObjectEvents = fabric.ObjectEvents,
+>
   extends fabric.FabricObject<Props, SProps, EventSpec>
   implements QRCodeProps
 {
@@ -62,9 +52,11 @@ export class QRCode<
    */
   declare qrVersion: QrVersion;
 
+  private moduleCount: number = 0;
+
   constructor(options?: Props) {
     super();
-    Object.assign(this, qrCodeDefaultValues);
+    Object.assign(this, OBJECT_DEFAULTS_QRCODE);
     this.setOptions(options);
     this.lockScalingFlip = true;
     this.setControlsVisibility({
@@ -106,8 +98,10 @@ export class QRCode<
       return;
     }
 
-    const qrScale = Math.floor(this.width / qr.getModuleCount());
-    let qrWidth = qrScale * qr.getModuleCount();
+    this.moduleCount = qr.getModuleCount();
+
+    const qrScale = Math.floor(this.width / this.moduleCount);
+    let qrWidth = qrScale * this.moduleCount;
     qrWidth -= qrWidth % 2; // avoid half-pixel rendering
 
     if (qrScale < 1 || qrWidth > this.width) {
@@ -123,6 +117,10 @@ export class QRCode<
     ctx.restore();
 
     super._render(ctx);
+  }
+
+  getModuleCount(): number {
+    return this.moduleCount;
   }
 
   override toObject(propertiesToInclude: any[] = []) {
