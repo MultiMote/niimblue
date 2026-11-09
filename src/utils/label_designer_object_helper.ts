@@ -29,7 +29,7 @@ export class LabelDesignerObjectHelper {
       return await this.addSvg(canvas, data);
     }
 
-    if (file.type === "image/png" || file.type === "image/jpeg" || file.type === "image/bmp" || file.type === "image/gif") {
+    if (file.type === "image/png" || file.type === "image/jpeg" || file.type === "image/bmp" || file.type === "image/gif" || file.type === "image/webp") {
       const url = await FileUtils.blobToDataUrl(file);
       const fabricImg = await fabric.FabricImage.fromURL(url);
       fabricImg.set({ ...OBJECT_DEFAULTS });

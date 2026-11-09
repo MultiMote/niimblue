@@ -1,7 +1,7 @@
 # 2026.11.0
 
 * Offline ZPL import/export.
-
+* Add webp to image filter.
 
 # 2026.10.1
 
