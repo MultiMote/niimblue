@@ -1,5 +1,5 @@
 import * as fabric from "fabric";
-import type { AppConfig, LabelProps } from "$/types";
+import type { AppConfig, LabelProps, StandardDpi } from "$/types";
 import { TextboxExt } from "$/fabric-object/textbox-ext";
 import Barcode from "$/fabric-object/barcode";
 import QRCode from "$/fabric-object/qrcode";
@@ -34,7 +34,7 @@ export const configureFabric = () => {
 };
 
 /** Standard printhead densities, dots per mm */
-export const DPI_DPMM: Record<203 | 300, number> = {
+export const DPI_DPMM: Record<StandardDpi, number> = {
   203: 8,
   300: 11.81,
 };

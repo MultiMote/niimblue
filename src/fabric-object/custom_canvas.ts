@@ -29,8 +29,7 @@ export class CustomCanvas extends fabric.Canvas {
   private readonly GRAY = "#CFCFCF";
   private readonly MIRROR_GHOST_COLOR = "rgba(0, 0, 0, 0.3)";
   private readonly DEAD_ZONE_COLOR = "rgba(255, 70, 70, 0.5)";
-  private readonly DEAD_ZONE_BORDER_COLOR = "#ff4646";
-  private readonly DEAD_ZONE_STEP = 4;
+  private readonly DEAD_ZONE_HATCHING_STEP = 8;
   private printheadSize: number = -1;
   private customBackground: boolean = true;
   private highlightMirror: boolean = true;
@@ -462,7 +461,7 @@ export class CustomCanvas extends fabric.Canvas {
     ctx.strokeStyle = this.DEAD_ZONE_COLOR;
     ctx.lineWidth = 1;
     ctx.beginPath();
-    for (let i = -zone.h; i <= zone.w; i += this.DEAD_ZONE_STEP) {
+    for (let i = -zone.h; i <= zone.w; i += this.DEAD_ZONE_HATCHING_STEP) {
       ctx.moveTo(zone.x + i, zone.y);
       ctx.lineTo(zone.x + i + zone.h, zone.y + zone.h);
     }
@@ -470,7 +469,7 @@ export class CustomCanvas extends fabric.Canvas {
     ctx.restore();
 
     ctx.setLineDash([]);
-    ctx.strokeStyle = this.DEAD_ZONE_BORDER_COLOR;
+    ctx.strokeStyle = this.DEAD_ZONE_COLOR;
     ctx.lineWidth = 1;
     ctx.beginPath();
     if (zone.borderX !== undefined) {
@@ -482,6 +481,7 @@ export class CustomCanvas extends fabric.Canvas {
     }
     ctx.stroke();
   }
+
   override _renderObjects(
     ctx: CanvasRenderingContext2D,
     objects: fabric.FabricObject[],

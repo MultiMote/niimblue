@@ -507,11 +507,9 @@
 
   onMount(() =>
     dimensionsUpdateRequest.subscribe((req) => {
-      if (!req) {
-        return;
+      if (req) {
+        updateDimensions(req.width, req.height, req.unit, req.dpmm);
       }
-
-      updateDimensions(req.width, req.height, req.unit, req.dpmm);
     }),
   );
 

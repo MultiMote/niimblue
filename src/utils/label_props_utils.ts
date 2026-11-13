@@ -14,17 +14,10 @@ export class LabelPropsUtils {
   }
 
   static sizeToPx(labelProps: LabelProps): { width: number; height: number } {
-    let width = this.unitToPx(labelProps.width, labelProps.unit, labelProps.dpmm);
-    let height = this.unitToPx(labelProps.height, labelProps.unit, labelProps.dpmm);
+    const width = this.unitToPx(labelProps.width, labelProps.unit, labelProps.dpmm);
+    const height = this.unitToPx(labelProps.height, labelProps.unit, labelProps.dpmm);
 
-    // printable dimension must be a multiple of 8
-    if (labelProps.printDirection === "left") {
-      height -= height % 8;
-    } else {
-      width -= width % 8;
-    }
-
-    return { width: Math.max(width, 8), height: Math.max(height, 8) };
+    return { width: Math.max(width, 1), height: Math.max(height, 1) };
   }
 
   static tailLengthToPx(labelProps: LabelProps): number {

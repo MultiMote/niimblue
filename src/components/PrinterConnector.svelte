@@ -21,7 +21,7 @@
     rfidInfo,
     dimensionsUpdateRequest,
   } from "$/stores/app";
-  import type { ConnectionType } from "$/types";
+  import type { ConnectionType, StandardDpi } from "$/types";
   import { tr, type TranslationKey } from "$/utils/i18n";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import { Toasts } from "$/utils/toasts";
@@ -91,7 +91,7 @@
 
   const applyDimensionsClicked = () => {
     const paper = $rfidInfo.paperInfo;
-    let dpi: keyof typeof DPI_DPMM = 203;
+    let dpi: StandardDpi = 203;
 
     if ($printerInfo.resolutionClass !== undefined) {
       dpi = $printerInfo.resolutionClass === ResolutionClass.DPI300 ? 300 : 203;
@@ -105,7 +105,7 @@
         height: paper.paperHeight,
         unit: "mm",
         dpmm: DPI_DPMM[dpi],
-      }); // todo: print direction?
+      });
     }
   };
 

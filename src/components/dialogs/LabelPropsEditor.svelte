@@ -90,10 +90,6 @@
       lines.push(text);
     }
 
-    if (printWidth % 8 !== 0) {
-      lines.push($tr("params.label.warning.div8"));
-    }
-
     return lines;
   });
 

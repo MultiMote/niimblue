@@ -56,7 +56,6 @@
   let csvParsed: DSVRowArray<string>;
   let currentPage = $state<number>(0);
   let pagesTotal = $state<number>(1);
-  let warnings = $state<string[]>([]);
   let trimmed = $state<boolean>(false);
   let currentPrintTask: AbstractPrintTask | undefined;
   let savedProps = $state<PreviewProps>({});
@@ -230,8 +229,6 @@
       iData = effects.mirror(iData);
     }
 
-    warnings = [];
-
     if (params.offset.offsetType === "inner") {
       previewCanvas.width = originalImage.width;
       previewCanvas.height = originalImage.height;
@@ -244,10 +241,6 @@
       previewContext.fillStyle = "white";
       previewContext.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
       previewContext.putImageData(iData, Math.max(params.offset.x, 0), Math.max(params.offset.y, 0));
-    }
-
-    if (trimmed) {
-      warnings.push($tr("preview.trimmed"));
     }
   };
 
@@ -378,13 +371,17 @@
 
     if (labelProps.printDirection === "top") {
       targetWidth = headSize > 0 ? Math.min(srcWidth, headSize) : srcWidth;
-      targetWidth -= targetWidth % 8;
     } else {
       targetHeight = headSize > 0 ? Math.min(srcHeight, headSize) : srcHeight;
-      targetHeight -= targetHeight % 8;
     }
 
     trimmed = targetWidth !== srcWidth || targetHeight !== srcHeight;
+
+    if (labelProps.printDirection === "top") {
+      targetWidth -= targetWidth % 8;
+    } else {
+      targetHeight -= targetHeight % 8;
+    }
 
     previewCanvas.width = targetWidth;
     previewCanvas.height = targetHeight;
@@ -509,15 +506,16 @@
       </div>
     {/if}
 
+    {#if trimmed}
+      <span class="text-info w-100"><MdIcon icon="info"/> {$tr("preview.trimmed")}</span>
+    {/if}
+
     {#if error}
       <div class="alert alert-danger" role="alert">{error}</div>
     {/if}
   </div>
 
   {#snippet footer()}
-    {#each warnings as line (line)}
-        <span class="text-warning w-100">{line}</span>
-    {/each}
 
     <div class="input-group input-group-sm">
       <span class="input-group-text">{$tr("preview.postprocess")}</span>
