@@ -22,6 +22,13 @@ export const CsvParamsSchema = z.object({
   data: z.string(),
 });
 
+export const LabelMetaSchema = z.object({
+  width: z.number().positive(),
+  height: z.number().positive(),
+});
+
+export const LabelMetaListSchema = z.array(LabelMetaSchema);
+
 /** Not validated */
 export const FabricObjectSchema = z.custom<fabric.FabricObject>((val: any): boolean => {
   return typeof val === "object";
@@ -151,5 +158,6 @@ export type PreviewProps = z.infer<typeof PreviewPropsSchema>;
 export type AutomationProps = z.infer<typeof AutomationPropsSchema>;
 export type AppConfig = z.infer<typeof AppConfigSchema>;
 export type UserFont = z.infer<typeof UserFontSchema>;
+export type LabelMeta = z.infer<typeof LabelMetaSchema>;
 
 export const previewPropsKeys = Object.keys(PreviewPropsSchema.shape) as (keyof PreviewProps)[];
