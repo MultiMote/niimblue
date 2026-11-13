@@ -21,6 +21,7 @@
   import ParamLockButton from "$/components/basic/ParamLockButton.svelte";
   import { tr, type TranslationKey } from "$/utils/i18n";
   import { canvasPreprocess } from "$/utils/canvas_preprocess";
+  import { LabelPropsUtils } from "$/utils/label_props_utils";
   import { type DSVRowArray, csvParse } from "d3-dsv";
   import { LocalStoragePersistence } from "$/utils/persistence";
   import MdIcon from "$/components/basic/MdIcon.svelte";
@@ -56,6 +57,7 @@
   let currentPage = $state<number>(0);
   let pagesTotal = $state<number>(1);
   let warnings = $state<string[]>([]);
+  let trimmed = $state<boolean>(false);
   let currentPrintTask: AbstractPrintTask | undefined;
   let savedProps = $state<PreviewProps>({});
 
@@ -192,6 +194,13 @@
     }
   };
 
+  const getPrintheadSize = (): number => {
+    if ($printerInfo?.printheadWidth !== undefined) {
+      return $printerInfo.printheadWidth;
+    }
+    return $printerMeta?.printheadPixels ?? -1;
+  };
+
   const updatePreview = () => {
     let iData: ImageData = effects.copyImageData(originalImage);
 
@@ -242,21 +251,8 @@
       previewContext.putImageData(iData, Math.max(params.offset.x, 0), Math.max(params.offset.y, 0));
     }
 
-
-    let headSize = -1;
-
-    if ($printerInfo?.printheadWidth !== undefined) {
-      headSize = $printerInfo.printheadWidth;
-    } else if ($printerMeta?.printheadPixels !== undefined) {
-      headSize = $printerMeta.printheadPixels;
-    }
-
-    if (headSize !== -1) {
-      const printWidth = labelProps.printDirection == "left" ? previewCanvas.height : previewCanvas.width;
-
-      if (printWidth > headSize) {
-        warnings.push($tr("params.label.warning.width") + " " + `${printWidth} > ${headSize}`);
-      }
+    if (trimmed) {
+      warnings.push($tr("preview.trimmed"));
     }
   };
 
@@ -347,9 +343,10 @@
   };
 
   const generatePreviewData = async (page: number): Promise<void> => {
+    const pxSize = LabelPropsUtils.sizeToPx(labelProps);
     const fabricTempCanvas = new CustomCanvas(undefined, {
-      width: labelProps.size.width,
-      height: labelProps.size.height,
+      width: pxSize.width,
+      height: pxSize.height,
     });
 
     fabricTempCanvas.setCustomBackground(false);
@@ -378,11 +375,39 @@
     fabricTempCanvas.requestRenderAll();
 
     const preRenderedCanvas = fabricTempCanvas.toCanvasElement();
-    const ctx = preRenderedCanvas.getContext("2d")!;
-    previewCanvas.width = preRenderedCanvas.width;
-    previewCanvas.height = preRenderedCanvas.height;
+    const srcWidth = preRenderedCanvas.width;
+    const srcHeight = preRenderedCanvas.height;
+    let targetWidth = srcWidth;
+    let targetHeight = srcHeight;
+    const headSize = getPrintheadSize();
+
+    if (labelProps.printDirection === "top") {
+      targetWidth = headSize > 0 ? Math.min(srcWidth, headSize) : srcWidth;
+      targetWidth -= targetWidth % 8;
+    } else {
+      targetHeight = headSize > 0 ? Math.min(srcHeight, headSize) : srcHeight;
+      targetHeight -= targetHeight % 8;
+    }
+
+    trimmed = targetWidth !== srcWidth || targetHeight !== srcHeight;
+
+    previewCanvas.width = targetWidth;
+    previewCanvas.height = targetHeight;
     previewContext = previewCanvas.getContext("2d")!;
-    originalImage = ctx.getImageData(0, 0, preRenderedCanvas.width, preRenderedCanvas.height);
+    previewContext.fillStyle = "white";
+    previewContext.fillRect(0, 0, targetWidth, targetHeight);
+    previewContext.drawImage(
+      preRenderedCanvas,
+      Math.floor((srcWidth - targetWidth) / 2),
+      Math.floor((srcHeight - targetHeight) / 2),
+      targetWidth,
+      targetHeight,
+      0,
+      0,
+      targetWidth,
+      targetHeight,
+    );
+    originalImage = previewContext.getImageData(0, 0, targetWidth, targetHeight);
 
     updatePreview();
 

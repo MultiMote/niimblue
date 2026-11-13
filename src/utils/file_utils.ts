@@ -1,11 +1,10 @@
 import * as fabric from "fabric";
 import {
   ExportedLabelTemplateSchema,
-  LabelPresetSchema,
+  LabelPropsSchema,
   UserFont,
   type ExportedLabelTemplate,
   type FabricJson,
-  type LabelPreset,
   type LabelProps,
 } from "$/types";
 import { OBJECT_DEFAULTS, OBJECT_DEFAULTS_VECTOR, THUMBNAIL_HEIGHT, THUMBNAIL_QUALITY } from "$/defaults";
@@ -234,16 +233,16 @@ export class FileUtils {
   }
 
   /** Convert label preset to JSON and download it */
-  static saveLabelPresetAsJson(preset: LabelPreset) {
-    const parsed = LabelPresetSchema.parse(preset);
+  static saveLabelPresetAsJson(preset: LabelProps) {
+    const parsed = LabelPropsSchema.parse(preset);
     const title = parsed.title?.trim();
     const filename = title ? `${title.replaceAll(/[\\/:*?"<>|]/g, "_")}.json` : `preset_${FileUtils.timestamp()}.json`;
     FileUtils.downloadBase64(filename, "application/json", FileUtils.base64obj(parsed));
   }
 
   /** Convert label presets to JSON and download them */
-  static saveLabelPresetsAsJson(presets: LabelPreset[]) {
-    const parsed = z.array(LabelPresetSchema).parse(presets);
+  static saveLabelPresetsAsJson(presets: LabelProps[]) {
+    const parsed = z.array(LabelPropsSchema).parse(presets);
     FileUtils.downloadBase64(`presets_${FileUtils.timestamp()}.json`, "application/json", FileUtils.base64obj(parsed));
   }
 

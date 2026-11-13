@@ -32,36 +32,31 @@ export const PreviewPropsOffsetSchema = z.object({
   offsetType: z.enum(["inner", "outer"]),
 });
 
-export const LabelPropsSchema = z.object({
-  printDirection: z.enum(["left", "top"]),
-  size: z.object({
+export const LabelPropsSchema = z.preprocess(
+  (data) => {
+    // Accepts the old format with pixel size in a nested "size" object
+    if (typeof data === "object" && data !== null && "size" in data) {
+      const { size, ...rest } = data as { size: { width: number; height: number } };
+      return { ...rest, width: size.width, height: size.height };
+    }
+    return data;
+  },
+  z.object({
     width: z.number().positive(),
     height: z.number().positive(),
+    unit: z.enum(["mm", "px"]).default("px"),
+    dpmm: z.number().positive().default(8),
+    printDirection: z.enum(["left", "top"]),
+    title: z.string().optional(),
+    shape: z.enum(["rect", "rounded_rect", "circle"]).default("rect").optional(),
+    split: z.enum(["none", "vertical", "horizontal"]).default("none").optional(),
+    splitParts: z.number().min(1).default(2).optional(),
+    tailPos: z.enum(["right", "bottom", "left", "top"]).default("right").optional(),
+    tailLength: z.number().default(0).optional(),
+    mirror: z.enum(["none", "copy", "flip"]).default("none").optional(),
+    offset: PreviewPropsOffsetSchema.optional(),
   }),
-  shape: z.enum(["rect", "rounded_rect", "circle"]).default("rect").optional(),
-  split: z.enum(["none", "vertical", "horizontal"]).default("none").optional(),
-  splitParts: z.number().min(1).default(2).optional(),
-  tailPos: z.enum(["right", "bottom", "left", "top"]).default("right").optional(),
-  tailLength: z.number().default(0).optional(),
-  mirror: z.enum(["none", "copy", "flip"]).default("none").optional(),
-  offset: PreviewPropsOffsetSchema.optional(),
-});
-
-export const LabelPresetSchema = z.object({
-  width: z.number().positive(),
-  height: z.number().positive(),
-  unit: z.enum(["mm", "px"]),
-  dpmm: z.number().positive(),
-  printDirection: z.enum(["left", "top"]),
-  title: z.string().optional(),
-  shape: z.enum(["rect", "rounded_rect", "circle"]).default("rect").optional(),
-  split: z.enum(["none", "vertical", "horizontal"]).default("none").optional(),
-  splitParts: z.number().min(1).default(2).optional(),
-  tailPos: z.enum(["right", "bottom", "left", "top"]).default("right").optional(),
-  tailLength: z.number().default(0).optional(),
-  mirror: z.enum(["none", "copy", "flip"]).default("none").optional(),
-  offset: PreviewPropsOffsetSchema.optional(),
-});
+);
 
 export const FabricJsonSchema = z.object({
   version: z.string(),
@@ -148,7 +143,6 @@ export type PostProcessType = z.infer<typeof PostProcessTypeSchema>;
 export type CsvParams = z.infer<typeof CsvParamsSchema>;
 export type UserIcon = z.infer<typeof UserIconSchema>;
 export type LabelProps = z.infer<typeof LabelPropsSchema>;
-export type LabelPreset = z.infer<typeof LabelPresetSchema>;
 export type FabricJson = z.infer<typeof FabricJsonSchema>;
 export type ExportedLabelTemplate = z.infer<typeof ExportedLabelTemplateSchema>;
 export type PreviewPropsOffset = z.infer<typeof PreviewPropsOffsetSchema>;

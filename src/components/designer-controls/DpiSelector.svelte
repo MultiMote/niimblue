@@ -1,5 +1,7 @@
 <script lang="ts">
   import { tr } from "$/utils/i18n";
+  import { DPI_DPMM } from "$/defaults";
+
   interface Props {
     value: number;
   }
@@ -11,8 +13,8 @@
   <span class="input-group-text">{$tr("params.label.head_density")}</span>
 
   <select class="form-select" bind:value>
-    <option value={8}>203dpi</option>
-    <option value={11.81}>300dpi</option>
+    <option value={DPI_DPMM[203]}>203dpi</option>
+    <option value={DPI_DPMM[300]}>300dpi</option>
   </select>
 
   <input class="form-control" type="number" min="1" bind:value />

@@ -2,13 +2,11 @@ import {
   AutomationPropsSchema,
   ExportedLabelTemplateSchema,
   FabricJsonSchema,
-  LabelPresetSchema,
   LabelPropsSchema,
   PreviewPropsSchema,
   type AutomationProps,
   type ConnectionType,
   type ExportedLabelTemplate,
-  type LabelPreset,
   type LabelProps,
   type PreviewProps,
 } from "$/types";
@@ -299,21 +297,21 @@ export class LocalStoragePersistence {
   /**
    * @throws {z.ZodError}
    */
-  static saveLabelPresets(presets: LabelPreset[]) {
+  static saveLabelPresets(presets: LabelProps[]) {
     this.validateAndSaveObject(
       "label_presets",
       presets,
-      z.array(LabelPresetSchema),
+      z.array(LabelPropsSchema),
     );
   }
 
   /**
    * @throws {z.ZodError}
    */
-  static loadLabelPresets(): LabelPreset[] | null {
+  static loadLabelPresets(): LabelProps[] | null {
     const presets = this.loadAndValidateObject(
       "label_presets",
-      z.array(LabelPresetSchema),
+      z.array(LabelPropsSchema),
     );
     return presets === null || presets.length === 0 ? null : presets;
   }

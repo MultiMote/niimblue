@@ -1,6 +1,7 @@
 import * as fabric from "fabric";
 import { DEFAULT_LABEL_PROPS, GRID_SIZE } from "$/defaults";
 import type { LabelProps } from "$/types";
+import { LabelPropsUtils } from "$/utils/label_props_utils";
 
 type LabelBounds = {
   startX: number;
@@ -198,15 +199,16 @@ export class CustomCanvas extends fabric.Canvas {
     let endY = this.height ?? 1;
     let startX = 0;
     let startY = 0;
+    const tailLength = LabelPropsUtils.tailLengthToPx(this.labelProps);
 
     if (this.labelProps.tailPos === "right") {
-      endX -= this.labelProps.tailLength ?? 0;
+      endX -= tailLength;
     } else if (this.labelProps.tailPos === "bottom") {
-      endY -= this.labelProps.tailLength ?? 0;
+      endY -= tailLength;
     } else if (this.labelProps.tailPos === "left") {
-      startX += this.labelProps.tailLength ?? 0;
+      startX += tailLength;
     } else if (this.labelProps.tailPos === "top") {
-      startY += this.labelProps.tailLength ?? 0;
+      startY += tailLength;
     }
 
     const width = endX - startX;
@@ -297,10 +299,7 @@ export class CustomCanvas extends fabric.Canvas {
     ctx.fillStyle = this.GRAY;
 
     ctx.beginPath();
-    if (
-      this.labelProps.tailLength !== undefined &&
-      this.labelProps.tailLength > 0
-    ) {
+    if (LabelPropsUtils.tailLengthToPx(this.labelProps) > 0) {
       if (this.labelProps.tailPos === "right") {
         ctx.rect(
           bb.endX - roundRadius,

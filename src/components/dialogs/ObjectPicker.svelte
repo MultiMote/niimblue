@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type LabelProps, type OjectType } from "$/types";
+  import { type LabelUnit, type LabelProps, type OjectType } from "$/types";
   import { tr } from "$/utils/i18n";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import ZplDialog from "$/components/dialogs/ZplDialog.svelte";
@@ -13,7 +13,7 @@
     onSubmit: (i: OjectType) => void;
     pdfImageReady: (img: HTMLCanvasElement) => void;
     onZplObjectsImported?: () => void;
-    onZplLabelSize?: (size: { width: number; height: number }) => void;
+    onZplLabelSize?: (size: { width: number; height: number, unit: LabelUnit }) => void;
     onClose?: () => void;
   }
 

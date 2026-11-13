@@ -6,8 +6,16 @@
   import { Barcode } from "$/fabric-object/barcode";
   import { QRCode } from "$/fabric-object/qrcode";
   import { iconCodepoints, type MaterialIcon } from "$/styles/mdi_icons";
-  import { appConfig, automation, connectionState, csvData, dimensionsUpdateRequest, loadedFonts } from "$/stores/app";
   import {
+    appConfig,
+    automation,
+    connectionState,
+    csvData,
+    dimensionsUpdateRequest,
+    loadedFonts,
+  } from "$/stores/app";
+  import {
+    type LabelUnit,
     type ExportedLabelTemplate,
     type FabricJson,
     type LabelProps,
@@ -34,6 +42,7 @@
   import VariableInsertControl from "$/components/designer-controls/VariableInsertControl.svelte";
   import { DEFAULT_LABEL_PROPS, GRID_SIZE, OBJECT_DEFAULTS } from "$/defaults";
   import { LabelDesignerUtils } from "$/utils/label_designer_utils";
+  import { LabelPropsUtils } from "$/utils/label_props_utils";
   import SavedLabelsMenu from "$/components/dialogs/SavedLabelsMenu.svelte";
   import { CustomCanvas } from "$/fabric-object/custom_canvas";
   import VectorParamsControls from "$/components/designer-controls/VectorParamsControls.svelte";
@@ -163,7 +172,7 @@
   const onUpdateLabelProps = (newProps: LabelProps) => {
     labelProps = newProps;
     hasUnsavedChanges = true;
-    fabricCanvas!.setDimensions(labelProps.size);
+    fabricCanvas!.setDimensions(LabelPropsUtils.sizeToPx(labelProps));
     fabricCanvas!.virtualZoom(fabricCanvas!.getVirtualZoom());
     try {
       LocalStoragePersistence.saveLastLabelProps(labelProps);
@@ -173,9 +182,8 @@
     }
   };
 
-  const updateDimensions = (width: number, height: number) => {
-    let newProps = { ...labelProps, size: { width, height } };
-    onUpdateLabelProps(newProps);
+  const updateDimensions = (width: number, height: number, unit: LabelUnit, dpmm: number) => {
+    onUpdateLabelProps({ ...labelProps, printDirection: "top", unit, width, height, dpmm });
   };
 
   const exportCurrentLabel = (): ExportedLabelTemplate => {
@@ -366,9 +374,10 @@
       Toasts.zodErrors(e, "Label parameters load error:");
     }
 
+    const pxSize = LabelPropsUtils.sizeToPx(labelProps);
     fabricCanvas = new CustomCanvas(htmlCanvas, {
-      width: labelProps.size.width,
-      height: labelProps.size.height,
+      width: pxSize.width,
+      height: pxSize.height,
     });
     fabricCanvas.setLabelProps(labelProps);
     fabricCanvas.onZoomChange = (z) => {
@@ -496,9 +505,11 @@
 
   onMount(() =>
     dimensionsUpdateRequest.subscribe((req) => {
-      if (req) {
-        updateDimensions(req.width, req.height);
+      if (!req) {
+        return;
       }
+
+      updateDimensions(req.width, req.height, req.unit, req.dpmm);
     }),
   );
 
@@ -697,7 +708,7 @@
         undo.push(fabricCanvas!, labelProps);
         editRevision++;
       }}
-      onZplLabelSize={(size) => updateDimensions(size.width, size.height)} />
+      onZplLabelSize={(size) => updateDimensions(size.width, size.height, size.unit, labelProps.dpmm)} />
   {/if}
 </div>
 

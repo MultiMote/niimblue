@@ -1,5 +1,5 @@
 import * as fabric from "fabric";
-import type { AppConfig, LabelPreset, LabelProps } from "$/types";
+import type { AppConfig, LabelProps } from "$/types";
 import { TextboxExt } from "$/fabric-object/textbox-ext";
 import Barcode from "$/fabric-object/barcode";
 import QRCode from "$/fabric-object/qrcode";
@@ -33,23 +33,45 @@ export const configureFabric = () => {
   });
 };
 
+/** Standard printhead densities, dots per mm */
+export const DPI_DPMM: Record<203 | 300, number> = {
+  203: 8,
+  300: 11.81,
+};
+
 /** Default presets for LabelPropsEditor */
-export const DEFAULT_LABEL_PRESETS: LabelPreset[] = [
+export const DEFAULT_LABEL_PRESETS: LabelProps[] = [
   // 203dpi
-  { width: 40, height: 12, unit: "mm", dpmm: 8, printDirection: "left", shape: "rect" },
-  { width: 48, height: 30, unit: "mm", dpmm: 8, printDirection: "top", shape: "rect" },
+  { width: 40, height: 12, unit: "mm", dpmm: DPI_DPMM[203], printDirection: "left", shape: "rect" },
+  { width: 48, height: 30, unit: "mm", dpmm: DPI_DPMM[203], printDirection: "top", shape: "rect" },
   // 300dpi
-  { width: 40, height: 12, unit: "mm", dpmm: 11.81, printDirection: "left", shape: "rect", title: "40x12mm 300dpi" },
-  { width: 48, height: 30, unit: "mm", dpmm: 11.81, printDirection: "top", shape: "rect", title: "48x30mm 300dpi" },
+  {
+    width: 40,
+    height: 12,
+    unit: "mm",
+    dpmm: DPI_DPMM[300],
+    printDirection: "left",
+    shape: "rect",
+    title: "40x12mm 300dpi",
+  },
+  {
+    width: 48,
+    height: 30,
+    unit: "mm",
+    dpmm: DPI_DPMM[300],
+    printDirection: "top",
+    shape: "rect",
+    title: "48x30mm 300dpi",
+  },
 ];
 
-/** Default canvas dimensions */
 export const DEFAULT_LABEL_PROPS: LabelProps = {
+  width: 30,
+  height: 12,
+  unit: "mm",
+  dpmm: DPI_DPMM[203],
   printDirection: "left",
-  size: {
-    width: 240,
-    height: 96,
-  },
+  shape: "rect",
 };
 
 /** Object movement snapping */

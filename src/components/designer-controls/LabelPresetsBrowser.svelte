@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { LabelPreset } from "$/types";
+  import type { LabelProps } from "$/types";
   import { tr } from "$/utils/i18n";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import { browserInfo } from "$/utils/browser.svelte";
@@ -9,7 +9,7 @@
     onItemSelected: (index: number) => void;
     onItemDelete: (index: number) => void;
     onItemExport: (index: number) => void;
-    presets: LabelPreset[];
+    presets: LabelProps[];
     selectedIndex?: number;
     class?: string;
   }
@@ -27,7 +27,7 @@
   let menuIndex = $state<number>(-1);
   let longPressTimer: ReturnType<typeof setTimeout> | null = null;
 
-  const scaleDimensions = (preset: LabelPreset): { width: number; height: number } => {
+  const scaleDimensions = (preset: LabelProps): { width: number; height: number } => {
     const scaleFactor = Math.min(100 / preset.width, 100 / preset.height);
     return {
       width: Math.round(preset.width * scaleFactor),

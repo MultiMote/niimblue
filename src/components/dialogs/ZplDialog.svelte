@@ -8,11 +8,12 @@
   import { canvasToZpl } from "$/utils/zpl/zpl_export";
   import type { CustomCanvas } from "$/fabric-object/custom_canvas";
   import type { FabricObject } from "fabric";
+  import { type LabelUnit } from "$/types";
 
   interface Props {
     canvas: CustomCanvas;
     onObjectsImported?: () => void;
-    onLabelSize?: (size: { width: number; height: number }) => void;
+    onLabelSize?: (size: { width: number; height: number, unit: LabelUnit }) => void;
     onClose?: () => void;
   }
 
@@ -67,6 +68,7 @@
     }
   };
 
+  // todo: units
   const applyParsedLabelSize = (labelWidth?: number, labelHeight?: number): boolean => {
     const width = Math.max(1, Math.round(labelWidth ?? canvas.getWidth()));
     const height = Math.max(1, Math.round(labelHeight ?? canvas.getHeight()));
@@ -74,7 +76,7 @@
       return false;
     }
     canvas.setDimensions({ width, height });
-    onLabelSize?.({ width, height });
+    onLabelSize?.({ width, height, unit: "px" });
     return true;
   };
 

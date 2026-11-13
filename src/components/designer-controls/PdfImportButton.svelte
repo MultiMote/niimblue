@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { LabelProps } from "$/types";
   import { FileUtils } from "$/utils/file_utils";
+  import { LabelPropsUtils } from "$/utils/label_props_utils";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import { Toasts } from "$/utils/toasts";
   import { tr } from "$/utils/i18n";
@@ -32,10 +33,11 @@
       const page = await pdf.getPage(1);
 
       const el: HTMLCanvasElement = document.createElement("canvas");
-      el.width = labelProps.size.width;
-      el.height = labelProps.size.height;
+      const pxSize = LabelPropsUtils.sizeToPx(labelProps);
+      el.width = pxSize.width;
+      el.height = pxSize.height;
 
-      const pdfScale = labelProps.size.width / page.getViewport({ scale: 1 }).width;
+      const pdfScale = pxSize.width / page.getViewport({ scale: 1 }).width;
 
       const viewport = page.getViewport({ scale: pdfScale });
       el.height = viewport.height;

@@ -28,6 +28,7 @@
   import { onMount } from "svelte";
   import { LocalStoragePersistence } from "$/utils/persistence";
   import type { MaterialIcon } from "material-icons";
+  import { DPI_DPMM } from "$/defaults";
   import FirmwareUpdater from "$/components/basic/FirmwareUpdater.svelte";
   import PrinterVerboseInfo from "$/components/dialogs/PrinterVerboseInfo.svelte";
 
@@ -90,25 +91,21 @@
 
   const applyDimensionsClicked = () => {
     const paper = $rfidInfo.paperInfo;
-    let dpmm = 8;
+    let dpi: keyof typeof DPI_DPMM = 203;
 
     if ($printerInfo.resolutionClass !== undefined) {
-      dpmm = $printerInfo.resolutionClass === ResolutionClass.DPI300 ? 11.81 : 0;
+      dpi = $printerInfo.resolutionClass === ResolutionClass.DPI300 ? 300 : 203;
     } else if ($printerInfo.capabilities?.printheadDpi !== undefined) {
-      dpmm = $printerInfo.capabilities?.printheadDpi === 300 ? 11.81 : 0;
+      dpi = $printerInfo.capabilities.printheadDpi === 300 ? 300 : 203;
     }
 
     if (paper?.paperWidth !== undefined && paper?.paperHeight !== undefined) {
-      let width = Math.floor(paper.paperWidth * dpmm);
-      let height = Math.floor(paper.paperHeight * dpmm);
-
-      if ($printerInfo.printheadWidth !== undefined && width > $printerInfo.printheadWidth) {
-        width = $printerInfo.printheadWidth;
-      }
-
-      width -= width % 8;
-
-      dimensionsUpdateRequest.set({ width, height }); // todo: print direction?
+      dimensionsUpdateRequest.set({
+        width: paper.paperWidth,
+        height: paper.paperHeight,
+        unit: "mm",
+        dpmm: DPI_DPMM[dpi],
+      }); // todo: print direction?
     }
   };
 

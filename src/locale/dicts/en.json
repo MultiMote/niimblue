@@ -215,6 +215,7 @@
     "preview.label_type": "Label type",
     "preview.not_connected": "Printer is not connected",
     "preview.not_implemented": "NOT IMPLEMENTED",
+    "preview.trimmed": "Canvas is trimmed to fit the printhead",
     "preview.offset.inner": "Inner",
     "preview.offset.outer": "Outer",
     "preview.offset": "Offset",

@@ -3,6 +3,7 @@
   import { tr } from "$/utils/i18n";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import { browserInfo } from "$/utils/browser.svelte";
+  import { LabelPropsUtils } from "$/utils/label_props_utils";
   import ModalBackdrop from "$/components/basic/ModalBackdrop.svelte";
 
   interface Props {
@@ -27,12 +28,13 @@
   let menuIndex = $state<number>(-1);
   let longPressTimer: ReturnType<typeof setTimeout> | null = null;
 
-  const scaleDimensions = (preset: LabelProps): { width: number; height: number } => {
-    const scaleFactor = Math.min(100 / preset.size.width, 100 / preset.size.height);
+  const scaleDimensions = (label: LabelProps): { width: number; height: number } => {
+    const { width, height } = LabelPropsUtils.sizeToPx(label);
+    const scaleFactor = Math.min(100 / width, 100 / height);
 
     return {
-      width: Math.round(preset.size.width * scaleFactor),
-      height: Math.round(preset.size.height * scaleFactor),
+      width: Math.round(width * scaleFactor),
+      height: Math.round(height * scaleFactor),
     };
   };
 

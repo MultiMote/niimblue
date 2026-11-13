@@ -1,7 +1,6 @@
 <script lang="ts">
   import {
-    LabelPresetSchema,
-    type LabelPreset,
+    LabelPropsSchema,
     type LabelProps,
     type LabelShape,
     type LabelSplit,
@@ -13,7 +12,8 @@
   import LabelPresetsBrowser from "$/components/designer-controls/LabelPresetsBrowser.svelte";
   import { printerInfo, printerMeta } from "$/stores/app";
   import { tr } from "$/utils/i18n";
-  import { DEFAULT_LABEL_PRESETS } from "$/defaults";
+  import { DEFAULT_LABEL_PRESETS, DPI_DPMM } from "$/defaults";
+  import { LabelPropsUtils } from "$/utils/label_props_utils";
   import { onMount, tick } from "svelte";
   import { LocalStoragePersistence } from "$/utils/persistence";
   import type { PrintDirection } from "@mmote/niimbluelib";
@@ -33,19 +33,21 @@
 
   let { labelProps, onChange, onClose }: Props = $props();
 
+  let labelPxSize = $derived(LabelPropsUtils.sizeToPx(labelProps));
+
   const tailPositions: TailPosition[] = ["right", "bottom", "left", "top"];
   const printDirections: PrintDirection[] = ["left", "top"];
   const labelShapes: LabelShape[] = ["rect", "rounded_rect", "circle"];
   const labelSplits: LabelSplit[] = ["none", "vertical", "horizontal"];
   const mirrorTypes: MirrorType[] = ["none", "flip", "copy"];
 
-  let labelPresets = $state<LabelPreset[]>(DEFAULT_LABEL_PRESETS);
+  let labelPresets = $state<LabelProps[]>(DEFAULT_LABEL_PRESETS);
   let selectedPresetIndex = $state<number>(-1);
 
   let title = $state<string | undefined>("");
   let prevUnit: LabelUnit = "mm";
   let unit = $state<LabelUnit>("mm");
-  let dpmm = $state<number>(8);
+  let dpmm = $state<number>(DPI_DPMM[203]);
   let width = $state<number>(0);
   let height = $state<number>(0);
   let printDirection = $state<PrintDirection>("left");
@@ -62,7 +64,7 @@
   let warnings = $derived.by<string[]>(() => {
     let lines: string[] = [];
 
-    const printWidth = labelProps.printDirection == "left" ? labelProps.size.height : labelProps.size.width;
+    const printWidth = labelProps.printDirection == "left" ? labelPxSize.height : labelPxSize.width;
 
     let headSize = -1;
 
@@ -96,42 +98,7 @@
   });
 
   const onApply = () => {
-    let newWidth = width;
-    let newHeight = height;
-    let newTailLength = tailLength;
-
-    // mm to px
-    if (unit === "mm") {
-      newWidth *= dpmm;
-      newHeight *= dpmm;
-      newTailLength *= dpmm;
-    }
-
-    // limit min size
-    newWidth = newWidth < dpmm ? dpmm : newWidth;
-    newHeight = newHeight < dpmm ? dpmm : newHeight;
-
-    // width must me multiple of 8
-    if (printDirection === "left") {
-      newHeight -= newHeight % 8;
-    } else {
-      newWidth -= newWidth % 8;
-    }
-
-    onChange({
-      printDirection: printDirection,
-      size: {
-        width: Math.floor(newWidth),
-        height: Math.floor(newHeight),
-      },
-      shape,
-      split,
-      splitParts,
-      tailPos,
-      tailLength: Math.floor(newTailLength),
-      mirror,
-      offset: hasPresetOffset ? { ...offset } : undefined,
-    });
+    onChange(makeLabelProps());
   };
 
   const onLabelPresetSelected = (index: number) => {
@@ -193,7 +160,7 @@
     hasPresetOffset = true;
   };
 
-  const makeLabelPreset = (): LabelPreset => ({
+  const makeLabelProps = (): LabelProps => ({
     dpmm,
     printDirection,
     unit,
@@ -206,7 +173,7 @@
     tailPos,
     tailLength,
     mirror,
-    offset: { ...offset },
+    offset: hasPresetOffset ? { ...offset } : undefined,
   });
 
   const onLabelPresetExport = (idx: number) => {
@@ -218,7 +185,7 @@
   };
 
   const onLabelPresetAdd = () => {
-    const newPresets = [...labelPresets, makeLabelPreset()];
+    const newPresets = [...labelPresets, makeLabelProps()];
     try {
       LocalStoragePersistence.saveLabelPresets(newPresets);
       labelPresets = newPresets;
@@ -242,7 +209,7 @@
     }
 
     const newPresets = [...labelPresets];
-    newPresets[selectedPresetIndex] = makeLabelPreset();
+    newPresets[selectedPresetIndex] = makeLabelProps();
 
     try {
       LocalStoragePersistence.saveLabelPresets(newPresets);
@@ -273,9 +240,11 @@
   };
 
   const fillWithCurrentParams = () => {
-    prevUnit = "px";
-    width = labelProps.size.width;
-    height = labelProps.size.height;
+    prevUnit = labelProps.unit;
+    unit = labelProps.unit;
+    dpmm = labelProps.dpmm;
+    width = labelProps.width;
+    height = labelProps.height;
     printDirection = labelProps.printDirection;
     shape = labelProps.shape ?? "rect";
     split = labelProps.split ?? "none";
@@ -285,14 +254,13 @@
     mirror = labelProps.mirror ?? "none";
     hasPresetOffset = labelProps.offset !== undefined;
     offset = labelProps.offset !== undefined ? { ...labelProps.offset } : getFallbackOffset();
-    onUnitChange();
   };
 
   const onImportClicked = async () => {
     try {
       const contents = await FileUtils.pickAndReadSingleTextFile("json");
       const rawData = JSON.parse(contents);
-      const imported = FileUtils.parseSingleOrList(rawData, LabelPresetSchema);
+      const imported = FileUtils.parseSingleOrList(rawData, LabelPropsSchema);
       const items = imported.kind === "single" ? [imported.item] : imported.items;
 
       if (items.length === 0) {
@@ -321,7 +289,7 @@
   };
 
   onMount(() => {
-    const defaultPreset: LabelPreset = DEFAULT_LABEL_PRESETS[0];
+    const defaultPreset: LabelProps = DEFAULT_LABEL_PRESETS[0];
     width = defaultPreset.width;
     height = defaultPreset.height;
     prevUnit = defaultPreset.unit;
@@ -336,7 +304,7 @@
     offset = defaultPreset.offset !== undefined ? { ...defaultPreset.offset } : getFallbackOffset();
 
     try {
-      const savedPresets: LabelPreset[] | null = LocalStoragePersistence.loadLabelPresets();
+      const savedPresets: LabelProps[] | null = LocalStoragePersistence.loadLabelPresets();
       if (savedPresets !== null) {
         labelPresets = savedPresets;
       }
@@ -374,12 +342,9 @@
 
   <div class="mb-2 text-secondary">
     {$tr("params.label.current")}
-    {labelProps.size.width}x{labelProps.size.height}
-    {$tr("params.label.px")}
-    {#if labelProps.printDirection === "top"}
-      ({$tr("params.label.direction")} {$tr("params.label.direction.top")})
-    {:else if labelProps.printDirection === "left"}
-      ({$tr("params.label.direction")} {$tr("params.label.direction.left")})
+    {labelProps.width}x{labelProps.height} {$tr(`params.label.${labelProps.unit}`)}
+    {#if labelProps.unit !== "px"}
+      ({labelPxSize.width}x{labelPxSize.height} {$tr("params.label.px")})
     {/if}
     <button class="btn btn-sm" onclick={fillWithCurrentParams}><MdIcon icon="arrow_downward" /></button>
   </div>
