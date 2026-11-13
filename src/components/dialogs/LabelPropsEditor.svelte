@@ -162,6 +162,14 @@
     hasPresetOffset = true;
   };
 
+  const onInputAreaAdd = () => {
+    inputAreas.push({ x: 1, y: 1, w: 10, h: 10 });
+  };
+
+  const onInputAreaDelete = (idx: number) => {
+    inputAreas.splice(idx, 1);
+  };
+
   const makeLabelProps = (): LabelProps => ({
     dpmm,
     printDirection,
@@ -491,6 +499,31 @@
       <option value="outer">{$tr("preview.offset.outer")}</option>
     </select>
   </div>
+
+  <div class="input-group input-group-sm mb-1">
+    <span class="input-group-text">{$tr("params.label.input_areas")}</span>
+    <button class="btn btn-sm btn-outline-secondary" onclick={onInputAreaAdd}>
+      <MdIcon icon="add" />
+      {$tr("params.label.input_areas.add")}
+    </button>
+  </div>
+
+  {#each inputAreas as area, idx (idx)}
+    <div class="input-group input-group-sm mb-1">
+      <span class="input-group-text">X</span>
+      <input class="form-control" type="number" min="0" step="0.1" bind:value={area.x} />
+      <span class="input-group-text">Y</span>
+      <input class="form-control" type="number" min="0" step="0.1" bind:value={area.y} />
+      <span class="input-group-text">W</span>
+      <input class="form-control" type="number" min="0" step="0.1" bind:value={area.w} />
+      <span class="input-group-text">H</span>
+      <input class="form-control" type="number" min="0" step="0.1" bind:value={area.h} />
+      <span class="input-group-text">{$tr("params.label.mm")}</span>
+      <button class="btn btn-sm btn-outline-secondary" onclick={() => onInputAreaDelete(idx)}>
+        <MdIcon icon="delete" />
+      </button>
+    </div>
+  {/each}
 
   <div class="input-group input-group-sm mb-2">
     <span class="input-group-text">{$tr("preview.label_type")}</span>

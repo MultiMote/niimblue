@@ -117,6 +117,8 @@
     "params.label.head_density.help": "Calculation: DPI / 25.4",
     "params.label.head_density": "Pixel density",
     "params.label.import": "Import",
+    "params.label.input_areas": "Input areas",
+    "params.label.input_areas.add": "Add area",
     "params.label.label_title": "Custom title",
     "params.label.menu_title": "Label properties",
     "params.label.mm": "mm",

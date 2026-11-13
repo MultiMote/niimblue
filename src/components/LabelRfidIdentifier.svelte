@@ -14,7 +14,11 @@
   import { Toasts } from "$/utils/toasts";
   import MdIcon from "./basic/MdIcon.svelte";
 
-  let barcodeKnown = $derived($labelPresets.some((preset) => preset.barcode === $rfidInfo.labelRfidInfo?.barCode));
+  let processing = $state(false);
+
+  let barcodeName = $derived(
+    $labelPresets.find((preset) => preset.barcode === $rfidInfo.labelRfidInfo?.barCode)?.title,
+  );
 
   const NiimbotCloudResponse = z.object({
     data: z
@@ -24,10 +28,12 @@
         rotate: z.number().nonnegative(),
         paperType: z.number().nonnegative(),
         inputAreas: z.array(InputAreaSchema).default([]),
-        names: z.array(z.object({
-          name: z.string(),
-          languageCode: z.string(),
-        })),
+        labelNames: z.array(
+          z.object({
+            name: z.string(),
+            languageCode: z.string(),
+          }),
+        ),
       })
       .optional(),
   });
@@ -38,6 +44,7 @@
     if (barCode === undefined) {
       return;
     }
+    processing = true;
 
     try {
       const resp = await fetch("https://print.niimbot.com/api/template/getCloudTemplateByOneCode", {
@@ -51,12 +58,15 @@
       const body = await resp.json();
       const parsed = await NiimbotCloudResponse.parseAsync(body);
 
+      processing = false;
+
+
       if (parsed.data === undefined) {
         Toasts.message(`No info for barcode ${barCode}`);
         return;
       }
 
-      const title = parsed.data.names.find(o => o.languageCode === "en")?.name ?? "";
+      const title = parsed.data.labelNames.find((o) => o.languageCode === "en")?.name ?? "";
 
       const preset: LabelProps = {
         barcode: barCode,
@@ -85,6 +95,8 @@
     } catch (e) {
       Toasts.error(e);
     }
+    processing = false;
+
   };
 
   const applyMeta = () => {
@@ -101,12 +113,14 @@
 
 {#if $connectionState === "connected" && $rfidInfo.labelRfidInfo?.tagPresent}
   <div class="input-group w-auto input-group-sm flex-nowrap justify-content-end">
-    <span class="input-group-text"
-      >{$rfidInfo.labelRfidInfo.barCode}
-      {#if !barcodeKnown}(unknown){/if}</span>
-    <button class="btn btn-secondary" onclick={fetchInfo}><MdIcon icon="cloud_download" /></button>
+    <span class="input-group-text" title={$rfidInfo.labelRfidInfo?.barCode}>
+      {barcodeName ?? $rfidInfo.labelRfidInfo?.barCode}
+      {#if !barcodeName}(unknown){/if}</span>
+    <button class="btn btn-secondary" onclick={fetchInfo} disabled={processing}>
+      <MdIcon icon={processing ? "hourglass_top" : "cloud_download"} />
+    </button>
 
-    {#if barcodeKnown}
+    {#if barcodeName}
       <button class="btn btn-secondary" onclick={applyMeta}><MdIcon icon="check" /></button>
     {/if}
   </div>
