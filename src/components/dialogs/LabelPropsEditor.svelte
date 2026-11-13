@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     LabelPropsSchema,
+    type InputArea,
     type LabelProps,
     type LabelShape,
     type LabelSplit,
@@ -58,6 +59,7 @@
   let tailPos = $state<TailPosition>("right");
   let mirror = $state<MirrorType>("none");
   let offset = $state<PreviewPropsOffset>({ x: 0, y: 0, offsetType: "inner" });
+  let inputAreas = $state<InputArea[]>([]);
   let hasPresetOffset = $state<boolean>(false);
   let modalRef: AppModal;
 
@@ -117,6 +119,7 @@
       mirror = preset.mirror ?? "none";
       hasPresetOffset = preset.offset !== undefined;
       offset = preset.offset !== undefined ? { ...preset.offset } : getFallbackOffset();
+      inputAreas = [...preset.inputAreas];
     }
   };
 
@@ -170,6 +173,7 @@
     tailLength,
     mirror,
     offset: hasPresetOffset ? { ...offset } : undefined,
+    inputAreas: [...inputAreas]
   });
 
   const onLabelPresetExport = (idx: number) => {

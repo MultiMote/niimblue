@@ -4,7 +4,7 @@ import {
   CsvParamsSchema,
   UserFontSchema,
   UserIconSchema,
-  LabelMetaListSchema,
+  LabelRfidMetaListSchema,
   type CsvParams,
   type UserFont,
   type UserIcon,
@@ -48,7 +48,8 @@ export const printerMeta = writable<PrinterModelMeta | undefined>();
 export const heartbeatFails = writable<number>(0);
 export const csvData = writablePersisted<CsvParams>("csv_params", CsvParamsSchema, { data: CSV_DEFAULT });
 export const dimensionsUpdateRequest = writable<{width: number, height: number, unit: LabelUnit, dpmm: number} | null>(null);
-export const labelMeta = writablePersisted<LabelMeta[]>("label_meta", LabelMetaListSchema, []);
+export const labelRfidMeta = writablePersisted<LabelMeta[]>("label_rfid_meta", LabelRfidMetaListSchema, []);
+export const labelRfidMetaApplyRequest = writable<LabelMeta | null>(null);
 
 userFonts.subscribe(FileUtils.loadFonts);
 

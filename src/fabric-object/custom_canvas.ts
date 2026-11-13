@@ -1,6 +1,6 @@
 import * as fabric from "fabric";
 import { DEFAULT_LABEL_PROPS, GRID_SIZE } from "$/defaults";
-import type { LabelProps } from "$/types";
+import type { InputArea, LabelProps } from "$/types";
 import { LabelPropsUtils } from "$/utils/label_props_utils";
 
 type LabelBounds = {
@@ -29,7 +29,8 @@ export class CustomCanvas extends fabric.Canvas {
   private readonly GRAY = "#CFCFCF";
   private readonly MIRROR_GHOST_COLOR = "rgba(0, 0, 0, 0.3)";
   private readonly DEAD_ZONE_COLOR = "rgba(255, 70, 70, 0.5)";
-  private readonly DEAD_ZONE_HATCHING_STEP = 8;
+  private readonly INPUT_AREA_COLOR = "rgba(70, 255, 70, 0.5)";
+  private readonly ZONE_HATCHING_STEP = 8;
   private printheadSize: number = -1;
   private customBackground: boolean = true;
   private highlightMirror: boolean = true;
@@ -449,24 +450,14 @@ export class CustomCanvas extends fabric.Canvas {
       }
     }
 
+    // Draw input areas as green hatched zones
+    (this.labelProps.inputAreas ?? []).forEach((area) => this.renderInputArea(ctx, area));
+
     ctx.restore();
   }
 
   private renderDeadZone(ctx: CanvasRenderingContext2D, zone: DeadZone) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(zone.x, zone.y, zone.w, zone.h);
-    ctx.clip();
-    ctx.setLineDash([]);
-    ctx.strokeStyle = this.DEAD_ZONE_COLOR;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    for (let i = -zone.h; i <= zone.w; i += this.DEAD_ZONE_HATCHING_STEP) {
-      ctx.moveTo(zone.x + i, zone.y);
-      ctx.lineTo(zone.x + i + zone.h, zone.y + zone.h);
-    }
-    ctx.stroke();
-    ctx.restore();
+    this.renderHatchedZone(ctx, zone, this.DEAD_ZONE_COLOR);
 
     ctx.setLineDash([]);
     ctx.strokeStyle = this.DEAD_ZONE_COLOR;
@@ -480,6 +471,41 @@ export class CustomCanvas extends fabric.Canvas {
       ctx.lineTo(zone.x + zone.w, zone.borderY - 0.5);
     }
     ctx.stroke();
+  }
+
+  /** Draw hatched rect zone (dead zones, input areas) */
+  private renderHatchedZone(ctx: CanvasRenderingContext2D, zone: DeadZone, color: string) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(zone.x, zone.y, zone.w, zone.h);
+    ctx.clip();
+    ctx.setLineDash([]);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let i = -zone.h; i <= zone.w; i += this.ZONE_HATCHING_STEP) {
+      ctx.moveTo(zone.x + i, zone.y);
+      ctx.lineTo(zone.x + i + zone.h, zone.y + zone.h);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  private renderInputArea(ctx: CanvasRenderingContext2D, area: InputArea) {
+    const dpmm = this.labelProps.dpmm;
+    const zone: DeadZone = {
+      x: LabelPropsUtils.unitToPx(area.x, "mm", dpmm),
+      y: LabelPropsUtils.unitToPx(area.y, "mm", dpmm),
+      w: LabelPropsUtils.unitToPx(area.w, "mm", dpmm),
+      h: LabelPropsUtils.unitToPx(area.h, "mm", dpmm),
+    };
+
+    this.renderHatchedZone(ctx, zone, this.INPUT_AREA_COLOR);
+
+    ctx.setLineDash([]);
+    ctx.strokeStyle = this.INPUT_AREA_COLOR;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(zone.x + 0.5, zone.y + 0.5, zone.w - 1, zone.h - 1);
   }
 
   override _renderObjects(

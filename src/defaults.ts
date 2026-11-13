@@ -42,8 +42,8 @@ export const DPI_DPMM: Record<StandardDpi, number> = {
 /** Default presets for LabelPropsEditor */
 export const DEFAULT_LABEL_PRESETS: LabelProps[] = [
   // 203dpi
-  { width: 40, height: 12, unit: "mm", dpmm: DPI_DPMM[203], printDirection: "left", shape: "rect" },
-  { width: 48, height: 30, unit: "mm", dpmm: DPI_DPMM[203], printDirection: "top", shape: "rect" },
+  { width: 40, height: 12, unit: "mm", dpmm: DPI_DPMM[203], printDirection: "left", shape: "rect", inputAreas: [] },
+  { width: 48, height: 30, unit: "mm", dpmm: DPI_DPMM[203], printDirection: "top", shape: "rect", inputAreas: [] },
   // 300dpi
   {
     width: 40,
@@ -53,6 +53,7 @@ export const DEFAULT_LABEL_PRESETS: LabelProps[] = [
     printDirection: "left",
     shape: "rect",
     title: "40x12mm 300dpi",
+    inputAreas: [],
   },
   {
     width: 48,
@@ -62,6 +63,7 @@ export const DEFAULT_LABEL_PRESETS: LabelProps[] = [
     printDirection: "top",
     shape: "rect",
     title: "48x30mm 300dpi",
+    inputAreas: [],
   },
 ];
 
@@ -72,6 +74,7 @@ export const DEFAULT_LABEL_PROPS: LabelProps = {
   dpmm: DPI_DPMM[203],
   printDirection: "left",
   shape: "rect",
+  inputAreas: [],
 };
 
 /** Object movement snapping */
