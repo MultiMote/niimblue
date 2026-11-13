@@ -13,6 +13,8 @@
     csvData,
     dimensionsUpdateRequest,
     loadedFonts,
+    printerInfo,
+    printerMeta,
   } from "$/stores/app";
   import {
     type LabelUnit,
@@ -521,6 +523,10 @@
 
   $effect(() => {
     fabricCanvas?.setLabelProps(labelProps);
+  });
+
+  $effect(() => {
+    fabricCanvas?.setPrintheadSize(LabelPropsUtils.getPrintheadSize($printerInfo, $printerMeta));
   });
 
   $effect(() => {

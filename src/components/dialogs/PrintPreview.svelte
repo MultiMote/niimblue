@@ -194,12 +194,7 @@
     }
   };
 
-  const getPrintheadSize = (): number => {
-    if ($printerInfo?.printheadWidth !== undefined) {
-      return $printerInfo.printheadWidth;
-    }
-    return $printerMeta?.printheadPixels ?? -1;
-  };
+  const getPrintheadSize = (): number => LabelPropsUtils.getPrintheadSize($printerInfo, $printerMeta);
 
   const updatePreview = () => {
     let iData: ImageData = effects.copyImageData(originalImage);

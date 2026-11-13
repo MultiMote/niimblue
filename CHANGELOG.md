@@ -4,6 +4,7 @@
 * Add webp to image filter.
 * Store size unit and dpmm in current label parameters (it was previously stored in pixels).
 * Auto trim the canvas to fit into the printhead size.
+* Highlight canvas dead zones using printhead size.
 
 # 2026.10.1
 

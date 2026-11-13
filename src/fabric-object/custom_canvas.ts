@@ -19,6 +19,8 @@ type FoldInfo = {
 };
 type MirrorInfo = { pos: fabric.Point; flip: boolean };
 
+type DeadZone = { x: number; y: number; w: number; h: number; borderX?: number; borderY?: number };
+
 export class CustomCanvas extends fabric.Canvas {
   private labelProps: LabelProps = DEFAULT_LABEL_PROPS;
   private readonly SEPARATOR_LINE_WIDTH = 2;
@@ -26,6 +28,10 @@ export class CustomCanvas extends fabric.Canvas {
   private readonly TAIL_WIDTH = 40;
   private readonly GRAY = "#CFCFCF";
   private readonly MIRROR_GHOST_COLOR = "rgba(0, 0, 0, 0.3)";
+  private readonly DEAD_ZONE_COLOR = "rgba(255, 70, 70, 0.5)";
+  private readonly DEAD_ZONE_BORDER_COLOR = "#ff4646";
+  private readonly DEAD_ZONE_STEP = 4;
+  private printheadSize: number = -1;
   private customBackground: boolean = true;
   private highlightMirror: boolean = true;
   private gridEnabled: boolean = false;
@@ -190,6 +196,11 @@ export class CustomCanvas extends fabric.Canvas {
 
   setGridEnabled(value: boolean) {
     this.gridEnabled = value;
+    this.requestRenderAll();
+  }
+
+  setPrintheadSize(value: number) {
+    this.printheadSize = value;
     this.requestRenderAll();
   }
 
@@ -413,7 +424,63 @@ export class CustomCanvas extends fabric.Canvas {
       ctx.stroke();
     }
 
+    // Draw dead zones beyond the printhead, the printable part is centered
+    if (this.printheadSize > 0) {
+      const isVertical = this.labelProps.printDirection === "top";
+      const dim = isVertical ? this.width : this.height;
+
+      if (dim !== undefined && dim > this.printheadSize) {
+        const cw = this.width ?? 1;
+        const ch = this.height ?? 1;
+        const excess = dim - this.printheadSize;
+        const deadStart = Math.floor(excess / 2);
+        const deadEnd = excess - deadStart;
+
+        const zones: DeadZone[] = isVertical
+          ? [
+              { x: 0, y: 0, w: deadStart, h: ch, borderX: deadStart },
+              { x: cw - deadEnd, y: 0, w: deadEnd, h: ch, borderX: cw - deadEnd },
+            ]
+          : [
+              { x: 0, y: 0, w: cw, h: deadStart, borderY: deadStart },
+              { x: 0, y: ch - deadEnd, w: cw, h: deadEnd, borderY: ch - deadEnd },
+            ];
+
+        zones.forEach((zone) => this.renderDeadZone(ctx, zone));
+      }
+    }
+
     ctx.restore();
+  }
+
+  private renderDeadZone(ctx: CanvasRenderingContext2D, zone: DeadZone) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(zone.x, zone.y, zone.w, zone.h);
+    ctx.clip();
+    ctx.setLineDash([]);
+    ctx.strokeStyle = this.DEAD_ZONE_COLOR;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let i = -zone.h; i <= zone.w; i += this.DEAD_ZONE_STEP) {
+      ctx.moveTo(zone.x + i, zone.y);
+      ctx.lineTo(zone.x + i + zone.h, zone.y + zone.h);
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.setLineDash([]);
+    ctx.strokeStyle = this.DEAD_ZONE_BORDER_COLOR;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    if (zone.borderX !== undefined) {
+      ctx.moveTo(zone.borderX - 0.5, zone.y);
+      ctx.lineTo(zone.borderX - 0.5, zone.y + zone.h);
+    } else if (zone.borderY !== undefined) {
+      ctx.moveTo(zone.x, zone.borderY - 0.5);
+      ctx.lineTo(zone.x + zone.w, zone.borderY - 0.5);
+    }
+    ctx.stroke();
   }
   override _renderObjects(
     ctx: CanvasRenderingContext2D,

@@ -1,6 +1,14 @@
+import type { PrinterInfo, PrinterModelMeta } from "@mmote/niimbluelib";
 import type { LabelProps, LabelUnit } from "$/types";
 
 export class LabelPropsUtils {
+  static getPrintheadSize(printerInfo?: PrinterInfo, printerMeta?: PrinterModelMeta): number {
+    if (printerInfo?.printheadWidth !== undefined) {
+      return printerInfo.printheadWidth;
+    }
+    return printerMeta?.printheadPixels ?? -1;
+  }
+
   static unitToPx(value: number, unit: LabelUnit, dpmm: number): number {
     return Math.floor(value * (unit === "mm" ? dpmm : 1));
   }
