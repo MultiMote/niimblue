@@ -11,13 +11,13 @@
     type TailPosition,
   } from "$/types";
   import LabelPresetsBrowser from "$/components/designer-controls/LabelPresetsBrowser.svelte";
-  import { printerInfo, printerMeta } from "$/stores/app";
-  import { tr } from "$/utils/i18n";
+  import { labelPresets, printerInfo, printerMeta } from "$/stores/app";
+  import { tr, type TranslationKey } from "$/utils/i18n";
   import { DEFAULT_LABEL_PRESETS, DPI_DPMM } from "$/defaults";
   import { LabelPropsUtils } from "$/utils/label_props_utils";
   import { onMount, tick } from "svelte";
   import { LocalStoragePersistence } from "$/utils/persistence";
-  import type { PrintDirection } from "@mmote/niimbluelib";
+  import { LabelType, type PrintDirection } from "@mmote/niimbluelib";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import { Toasts } from "$/utils/toasts";
   import { FileUtils } from "$/utils/file_utils";
@@ -42,10 +42,11 @@
   const labelSplits: LabelSplit[] = ["none", "vertical", "horizontal"];
   const mirrorTypes: MirrorType[] = ["none", "flip", "copy"];
 
-  let labelPresets = $state<LabelProps[]>(DEFAULT_LABEL_PRESETS);
   let selectedPresetIndex = $state<number>(-1);
 
-  let title = $state<string | undefined>("");
+  let title = $state<string>("");
+  let barcode = $state<string>("");
+  let labelType = $state<LabelType | undefined>();
   let prevUnit: LabelUnit = "mm";
   let unit = $state<LabelUnit>("mm");
   let dpmm = $state<number>(DPI_DPMM[203]);
@@ -100,7 +101,7 @@
   };
 
   const onLabelPresetSelected = (index: number) => {
-    const preset = labelPresets[index];
+    const preset = $labelPresets[index];
     selectedPresetIndex = index;
 
     if (preset !== undefined) {
@@ -111,6 +112,8 @@
       width = preset.width;
       height = preset.height;
       title = preset.title ?? "";
+      barcode = preset.barcode ?? "";
+      labelType = preset.labelType;
       shape = preset.shape ?? "rect";
       split = preset.split ?? "none";
       splitParts = preset.splitParts ?? 2;
@@ -129,17 +132,17 @@
   };
 
   const onLabelPresetDelete = (idx: number) => {
-    const result = [...labelPresets];
-    result.splice(idx, 1);
-    labelPresets = result;
+    labelPresets.update((presets) => {
+      const result = [...presets];
+      result.splice(idx, 1);
+      return result;
+    });
 
     if (selectedPresetIndex === idx) {
       selectedPresetIndex = -1;
     } else if (selectedPresetIndex > idx) {
       selectedPresetIndex--;
     }
-
-    LocalStoragePersistence.saveLabelPresets(labelPresets);
   };
 
   const getFallbackOffset = (): PreviewPropsOffset => {
@@ -172,23 +175,23 @@
     tailPos,
     tailLength,
     mirror,
+    barcode,
+    labelType,
     offset: hasPresetOffset ? { ...offset } : undefined,
-    inputAreas: [...inputAreas]
+    inputAreas: [...inputAreas],
   });
 
   const onLabelPresetExport = (idx: number) => {
     try {
-      FileUtils.saveLabelPresetAsJson(labelPresets[idx]);
+      FileUtils.saveLabelPresetAsJson($labelPresets[idx]);
     } catch (e) {
       Toasts.zodErrors(e, "Preset save error:");
     }
   };
 
   const onLabelPresetAdd = () => {
-    const newPresets = [...labelPresets, makeLabelProps()];
     try {
-      LocalStoragePersistence.saveLabelPresets(newPresets);
-      labelPresets = newPresets;
+      labelPresets.update((presets) => [...presets, makeLabelProps()]);
     } catch (e) {
       Toasts.zodErrors(e, "Presets save error:");
     }
@@ -208,12 +211,12 @@
       return;
     }
 
-    const newPresets = [...labelPresets];
-    newPresets[selectedPresetIndex] = makeLabelProps();
-
     try {
-      LocalStoragePersistence.saveLabelPresets(newPresets);
-      labelPresets = newPresets;
+      labelPresets.update((presets) => {
+        const newPresets = [...presets];
+        newPresets[selectedPresetIndex] = makeLabelProps();
+        return newPresets;
+      });
     } catch (e) {
       Toasts.zodErrors(e, "Presets save error:");
     }
@@ -254,6 +257,10 @@
     mirror = labelProps.mirror ?? "none";
     hasPresetOffset = labelProps.offset !== undefined;
     offset = labelProps.offset !== undefined ? { ...labelProps.offset } : getFallbackOffset();
+    inputAreas = [...labelProps.inputAreas];
+    barcode = labelProps.barcode ?? "";
+    title = labelProps.title ?? "";
+    labelType = labelProps.labelType;
   };
 
   const onImportClicked = async () => {
@@ -267,9 +274,7 @@
         return;
       }
 
-      const presets = [...labelPresets, ...items];
-      LocalStoragePersistence.saveLabelPresets(presets);
-      labelPresets = presets;
+      labelPresets.update((presets) => [...presets, ...items]);
       selectedPresetIndex = -1;
     } catch (e) {
       if (e instanceof z.ZodError) {
@@ -282,11 +287,13 @@
 
   const onExportClicked = () => {
     try {
-      FileUtils.saveLabelPresetsAsJson(labelPresets);
+      FileUtils.saveLabelPresetsAsJson($labelPresets);
     } catch (e) {
       Toasts.zodErrors(e, "Presets save error:");
     }
   };
+
+  const labelTypeTranslationKey = (labelType: string) => `preview.label_type.${labelType}` as TranslationKey;
 
   onMount(() => {
     const defaultPreset: LabelProps = DEFAULT_LABEL_PRESETS[0];
@@ -302,15 +309,6 @@
     mirror = defaultPreset.mirror ?? "none";
     hasPresetOffset = defaultPreset.offset !== undefined;
     offset = defaultPreset.offset !== undefined ? { ...defaultPreset.offset } : getFallbackOffset();
-
-    try {
-      const savedPresets: LabelProps[] | null = LocalStoragePersistence.loadLabelPresets();
-      if (savedPresets !== null) {
-        labelPresets = savedPresets;
-      }
-    } catch (e) {
-      Toasts.zodErrors(e, "Presets load error:");
-    }
 
     tick().then(() => fillWithCurrentParams());
   });
@@ -342,7 +340,8 @@
 
   <div class="mb-2 text-secondary">
     {$tr("params.label.current")}
-    {labelProps.width}x{labelProps.height} {$tr(`params.label.${labelProps.unit}`)}
+    {labelProps.width}x{labelProps.height}
+    {$tr(`params.label.${labelProps.unit}`)}
     {#if labelProps.unit !== "px"}
       ({labelPxSize.width}x{labelPxSize.height} {$tr("params.label.px")})
     {/if}
@@ -355,7 +354,7 @@
 
   <LabelPresetsBrowser
     class="mb-1"
-    presets={labelPresets}
+    presets={$labelPresets}
     selectedIndex={selectedPresetIndex}
     onItemSelected={onLabelPresetSelected}
     onItemDelete={onLabelPresetDelete}
@@ -491,6 +490,29 @@
       <option value="inner">{$tr("preview.offset.inner")}</option>
       <option value="outer">{$tr("preview.offset.outer")}</option>
     </select>
+  </div>
+
+  <div class="input-group input-group-sm mb-2">
+    <span class="input-group-text">{$tr("preview.label_type")}</span>
+    <select
+      class="form-select"
+      bind:value={labelType}>
+      <option value={undefined}>
+        Unset
+      </option>
+      {#each Object.values(LabelType) as lt (lt)}
+        {#if typeof lt !== "string"}
+          <option value={lt}>
+            {$tr(labelTypeTranslationKey(LabelType[lt]))}
+          </option>
+        {/if}
+      {/each}
+    </select>
+  </div>
+
+  <div class="input-group flex-nowrap input-group-sm mb-2">
+    <span class="input-group-text">Barcode</span>
+    <input class="form-control" type="text" bind:value={barcode} />
   </div>
 
   <div class="input-group flex-nowrap input-group-sm">

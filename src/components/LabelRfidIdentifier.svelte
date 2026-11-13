@@ -1,11 +1,20 @@
 <script lang="ts">
-  import { rfidInfo, connectionState, labelRfidMeta, labelRfidMetaApplyRequest } from "$/stores/app";
+  import {
+    rfidInfo,
+    connectionState,
+    labelPresets,
+    labelPropsUpdateRequest,
+    printerInfo,
+    printerMeta,
+  } from "$/stores/app";
   import { z } from "zod";
-  import { InputAreaSchema, type LabelMeta } from "$/types";
+  import { InputAreaSchema, type LabelProps } from "$/types";
+  import { DPI_DPMM } from "$/defaults";
+  import { LabelPropsUtils } from "$/utils/label_props_utils";
   import { Toasts } from "$/utils/toasts";
   import MdIcon from "./basic/MdIcon.svelte";
 
-  let barcodeKnown = $derived($labelRfidMeta.some((meta) => meta.barcode === $rfidInfo.labelRfidInfo?.barCode));
+  let barcodeKnown = $derived($labelPresets.some((preset) => preset.barcode === $rfidInfo.labelRfidInfo?.barCode));
 
   const NiimbotCloudResponse = z.object({
     data: z
@@ -15,6 +24,10 @@
         rotate: z.number().nonnegative(),
         paperType: z.number().nonnegative(),
         inputAreas: z.array(InputAreaSchema).default([]),
+        names: z.array(z.object({
+          name: z.string(),
+          languageCode: z.string(),
+        })),
       })
       .optional(),
   });
@@ -43,24 +56,29 @@
         return;
       }
 
-      const meta: LabelMeta = {
+      const title = parsed.data.names.find(o => o.languageCode === "en")?.name ?? "";
+
+      const preset: LabelProps = {
         barcode: barCode,
+        labelType: parsed.data.paperType,
         width: parsed.data.width,
         height: parsed.data.height,
+        unit: "mm",
+        dpmm: DPI_DPMM[LabelPropsUtils.getDpi($printerInfo, $printerMeta)],
         inputAreas: parsed.data.inputAreas,
-        labelType: parsed.data.paperType,
         printDirection: [0, 180].includes(parsed.data.rotate) ? "top" : "left",
+        title,
       };
 
-      labelRfidMeta.update((items) => {
-        const idx = items.findIndex((item) => item.barcode === barCode);
+      labelPresets.update((presets) => {
+        const idx = presets.findIndex((item) => item.barcode === barCode);
 
         if (idx === -1) {
-          return [...items, meta];
+          return [...presets, preset];
         }
 
-        const next = [...items];
-        next[idx] = meta;
+        const next = [...presets];
+        next[idx] = preset;
 
         return next;
       });
@@ -71,13 +89,13 @@
 
   const applyMeta = () => {
     const barCode = $rfidInfo.labelRfidInfo?.barCode;
-    const meta = $labelRfidMeta.find((item) => item.barcode === barCode);
+    const preset = $labelPresets.find((item) => item.barcode === barCode);
 
-    if (meta === undefined) {
+    if (preset === undefined) {
       return;
     }
 
-    labelRfidMetaApplyRequest.set(meta);
+    labelPropsUpdateRequest.set(preset);
   };
 </script>
 
@@ -86,10 +104,10 @@
     <span class="input-group-text"
       >{$rfidInfo.labelRfidInfo.barCode}
       {#if !barcodeKnown}(unknown){/if}</span>
-    <button class="btn btn-secondary" onclick={fetchInfo}><MdIcon icon="cloud_download"/></button>
+    <button class="btn btn-secondary" onclick={fetchInfo}><MdIcon icon="cloud_download" /></button>
 
     {#if barcodeKnown}
-      <button class="btn btn-secondary" onclick={applyMeta}><MdIcon icon="check"/></button>
+      <button class="btn btn-secondary" onclick={applyMeta}><MdIcon icon="check" /></button>
     {/if}
   </div>
 {/if}

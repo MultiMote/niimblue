@@ -29,17 +29,6 @@ export const InputAreaSchema = z.object({
   h: z.number().positive(),
 });
 
-export const LabelRfidMetaSchema = z.object({
-  barcode: z.string(),
-  width: z.number().positive(),
-  height: z.number().positive(),
-  labelType: z.number().positive(),
-  printDirection: z.enum(["left", "top"]),
-  inputAreas: z.array(InputAreaSchema).default([]),
-});
-
-export const LabelRfidMetaListSchema = z.array(LabelRfidMetaSchema);
-
 /** Not validated */
 export const FabricObjectSchema = z.custom<fabric.FabricObject>((val: any): boolean => {
   return typeof val === "object";
@@ -75,6 +64,8 @@ export const LabelPropsSchema = z.preprocess(
     mirror: z.enum(["none", "copy", "flip"]).default("none").optional(),
     offset: PreviewPropsOffsetSchema.optional(),
     inputAreas: z.array(InputAreaSchema).default([]),
+    barcode: z.string().optional(),
+    labelType: z.enum(LabelType).optional(),
   }),
 );
 
@@ -170,7 +161,6 @@ export type PreviewProps = z.infer<typeof PreviewPropsSchema>;
 export type AutomationProps = z.infer<typeof AutomationPropsSchema>;
 export type AppConfig = z.infer<typeof AppConfigSchema>;
 export type UserFont = z.infer<typeof UserFontSchema>;
-export type LabelMeta = z.infer<typeof LabelRfidMetaSchema>;
 export type InputArea = z.infer<typeof InputAreaSchema>;
 
 export const previewPropsKeys = Object.keys(PreviewPropsSchema.shape) as (keyof PreviewProps)[];

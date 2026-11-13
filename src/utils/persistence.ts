@@ -294,28 +294,6 @@ export class LocalStoragePersistence {
     );
   }
 
-  /**
-   * @throws {z.ZodError}
-   */
-  static saveLabelPresets(presets: LabelProps[]) {
-    this.validateAndSaveObject(
-      "label_presets",
-      presets,
-      z.array(LabelPropsSchema),
-    );
-  }
-
-  /**
-   * @throws {z.ZodError}
-   */
-  static loadLabelPresets(): LabelProps[] | null {
-    const presets = this.loadAndValidateObject(
-      "label_presets",
-      z.array(LabelPropsSchema),
-    );
-    return presets === null || presets.length === 0 ? null : presets;
-  }
-
   static loadLastConnectionType(): ConnectionType | null {
     const value = localStorage.getItem("connection_type");
     if (value === null || !["bluetooth", "serial"].includes(value)) {

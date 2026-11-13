@@ -459,7 +459,9 @@
       params.offset = { ...labelProps.offset };
     }
 
-    if ($rfidInfo.labelRfidInfo?.consumablesType) {
+    if (labelProps.labelType) {
+      params.labelType = labelProps.labelType;
+    } else if ($rfidInfo.labelRfidInfo?.consumablesType) {
       params.labelType = $rfidInfo.labelRfidInfo.consumablesType;
     }
 

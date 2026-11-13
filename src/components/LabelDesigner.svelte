@@ -11,15 +11,13 @@
     automation,
     connectionState,
     csvData,
-    dimensionsUpdateRequest,
-    labelRfidMetaApplyRequest,
+    labelPropsUpdateRequest,
     loadedFonts,
     printerInfo,
     printerMeta,
   } from "$/stores/app";
   import {
     type LabelUnit,
-    type LabelMeta,
     type ExportedLabelTemplate,
     type FabricJson,
     type LabelProps,
@@ -187,18 +185,11 @@
   };
 
   const updateDimensions = (width: number, height: number, unit: LabelUnit, dpmm: number) => {
-    onUpdateLabelProps({ ...labelProps, printDirection: "top", unit, width, height, dpmm });
+    applyLabelPreset({ printDirection: "top", unit, width, height, dpmm });
   };
 
-  const applyRfidMeta = (meta: LabelMeta) => {
-    onUpdateLabelProps({
-      ...labelProps,
-      printDirection: meta.printDirection,
-      unit: "mm",
-      width: meta.width,
-      height: meta.height,
-      inputAreas: meta.inputAreas,
-    });
+  const applyLabelPreset = (preset: Partial<LabelProps>) => {
+    onUpdateLabelProps({ ...labelProps, ...preset });
   };
 
   const exportCurrentLabel = (): ExportedLabelTemplate => {
@@ -519,17 +510,9 @@
   };
 
   onMount(() =>
-    dimensionsUpdateRequest.subscribe((req) => {
-      if (req) {
-        updateDimensions(req.width, req.height, req.unit, req.dpmm);
-      }
-    }),
-  );
-
-  onMount(() =>
-    labelRfidMetaApplyRequest.subscribe((meta) => {
-      if (meta) {
-        applyRfidMeta(meta);
+    labelPropsUpdateRequest.subscribe((preset) => {
+      if (preset) {
+        applyLabelPreset(preset);
       }
     }),
   );
