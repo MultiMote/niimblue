@@ -13,12 +13,11 @@
   import { LabelPropsUtils } from "$/utils/label_props_utils";
   import { Toasts } from "$/utils/toasts";
   import MdIcon from "./basic/MdIcon.svelte";
+  import { PrintDirection } from "@mmote/niimbluelib";
 
   let processing = $state(false);
 
-  let barcodeName = $derived(
-    $labelPresets.find((preset) => preset.barcode === $rfidInfo.labelRfidInfo?.barCode)?.title,
-  );
+  let presetFound = $derived($labelPresets.find((preset) => preset.barcode === $rfidInfo.labelRfidInfo?.barCode));
 
   const NiimbotCloudResponse = z.object({
     data: z
@@ -26,6 +25,7 @@
         width: z.number().positive(),
         height: z.number().positive(),
         rotate: z.number().nonnegative(),
+        canvasRotate: z.number().nonnegative().default(0),
         paperType: z.number().nonnegative(),
         inputAreas: z.array(InputAreaSchema).default([]),
         labelNames: z.array(
@@ -60,23 +60,32 @@
 
       processing = false;
 
-
       if (parsed.data === undefined) {
         Toasts.message(`No info for barcode ${barCode}`);
         return;
       }
 
       const title = parsed.data.labelNames.find((o) => o.languageCode === "en")?.name ?? "";
+      let printDirection: PrintDirection = parsed.data.canvasRotate % 180 == 90 ? "left" : "top";
+      let canvasRotate = parsed.data.canvasRotate % 180 == 90;
+      let width = parsed.data.width;
+      let height = parsed.data.height;
+
+      if (canvasRotate) {
+        printDirection = printDirection === "top" ? "left" : "top";
+        width = parsed.data.height;
+        height = parsed.data.width;
+      }
 
       const preset: LabelProps = {
         barcode: barCode,
         labelType: parsed.data.paperType,
-        width: parsed.data.width,
-        height: parsed.data.height,
+        width,
+        height,
         unit: "mm",
         dpmm: DPI_DPMM[LabelPropsUtils.getDpi($printerInfo, $printerMeta)],
         inputAreas: parsed.data.inputAreas,
-        printDirection: [0, 180].includes(parsed.data.rotate) ? "top" : "left",
+        printDirection,
         title,
       };
 
@@ -96,10 +105,9 @@
       Toasts.error(e);
     }
     processing = false;
-
   };
 
-  const applyMeta = () => {
+  const applyPreset = () => {
     const barCode = $rfidInfo.labelRfidInfo?.barCode;
     const preset = $labelPresets.find((item) => item.barcode === barCode);
 
@@ -114,14 +122,17 @@
 {#if $connectionState === "connected" && $rfidInfo.labelRfidInfo?.tagPresent}
   <div class="input-group w-auto input-group-sm flex-nowrap justify-content-end">
     <span class="input-group-text" title={$rfidInfo.labelRfidInfo?.barCode}>
-      {barcodeName ?? $rfidInfo.labelRfidInfo?.barCode}
-      {#if !barcodeName}(unknown){/if}</span>
-    <button class="btn btn-secondary" onclick={fetchInfo} disabled={processing}>
-      <MdIcon icon={processing ? "hourglass_top" : "cloud_download"} />
-    </button>
+      {presetFound?.title || $rfidInfo.labelRfidInfo?.barCode}
+      {#if !presetFound}(unknown){/if}</span>
 
-    {#if barcodeName}
-      <button class="btn btn-secondary" onclick={applyMeta}><MdIcon icon="check" /></button>
+    {#if presetFound}
+      <button class="btn btn-secondary" onclick={applyPreset} title="Apply preset">
+        <MdIcon icon="aspect_ratio" />
+      </button>
+    {:else}
+      <button class="btn btn-secondary" onclick={fetchInfo} disabled={processing} title="Fetch and create preset">
+        <MdIcon icon={processing ? "hourglass_top" : "cloud_download"} />
+      </button>
     {/if}
   </div>
 {/if}

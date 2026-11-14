@@ -5,6 +5,10 @@
 * Store size unit and dpmm in current label parameters (it was previously stored in pixels).
 * Auto trim the canvas to fit into the printhead size.
 * Highlight canvas dead zones using printhead size.
+* Now you can associate label preset with RFID barcode.
+* Add "Input areas" to presets.
+* Label preset can be created automatically upon the user's request to the NIIMBOT cloud.
+* The font size has been reduced for preset and template names.
 
 # 2026.10.1
 

@@ -11,7 +11,7 @@
     type TailPosition,
   } from "$/types";
   import LabelPresetsBrowser from "$/components/designer-controls/LabelPresetsBrowser.svelte";
-  import { labelPresets, printerInfo, printerMeta } from "$/stores/app";
+  import { labelPresets, printerInfo, printerMeta, rfidInfo } from "$/stores/app";
   import { tr, type TranslationKey } from "$/utils/i18n";
   import { DEFAULT_LABEL_PRESETS, DPI_DPMM } from "$/defaults";
   import { LabelPropsUtils } from "$/utils/label_props_utils";
@@ -301,6 +301,10 @@
     }
   };
 
+  const insertCurrentBarcode = () => {
+    barcode = $rfidInfo.labelRfidInfo?.barCode ?? "";
+  };
+
   const labelTypeTranslationKey = (labelType: string) => `preview.label_type.${labelType}` as TranslationKey;
 
   onMount(() => {
@@ -527,12 +531,8 @@
 
   <div class="input-group input-group-sm mb-2">
     <span class="input-group-text">{$tr("preview.label_type")}</span>
-    <select
-      class="form-select"
-      bind:value={labelType}>
-      <option value={undefined}>
-        Unset
-      </option>
+    <select class="form-select" bind:value={labelType}>
+      <option value={undefined}> Unset </option>
       {#each Object.values(LabelType) as lt (lt)}
         {#if typeof lt !== "string"}
           <option value={lt}>
@@ -543,14 +543,16 @@
     </select>
   </div>
 
-  <div class="input-group flex-nowrap input-group-sm mb-2">
-    <span class="input-group-text">Barcode</span>
-    <input class="form-control" type="text" bind:value={barcode} />
-  </div>
-
   <div class="input-group flex-nowrap input-group-sm">
     <span class="input-group-text">{$tr("params.label.label_title")}</span>
     <input class="form-control" type="text" bind:value={title} />
+    <span class="input-group-text">Barcode</span>
+    <input class="form-control" type="text" bind:value={barcode} />
+    {#if $rfidInfo.labelRfidInfo?.barCode}
+      <button class="btn btn-outline-secondary" onclick={insertCurrentBarcode} title="Insert current barcode">
+        <MdIcon icon="scanner" />
+      </button>
+    {/if}
   </div>
 
   {#snippet footer()}
