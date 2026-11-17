@@ -56,9 +56,7 @@
   let csvParsed: DSVRowArray<string>;
   let currentPage = $state<number>(0);
   let pagesTotal = $state<number>(1);
-  let labelTrimmed = $state<boolean>(false);
-  let offsetTrimmed = $state<boolean>(false);
-  let trimmed = $derived(labelTrimmed || offsetTrimmed);
+  let trimmed = $state<boolean>(false);
   let currentPrintTask: AbstractPrintTask | undefined;
   let savedProps = $state<PreviewProps>({});
 
@@ -257,26 +255,25 @@
       iData = effects.mirror(iData);
     }
 
-    if (params.offset.offsetType === "inner") {
-      offsetTrimmed = false;
-      previewCanvas.width = originalImage.width;
-      previewCanvas.height = originalImage.height;
-      previewContext.fillStyle = "white";
-      previewContext.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
-      previewContext.putImageData(iData, params.offset.x, params.offset.y);
-    } else {
-      const fullWidth = originalImage.width + Math.max(params.offset.x, 0);
-      const fullHeight = originalImage.height + Math.max(params.offset.y, 0);
-      const target = trimToPrinthead(fullWidth, fullHeight);
+    let fullWidth = originalImage.width;
+    let fullHeight = originalImage.height;
 
-      offsetTrimmed = target.trimmed;
-
-      previewCanvas.width = target.width;
-      previewCanvas.height = target.height;
-      previewContext.fillStyle = "white";
-      previewContext.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
-      previewContext.putImageData(iData, params.offset.x, params.offset.y);
+    if (params.offset.offsetType === "outer") {
+      fullWidth += Math.abs(params.offset.x);
+      fullHeight += Math.abs(params.offset.y);
     }
+
+    const target = trimToPrinthead(fullWidth, fullHeight);
+    trimmed = target.trimmed;
+
+    previewCanvas.width = target.width;
+    previewCanvas.height = target.height;
+    previewContext.fillStyle = "white";
+    previewContext.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+
+    const cropX = Math.floor((originalImage.width - target.width) / 2);
+    const cropY = Math.floor((originalImage.height - target.height) / 2);
+    previewContext.putImageData(iData, params.offset.x - cropX, params.offset.y - cropY);
   };
 
   const toggleSavedProp = (key: string, value: any) => {
@@ -398,31 +395,14 @@
     fabricTempCanvas.requestRenderAll();
 
     const preRenderedCanvas = fabricTempCanvas.toCanvasElement();
-    const srcWidth = preRenderedCanvas.width;
-    const srcHeight = preRenderedCanvas.height;
-    const target = trimToPrinthead(srcWidth, srcHeight);
-    const targetWidth = target.width;
-    const targetHeight = target.height;
 
-    labelTrimmed = target.trimmed;
-
-    previewCanvas.width = targetWidth;
-    previewCanvas.height = targetHeight;
     previewContext = previewCanvas.getContext("2d")!;
+    previewCanvas.width = preRenderedCanvas.width;
+    previewCanvas.height = preRenderedCanvas.height;
     previewContext.fillStyle = "white";
-    previewContext.fillRect(0, 0, targetWidth, targetHeight);
-    previewContext.drawImage(
-      preRenderedCanvas,
-      Math.floor((srcWidth - targetWidth) / 2),
-      Math.floor((srcHeight - targetHeight) / 2),
-      targetWidth,
-      targetHeight,
-      0,
-      0,
-      targetWidth,
-      targetHeight,
-    );
-    originalImage = previewContext.getImageData(0, 0, targetWidth, targetHeight);
+    previewContext.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+    previewContext.drawImage(preRenderedCanvas, 0, 0);
+    originalImage = previewContext.getImageData(0, 0, previewCanvas.width, previewCanvas.height);
 
     updatePreview();
 
