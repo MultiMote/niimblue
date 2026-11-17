@@ -19,12 +19,13 @@ export function writablePersisted<T>(
   key: string,
   schema: z.ZodType<T>,
   initialValue: T,
+  resetCond?: (value: T) => boolean,
 ): Writable<T> {
   const wr = writable<T>(initialValue);
 
   try {
     const val = LocalStoragePersistence.loadAndValidateObject(key, schema);
-    if (val === null) {
+    if (val === null || resetCond?.(val)) {
       wr.set(initialValue);
     } else {
       wr.set(val);
@@ -292,28 +293,6 @@ export class LocalStoragePersistence {
       "saved_preview_props",
       PreviewPropsSchema,
     );
-  }
-
-  /**
-   * @throws {z.ZodError}
-   */
-  static saveLabelPresets(presets: LabelProps[]) {
-    this.validateAndSaveObject(
-      "label_presets",
-      presets,
-      z.array(LabelPropsSchema),
-    );
-  }
-
-  /**
-   * @throws {z.ZodError}
-   */
-  static loadLabelPresets(): LabelProps[] | null {
-    const presets = this.loadAndValidateObject(
-      "label_presets",
-      z.array(LabelPropsSchema),
-    );
-    return presets === null || presets.length === 0 ? null : presets;
   }
 
   static loadLastConnectionType(): ConnectionType | null {

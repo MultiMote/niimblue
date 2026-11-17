@@ -11,7 +11,7 @@
     automation,
     connectionState,
     csvData,
-    dimensionsUpdateRequest,
+    labelPropsUpdateRequest,
     loadedFonts,
     printerInfo,
     printerMeta,
@@ -185,7 +185,11 @@
   };
 
   const updateDimensions = (width: number, height: number, unit: LabelUnit, dpmm: number) => {
-    onUpdateLabelProps({ ...labelProps, printDirection: "top", unit, width, height, dpmm });
+    applyLabelPreset({ printDirection: "top", unit, width, height, dpmm });
+  };
+
+  const applyLabelPreset = (preset: Partial<LabelProps>) => {
+    onUpdateLabelProps({ ...labelProps, ...preset });
   };
 
   const exportCurrentLabel = (): ExportedLabelTemplate => {
@@ -506,9 +510,9 @@
   };
 
   onMount(() =>
-    dimensionsUpdateRequest.subscribe((req) => {
-      if (req) {
-        updateDimensions(req.width, req.height, req.unit, req.dpmm);
+    labelPropsUpdateRequest.subscribe((preset) => {
+      if (preset) {
+        applyLabelPreset(preset);
       }
     }),
   );

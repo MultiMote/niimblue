@@ -22,6 +22,13 @@ export const CsvParamsSchema = z.object({
   data: z.string(),
 });
 
+export const InputAreaSchema = z.object({
+  x: z.number().nonnegative(),
+  y: z.number().nonnegative(),
+  w: z.number().nonnegative(),
+  h: z.number().nonnegative(),
+});
+
 /** Not validated */
 export const FabricObjectSchema = z.custom<fabric.FabricObject>((val: any): boolean => {
   return typeof val === "object";
@@ -56,6 +63,9 @@ export const LabelPropsSchema = z.preprocess(
     tailLength: z.number().default(0).optional(),
     mirror: z.enum(["none", "copy", "flip"]).default("none").optional(),
     offset: PreviewPropsOffsetSchema.optional(),
+    inputAreas: z.array(InputAreaSchema).default([]),
+    barcode: z.string().optional(),
+    labelType: z.enum(LabelType).optional(),
   }),
 );
 
@@ -126,6 +136,7 @@ export const AppConfigSchema = z.object({
   packetIntervalMs: z.number().gte(0).optional(),
   gridEnabled: z.boolean().optional(),
   savedLabelsSortMode: z.enum(["date_desc", "date_asc", "title_asc", "title_desc"]).optional(),
+  cloudRequestConfirmed: z.boolean().optional()
 });
 
 export const UserIconSchema = z.object({
@@ -151,5 +162,6 @@ export type PreviewProps = z.infer<typeof PreviewPropsSchema>;
 export type AutomationProps = z.infer<typeof AutomationPropsSchema>;
 export type AppConfig = z.infer<typeof AppConfigSchema>;
 export type UserFont = z.infer<typeof UserFontSchema>;
+export type InputArea = z.infer<typeof InputAreaSchema>;
 
 export const previewPropsKeys = Object.keys(PreviewPropsSchema.shape) as (keyof PreviewProps)[];

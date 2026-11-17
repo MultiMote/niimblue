@@ -2,6 +2,7 @@ import { get, readable, writable } from "svelte/store";
 import {
   AppConfigSchema,
   CsvParamsSchema,
+  LabelPropsSchema,
   UserFontSchema,
   UserIconSchema,
   type CsvParams,
@@ -11,7 +12,7 @@ import {
   type AutomationProps,
   type ConnectionState,
   type ConnectionType,
-  type LabelUnit,
+  type LabelProps,
 } from "$/types";
 import {
   CombinedRfidInfo,
@@ -26,7 +27,7 @@ import {
   createPrinterInfo,
 } from "@mmote/niimbluelib";
 import { LocalStoragePersistence, writablePersisted } from "$/utils/persistence";
-import { APP_CONFIG_DEFAULTS, CSV_DEFAULT, OBJECT_DEFAULTS_TEXT } from "$/defaults";
+import { APP_CONFIG_DEFAULTS, CSV_DEFAULT, DEFAULT_LABEL_PRESETS, OBJECT_DEFAULTS_TEXT } from "$/defaults";
 import z from "zod";
 import { FileUtils } from "$/utils/file_utils";
 
@@ -45,7 +46,13 @@ export const rfidInfo = writable<CombinedRfidInfo>({});
 export const printerMeta = writable<PrinterModelMeta | undefined>();
 export const heartbeatFails = writable<number>(0);
 export const csvData = writablePersisted<CsvParams>("csv_params", CsvParamsSchema, { data: CSV_DEFAULT });
-export const dimensionsUpdateRequest = writable<{width: number, height: number, unit: LabelUnit, dpmm: number} | null>(null);
+export const labelPresets = writablePersisted<LabelProps[]>(
+  "label_presets",
+  z.array(LabelPropsSchema),
+  DEFAULT_LABEL_PRESETS,
+  (v) => v.length === 0,
+);
+export const labelPropsUpdateRequest = writable<Partial<LabelProps> | null>(null);
 
 userFonts.subscribe(FileUtils.loadFonts);
 

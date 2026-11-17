@@ -7,7 +7,8 @@
   import DebugStuff from "$/components/dialogs/DebugStuff.svelte";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import AppPrompt from "$/components/dialogs/AppPrompt.svelte";
-  import AppConfirm from "./dialogs/AppConfirm.svelte";
+  import AppConfirm from "$/components/dialogs/AppConfirm.svelte";
+  import LabelRfidIdentifier from "$/components/LabelRfidIdentifier.svelte";
 
   // eslint-disable-next-line no-undef
   const appCommit = __APP_COMMIT__;
@@ -29,7 +30,8 @@
           <span class="niim">Niim</span><span class="blue">Blue{isStandalone ? "s" : ""}</span>
         </h1>
       </div>
-      <div class="col-md-3">
+      <div class="col-12 col-md-auto d-flex flex-wrap align-items-center justify-content-end gap-3">
+        <LabelRfidIdentifier />
         <PrinterConnector />
       </div>
     </div>

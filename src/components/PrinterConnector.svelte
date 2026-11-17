@@ -3,7 +3,6 @@
   AutoShutdownTime,
     LabelType,
     NiimbotCapacitorBleClient,
-    ResolutionClass,
     SoundSettingsItemType,
     Utils,
     type AvailableTransports,
@@ -19,9 +18,9 @@
     heartbeatFails,
     automation,
     rfidInfo,
-    dimensionsUpdateRequest,
+    labelPropsUpdateRequest,
   } from "$/stores/app";
-  import type { ConnectionType, StandardDpi } from "$/types";
+  import type { ConnectionType } from "$/types";
   import { tr, type TranslationKey } from "$/utils/i18n";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import { Toasts } from "$/utils/toasts";
@@ -29,6 +28,7 @@
   import { LocalStoragePersistence } from "$/utils/persistence";
   import type { MaterialIcon } from "material-icons";
   import { DPI_DPMM } from "$/defaults";
+  import { LabelPropsUtils } from "$/utils/label_props_utils";
   import FirmwareUpdater from "$/components/basic/FirmwareUpdater.svelte";
   import PrinterVerboseInfo from "$/components/dialogs/PrinterVerboseInfo.svelte";
 
@@ -91,20 +91,14 @@
 
   const applyDimensionsClicked = () => {
     const paper = $rfidInfo.paperInfo;
-    let dpi: StandardDpi = 203;
-
-    if ($printerInfo.resolutionClass !== undefined) {
-      dpi = $printerInfo.resolutionClass === ResolutionClass.DPI300 ? 300 : 203;
-    } else if ($printerInfo.capabilities?.printheadDpi !== undefined) {
-      dpi = $printerInfo.capabilities.printheadDpi === 300 ? 300 : 203;
-    }
 
     if (paper?.paperWidth !== undefined && paper?.paperHeight !== undefined) {
-      dimensionsUpdateRequest.set({
+      labelPropsUpdateRequest.set({
+        printDirection: "top",
         width: paper.paperWidth,
         height: paper.paperHeight,
         unit: "mm",
-        dpmm: DPI_DPMM[dpi],
+        dpmm: DPI_DPMM[LabelPropsUtils.getDpi($printerInfo, $printerMeta)],
       });
     }
   };

@@ -205,6 +205,7 @@
     background-color: rgba(255, 255, 255, 0.8);
     color: black;
     border-radius: 8px;
+    font-size: 0.8rem;
   }
 
   .card.print-start-left {

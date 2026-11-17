@@ -459,7 +459,9 @@
       params.offset = { ...labelProps.offset };
     }
 
-    if ($rfidInfo.labelRfidInfo?.consumablesType) {
+    if (labelProps.labelType) {
+      params.labelType = labelProps.labelType;
+    } else if ($rfidInfo.labelRfidInfo?.consumablesType) {
       params.labelType = $rfidInfo.labelRfidInfo.consumablesType;
     }
 
@@ -847,7 +849,7 @@
         bind:value={params.labelType}
         onchange={() => updateSavedProp("labelType", params.labelType)}>
         {#each Object.values(LabelType) as lt (lt)}
-          {#if typeof lt !== "string"}
+          {#if typeof lt !== "string" && lt !== LabelType.Invalid}
             <option value={lt}>
               {#if $printerMeta?.paperTypes.includes(lt)}✔{/if}
               {$tr(labelTypeTranslationKey(LabelType[lt]))}
@@ -904,6 +906,7 @@
         type="number"
         bind:value={params.offset.y}
         onchange={() => updateSavedProp("offset", params.offset, true)} />
+      <span class="input-group-text">{$tr("params.label.px")}</span>
       <select
         class="form-select"
         bind:value={params.offset.offsetType}

@@ -211,6 +211,7 @@
     color: black;
     border-radius: 8px;
     z-index: 1;
+    font-size: 0.8rem;
   }
 
   .card.print-start-left {
