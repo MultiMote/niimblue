@@ -53,7 +53,11 @@ export default defineConfig({
           }
           return null;
         },
-        chunkFileNames: () => {
+        chunkFileNames: (chunkInfo) => {
+          const facadeModuleId = chunkInfo.facadeModuleId ?? "";
+          if (facadeModuleId.includes("/locale/dicts/") && facadeModuleId.endsWith(".json")) {
+            return "assets/locales/[name].[hash].js";
+          }
           return "assets/[name].[hash].js";
         },
       },

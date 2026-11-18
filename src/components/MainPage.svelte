@@ -1,10 +1,13 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { Utils } from "@mmote/niimbluelib";
   import BrowserWarning from "$/components/basic/BrowserWarning.svelte";
   import LabelDesigner from "$/components/LabelDesigner.svelte";
   import PrinterConnector from "$/components/PrinterConnector.svelte";
   import { locale, locales, tr } from "$/utils/i18n";
   import DebugStuff from "$/components/dialogs/DebugStuff.svelte";
+  import ChangelogDialog from "$/components/dialogs/ChangelogDialog.svelte";
+  import { checkForUpdates, updateInfo } from "$/utils/update.svelte";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import AppPrompt from "$/components/dialogs/AppPrompt.svelte";
   import AppConfirm from "$/components/dialogs/AppConfirm.svelte";
@@ -20,6 +23,13 @@
   let isStandalone = Utils.getAvailableTransports().capacitorBle || "__TAURI__" in window;
 
   let debugStuffShow = $state<boolean>(false);
+  let changelogShow = $state<boolean>(false);
+
+  onMount(() => {
+    if (appVersion) {
+      checkForUpdates(appVersion);
+    }
+  });
 </script>
 
 <div class="page-wrapper d-flex flex-column min-vh-100">
@@ -61,6 +71,14 @@
         <a class="text-secondary" href="https://github.com/MultiMote/niimblue/releases/tag/{appVersion}">
           {appVersion}
         </a>
+        {#if updateInfo.updateAvailable}
+          <button
+            class="btn btn-link p-0 text-warning"
+            title={$tr("main.changelog.new_version")}
+            onclick={() => (changelogShow = true)}>
+            <MdIcon icon="new_releases" />
+          </button>
+        {/if}
       {:else if appCommit}
         <a class="text-secondary" href="https://github.com/MultiMote/niimblue/commit/{appCommit}">
           {appCommit.slice(0, 6)}
@@ -80,6 +98,10 @@
 
 {#if debugStuffShow}
   <DebugStuff bind:show={debugStuffShow} />
+{/if}
+
+{#if changelogShow}
+  <ChangelogDialog bind:show={changelogShow} currentVersion={appVersion} />
 {/if}
 
 <AppPrompt />
