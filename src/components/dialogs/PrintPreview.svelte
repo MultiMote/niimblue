@@ -480,23 +480,21 @@
 
 <AppModal title={$tr("preview.title")} onClose={onModalClose} bind:this={modalRef} size="lg">
   <div class="d-flex justify-content-center">
-    {#if pagesTotal > 1}
-      <button disabled={printState !== "idle"} class="btn w-100 fs-1" onclick={pageDown}>
-        <MdIcon icon="chevron_left" />
-      </button>
-    {/if}
-
     <canvas class="print-start-{labelProps.printDirection}" bind:this={previewCanvas}></canvas>
-
-    {#if pagesTotal > 1}
-      <button disabled={printState !== "idle"} class="btn w-100 fs-1" onclick={pageUp}>
-        <MdIcon icon="chevron_right" />
-      </button>
-    {/if}
   </div>
 
   <div class="text-center">
-    {#if pagesTotal > 1}<div>Page {currentPage + 1} / {pagesTotal}</div>{/if}
+    {#if pagesTotal > 1}
+      <div class="d-inline-flex align-items-center">
+        <button disabled={printState !== "idle"} class="btn" onclick={pageDown}>
+          <MdIcon icon="chevron_left" />
+        </button>
+        <span>{$tr("preview.page")} {currentPage + 1} / {pagesTotal}</span>
+        <button disabled={printState !== "idle"} class="btn" onclick={pageUp}>
+          <MdIcon icon="chevron_right" />
+        </button>
+      </div>
+    {/if}
 
     {#if printState === "printing"}
       <div>
