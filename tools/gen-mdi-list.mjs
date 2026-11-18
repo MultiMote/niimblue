@@ -1,9 +1,15 @@
 import fs from "fs";
+import path from "path";
 import readline from "readline";
+
+// Project root (script lives in <root>/tools)
+const projectRoot = path.resolve(import.meta.dirname, "..");
+const mdiDir = path.join(projectRoot, "node_modules/material-icons");
+
 const codepoints = {};
 const availableIcons = [];
 
-let fileStream = fs.createReadStream("node_modules/material-icons/css/_codepoints.scss");
+let fileStream = fs.createReadStream(path.join(mdiDir, "css/_codepoints.scss"));
 
 let rl = readline.createInterface({
   input: fileStream,
@@ -18,7 +24,7 @@ for await (const line of rl) {
 }
 fileStream.close();
 
-fileStream = fs.createReadStream("node_modules/material-icons/index.d.ts");
+fileStream = fs.createReadStream(path.join(mdiDir, "index.d.ts"));
 
 rl = readline.createInterface({
   input: fileStream,

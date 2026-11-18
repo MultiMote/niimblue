@@ -1,21 +1,22 @@
-import { derived, writable } from "svelte/store";
-import type { TranslationKey, SupportedLanguage } from "$/locale";
-import { languageNames, langPack } from "$/locale";
+import { derived, get, writable } from "svelte/store";
 import { match as langMatch } from "@formatjs/intl-localematcher";
+import { languageNames, loadTranslationDict } from "$/locale";
+import type { SupportedLanguage, TranslationDict, TranslationKey } from "$/locale";
 
-/** Check browser language and return supported language code.
+const fallbackLanguage: SupportedLanguage = "en";
+
+/** Guess supported language code from browser settings.
  *  If language is not supported, "en" is returned. */
 const guessBrowserLanguage = (): SupportedLanguage => {
-  const fallback: SupportedLanguage = "en";
   const browserLang = navigator.language;
-  const supportedLangs = Object.keys(langPack).map((e) => e.replaceAll("_", "-"));
+  const supportedLangs = Object.keys(languageNames).map((e) => e.replaceAll("_", "-"));
 
   try {
-    const nearestLang = langMatch([browserLang], supportedLangs, fallback);
+    const nearestLang = langMatch([browserLang], supportedLangs, fallbackLanguage);
     return nearestLang.replaceAll("-", "_") as SupportedLanguage;
   } catch (e) {
     console.warn("Unable to detect language:", e);
-    return fallback;
+    return fallbackLanguage;
   }
 };
 
@@ -23,18 +24,37 @@ export const locale = writable<SupportedLanguage>(
   (localStorage.getItem("locale") as SupportedLanguage) ?? guessBrowserLanguage(),
 );
 
-locale.subscribe((value: SupportedLanguage) => localStorage.setItem("locale", value));
+const loadedDicts = writable<Partial<Record<SupportedLanguage, TranslationDict>>>({});
 
-export const tr = derived(locale, ($locale) => (key: TranslationKey) => {
-  const result = langPack[$locale] ? langPack[$locale][key] : undefined;
-  if (result === undefined || result === "") {
-    if ($locale !== "en") {
+const ensureDictLoaded = (lang: SupportedLanguage): Promise<TranslationDict> =>
+  loadTranslationDict(lang).then((dict) => {
+    loadedDicts.update((dicts) => (dicts[lang] === dict ? dicts : { ...dicts, [lang]: dict }));
+    return dict;
+  });
+
+locale.subscribe((value: SupportedLanguage) => {
+  localStorage.setItem("locale", value);
+  ensureDictLoaded(value).catch((e: unknown) => console.error(`Unable to load ${value} locale:`, e));
+});
+
+export const initI18n = (): Promise<void> =>
+  Promise.all([ensureDictLoaded(fallbackLanguage), ensureDictLoaded(get(locale))]).then(() => {});
+
+export const tr = derived([locale, loadedDicts], ([$locale, $dicts]) => {
+  const dict = $dicts[$locale];
+  const fallbackDict = $dicts[fallbackLanguage];
+
+  return (key: TranslationKey): string => {
+    const result = dict?.[key];
+    if (result) {
+      return result;
+    }
+    if (dict !== undefined && $locale !== fallbackLanguage) {
       console.warn(`${key} of ${$locale} locale is not translated`);
     }
-    return langPack.en[key];
-  }
-  return result;
+    return fallbackDict?.[key] ?? key;
+  };
 });
 
 export const locales = languageNames;
-export type { TranslationKey, SupportedLanguage } from "$/locale";
+export type { TranslationKey, SupportedLanguage, TranslationDict } from "$/locale";

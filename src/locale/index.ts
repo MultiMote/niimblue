@@ -1,78 +1,93 @@
-import lang_cs from "$/locale/dicts/cs.json";
-import lang_de from "$/locale/dicts/de.json";
-import lang_en from "$/locale/dicts/en.json";
-import lang_it from "$/locale/dicts/it.json";
-import lang_ru from "$/locale/dicts/ru.json";
-import lang_pl from "$/locale/dicts/pl.json";
-import lang_zh_cn from "$/locale/dicts/zh_cn.json";
-import lang_zh_tw from "$/locale/dicts/zh_tw.json";
-import lang_fr from "$/locale/dicts/fr.json";
-import lang_pt_br from "$/locale/dicts/pt_BR.json";
-import lang_hr from "$/locale/dicts/hr.json";
-import lang_ko_kr from "$/locale/dicts/ko_KR.json";
-import lang_es from "$/locale/dicts/es.json";
-import lang_ar from "$/locale/dicts/ar.json";
-import lang_hu from "$/locale/dicts/hu.json";
-import lang_tr from "$/locale/dicts/tr.json";
-import lang_hi from "$/locale/dicts/hi.json";
-import lang_mr from "$/locale/dicts/mr.json";
-import lang_bg from "$/locale/dicts/bg.json";
-import lang_sv from "$/locale/dicts/sv.json";
-import lang_uk from "$/locale/dicts/uk.json";
+import type en from "./dicts/en.json";
 
-export type TranslationKey = keyof typeof lang_en;
-export type TranslationDict = Record<TranslationKey, string>;
+export type TranslationKey = keyof typeof en;
+export type TranslationDict = Partial<Record<TranslationKey, string>>;
 
-export const langPack = {
+export const languageNames = {
   /** English (fallback) */
-  en: lang_en,
+  en: "English",
   /** Czech */
-  cs: lang_cs as TranslationDict,
+  cs: "Čeština",
   /** German */
-  de: lang_de as TranslationDict,
+  de: "Deutsch",
   /** Italian */
-  it: lang_it as TranslationDict,
+  it: "Italiano",
   /** Russian */
-  ru: lang_ru as TranslationDict,
+  ru: "Русский",
   /** Polish */
-  pl: lang_pl as TranslationDict,
+  pl: "Polski",
   /** Simplified Chinese */
-  zh_cn: lang_zh_cn as TranslationDict,
+  zh_cn: "简体中文",
   /** Traditional Chinese */
-  zh_tw: lang_zh_tw as TranslationDict,
+  zh_tw: "繁體中文",
   /** French */
-  fr: lang_fr as TranslationDict,
+  fr: "Français",
   /** Portuguese (Brazil) */
-  pt_br: lang_pt_br as TranslationDict,
+  pt_br: "Português (Brasil)",
   /** Croatian */
-  hr: lang_hr as TranslationDict,
+  hr: "Hrvatski",
   /** Korean */
-  ko_kr: lang_ko_kr as TranslationDict,
+  ko_kr: "한국어",
   /** Spanish */
-  es: lang_es as TranslationDict,
+  es: "Español",
   /** Arabic */
-  ar: lang_ar as TranslationDict,
+  ar: "العربية",
   /** Hungarian */
-  hu: lang_hu as TranslationDict,
+  hu: "Magyar",
   /** Turkish */
-  tr: lang_tr as TranslationDict,
+  tr: "Türkçe",
   /** Hindi */
-  hi: lang_hi as TranslationDict,
+  hi: "हिंदी",
   /** Marathi */
-  mr: lang_mr as TranslationDict,
+  mr: "मराठी",
   /** Bulgarian */
-  bg: lang_bg as TranslationDict,
+  bg: "Български",
   /** Swedish */
-  sv: lang_sv as TranslationDict,
+  sv: "Svenska",
   /** Ukrainian */
-  uk: lang_uk as TranslationDict,
+  uk: "Українська",
 } as const;
 
-export type SupportedLanguage = keyof typeof langPack;
+export type SupportedLanguage = keyof typeof languageNames;
 
-export const languageNames = Object.assign(
-  {},
-  ...Object.entries(langPack).map(([k, v]) => ({
-    [k]: v["lang.name"] ?? k,
-  })),
-) as Record<SupportedLanguage, string>;
+const langLoaders: Record<SupportedLanguage, () => Promise<{ default: TranslationDict }>> = {
+  en: () => import("./dicts/en.json"),
+  cs: () => import("./dicts/cs.json"),
+  de: () => import("./dicts/de.json"),
+  it: () => import("./dicts/it.json"),
+  ru: () => import("./dicts/ru.json"),
+  pl: () => import("./dicts/pl.json"),
+  zh_cn: () => import("./dicts/zh_cn.json"),
+  zh_tw: () => import("./dicts/zh_tw.json"),
+  fr: () => import("./dicts/fr.json"),
+  pt_br: () => import("./dicts/pt_BR.json"),
+  hr: () => import("./dicts/hr.json"),
+  ko_kr: () => import("./dicts/ko_KR.json"),
+  es: () => import("./dicts/es.json"),
+  ar: () => import("./dicts/ar.json"),
+  hu: () => import("./dicts/hu.json"),
+  tr: () => import("./dicts/tr.json"),
+  hi: () => import("./dicts/hi.json"),
+  mr: () => import("./dicts/mr.json"),
+  bg: () => import("./dicts/bg.json"),
+  sv: () => import("./dicts/sv.json"),
+  uk: () => import("./dicts/uk.json"),
+};
+
+const dictPromises = new Map<SupportedLanguage, Promise<TranslationDict>>();
+
+export const loadTranslationDict = (lang: SupportedLanguage): Promise<TranslationDict> => {
+  const cached = dictPromises.get(lang);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  const promise = langLoaders[lang]()
+    .then((module) => module.default)
+    .catch((e: unknown) => {
+      dictPromises.delete(lang); // allow retrying later
+      throw e;
+    });
+  dictPromises.set(lang, promise);
+  return promise;
+};

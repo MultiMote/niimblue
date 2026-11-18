@@ -9,6 +9,7 @@
 * Add "Input areas" to presets.
 * Label preset can be created automatically upon the user's request to the NIIMBOT cloud.
 * The font size has been reduced for preset and template names.
+* Translations are imported dynamically now.
 
 # 2026.10.1
 

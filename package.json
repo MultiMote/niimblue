@@ -11,7 +11,8 @@
 		"build-rel": "vite build --base=./",
 		"preview": "vite preview",
 		"sv-check": "svelte-check --tsconfig ./tsconfig.json",
-		"gen-mdi-list": "node gen-mdi-list.mjs > src/styles/mdi_icons.ts",
+		"gen-mdi-list": "node tools/gen-mdi-list.mjs > src/styles/mdi_icons.ts",
+		"check-locales": "node tools/check-locales.mjs",
 		"lint": "eslint .",
 		"format-all": "prettier --write \"src/**/*.{ts,svelte}\" \"!src/styles/mdi_icons.ts\""
 	},
