@@ -16,4 +16,5 @@ Thank you for your interest in contributing to NiimBlue!
 
 - Run `npm run sv-check` and `npm run lint` before submitting pull request.
 
-- AI generated code is not appreciated. If you use AI to generate code, please make sure to review it and ensure it meets the project standards.
+- AI generated code is not appreciated. If you use AI to generate code, please make sure to review it and ensure it meets the project standards. Also don't shit with comments where the code speaks for itself.
+

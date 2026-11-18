@@ -25,7 +25,11 @@ Give thanks:
 
 ## Features
 
-* Privacy first! This application works completely offline (at browser side) and does not send any data (except for downloading application files). Label data is stored in your browser.
+* Privacy first! All your data is stored in your browser and never sent anywhere. Printing goes directly to the printer via Bluetooth or USB. The following requests are still made:
+    - Application files are downloaded from the server the app is hosted on.
+    - Update check on startup: the latest release version is fetched from GitHub (`api.github.com`).
+    - Changelog: fetched from GitHub (`raw.githubusercontent.com`) when you open the changelog dialog.
+    - Cloud label presets: when you create a preset from an RFID tag (after confirmation), its barcode is sent to the official NIIMBOT cloud (`print.niimbot.com`) or the `rfid.niim.blue` mirror.
 * Support for both Bluetooth and USB connections.
 * Rich label editor. Label saving, import/export.
 * Print preview. You can see how your label will look like after post-processing. Several post-processing algorithms are available.
