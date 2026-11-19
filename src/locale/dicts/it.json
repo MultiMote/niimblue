@@ -252,5 +252,19 @@
     "params.saved_labels.export.png": "Come PNG",
     "params.saved_labels.export.zpl": "Come ZPL",
     "preview.trimmed": "La tela è stata ritagliata per le misure di stampa",
-    "preview.postprocess.grayscale": "Scala di grigio"
+    "preview.postprocess.grayscale": "Scala di grigio",
+    "preview.postprocess.screentone": "Screentone",
+    "preview.postprocess.screentone.angle": "Angolo",
+    "preview.postprocess.screentone.dot_size": "Grandezza punti",
+    "preview.postprocess.brightness": "Luminosità",
+    "preview.postprocess.contrast": "Contrasto",
+    "rfid_identifier.create": "Crea etichetta predefinita usando il cloud NIIMBOT",
+    "rfid_identifier.warn": "Questa azione invierà una richiesta a print.niimbot.com (o un proxy di ripiego) con il codice a barre dell'etichetta. Consenti? Verrai avvertito soltanto una volta.",
+    "rfid_identifier.apply": "Applica il predefinito alla tela",
+    "rfid_identifier.added": "Predefinito {title} aggiunto",
+    "rfid_identifier.updated": "Predefinito {titlo} aggiornato",
+    "dialog.cancel": "Cancella",
+    "dialog.no": "No",
+    "dialog.ok": "OK",
+    "dialog.yes": "Si"
 }
