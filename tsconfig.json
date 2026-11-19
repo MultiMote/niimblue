@@ -17,7 +17,9 @@
     "useUnknownInCatchVariables": true,
     "lib": ["dom", "dom.iterable", "es2022", "webworker"],
     "paths": {
-      "$/*": ["./src/*"]
+      "$/*": ["./src/*"],
+      "$platform": ["./src/platform/web/index.ts"],
+      "$platform/*": ["./src/platform/web/*"]
     }
   },
   "include": [

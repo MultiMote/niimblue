@@ -22,11 +22,13 @@ import {
   instantiateClient,
   type HeartbeatData,
   type NiimbotAbstractClient,
+  type NiimbotClientType,
   type PrinterInfo,
   type PrinterModelMeta,
   createPrinterInfo,
 } from "@mmote/niimbluelib";
 import { LocalStoragePersistence, writablePersisted } from "$/utils/persistence";
+import { createPlatformClient } from "$platform";
 import { APP_CONFIG_DEFAULTS, CSV_DEFAULT, DEFAULT_LABEL_PRESETS, OBJECT_DEFAULTS_TEXT } from "$/defaults";
 import z from "zod";
 import { FileUtils } from "$/utils/file_utils";
@@ -76,7 +78,7 @@ export const initClient = (connectionType: ConnectionType) => {
         prevClient.disconnect();
       }
 
-      newClient = instantiateClient(connectionType);
+      newClient = createPlatformClient(connectionType) ?? instantiateClient(connectionType as NiimbotClientType);
 
       const conf = get(appConfig);
 

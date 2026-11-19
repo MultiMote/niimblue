@@ -8,7 +8,7 @@
   import { Toasts } from "$/utils/toasts";
   import { FileUtils } from "$/utils/file_utils";
   import * as fabric from "fabric";
-  import { Utils } from "@mmote/niimbluelib";
+  import { isStandaloneApp } from "$/utils/env";
   import { z } from "zod";
   import AppModal from "$/components/basic/AppModal.svelte";
   import { appConfirm } from "$/stores/confirm";
@@ -33,7 +33,7 @@
   let title = $state<string>("");
   let usedSpace = $state<number>(0);
   let customDefaultTemplate = $state<boolean>(LocalStoragePersistence.hasCustomDefaultTemplate());
-  let isStandalone = Utils.getAvailableTransports().capacitorBle;
+  let isStandalone = isStandaloneApp();
   let modalRef: AppModal;
   let sortMode = $derived($appConfig.savedLabelsSortMode ?? "date_asc");
 

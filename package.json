@@ -11,6 +11,7 @@
 		"build-rel": "vite build --base=./",
 		"preview": "vite preview",
 		"sv-check": "svelte-check --tsconfig ./tsconfig.json",
+		"sv-check-tauri": "svelte-check --tsconfig ./tsconfig.tauri.json",
 		"gen-mdi-list": "node tools/gen-mdi-list.mjs > src/styles/mdi_icons.ts",
 		"check-locales": "node tools/check-locales.mjs",
 		"lint": "eslint .",
@@ -38,6 +39,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.39.4",
+		"@mnlphlp/plugin-blec": "^0.20.0",
 		"@sveltejs/vite-plugin-svelte": "^6.2.4",
 		"@tsconfig/svelte": "^5.0.8",
 		"@types/bootstrap": "^5.2.11",
