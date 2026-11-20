@@ -191,6 +191,7 @@
     "preview.offset.inner": "Внутри",
     "preview.offset.outer": "Снаружи",
     "preview.offset": "Смещение",
+    "preview.page": "Страница",
     "preview.postprocess.atkinson": "Дизеринг (Аткинсон)",
     "preview.postprocess.bayer": "Дизеринг (Байер)",
     "preview.postprocess.threshold": "Порог",
