@@ -262,5 +262,11 @@
     "rfid_identifier.warn": "Это действие отправит запрос на print.niimbot.com (или резервный прокси) со штрихкодом этикетки. Вы согласны? Предупреждение будет показано только один раз.",
     "rfid_identifier.apply": "Применить шаблон",
     "rfid_identifier.added": "Шаблон {title} добавлен",
-    "rfid_identifier.updated": "Шаблон {title} обновлён"
+    "rfid_identifier.updated": "Шаблон {title} обновлён",
+    "main.changelog.empty": "Нет изменений",
+    "main.changelog.error": "Не удалось получить список изменений",
+    "main.changelog.loading": "Загрузка...",
+    "main.changelog.new_version": "Доступна новая версия",
+    "main.changelog.title": "Чего нового",
+    "main.changelog.update": "Обновить"
 }
