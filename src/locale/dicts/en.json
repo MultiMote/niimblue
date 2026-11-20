@@ -234,7 +234,7 @@
     "preview.postprocess.bayer": "Dither (Bayer)",
     "preview.postprocess.floyd_steinberg": "Dither (Floyd-Steinberg)",
     "preview.postprocess.grayscale": "Grayscale",
-    "preview.postprocess.jjn": "Dither (Jarvisт-Judiceт-Ninke)",
+    "preview.postprocess.jjn": "Dither (Jarvis–Judice–Ninke)",
     "preview.postprocess.screentone": "Screentone",
     "preview.postprocess.screentone.angle": "Angle",
     "preview.postprocess.screentone.dot_size": "Dot size",
