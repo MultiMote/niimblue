@@ -262,7 +262,7 @@
     "rfid_identifier.warn": "Questa azione invierà una richiesta a print.niimbot.com (o un proxy di ripiego) con il codice a barre dell'etichetta. Consenti? Verrai avvertito soltanto una volta.",
     "rfid_identifier.apply": "Applica il predefinito alla tela",
     "rfid_identifier.added": "Predefinito {title} aggiunto",
-    "rfid_identifier.updated": "Predefinito {titlo} aggiornato",
+    "rfid_identifier.updated": "Predefinito {title} aggiornato",
     "dialog.cancel": "Cancella",
     "dialog.no": "No",
     "dialog.ok": "OK",
