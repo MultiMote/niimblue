@@ -4,6 +4,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .plugin(tauri_plugin_blec::init())
+        .plugin(tauri_plugin_serialplugin::init())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

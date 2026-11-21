@@ -2,6 +2,9 @@ import { NiimbotCapacitorBleClient, type ConnectionInfo, type NiimbotAbstractCli
 import type { ConnectionType } from "$/types";
 import type { PlatformConnectOptions, PlatformTransport } from "$/platform/types";
 
+/** The web build has no host-provided transports and relies on the browser APIs. */
+export const webTransportsEnabled = true;
+
 /** The web build has no host-provided transports. */
 export const platformTransports: PlatformTransport[] = [];
 

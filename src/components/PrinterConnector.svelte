@@ -30,7 +30,7 @@
   import { LabelPropsUtils } from "$/utils/label_props_utils";
   import FirmwareUpdater from "$/components/basic/FirmwareUpdater.svelte";
   import PrinterVerboseInfo from "$/components/dialogs/PrinterVerboseInfo.svelte";
-  import { platformTransports, connectPlatformClient } from "$platform";
+  import { platformTransports, connectPlatformClient, webTransportsEnabled } from "$platform";
 
   let connectionType = $state<ConnectionType>("bluetooth");
   let featureSupport = $state<AvailableTransports>({ webBluetooth: false, webSerial: false, capacitorBle: false });
@@ -85,20 +85,22 @@
   const availableConnectionType = (type: ConnectionType): boolean => {
     switch (type) {
       case "bluetooth":
-        return featureSupport.webBluetooth;
+        return webTransportsEnabled && featureSupport.webBluetooth;
       case "serial":
-        return featureSupport.webSerial;
+        return webTransportsEnabled && featureSupport.webSerial;
       case "capacitor-ble":
-        return featureSupport.capacitorBle;
+        return webTransportsEnabled && featureSupport.capacitorBle;
       default:
         return platformTransports.some((transport) => transport.type === type);
     }
   };
 
   const fallbackConnectionType = (): ConnectionType => {
-    if (featureSupport.webBluetooth) return "bluetooth";
-    if (featureSupport.capacitorBle) return "capacitor-ble";
-    if (featureSupport.webSerial) return "serial";
+    if (webTransportsEnabled) {
+      if (featureSupport.webBluetooth) return "bluetooth";
+      if (featureSupport.capacitorBle) return "capacitor-ble";
+      if (featureSupport.webSerial) return "serial";
+    }
 
     return platformTransports[0]?.type ?? "bluetooth";
   };
@@ -303,7 +305,7 @@
     </div>
 
     <span class="input-group-text">
-      {#if connectionType === "serial"}
+      {#if connectionType === "serial" || connectionType === "platform-serial"}
         <MdIcon icon="usb" />
       {:else}
         <MdIcon icon="bluetooth" />
@@ -317,7 +319,7 @@
       ></MdIcon>
     </span>
   {:else}
-    {#if featureSupport.webBluetooth}
+    {#if webTransportsEnabled && featureSupport.webBluetooth}
       <button
         disabled={$connectionState === "connecting"}
         class="btn text-nowrap {connectionType === 'bluetooth' ? 'btn-light' : 'btn-outline-secondary'}"
@@ -326,7 +328,7 @@
         {$tr("connector.bluetooth")}
       </button>
     {/if}
-    {#if featureSupport.webSerial}
+    {#if webTransportsEnabled && featureSupport.webSerial}
       <button
         disabled={$connectionState === "connecting"}
         class="btn text-nowrap {connectionType === 'serial' ? 'btn-light' : 'btn-outline-secondary'}"
@@ -335,7 +337,7 @@
         {$tr("connector.serial")}
       </button>
     {/if}
-    {#if featureSupport.capacitorBle}
+    {#if webTransportsEnabled && featureSupport.capacitorBle}
       <button
         disabled={$connectionState === "connecting"}
         class="btn text-nowrap {connectionType === 'capacitor-ble' ? 'btn-light' : 'btn-outline-secondary'}"

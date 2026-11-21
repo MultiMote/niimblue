@@ -12,6 +12,7 @@
   import AppConfirm from "$/components/dialogs/AppConfirm.svelte";
   import LabelRfidIdentifier from "$/components/LabelRfidIdentifier.svelte";
   import PlatformBleDevicePicker from "$platform/BleDevicePicker.svelte";
+  import PlatformSerialDevicePicker from "$platform/SerialDevicePicker.svelte";
   import { isStandaloneApp } from "$/utils/env";
 
   // eslint-disable-next-line no-undef
@@ -110,6 +111,8 @@
 <AppConfirm />
 
 <PlatformBleDevicePicker />
+
+<PlatformSerialDevicePicker />
 
 <style>
   .niim {
