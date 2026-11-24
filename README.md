@@ -34,8 +34,8 @@ Give thanks:
 * Rich label editor. Label saving, import/export.
 * Print preview. You can see how your label will look like after post-processing. Several post-processing algorithms are available.
 * [Standalone apps](https://github.com/MultiMote/niimblue/releases):
-    - Android (Capacitor based)
-    - Windows (Tauri based, uses Edge backed)
+    - Android (Tauri based, native Bluetooth)
+    - Windows and Linux (Tauri based, native Bluetooth)
 * Most complete implementation of [NIIMBOT protocol](https://printers.niim.blue/interfacing/proto/).
 
 You can see more complete list of implemented and planned features [on the Wiki](https://github.com/MultiMote/niimblue/wiki#features).
@@ -157,6 +157,39 @@ To get static files run `npm run build` (result builds to `dist`) or download `n
 #### Using Docker Image
 
 Follow the instructions in the [wiki](https://github.com/MultiMote/niimblue/wiki/Running-own-instance-with-Docker).
+
+### Desktop standalone app (Tauri)
+
+The desktop app is located in `standalone-apps/tauri` and is built for both Windows and Linux.
+It uses `tauri-plugin-blec` and the system Bluetooth stack instead of Web Bluetooth.
+
+Linux system dependencies:
+
+```bash
+sudo apt install libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+```
+
+Development:
+
+```bash
+cd standalone-apps/tauri
+npm i
+npm run dev-www # in one terminal
+npm run tauri dev # in another terminal
+```
+
+Build (on Linux, `src-tauri/tauri.linux.conf.json` is applied automatically):
+
+```bash
+cd standalone-apps/tauri
+npm run build-www
+npm run tauri build
+```
+
+Packages are written to `standalone-apps/tauri/src-tauri/target/release/bundle`.
+
+The regular `npm run build` in the repository root still produces a pure web build without
+any Tauri dependencies.
 
 ### IDE setup
 

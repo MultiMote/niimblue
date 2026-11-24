@@ -1,0 +1,14 @@
+{
+  "name": "niimblues",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "tauri": "tauri",
+    "dev-www": "cd ../.. && vite --mode tauri",
+    "build-www": "cd ../.. && vite build --mode tauri --outDir ./standalone-apps/tauri/www"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

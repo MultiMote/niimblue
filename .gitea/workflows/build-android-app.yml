@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  CAPACITOR_PROJECT_DIR: ./standalone-apps/capacitor
+  TAURI_PROJECT_DIR: ./standalone-apps/tauri
 
 jobs:
   build-android-app:
@@ -41,70 +41,64 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
         with:
-          packages: 'build-tools;36.0.0'
+          packages: 'platforms;android-37.0 build-tools;37.0.0 ndk;29.0.14206865 cmake;3.31.6'
           log-accepted-android-sdk-licenses: false
 
-      - name: Add build tools to PATH for apksigner
-        run: echo "$ANDROID_HOME/build-tools/36.0.0" >> $GITEA_PATH
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: ${{ env.TAURI_PROJECT_DIR }}/src-tauri
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install tauri dependencies
+        working-directory: ${{ env.TAURI_PROJECT_DIR }}
+        run: npm ci
+
+      - name: Build niimblue www
+        working-directory: ${{ env.TAURI_PROJECT_DIR }}
+        run: npm run build-www
+        env:
+          COMMIT_HASH: ${{ gitea.sha }}
+          COMMIT_TAG: ${{ gitea.ref_name }}
+
+      - name: Build tauri android app
+        working-directory: ${{ env.TAURI_PROJECT_DIR }}
+        run: npm run tauri -- android build --apk --split-per-abi
+        env:
+          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/29.0.14206865
 
       - name: Decode Keystore
         run: mkdir -p .keystore && echo $KEYSTORE_BASE_64 | base64 -d > .keystore/keystore.jks
         env:
           KEYSTORE_BASE_64: ${{ secrets.KEYSTORE_BASE_64 }}
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install capacitor dependencies
-        working-directory: ${{ env.CAPACITOR_PROJECT_DIR }}
-        run: npm ci
-
-      - name: Gradle cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Build niimblue www
-        working-directory: ${{ env.CAPACITOR_PROJECT_DIR }}
-        run: npm run build-www
-        env:
-          COMMIT_HASH: ${{ gitea.sha }}
-          COMMIT_TAG: ${{ gitea.ref_name }}
-
-      - name: Gradle cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Fix permissions
-        working-directory: ${{ env.CAPACITOR_PROJECT_DIR }}
-        run: chmod +x ./android/gradlew
-
-      - name: Build and sign capacitor app
-        working-directory: ${{ env.CAPACITOR_PROJECT_DIR }}
+      - name: Sign apks
         run: |
-          export APP_VERSION="${APP_VERSION#v}"
-          npm run build-android
+          BT="$ANDROID_HOME/build-tools/37.0.0"
+          APK_BASE="$TAURI_PROJECT_DIR/src-tauri/gen/android/app/build/outputs/apk"
+          APP_VERSION="${APP_VERSION#v}"
+          for abi in arm64 arm x86 x86_64; do
+            "$BT/zipalign" -f 4 "$APK_BASE/$abi/release/app-$abi-release-unsigned.apk" aligned-$abi.apk
+            "$BT/apksigner" sign \
+              --ks .keystore/keystore.jks \
+              --ks-key-alias "$KEYSTORE_ALIAS" \
+              --ks-pass "pass:$KEYSTORE_PASSWORD" \
+              --key-pass "pass:$KEYSTORE_ALIAS_PASSWORD" \
+              --out "niimblues-$APP_VERSION-$abi.apk" \
+              aligned-$abi.apk
+          done
         env:
-          KEYSTORE_PATH: ${{ gitea.workspace }}/.keystore/keystore.jks
           KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEYSTORE_ALIAS_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          APP_VERSION_CODE: ${{ gitea.run_number }}
           APP_VERSION: ${{ gitea.ref_name }}
-
-      - name: Copy release apk
-        run: cp ${{ env.CAPACITOR_PROJECT_DIR }}/android/app/build/outputs/apk/release/app-release-signed.apk "$RUNNER_TEMP/niimblues-${{ gitea.ref_name }}.apk"
 
       - name: Create draft release if it does not exist
         run: |
@@ -120,9 +114,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
 
       - name: Update GitHub release
-        run: gh release upload "${{gitea.ref_name}}" "$RUNNER_TEMP/niimblues-${{ gitea.ref_name }}.apk" -R MultiMote/niimblue --clobber
+        run: gh release upload "${{gitea.ref_name}}" niimblues-*.apk -R MultiMote/niimblue --clobber
         env:
           GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
-
-
-

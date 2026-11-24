@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { Utils } from "@mmote/niimbluelib";
   import BrowserWarning from "$/components/basic/BrowserWarning.svelte";
   import LabelDesigner from "$/components/LabelDesigner.svelte";
   import PrinterConnector from "$/components/PrinterConnector.svelte";
@@ -12,6 +11,9 @@
   import AppPrompt from "$/components/dialogs/AppPrompt.svelte";
   import AppConfirm from "$/components/dialogs/AppConfirm.svelte";
   import LabelRfidIdentifier from "$/components/LabelRfidIdentifier.svelte";
+  import PlatformBleDevicePicker from "$platform/BleDevicePicker.svelte";
+  import PlatformSerialDevicePicker from "$platform/SerialDevicePicker.svelte";
+  import { isStandaloneApp } from "$/utils/env";
 
   // eslint-disable-next-line no-undef
   const appCommit = __APP_COMMIT__;
@@ -20,7 +22,7 @@
   // eslint-disable-next-line no-undef
   const buildDate = __BUILD_DATE__;
 
-  let isStandalone = Utils.getAvailableTransports().capacitorBle || "__TAURI__" in window;
+  const isStandalone = isStandaloneApp();
 
   let debugStuffShow = $state<boolean>(false);
   let changelogShow = $state<boolean>(false);
@@ -107,6 +109,10 @@
 <AppPrompt />
 
 <AppConfirm />
+
+<PlatformBleDevicePicker />
+
+<PlatformSerialDevicePicker />
 
 <style>
   .niim {

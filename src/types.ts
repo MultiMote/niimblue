@@ -3,7 +3,7 @@ import * as fabric from "fabric";
 import { z } from "zod";
 
 export type ConnectionState = "connecting" | "connected" | "disconnected";
-export type ConnectionType = "bluetooth" | "serial" | "capacitor-ble";
+export type ConnectionType = "bluetooth" | "serial" | "platform-ble" | "platform-serial";
 
 export type LabelUnit = "mm" | "px";
 export type OjectType = "text" | "rectangle" | "line" | "circle" | "image" | "qrcode" | "barcode" | "aruco" | "pdf";
@@ -121,9 +121,9 @@ export const PreviewPropsSchema = z.object({
 });
 
 export const AutomationPropsSchema = z.object({
-  /** Request device connect on page load. Works only for Capacitor BLE connection. */
+  /** Request device connect on page load. Works only for platform (Tauri) connections. */
   autoConnect: z.boolean().optional(),
-  /** Connect to MAC or device id. Works only for Capacitor BLE connection. */
+  /** Connect to MAC, device id or serial port path. Works only for platform (Tauri) connections. */
   autoConnectDeviceId: z.string().optional(),
   /** immediately - just open print preview dialog */
   startPrint: z.enum(["after_connect", "immediately"]).optional(),

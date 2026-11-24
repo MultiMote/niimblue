@@ -1,8 +1,7 @@
 <script lang="ts">
   import {
-  AutoShutdownTime,
+    AutoShutdownTime,
     LabelType,
-    NiimbotCapacitorBleClient,
     SoundSettingsItemType,
     Utils,
     type AvailableTransports,
@@ -31,9 +30,10 @@
   import { LabelPropsUtils } from "$/utils/label_props_utils";
   import FirmwareUpdater from "$/components/basic/FirmwareUpdater.svelte";
   import PrinterVerboseInfo from "$/components/dialogs/PrinterVerboseInfo.svelte";
+  import { platformTransports, connectPlatformClient, webTransportsEnabled } from "$platform";
 
   let connectionType = $state<ConnectionType>("bluetooth");
-  let featureSupport = $state<AvailableTransports>({ webBluetooth: false, webSerial: false, capacitorBle: false });
+  let featureSupport = $state<AvailableTransports>({ webBluetooth: false, webSerial: false, capacitorBle: false }); // niimbluelib still reports this flag; it is always false in Tauri/web builds
   let verboseInfoShow = $state<boolean>(false);
 
   const percentage = (cur?: number, total?: number) => {
@@ -49,14 +49,15 @@
     connectionState.set("connecting");
 
     try {
-      if ($printerClient instanceof NiimbotCapacitorBleClient && $automation?.autoConnectDeviceId !== undefined) {
-        await $printerClient.connect({ deviceId: $automation.autoConnectDeviceId });
-      } else {
-        await $printerClient.connect();
-      }
+      await connectPlatformClient($printerClient, {
+        deviceId: $automation?.autoConnectDeviceId,
+      });
     } catch (e) {
       connectionState.set("disconnected");
-      Toasts.error(e);
+
+      if (!(e instanceof Error && e.name === "AbortError")) {
+        Toasts.error(e);
+      }
     }
   };
 
@@ -79,6 +80,26 @@
   const switchConnectionType = (c: ConnectionType) => {
     LocalStoragePersistence.saveLastConnectionType(c);
     connectionType = c;
+  };
+
+  const availableConnectionType = (type: ConnectionType): boolean => {
+    switch (type) {
+      case "bluetooth":
+        return webTransportsEnabled && featureSupport.webBluetooth;
+      case "serial":
+        return webTransportsEnabled && featureSupport.webSerial;
+      default:
+        return platformTransports.some((transport) => transport.type === type);
+    }
+  };
+
+  const fallbackConnectionType = (): ConnectionType => {
+    if (webTransportsEnabled) {
+      if (featureSupport.webBluetooth) return "bluetooth";
+      if (featureSupport.webSerial) return "serial";
+    }
+
+    return platformTransports[0]?.type ?? "bluetooth";
   };
 
   const batteryIcon = (value: number): MaterialIcon => {
@@ -106,20 +127,17 @@
   onMount(() => {
     featureSupport = Utils.getAvailableTransports();
 
-    connectionType = LocalStoragePersistence.loadLastConnectionType() ?? "bluetooth";
+    connectionType = LocalStoragePersistence.loadLastConnectionType() ?? fallbackConnectionType();
 
-    if (!featureSupport.capacitorBle && connectionType === "capacitor-ble") {
-      connectionType = "bluetooth";
-    }
-    if (!featureSupport.webSerial && connectionType === "serial") {
-      connectionType = "bluetooth";
-    }
-    if (!featureSupport.webBluetooth && connectionType === "bluetooth" && featureSupport.capacitorBle) {
-      connectionType = "capacitor-ble";
+    if (!availableConnectionType(connectionType)) {
+      connectionType = fallbackConnectionType();
     }
 
-    if ($automation !== undefined && $automation.autoConnect && connectionType === "capacitor-ble") {
-      onConnectClicked();
+    if (
+      $automation?.autoConnect &&
+      platformTransports.some((t) => t.type === connectionType)
+    ) {
+      void onConnectClicked();
     }
   });
 </script>
@@ -284,7 +302,7 @@
     </div>
 
     <span class="input-group-text">
-      {#if connectionType === "serial"}
+      {#if connectionType === "serial" || connectionType === "platform-serial"}
         <MdIcon icon="usb" />
       {:else}
         <MdIcon icon="bluetooth" />
@@ -298,7 +316,7 @@
       ></MdIcon>
     </span>
   {:else}
-    {#if featureSupport.webBluetooth}
+    {#if webTransportsEnabled && featureSupport.webBluetooth}
       <button
         disabled={$connectionState === "connecting"}
         class="btn text-nowrap {connectionType === 'bluetooth' ? 'btn-light' : 'btn-outline-secondary'}"
@@ -307,7 +325,7 @@
         {$tr("connector.bluetooth")}
       </button>
     {/if}
-    {#if featureSupport.webSerial}
+    {#if webTransportsEnabled && featureSupport.webSerial}
       <button
         disabled={$connectionState === "connecting"}
         class="btn text-nowrap {connectionType === 'serial' ? 'btn-light' : 'btn-outline-secondary'}"
@@ -316,22 +334,24 @@
         {$tr("connector.serial")}
       </button>
     {/if}
-    {#if featureSupport.capacitorBle}
+    {#each platformTransports as transport (transport.type)}
       <button
         disabled={$connectionState === "connecting"}
-        class="btn text-nowrap {connectionType === 'capacitor-ble' ? 'btn-light' : 'btn-outline-secondary'}"
-        onclick={() => switchConnectionType((connectionType = "capacitor-ble"))}>
-        <MdIcon icon="usb" />
-        Capacitor BLE
+        class="btn text-nowrap {connectionType === transport.type ? 'btn-light' : 'btn-outline-secondary'}"
+        onclick={() => switchConnectionType(transport.type)}>
+        <MdIcon icon={transport.icon} />
+        {$tr(transport.labelKey)}
       </button>
-    {/if}
+    {/each}
   {/if}
 
   {#if $connectionState !== "connected"}
     <button
       class="btn btn-primary"
       disabled={$connectionState === "connecting" ||
-        (!featureSupport.capacitorBle && !featureSupport.webBluetooth && !featureSupport.webSerial)}
+        (!featureSupport.webBluetooth &&
+          !featureSupport.webSerial &&
+          platformTransports.length === 0)}
       onclick={onConnectClicked}>
       <MdIcon icon="power" />
     </button>

@@ -31,7 +31,7 @@ export default defineConfig(
       },
     },
     {
-      ignores: ["dist/", "capacitor/"],
+      ignores: ["dist/", "standalone-apps/*/www/", "standalone-apps/*/src-tauri/target/", "standalone-apps/*/src-tauri/gen/"],
     },
     {
       rules: {

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { Utils } from "@mmote/niimbluelib";
   import AppModal from "$/components/basic/AppModal.svelte";
   import { fetchChangelog, openLatestReleasePage, type ChangelogSection } from "$/utils/update.svelte";
   import { tr } from "$/utils/i18n";
+  import { isStandaloneApp } from "$/utils/env";
 
   interface Props {
     show?: boolean;
@@ -11,7 +11,7 @@
 
   let { show = $bindable(false), currentVersion }: Props = $props();
 
-  let isStandalone = Utils.getAvailableTransports().capacitorBle || "__TAURI__" in window;
+  let isStandalone = isStandaloneApp();
 
   let loading = $state(false);
   let failed = $state(false);

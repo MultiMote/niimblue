@@ -1,4 +1,4 @@
-name: Build Windows Tauri app
+name: Build desktop Tauri apps
 
 on:
   push:
@@ -9,10 +9,104 @@ on:
   workflow_dispatch:
 
 env:
-  TAURI_PROJECT_DIR: ./standalone-apps/tauri-windows
+  TAURI_PROJECT_DIR: ./standalone-apps/tauri
 
 jobs:
-  build-tauri-app:
+  build-linux-app:
+    runs-on: ubuntu-latest
+    if: github.repository == 'MultiMote/niimblue'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "25"
+          cache: npm
+          cache-dependency-path: ./package-lock.json
+
+      - name: Setup GitHub CLI
+        uses: dev-hanz-ops/install-gh-cli-action@v0.2.1
+        with:
+          gh-cli-version: 2.72.0
+
+      - name: Install build dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libdbus-1-dev
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ${{ env.TAURI_PROJECT_DIR }}/src-tauri/target
+          key: ${{ runner.os }}-cargo-linux-${{ hashFiles(format('{0}/src-tauri/Cargo.lock', env.TAURI_PROJECT_DIR)) }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-linux-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check code
+        run: npm run sv-check-tauri
+
+      - name: Install Tauri node dependencies
+        working-directory: ${{ env.TAURI_PROJECT_DIR }}
+        run: npm ci
+
+      - name: Build niimblue www
+        working-directory: ${{ env.TAURI_PROJECT_DIR }}
+        run: npm run build-www
+        env:
+          COMMIT_HASH: ${{ gitea.sha }}
+          COMMIT_TAG: ${{ gitea.ref_name }}
+
+      - name: Write version
+        working-directory: ${{ env.TAURI_PROJECT_DIR }}
+        run: |
+          export APP_VERSION="${APP_VERSION#v}"
+          echo "{\"version\": \"$APP_VERSION\"}" > ./version.json
+        env:
+          APP_VERSION: ${{ gitea.ref_name }}
+
+      - name: Build app
+        working-directory: ${{ env.TAURI_PROJECT_DIR }}
+        run: npm run tauri build -- --config ./version.json
+
+      - name: Copy release binary
+        run: cp "${{ env.TAURI_PROJECT_DIR }}/src-tauri/target/release/niimblues" "$RUNNER_TEMP/niimblues-${{ gitea.ref_name }}.bin"
+
+      - name: Create draft release if it does not exist
+        run: |
+          if ! gh release view "${{ gitea.ref_name }}" -R MultiMote/niimblue >/dev/null 2>&1; then
+            gh release create "${{ gitea.ref_name }}" \
+              -R MultiMote/niimblue \
+              --target "${{ gitea.sha }}" \
+              --draft \
+              --title "${{ gitea.ref_name }}" \
+              --notes ""
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
+
+      - name: Update GitHub release
+        run: gh release upload "${{ gitea.ref_name }}" "$RUNNER_TEMP/niimblues-${{ gitea.ref_name }}.bin" -R MultiMote/niimblue --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
+
+  build-windows-app:
     runs-on: ubuntu-latest
     if: github.repository == 'MultiMote/niimblue'
 
@@ -62,6 +156,9 @@ jobs:
       - name: Build niimblue www
         working-directory: ${{ env.TAURI_PROJECT_DIR }}
         run: npm run build-www
+        env:
+          COMMIT_HASH: ${{ gitea.sha }}
+          COMMIT_TAG: ${{ gitea.ref_name }}
 
       - name: Write version
         working-directory: ${{ env.TAURI_PROJECT_DIR }}
@@ -97,6 +194,3 @@ jobs:
         run: gh release upload "${{ gitea.ref_name }}" "$RUNNER_TEMP/niimblues-${{ gitea.ref_name }}.exe" -R MultiMote/niimblue --clobber
         env:
           GH_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
-
-
-

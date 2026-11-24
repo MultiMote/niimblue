@@ -297,7 +297,10 @@ export class LocalStoragePersistence {
 
   static loadLastConnectionType(): ConnectionType | null {
     const value = localStorage.getItem("connection_type");
-    if (value === null || !["bluetooth", "serial"].includes(value)) {
+    if (
+      value === null ||
+      !["bluetooth", "serial", "platform-ble", "platform-serial"].includes(value)
+    ) {
       return null;
     }
     return value as ConnectionType;

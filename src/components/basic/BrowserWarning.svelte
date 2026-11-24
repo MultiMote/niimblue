@@ -3,12 +3,14 @@
   import { tr } from "$/utils/i18n";
   import MdIcon from "$/components/basic/MdIcon.svelte";
   import { browserInfo } from "$/utils/browser.svelte";
+  import { platformTransports } from "$platform";
   let caps = Utils.getAvailableTransports();
+  let hasPlatformTransport = platformTransports.length > 0;
   let browserWarningDismissed = $state(false);
   let fingerprintingWarningDismissed = $state(false);
 </script>
 
-{#if !browserWarningDismissed && !caps.webSerial && !caps.webBluetooth && !caps.capacitorBle}
+{#if !browserWarningDismissed && !caps.webSerial && !caps.webBluetooth && !hasPlatformTransport}
   <div class="alert alert-danger alert-dismissible" role="alert">
     <button type="button" class="btn-close" aria-label="Dismiss warning" onclick={() => browserWarningDismissed = true}></button>
     {#if browserInfo.isIOSSafari }

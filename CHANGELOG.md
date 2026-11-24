@@ -11,6 +11,8 @@
 * The font size has been reduced for preset and template names.
 * Translations are imported dynamically now.
 * Moved page buttons in print preview to canvas bottom.
+* Add Linux standalone app (Tauri) with native Bluetooth support.
+* The Windows standalone app now uses native Bluetooth instead of Web Bluetooth.
 
 # 2026.10.1
 

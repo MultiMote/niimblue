@@ -10,11 +10,11 @@ import {
 import { OBJECT_DEFAULTS, OBJECT_DEFAULTS_VECTOR, THUMBNAIL_HEIGHT, THUMBNAIL_QUALITY } from "$/defaults";
 import { z } from "zod";
 import { CustomCanvas } from "$/fabric-object/custom_canvas";
-import { Capacitor } from "@capacitor/core";
 import { CanvasUtils } from "$/utils/canvas_utils";
 import { LocalStoragePersistence } from "./persistence";
 import { csvData, loadedFonts } from "$/stores/app";
 import { get } from "svelte/store";
+import { isStandaloneApp } from "$/utils/env";
 
 export class FileUtils {
   static timestamp(): number {
@@ -135,26 +135,11 @@ export class FileUtils {
     }, 10_000);
   }
 
-  static async downloadBase64Capacitor(filename: string, base64Data: string) {
-    const { Directory, Filesystem } = await import("@capacitor/filesystem");
-    const { Share } = await import("@capacitor/share");
-
-    const result = await Filesystem.writeFile({
-      data: base64Data,
-      path: filename,
-      directory: Directory.Cache,
-    });
-
-    await Share.share({
-      title: filename,
-      text: filename,
-      url: result.uri,
-    });
-  }
-
+  /** Save a file through the OS share sheet (Android) or browser download */
   static async downloadBase64(filename: string, mime: string, base64Data: string) {
-    if (Capacitor.getPlatform() !== "web") {
-      FileUtils.downloadBase64Capacitor(filename, base64Data);
+    if (isStandaloneApp()) {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("export_file", { filename, mime, dataB64: base64Data });
       return;
     }
 
